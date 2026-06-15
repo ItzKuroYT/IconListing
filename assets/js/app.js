@@ -98,6 +98,18 @@ function hasBlockedText(value = "") {
   });
 }
 
+function createId() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
+  if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+    const bytes = window.crypto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+  return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 function isAdmin(user) {
   return !!user && (CONFIG.admins.users.includes(user.username) || CONFIG.admins.emails.includes(user.email));
 }
@@ -156,7 +168,7 @@ function fallbackRequest(action, payload) {
     if (hasBlockedText(payload.username)) return Promise.reject(new Error("That username is not allowed here."));
     const exists = db.users.some((item) => same(item.email, payload.email) || same(item.username, payload.username));
     if (exists) return Promise.reject(new Error("That username or email is already taken."));
-    const next = { id: crypto.randomUUID(), username: cleanText(payload.username), email: cleanText(payload.email), password: payload.password, banned: false };
+    const next = { id: createId(), username: cleanText(payload.username), email: cleanText(payload.email), password: payload.password, banned: false };
     db.users.push(next);
     save();
     store.session = { token: `local-${next.id}`, user: publicUser(next) };
@@ -176,7 +188,7 @@ function fallbackRequest(action, payload) {
     const next = {
       ...existing,
       ...server,
-      id: server.id || crypto.randomUUID(),
+      id: server.id || createId(),
       ownerId: existing?.ownerId || user.id,
       ownerName: user.username,
       votes: existing?.votes || 0,
@@ -210,7 +222,7 @@ function fallbackRequest(action, payload) {
     const username = cleanText(payload.minecraftUsername || "");
     if (!server) return Promise.reject(new Error("Listing not found."));
     if (!/^[A-Za-z0-9_]{3,16}$/.test(username)) return Promise.reject(new Error("Enter a valid Minecraft username."));
-    const vote = { id: crypto.randomUUID(), serverId: server.id, minecraftUsername: username, createdAt: new Date().toISOString() };
+    const vote = { id: createId(), serverId: server.id, minecraftUsername: username, createdAt: new Date().toISOString() };
     db.votes.push(vote);
     server.votes = db.votes.filter((item) => item.serverId === server.id).length;
     save();
@@ -261,7 +273,7 @@ function fallbackRequest(action, payload) {
     if (payload.command === "saveClient") {
       const client = sanitizeClient(payload.value || {});
       const existing = db.clients.find((item) => item.id === client.id);
-      db.clients = existing ? db.clients.map((item) => (item.id === existing.id ? client : item)) : [...db.clients, { ...client, id: crypto.randomUUID() }];
+      db.clients = existing ? db.clients.map((item) => (item.id === existing.id ? client : item)) : [...db.clients, { ...client, id: createId() }];
     }
     save();
     return Promise.resolve({ users: db.users.map(publicUser), servers: rankServers(db.servers, db.votes), clients: db.clients });

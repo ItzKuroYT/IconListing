@@ -38,7 +38,7 @@ module.exports = async function handler(req, res) {
       const exists = db.users.some((item) => same(item.email, body.email) || same(item.username, body.username));
       if (exists) throw httpError(409, "That username or email is already taken.");
       const next = {
-        id: crypto.randomUUID(),
+        id: createId(),
         username: cleanText(body.username),
         email: cleanText(body.email),
         passwordHash: hashPassword(body.password),
@@ -65,7 +65,7 @@ module.exports = async function handler(req, res) {
       const next = {
         ...existing,
         ...server,
-        id: server.id || crypto.randomUUID(),
+        id: server.id || createId(),
         ownerId: existing?.ownerId || user.id,
         ownerName: user.username,
         votes: existing?.votes || 0,
@@ -101,7 +101,7 @@ module.exports = async function handler(req, res) {
       const minecraftUsername = cleanText(body.minecraftUsername || "");
       if (!/^[A-Za-z0-9_]{3,16}$/.test(minecraftUsername)) throw httpError(400, "Enter a valid Minecraft username.");
       if (server.votifierEnabled) await sendVotifierVote(server, minecraftUsername);
-      const vote = { id: crypto.randomUUID(), serverId: server.id, minecraftUsername, createdAt: new Date().toISOString() };
+      const vote = { id: createId(), serverId: server.id, minecraftUsername, createdAt: new Date().toISOString() };
       db.votes.push(vote);
       server.votes = votesForServer(db.votes, server.id).length;
       await saveDb(db);
@@ -162,7 +162,7 @@ module.exports = async function handler(req, res) {
       if (body.command === "saveClient") {
         const client = sanitizeClient(body.value || {});
         const existing = db.clients.find((item) => item.id === client.id);
-        db.clients = existing ? db.clients.map((item) => (item.id === client.id ? client : item)) : [...db.clients, { ...client, id: crypto.randomUUID() }];
+        db.clients = existing ? db.clients.map((item) => (item.id === client.id ? client : item)) : [...db.clients, { ...client, id: createId() }];
       }
       await saveDb(db);
       return json(res, 200, { ...statePayload(db, user), users: db.users.map(publicUser) });
@@ -338,6 +338,17 @@ function sanitizeClient(client) {
 
 function votesForServer(votes, serverId) {
   return votes.filter((vote) => vote.serverId === serverId);
+}
+
+function createId() {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  return [
+    crypto.randomBytes(4).toString("hex"),
+    crypto.randomBytes(2).toString("hex"),
+    crypto.randomBytes(2).toString("hex"),
+    crypto.randomBytes(2).toString("hex"),
+    crypto.randomBytes(6).toString("hex")
+  ].join("-");
 }
 
 function rankServers(servers, votes = []) {
