@@ -486,9 +486,9 @@ function renderHome(state) {
   $("#app").innerHTML = `<div class="page">
     <section class="hero-band compact">
       <div class="hero-content">
-        <div class="eyebrow">Minecraft server lists, without the clutter</div>
+        <div class="eyebrow">Minecraft server lists</div>
         <h1 class="hero-title"><span>${CONFIG.site.name}</span></h1>
-        <p class="hero-copy">Browse Minecraft servers by gamemode, check live status, and vote for the communities you actually play on.</p>
+        <p class="hero-copy">Browse Minecraft servers by gamemode, check live status, and vote for the communities you love and enjoy.</p>
         <div class="hero-actions">
           <a class="button primary" href="${route("/servers/")}">Browse Servers</a>
           <a class="button" href="${state.user ? route("/dashboard/") : route("/login/")}">${state.user ? "Manage Listings" : "Add Your Server"}</a>
@@ -499,7 +499,7 @@ function renderHome(state) {
       <div class="section-head">
         <div>
           <h2 class="section-title">Sponsored Servers</h2>
-          <p class="section-copy">Paid placements appear here first, clearly marked with a star.</p>
+          <p class="section-copy">Paid sponsers appear here</p>
         </div>
       </div>
       <div id="sponsoredList" class="server-list"></div>
@@ -508,7 +508,7 @@ function renderHome(state) {
       <div class="section-head">
         <div>
           <h2 class="section-title">All Servers</h2>
-          <p class="section-copy">Rankings use live player counts and real community votes.</p>
+          <p class="section-copy">View all servers, sorted by popularity and votes</p>
         </div>
       </div>
       ${toolbarMarkup()}
