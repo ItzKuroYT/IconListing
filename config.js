@@ -81,9 +81,9 @@ const IconListingConfig = {
       action: "Add a Server"
     },
     home: {
-      eyebrow: "Minecraft server directory",
+      eyebrow: "Minecraft server listing - done right.",
       title: "Icon Listing",
-      body: "A simple place to list servers, check basic status, and send votes. No fake seeded listings.",
+      body: "A simple place to list servers, check status, and vote. ",
       browseButton: "Browse servers",
       submitButton: "Submit a server",
       manageButton: "Manage listings",
