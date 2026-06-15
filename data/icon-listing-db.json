@@ -71,7 +71,23 @@
       }
     }
   ],
-  "clients": [],
+  "clients": [
+    {
+      "id": "962e9cc4-3564-4813-87d5-735f9586d892",
+      "name": "test",
+      "url": "https://test.com",
+      "youtubeUrl": "",
+      "description": "testtesttesttesttesttesttetesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestteststtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttetesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestteststtesttesttesttesttesttesttesttesttest",
+      "images": [
+        "test",
+        "test"
+      ],
+      "version": "java",
+      "pricing": "free",
+      "createdAt": "2026-06-15T23:54:52.363Z",
+      "updatedAt": "2026-06-15T23:54:52.363Z"
+    }
+  ],
   "votes": [],
   "voteIps": {}
 }
