@@ -54,7 +54,12 @@
       "uptimeChecks": 6,
       "uptimeSuccesses": 6,
       "analytics": {
-        "ipCopies": [],
+        "ipCopies": [
+          {
+            "visitorHash": "de094a641bc3709d85abfebd2b07f21c749c7a424cdcc15b3245b777e0335f0c",
+            "createdAt": "2026-06-15T23:32:43.923Z"
+          }
+        ],
         "playerHistory": [
           {
             "createdAt": "2026-06-15T23:27:30.188Z",
