@@ -27,7 +27,7 @@ const IconListingConfig = {
   },
   api: {
     basePath: "/api",
-    productionBasePath: "",
+    productionBasePath: "https://icon-listing.vercel.app/api",
     useLocalFallback: true,
     localFallbackHosts: ["", "localhost", "127.0.0.1"],
     requestTimeoutMs: 8000

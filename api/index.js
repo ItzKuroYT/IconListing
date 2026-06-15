@@ -200,6 +200,7 @@ function migrateDb(db = freshDb()) {
 
 async function loadDb() {
   requireConfiguredProductionDb();
+  if (hasGithubStorage()) return readGithubDb();
   if (hasKvStorage()) {
     const { kv } = await import("@vercel/kv");
     return (await kv.get("icon-listing-db")) || freshDb();
@@ -213,6 +214,10 @@ async function loadDb() {
 
 async function saveDb(db) {
   requireConfiguredProductionDb();
+  if (hasGithubStorage()) {
+    await writeGithubDb(db);
+    return;
+  }
   if (hasKvStorage()) {
     const { kv } = await import("@vercel/kv");
     await kv.set("icon-listing-db", db);
@@ -221,14 +226,83 @@ async function saveDb(db) {
   await fs.writeFile(TMP_DB, JSON.stringify(db, null, 2));
 }
 
+let githubDbCache = { data: null, sha: null, loadedAt: 0 };
+
+function hasGithubStorage() {
+  return !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO);
+}
+
 function hasKvStorage() {
   return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 }
 
 function requireConfiguredProductionDb() {
-  if (process.env.VERCEL && !hasKvStorage() && process.env.ICON_LISTING_ALLOW_TMP_DB !== "true") {
-    throw httpError(500, "Database is not configured. Add Vercel KV to this project so listings are shared publicly.");
+  if (process.env.VERCEL && !hasGithubStorage() && !hasKvStorage() && process.env.ICON_LISTING_ALLOW_TMP_DB !== "true") {
+    throw httpError(500, "Database is not configured. Add GitHub storage or Vercel KV so listings are shared publicly.");
   }
+}
+
+async function readGithubDb() {
+  if (githubDbCache.data && Date.now() - githubDbCache.loadedAt < 1500) return cloneJson(githubDbCache.data);
+  const response = await fetch(githubDbUrl(true), { headers: githubHeaders() });
+  if (response.status === 404) {
+    const db = migrateDb(freshDb());
+    githubDbCache = { data: db, sha: null, loadedAt: Date.now() };
+    return cloneJson(db);
+  }
+  if (!response.ok) throw new Error(`GitHub database read failed (${response.status}).`);
+  const payload = await response.json();
+  const content = Buffer.from(String(payload.content || "").replace(/\n/g, ""), "base64").toString("utf8");
+  const db = migrateDb(JSON.parse(content || "{}"));
+  githubDbCache = { data: db, sha: payload.sha, loadedAt: Date.now() };
+  return cloneJson(db);
+}
+
+async function writeGithubDb(db, retry = true) {
+  const normalized = migrateDb(db);
+  if (!githubDbCache.sha) await readGithubDb();
+  const body = {
+    message: "Update Icon Listing database",
+    content: Buffer.from(JSON.stringify(normalized, null, 2)).toString("base64"),
+    branch: githubBranch()
+  };
+  if (githubDbCache.sha) body.sha = githubDbCache.sha;
+  const response = await fetch(githubDbUrl(false), {
+    method: "PUT",
+    headers: githubHeaders(),
+    body: JSON.stringify(body)
+  });
+  if (response.status === 409 && retry) {
+    githubDbCache = { data: null, sha: null, loadedAt: 0 };
+    return writeGithubDb(normalized, false);
+  }
+  if (!response.ok) throw new Error(`GitHub database write failed (${response.status}).`);
+  const payload = await response.json();
+  githubDbCache = { data: cloneJson(normalized), sha: payload.content?.sha || githubDbCache.sha, loadedAt: Date.now() };
+}
+
+function githubDbUrl(includeRef) {
+  const filePath = process.env.GITHUB_DB_PATH || "data/icon-listing-db.json";
+  const contentPath = encodeURIComponent(filePath).replace(/%2F/g, "/");
+  const base = `https://api.github.com/repos/${process.env.GITHUB_REPO}/contents/${contentPath}`;
+  return includeRef ? `${base}?ref=${encodeURIComponent(githubBranch())}` : base;
+}
+
+function githubBranch() {
+  return process.env.GITHUB_BRANCH || "main";
+}
+
+function githubHeaders() {
+  return {
+    accept: "application/vnd.github+json",
+    authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+    "content-type": "application/json",
+    "user-agent": "IconListing"
+  };
+}
+
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value));
 }
 
 function statePayload(db, user) {
