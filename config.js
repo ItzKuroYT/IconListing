@@ -157,6 +157,12 @@ const IconListingConfig = {
   },
   moderation: {
     replacement: "***",
+    blockedServerHosts: [
+      "falixsrv.me",
+      "falixserver.me",
+      "aternos.me",
+      "aternos.org"
+    ],
     blockedWords: [
       "fuck",
       "shit",

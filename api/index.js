@@ -459,6 +459,7 @@ function validateServer(server) {
   if (next.tags.length < CONFIG.limits.tagsMin || next.tags.length > CONFIG.limits.tagsMax) throw httpError(400, `Select ${CONFIG.limits.tagsMin} to ${CONFIG.limits.tagsMax} tags.`);
   if (!CONFIG.countries.includes(next.country)) throw httpError(400, "Select a valid country.");
   if (next.crossPlay && !next.bedrockHost) throw httpError(400, "Bedrock host is required for cross-play listings.");
+  if (isBlockedServerHost(next.javaHost) || isBlockedServerHost(next.bedrockHost)) throw httpError(400, "FalixSrv and Aternos servers are not allowed on this listing site.");
   return next;
 }
 
@@ -489,6 +490,15 @@ function votesForServer(votes, serverId) {
 
 function publicServer(server) {
   return { ...server, analytics: publicAnalytics(server) };
+}
+
+function isBlockedServerHost(host = "") {
+  const value = String(host || "").trim().toLowerCase();
+  if (!value) return false;
+  return (CONFIG.moderation?.blockedServerHosts || []).some((blocked) => {
+    const next = String(blocked || "").trim().toLowerCase();
+    return value === next || value.endsWith(`.${next}`) || value.includes(next);
+  });
 }
 
 function publicAnalytics(server) {

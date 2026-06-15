@@ -367,7 +367,17 @@ function sanitizeServer(server) {
   if (!next.name || !next.javaHost) throw new Error("Server name and Java host are required.");
   if (next.description.length < CONFIG.limits.descriptionMinLength) throw new Error(`Description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
   if (tags.length < CONFIG.limits.tagsMin || tags.length > CONFIG.limits.tagsMax) throw new Error(`Select ${CONFIG.limits.tagsMin} to ${CONFIG.limits.tagsMax} tags.`);
+  if (isBlockedServerHost(next.javaHost) || isBlockedServerHost(next.bedrockHost)) throw new Error("FalixSrv and Aternos servers are not allowed on this listing site.");
   return next;
+}
+
+function isBlockedServerHost(host = "") {
+  const value = String(host || "").trim().toLowerCase();
+  if (!value) return false;
+  return (CONFIG.moderation?.blockedServerHosts || []).some((blocked) => {
+    const next = String(blocked || "").trim().toLowerCase();
+    return value === next || value.endsWith(`.${next}`) || value.includes(next);
+  });
 }
 
 function sanitizeClient(client) {
@@ -682,11 +692,23 @@ function renderServerDetail(state) {
         ${canEdit ? detailTabButton("edit", "Edit") : ""}
       </div>
       <div class="detail-body detail-tab-panel active" data-panel="info">
-        <div class="detail-banner" style="${banner}"></div>
-        <div class="description-text">${escapeHtml(server.description)}</div>
-        <div class="grid two">
-          <div class="mini-stat"><strong>${Number(server.playersOnline || 0).toLocaleString()}</strong><span>players online</span></div>
-          <div class="mini-stat"><strong>${Number(server.votes || 0).toLocaleString()}</strong><span>total votes</span></div>
+        <div class="server-showcase">
+          <div class="detail-banner" style="${banner}"></div>
+          <div>
+            <p class="eyebrow">Server listing</p>
+            <h2>${escapeHtml(server.name)}</h2>
+            <p>${escapeHtml(serverAddress(server))}</p>
+            <div class="server-tags">${(server.tags || []).slice(0, 5).map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>
+          </div>
+        </div>
+        <div class="quick-stats">
+          <div class="mini-stat"><strong>${Number(server.playersOnline || 0).toLocaleString()}</strong><span>online now</span></div>
+          <div class="mini-stat"><strong>${Number(server.votes || 0).toLocaleString()}</strong><span>votes</span></div>
+          <div class="mini-stat"><strong>#${server.rank || "-"}</strong><span>rank</span></div>
+        </div>
+        <div class="description-card">
+          <h3>About this server</h3>
+          <div class="description-text">${escapeHtml(server.description)}</div>
         </div>
         <a class="button vote-wide" href="${route(`/vote/?server=${encodeURIComponent(server.id)}`)}">Vote for ${escapeHtml(server.name)}</a>
       </div>

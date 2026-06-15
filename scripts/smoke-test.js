@@ -95,6 +95,21 @@ async function main() {
     );
     assert(badListing.code === 400, "blocked words should reject a listing");
 
+    const blockedHostListing = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Blocked Host SMP",
+          javaHost: "example.aternos.me",
+          country: "United States",
+          description: "A".repeat(220),
+          tags: ["SMP"]
+        }
+      },
+      login.json.token
+    );
+    assert(blockedHostListing.code === 400, "FalixSrv and Aternos hosts should be rejected");
+
     const description =
       "A real listing created by the smoke test to verify account login, listing creation, mcstatus fallback, Votifier forwarding, vote recording, and monthly vote totals without using premade seed content.\nLine two should keep its line break.\n\nLine four should still be separated after saving.";
     const saved = await call(
@@ -173,7 +188,7 @@ async function main() {
     assert(client && client.images.length === 2 && client.version === "both" && client.pricing === "paid", "sponsored client fields should be stored");
     assert(finalState.json.votes.length === 1, "monthly vote records should be stored");
 
-    console.log("Smoke test passed: auth, empty state, profanity filter, mcstatus fallback, Votifier, voting, sponsored clients.");
+    console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, mcstatus fallback, Votifier, voting, sponsored clients.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });
