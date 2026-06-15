@@ -48,11 +48,11 @@
       "uptimePercent": 100,
       "sponsored": true,
       "createdAt": "2026-06-15T22:08:11.216Z",
-      "updatedAt": "2026-06-15T23:37:02.585Z",
-      "lastPingAt": "2026-06-15T23:37:03.926Z",
-      "lastSuccessfulPingAt": "2026-06-15T23:37:03.926Z",
-      "uptimeChecks": 8,
-      "uptimeSuccesses": 8,
+      "updatedAt": "2026-06-15T23:37:06.513Z",
+      "lastPingAt": "2026-06-15T23:37:06.526Z",
+      "lastSuccessfulPingAt": "2026-06-15T23:37:06.526Z",
+      "uptimeChecks": 9,
+      "uptimeSuccesses": 9,
       "analytics": {
         "ipCopies": [
           {
@@ -62,7 +62,7 @@
         ],
         "playerHistory": [
           {
-            "createdAt": "2026-06-15T23:37:03.926Z",
+            "createdAt": "2026-06-15T23:37:06.526Z",
             "playersOnline": 4185,
             "playersMax": 1191,
             "online": true
