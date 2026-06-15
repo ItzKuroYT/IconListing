@@ -199,7 +199,8 @@ function migrateDb(db = freshDb()) {
 }
 
 async function loadDb() {
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+  requireConfiguredProductionDb();
+  if (hasKvStorage()) {
     const { kv } = await import("@vercel/kv");
     return (await kv.get("icon-listing-db")) || freshDb();
   }
@@ -211,12 +212,23 @@ async function loadDb() {
 }
 
 async function saveDb(db) {
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+  requireConfiguredProductionDb();
+  if (hasKvStorage()) {
     const { kv } = await import("@vercel/kv");
     await kv.set("icon-listing-db", db);
     return;
   }
   await fs.writeFile(TMP_DB, JSON.stringify(db, null, 2));
+}
+
+function hasKvStorage() {
+  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
+function requireConfiguredProductionDb() {
+  if (process.env.VERCEL && !hasKvStorage() && process.env.ICON_LISTING_ALLOW_TMP_DB !== "true") {
+    throw httpError(500, "Database is not configured. Add Vercel KV to this project so listings are shared publicly.");
+  }
 }
 
 function statePayload(db, user) {

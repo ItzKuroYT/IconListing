@@ -118,6 +118,18 @@ function authHeaders() {
   return store.session?.token ? { Authorization: `Bearer ${store.session.token}` } : {};
 }
 
+function isLocalFallbackAllowed() {
+  return !!CONFIG.api.useLocalFallback && (location.protocol === "file:" || (CONFIG.api.localFallbackHosts || []).includes(location.hostname));
+}
+
+function apiBasePath() {
+  return CONFIG.api.productionBasePath || CONFIG.api.basePath;
+}
+
+function productionApiMessage() {
+  return "Public listings are not connected yet. Set the site's production API URL and configure Vercel KV so listings can be shared.";
+}
+
 async function request(action, payload = {}, method = "POST") {
   if (location.protocol !== "file:") {
     const controller = new AbortController();
@@ -129,12 +141,18 @@ async function request(action, payload = {}, method = "POST") {
         signal: controller.signal
       };
       if (method !== "GET") options.body = JSON.stringify(payload);
-      const response = await fetch(`${CONFIG.api.basePath}?action=${encodeURIComponent(action)}`, options);
-      const json = await response.json();
-      if (!response.ok || json.error) throw new Error(json.error || "Request failed");
+      const response = await fetch(`${apiBasePath()}?action=${encodeURIComponent(action)}`, options);
+      let json = null;
+      try {
+        json = await response.json();
+      } catch {
+        if (!response.ok) throw new Error(productionApiMessage());
+        throw new Error("The API returned an unreadable response.");
+      }
+      if (!response.ok || json.error) throw new Error(json.error || productionApiMessage());
       return json;
     } catch (error) {
-      if (!CONFIG.api.useLocalFallback) throw error;
+      if (!isLocalFallbackAllowed()) throw error.message ? error : new Error(productionApiMessage());
     } finally {
       window.clearTimeout(timeout);
     }

@@ -27,7 +27,9 @@ const IconListingConfig = {
   },
   api: {
     basePath: "/api",
+    productionBasePath: "",
     useLocalFallback: true,
+    localFallbackHosts: ["", "localhost", "127.0.0.1"],
     requestTimeoutMs: 8000
   },
   admins: {
