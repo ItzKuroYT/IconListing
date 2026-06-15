@@ -73,7 +73,7 @@
   ],
   "clients": [
     {
-      "id": "962e9cc4-3564-4813-87d5-735f9586d892",
+      "id": "c756830d-faa4-43f0-a543-42e667af609b",
       "name": "test",
       "url": "https://test.com",
       "youtubeUrl": "",
@@ -84,8 +84,8 @@
       ],
       "version": "java",
       "pricing": "free",
-      "createdAt": "2026-06-15T23:54:52.363Z",
-      "updatedAt": "2026-06-15T23:54:52.363Z"
+      "createdAt": "2026-06-15T23:54:52.793Z",
+      "updatedAt": "2026-06-15T23:54:52.793Z"
     }
   ],
   "votes": [],
