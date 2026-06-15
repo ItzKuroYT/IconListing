@@ -1,6 +1,15 @@
 {
   "version": 2,
-  "users": [],
+  "users": [
+    {
+      "id": "08ec4f76-24a7-444a-a197-19ed103b8d7a",
+      "username": "ItzKuroYT",
+      "email": "isaaccooper926@gmail.com",
+      "passwordHash": "5e539489994bb83e345cf8ccd0c7d04a:0c3f553be859e4a00dde9689a313f4c7340069b7eaa6f74bb171cdcfd2c8ba47",
+      "banned": false,
+      "createdAt": "2026-06-15T22:06:59.948Z"
+    }
+  ],
   "servers": [],
   "clients": [],
   "votes": [],
