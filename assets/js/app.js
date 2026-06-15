@@ -127,7 +127,7 @@ function apiBasePath() {
 }
 
 function productionApiMessage() {
-  return "Public listings are not connected yet. Set the site's production API URL and configure Vercel KV so listings can be shared.";
+  return "Public listings are not connected yet. Set the production API URL and GitHub storage variables in Vercel so listings can be shared.";
 }
 
 async function request(action, payload = {}, method = "POST") {

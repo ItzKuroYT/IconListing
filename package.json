@@ -9,9 +9,7 @@
     "check": "node -c api/index.js && node -c assets/js/app.js && node -c dev-server.js",
     "smoke": "node scripts/smoke-test.js"
   },
-  "dependencies": {
-    "@vercel/kv": "^3.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "vercel": "^34.3.0"
   }

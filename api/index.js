@@ -201,10 +201,6 @@ function migrateDb(db = freshDb()) {
 async function loadDb() {
   requireConfiguredProductionDb();
   if (hasGithubStorage()) return readGithubDb();
-  if (hasKvStorage()) {
-    const { kv } = await import("@vercel/kv");
-    return (await kv.get("icon-listing-db")) || freshDb();
-  }
   try {
     return JSON.parse(await fs.readFile(TMP_DB, "utf8"));
   } catch {
@@ -218,11 +214,6 @@ async function saveDb(db) {
     await writeGithubDb(db);
     return;
   }
-  if (hasKvStorage()) {
-    const { kv } = await import("@vercel/kv");
-    await kv.set("icon-listing-db", db);
-    return;
-  }
   await fs.writeFile(TMP_DB, JSON.stringify(db, null, 2));
 }
 
@@ -232,13 +223,9 @@ function hasGithubStorage() {
   return !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO);
 }
 
-function hasKvStorage() {
-  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
-}
-
 function requireConfiguredProductionDb() {
-  if (process.env.VERCEL && !hasGithubStorage() && !hasKvStorage() && process.env.ICON_LISTING_ALLOW_TMP_DB !== "true") {
-    throw httpError(500, "Database is not configured. Add GitHub storage or Vercel KV so listings are shared publicly.");
+  if (process.env.VERCEL && !hasGithubStorage() && process.env.ICON_LISTING_ALLOW_TMP_DB !== "true") {
+    throw httpError(500, "Database is not configured. Add the GitHub storage variables in Vercel so listings are shared publicly.");
   }
 }
 
