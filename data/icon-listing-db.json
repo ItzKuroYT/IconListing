@@ -48,9 +48,9 @@
       "uptimePercent": 100,
       "sponsored": true,
       "createdAt": "2026-06-15T22:08:11.216Z",
-      "updatedAt": "2026-06-15T23:37:02.616Z",
-      "lastPingAt": "2026-06-15T23:37:03.883Z",
-      "lastSuccessfulPingAt": "2026-06-15T23:37:03.883Z",
+      "updatedAt": "2026-06-15T23:37:02.585Z",
+      "lastPingAt": "2026-06-15T23:37:03.926Z",
+      "lastSuccessfulPingAt": "2026-06-15T23:37:03.926Z",
       "uptimeChecks": 8,
       "uptimeSuccesses": 8,
       "analytics": {
@@ -62,7 +62,7 @@
         ],
         "playerHistory": [
           {
-            "createdAt": "2026-06-15T23:37:03.883Z",
+            "createdAt": "2026-06-15T23:37:03.926Z",
             "playersOnline": 4185,
             "playersMax": 1191,
             "online": true
