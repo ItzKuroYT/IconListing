@@ -28,12 +28,12 @@ function response() {
   };
 }
 
-async function call(action, body = {}, token = "", method = "POST") {
+async function call(action, body = {}, token = "", method = "POST", headers = {}) {
   const req = {
     method,
     query: { action },
     body,
-    headers: { authorization: token ? `Bearer ${token}` : "" }
+    headers: { authorization: token ? `Bearer ${token}` : "", ...headers }
   };
   const res = response();
   await handler(req, res);
@@ -96,7 +96,7 @@ async function main() {
     assert(badListing.code === 400, "blocked words should reject a listing");
 
     const description =
-      "A real listing created by the smoke test to verify account login, listing creation, mcstatus fallback, Votifier forwarding, vote recording, and monthly vote totals without using premade seed content. The text is intentionally natural and long enough to pass the configured description minimum.";
+      "A real listing created by the smoke test to verify account login, listing creation, mcstatus fallback, Votifier forwarding, vote recording, and monthly vote totals without using premade seed content.\nLine two should keep its line break.\n\nLine four should still be separated after saving.";
     const saved = await call(
       "saveServer",
       {
@@ -131,9 +131,17 @@ async function main() {
     assert(vote.code === 200, "vote should be accepted");
     assert(received.length === 2, "Votifier provider should receive test vote and real vote");
 
+    const copy = await call("trackCopy", { serverId: saved.json.server.id }, "", "POST", {
+      "x-forwarded-for": "203.0.113.10",
+      "user-agent": "IconListingSmoke"
+    });
+    assert(copy.code === 200 && copy.json.analytics.ipCopiesLast30 === 1, "IP copy analytics should count one unique copy");
+
     const finalState = await call("state", {}, "", "GET");
     const server = finalState.json.servers.find((item) => item.id === saved.json.server.id);
     assert(server && server.votes === 1, "server should have one counted vote");
+    assert(server.description.includes("\nLine two") && server.description.includes("\n\nLine four"), "server description should preserve line breaks");
+    assert(server.analytics.ipCopiesLast30 === 1, "server should expose public IP copy analytics");
     assert(finalState.json.votes.length === 1, "monthly vote records should be stored");
 
     console.log("Smoke test passed: auth, empty state, profanity filter, mcstatus fallback, Votifier, voting.");

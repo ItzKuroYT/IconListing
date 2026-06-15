@@ -24,11 +24,11 @@ module.exports = async function handler(req, res) {
     const db = migrateDb(await loadDb());
     const user = await userFromRequest(req, db);
 
-    await cleanupStaleServers(db);
+    const cleaned = await cleanupStaleServers(db);
 
     if (action === "state") {
-      await refreshPings(db);
-      await saveDb(db);
+      const refreshed = await refreshPings(db);
+      if (cleaned || refreshed) await saveDb(db);
       return json(res, 200, statePayload(db, user));
     }
 
@@ -81,7 +81,7 @@ module.exports = async function handler(req, res) {
       await updatePing(next);
       db.servers = existing ? db.servers.map((item) => (item.id === existing.id ? next : item)) : [...db.servers, next];
       await saveDb(db);
-      return json(res, 200, { server: next });
+      return json(res, 200, { server: publicServer(next) });
     }
 
     if (action === "deleteServer") {
@@ -105,7 +105,15 @@ module.exports = async function handler(req, res) {
       db.votes.push(vote);
       server.votes = votesForServer(db.votes, server.id).length;
       await saveDb(db);
-      return json(res, 200, { ok: true, vote, server });
+      return json(res, 200, { ok: true, vote, server: publicServer(server) });
+    }
+
+    if (action === "trackCopy") {
+      const server = db.servers.find((item) => item.id === body.serverId);
+      if (!server) throw httpError(404, "Listing not found.");
+      recordIpCopy(server, req);
+      await saveDb(db);
+      return json(res, 200, { ok: true, analytics: publicAnalytics(server) });
     }
 
     if (action === "accountUpdate") {
@@ -192,9 +200,19 @@ function migrateDb(db = freshDb()) {
     ...db,
     version: 2,
     users: Array.isArray(db.users) ? db.users : [],
-    servers: Array.isArray(db.servers) ? db.servers.filter((server) => !String(server.id || "").startsWith("seed-")) : [],
+    servers: Array.isArray(db.servers) ? db.servers.filter((server) => !String(server.id || "").startsWith("seed-")).map(normalizeServer) : [],
     clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")) : [],
     votes: Array.isArray(db.votes) ? db.votes : []
+  };
+}
+
+function normalizeServer(server) {
+  return {
+    ...server,
+    analytics: {
+      ipCopies: Array.isArray(server.analytics?.ipCopies) ? server.analytics.ipCopies : [],
+      playerHistory: Array.isArray(server.analytics?.playerHistory) ? server.analytics.playerHistory : []
+    }
   };
 }
 
@@ -293,20 +311,25 @@ function cloneJson(value) {
 }
 
 function statePayload(db, user) {
-  return { servers: rankServers(db.servers, db.votes), clients: db.clients, votes: db.votes, user: publicUser(user) };
+  return { servers: rankServers(db.servers, db.votes).map(publicServer), clients: db.clients, votes: db.votes, user: publicUser(user) };
 }
 
 async function cleanupStaleServers(db) {
   const cutoff = Date.now() - CONFIG.limits.staleServerDeleteDays * 24 * 60 * 60 * 1000;
+  const before = db.servers.length;
   db.servers = db.servers.filter((server) => !server.lastSuccessfulPingAt || new Date(server.lastSuccessfulPingAt).getTime() >= cutoff);
+  return db.servers.length !== before;
 }
 
 async function refreshPings(db) {
+  let changed = false;
   for (const server of db.servers) {
     if (!server.lastPingAt || Date.now() - new Date(server.lastPingAt).getTime() > PING_TTL_MS) {
       await updatePing(server);
+      changed = true;
     }
   }
+  return changed;
 }
 
 async function updatePing(server) {
@@ -317,6 +340,7 @@ async function updatePing(server) {
   server.playersOnline = ping.playersOnline;
   server.playersMax = ping.playersMax;
   server.version = ping.version || server.version || "Unknown";
+  recordPlayerSnapshot(server, now);
   if (ping.online) {
     server.lastSuccessfulPingAt = now;
     server.uptimeChecks = Number(server.uptimeChecks || 0) + 1;
@@ -325,6 +349,29 @@ async function updatePing(server) {
     server.uptimeChecks = Number(server.uptimeChecks || 0) + 1;
   }
   server.uptimePercent = server.uptimeChecks ? (Number(server.uptimeSuccesses || 0) / server.uptimeChecks) * 100 : 0;
+}
+
+function recordPlayerSnapshot(server, createdAt) {
+  if (!server.analytics) server.analytics = { ipCopies: [], playerHistory: [] };
+  if (!server.analytics.playerHistory) server.analytics.playerHistory = [];
+  const last = server.analytics.playerHistory[server.analytics.playerHistory.length - 1];
+  if (last && new Date(createdAt).getTime() - new Date(last.createdAt).getTime() < 60 * 60 * 1000) {
+    server.analytics.playerHistory[server.analytics.playerHistory.length - 1] = {
+      createdAt,
+      playersOnline: Number(server.playersOnline || 0),
+      playersMax: Number(server.playersMax || 0),
+      online: !!server.online
+    };
+  } else {
+    server.analytics.playerHistory.push({
+      createdAt,
+      playersOnline: Number(server.playersOnline || 0),
+      playersMax: Number(server.playersMax || 0),
+      online: !!server.online
+    });
+  }
+  const cutoff = Date.now() - 31 * 24 * 60 * 60 * 1000;
+  server.analytics.playerHistory = server.analytics.playerHistory.filter((item) => new Date(item.createdAt).getTime() >= cutoff).slice(-120);
 }
 
 async function pingJava(host, port) {
@@ -411,6 +458,52 @@ function sanitizeClient(client) {
 
 function votesForServer(votes, serverId) {
   return votes.filter((vote) => vote.serverId === serverId);
+}
+
+function publicServer(server) {
+  return { ...server, analytics: publicAnalytics(server) };
+}
+
+function publicAnalytics(server) {
+  const analytics = server.analytics || {};
+  return {
+    ipCopiesLast7: uniqueIpCopies(analytics.ipCopies, 7),
+    ipCopiesLast30: uniqueIpCopies(analytics.ipCopies, 30),
+    ipCopyDaily: dailyIpCopies(analytics.ipCopies, 30),
+    playerHistory: Array.isArray(analytics.playerHistory) ? analytics.playerHistory.slice(-120) : []
+  };
+}
+
+function uniqueIpCopies(copies = [], days) {
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  return new Set(copies.filter((copy) => new Date(copy.createdAt).getTime() >= cutoff).map((copy) => copy.visitorHash)).size;
+}
+
+function dailyIpCopies(copies = [], days) {
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date(Date.now() - (days - index - 1) * 24 * 60 * 60 * 1000);
+    const key = date.toISOString().slice(0, 10);
+    const visitors = new Set(copies.filter((copy) => String(copy.createdAt || "").startsWith(key)).map((copy) => copy.visitorHash));
+    return { date: key, count: visitors.size };
+  });
+}
+
+function recordIpCopy(server, req) {
+  if (!server.analytics) server.analytics = { ipCopies: [], playerHistory: [] };
+  if (!server.analytics.ipCopies) server.analytics.ipCopies = [];
+  const visitorHash = clientHash(req);
+  const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  server.analytics.ipCopies = server.analytics.ipCopies.filter((copy) => new Date(copy.createdAt).getTime() >= cutoff);
+  if (!server.analytics.ipCopies.some((copy) => copy.visitorHash === visitorHash)) {
+    server.analytics.ipCopies.push({ visitorHash, createdAt: new Date().toISOString() });
+  }
+}
+
+function clientHash(req) {
+  const forwarded = req.headers["x-forwarded-for"] || req.headers["X-Forwarded-For"] || "";
+  const ip = String(forwarded).split(",")[0].trim() || req.socket?.remoteAddress || "unknown";
+  const agent = req.headers["user-agent"] || req.headers["User-Agent"] || "";
+  return crypto.createHmac("sha256", SESSION_SECRET).update(`${ip}|${agent}`).digest("hex");
 }
 
 function createId() {

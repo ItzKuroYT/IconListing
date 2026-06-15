@@ -2,7 +2,7 @@ const CONFIG = window.ICON_LISTING_CONFIG;
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
-const EMPTY_TEXT = "Theres no listing here, Be the first to make one!";
+const EMPTY_TEXT = "No servers listed yet";
 
 const store = {
   get session() {
@@ -36,13 +36,23 @@ function migrateDb(db) {
     ...db,
     version: 2,
     users: Array.isArray(db.users) ? db.users : [],
-    servers: Array.isArray(db.servers) ? db.servers.filter((server) => !String(server.id || "").startsWith("seed-")) : [],
+    servers: Array.isArray(db.servers) ? db.servers.filter((server) => !String(server.id || "").startsWith("seed-")).map(normalizeServer) : [],
     clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")) : [],
     votes: Array.isArray(db.votes) ? db.votes : [],
     voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {}
   };
   store.fallbackDb = next;
   return next;
+}
+
+function normalizeServer(server) {
+  return {
+    ...server,
+    analytics: {
+      ipCopies: Array.isArray(server.analytics?.ipCopies) ? server.analytics.ipCopies : [],
+      playerHistory: Array.isArray(server.analytics?.playerHistory) ? server.analytics.playerHistory : []
+    }
+  };
 }
 
 function route(path) {
@@ -223,7 +233,7 @@ function fallbackRequest(action, payload) {
     };
     db.servers = existing ? db.servers.map((item) => (item.id === existing.id ? next : item)) : [...db.servers, next];
     save();
-    return Promise.resolve({ server: next });
+    return Promise.resolve({ server: { ...next, analytics: publicAnalytics(next) } });
   }
   if (action === "deleteServer") {
     if (!user) return Promise.reject(new Error("Log in before deleting a listing."));
@@ -244,7 +254,21 @@ function fallbackRequest(action, payload) {
     db.votes.push(vote);
     server.votes = db.votes.filter((item) => item.serverId === server.id).length;
     save();
-    return Promise.resolve({ ok: true, vote, server });
+    return Promise.resolve({ ok: true, vote, server: { ...server, analytics: publicAnalytics(server) } });
+  }
+  if (action === "trackCopy") {
+    const server = db.servers.find((item) => item.id === payload.serverId);
+    if (!server) return Promise.reject(new Error("Listing not found."));
+    if (!server.analytics) server.analytics = { ipCopies: [], playerHistory: [] };
+    if (!server.analytics.ipCopies) server.analytics.ipCopies = [];
+    const visitorHash = store.session?.user?.id || "local";
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    server.analytics.ipCopies = server.analytics.ipCopies.filter((copy) => new Date(copy.createdAt).getTime() >= cutoff);
+    if (!server.analytics.ipCopies.some((copy) => copy.visitorHash === visitorHash)) {
+      server.analytics.ipCopies.push({ visitorHash, createdAt: new Date().toISOString() });
+    }
+    save();
+    return Promise.resolve({ ok: true, analytics: publicAnalytics(server) });
   }
   if (action === "accountUpdate") {
     if (!user) return Promise.reject(new Error("Log in before editing your account."));
@@ -373,7 +397,7 @@ function scoreServer(server, votes = []) {
 
 function rankServers(servers, votes = []) {
   return [...servers]
-    .map((server) => ({ ...server, votes: votesForServer(votes, server.id).length || server.votes || 0 }))
+    .map((server) => ({ ...server, votes: votesForServer(votes, server.id).length || server.votes || 0, analytics: publicAnalytics(server) }))
     .sort((a, b) => scoreServer(b, votes) - scoreServer(a, votes))
     .map((server, index) => ({ ...server, rank: index + 1 }));
 }
@@ -444,16 +468,40 @@ function syncAuthUi(user) {
 function emptyNotice() {
   return `<div class="empty-state">
     <h2>${EMPTY_TEXT}</h2>
-    <p>New servers show up here as soon as someone submits a listing.</p>
+    <p>Listings will show here after they are submitted and saved.</p>
     <a class="button primary" href="${store.session ? route("/dashboard/") : route("/login/")}">Add a Server</a>
   </div>`;
+}
+
+function publicAnalytics(server) {
+  const analytics = server.analytics || {};
+  return {
+    ipCopiesLast7: uniqueIpCopies(analytics.ipCopies, 7),
+    ipCopiesLast30: uniqueIpCopies(analytics.ipCopies, 30),
+    ipCopyDaily: dailyIpCopies(analytics.ipCopies, 30),
+    playerHistory: Array.isArray(analytics.playerHistory) ? analytics.playerHistory.slice(-120) : []
+  };
+}
+
+function uniqueIpCopies(copies = [], days) {
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  return new Set(copies.filter((copy) => new Date(copy.createdAt).getTime() >= cutoff).map((copy) => copy.visitorHash)).size;
+}
+
+function dailyIpCopies(copies = [], days) {
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date(Date.now() - (days - index - 1) * 24 * 60 * 60 * 1000);
+    const key = date.toISOString().slice(0, 10);
+    const visitors = new Set(copies.filter((copy) => String(copy.createdAt || "").startsWith(key)).map((copy) => copy.visitorHash));
+    return { date: key, count: visitors.size };
+  });
 }
 
 function serverCard(server) {
   const banner = server.bannerUrl ? `background-image:url('${escapeHtml(asset(server.bannerUrl))}')` : "";
   return `<article class="server-card ${server.sponsored ? "sponsored" : ""}" data-server-id="${escapeHtml(server.id)}">
     <a class="server-card-link" href="${route(`/server/?id=${encodeURIComponent(server.id)}`)}" aria-label="Open ${escapeHtml(server.name)} listing"></a>
-    <div class="rank">${server.sponsored ? `<span class="star">★</span>` : ""}#${server.rank || "-"}</div>
+    <div class="rank">${server.sponsored ? `<span class="star">*</span>` : ""}#${server.rank || "-"}</div>
     <div class="banner" style="${banner}" role="img" aria-label="${escapeHtml(server.name)} banner"></div>
     <div class="server-main">
       <h3 class="server-title">${escapeHtml(server.name)} ${server.sponsored ? `<span class="pill">Sponsored</span>` : ""}</h3>
@@ -516,12 +564,12 @@ function renderHome(state) {
   $("#app").innerHTML = `<div class="page">
     <section class="hero-band compact">
       <div class="hero-content">
-        <div class="eyebrow">Minecraft server lists</div>
-        <h1 class="hero-title"><span>${CONFIG.site.name}</span></h1>
-        <p class="hero-copy">Browse Minecraft servers by gamemode, check live status, and vote for the communities you love and enjoy.</p>
+        <div class="eyebrow">Minecraft server directory</div>
+        <h1 class="hero-title">${CONFIG.site.name}</h1>
+        <p class="hero-copy">A simple place to list servers, check basic status, and send votes. No fake seeded listings.</p>
         <div class="hero-actions">
-          <a class="button primary" href="${route("/servers/")}">Browse Servers</a>
-          <a class="button" href="${state.user ? route("/dashboard/") : route("/login/")}">${state.user ? "Manage Listings" : "Add Your Server"}</a>
+          <a class="button primary" href="${route("/servers/")}">Browse servers</a>
+          <a class="button" href="${state.user ? route("/dashboard/") : route("/login/")}">${state.user ? "Manage listings" : "Submit a server"}</a>
         </div>
       </div>
     </section>
@@ -529,7 +577,7 @@ function renderHome(state) {
       <div class="section-head">
         <div>
           <h2 class="section-title">Sponsored Servers</h2>
-          <p class="section-copy">Paid sponsers appear here</p>
+          <p class="section-copy">Paid placements. Marked separately from the main list.</p>
         </div>
       </div>
       <div id="sponsoredList" class="server-list"></div>
@@ -538,7 +586,7 @@ function renderHome(state) {
       <div class="section-head">
         <div>
           <h2 class="section-title">All Servers</h2>
-          <p class="section-copy">View all servers, sorted by popularity and votes</p>
+          <p class="section-copy">Sorted by rank by default. Use search if you already know what you want.</p>
         </div>
       </div>
       ${toolbarMarkup()}
@@ -556,7 +604,7 @@ function renderServers(state) {
       <div class="section-head">
         <div>
           <h1 class="section-title">${tag ? `${escapeHtml(tag)} Servers` : "Servers"}</h1>
-          <p class="section-copy">Use the filters to find a server that fits how you play.</p>
+          <p class="section-copy">Search by name, IP, or tag.</p>
         </div>
       </div>
       ${toolbarMarkup(tag)}
@@ -575,13 +623,16 @@ function renderServerDetail(state) {
   }
   const banner = server.bannerUrl ? `background-image:url('${escapeHtml(asset(server.bannerUrl))}')` : "";
   const owner = server.ownerName || "Server owner";
+  const canEdit = state.user && (server.ownerId === state.user.id || isAdmin(state.user));
+  const ip = serverAddress(server);
+  const bedrockIp = server.crossPlay ? `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}` : "";
   $("#app").innerHTML = `<div class="page detail-layout">
     <aside class="info-panel">
       <h1>${escapeHtml(server.name)}</h1>
       ${infoRow("Owner", owner)}
       ${infoRow("Status", `<span class="status inline"><span class="dot ${server.online ? "online" : ""}"></span>${server.online ? "Online" : "Offline"}</span>`)}
-      ${infoRow("Java IP", `${escapeHtml(server.javaHost)}:${Number(server.javaPort || CONFIG.defaults.javaPort)}`)}
-      ${server.crossPlay ? infoRow("Bedrock IP", `${escapeHtml(server.bedrockHost)}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}`) : ""}
+      ${infoRow("Java IP", `<span class="copy-row"><span>${escapeHtml(ip)}</span><button class="mini-button" data-copy-ip type="button">Copy</button></span>`)}
+      ${server.crossPlay ? infoRow("Bedrock IP", `<span class="copy-row"><span>${escapeHtml(bedrockIp)}</span><button class="mini-button" data-copy-bedrock type="button">Copy</button></span>`) : ""}
       ${server.websiteUrl ? infoRow("Website", `<a href="${escapeHtml(server.websiteUrl)}">${escapeHtml(server.websiteUrl)}</a>`) : ""}
       ${server.discordUrl ? infoRow("Discord", `<a href="${escapeHtml(server.discordUrl)}">Click to join</a>`) : ""}
       ${infoRow("Players", `${Number(server.playersOnline || 0).toLocaleString()}${server.playersMax ? `/${Number(server.playersMax).toLocaleString()}` : ""}`)}
@@ -594,22 +645,214 @@ function renderServerDetail(state) {
       ${infoRow("Tags", `<div class="server-tags">${(server.tags || []).map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>`)}
     </aside>
     <section class="detail-card">
-      <div class="tabs"><button class="tab active">Info</button><button class="tab">Stats</button><button class="tab">Banners</button><button class="tab">Trailer</button></div>
-      <div class="detail-body">
+      <div class="tabs">
+        ${detailTabButton("info", "Info", true)}
+        ${detailTabButton("stats", "Stats")}
+        ${detailTabButton("banners", "Banners")}
+        ${detailTabButton("analytics", "Analytics")}
+        ${detailTabButton("trailer", "Trailer")}
+        ${canEdit ? detailTabButton("edit", "Edit") : ""}
+      </div>
+      <div class="detail-body detail-tab-panel active" data-panel="info">
         <div class="detail-banner" style="${banner}"></div>
-        <p>${escapeHtml(server.description)}</p>
+        <div class="description-text">${escapeHtml(server.description)}</div>
         <div class="grid two">
           <div class="mini-stat"><strong>${Number(server.playersOnline || 0).toLocaleString()}</strong><span>players online</span></div>
           <div class="mini-stat"><strong>${Number(server.votes || 0).toLocaleString()}</strong><span>total votes</span></div>
         </div>
+        <a class="button vote-wide" href="${route(`/vote/?server=${encodeURIComponent(server.id)}`)}">Vote for ${escapeHtml(server.name)}</a>
       </div>
-      <a class="button vote-wide" href="${route(`/vote/?server=${encodeURIComponent(server.id)}`)}">Vote for ${escapeHtml(server.name)}</a>
+      <div class="detail-body detail-tab-panel" data-panel="stats">
+        <h2 class="detail-heading">Player history</h2>
+        ${playerChart(server.analytics?.playerHistory || [], server.playersOnline)}
+        <div class="metric-select">Players</div>
+      </div>
+      <div class="detail-body detail-tab-panel" data-panel="banners">
+        <h2 class="detail-heading">Banners</h2>
+        ${bannerPreview(server)}
+        <label class="field banner-field"><span>HTML code</span><input class="input code-input" value="${escapeHtml(htmlBannerCode(server))}" readonly></label>
+        <label class="field banner-field"><span>BB code</span><input class="input code-input" value="${escapeHtml(bbBannerCode(server))}" readonly></label>
+      </div>
+      <div class="detail-body detail-tab-panel" data-panel="analytics">
+        <h2 class="detail-heading">Unique IP copies</h2>
+        <div class="grid two">
+          <div class="mini-stat"><strong>${Number(server.analytics?.ipCopiesLast7 || 0).toLocaleString()}</strong><span>last 7 days</span></div>
+          <div class="mini-stat"><strong>${Number(server.analytics?.ipCopiesLast30 || 0).toLocaleString()}</strong><span>last 30 days</span></div>
+        </div>
+        ${copyChart(server.analytics?.ipCopyDaily || [])}
+        <p class="detail-note">Only the first copy from the same visitor in a 30-day period is counted.</p>
+      </div>
+      <div class="detail-body detail-tab-panel" data-panel="trailer">
+        <h2 class="detail-heading">Trailer</h2>
+        ${trailerEmbed(server.youtubeUrl)}
+      </div>
+      ${canEdit ? `<div class="detail-body detail-tab-panel" data-panel="edit">
+        <h2 class="detail-heading">Edit listing</h2>
+        <p class="section-copy">Open your dashboard to change the server name, tags, banner, description, Votifier, or links.</p>
+        <a class="button primary" href="${route("/dashboard/")}">Open dashboard</a>
+      </div>` : ""}
     </section>
   </div>`;
+  bindServerDetail(server);
 }
 
 function infoRow(label, value) {
   return `<div class="info-row"><strong>${label}</strong><span>${value}</span></div>`;
+}
+
+function detailTabButton(id, label, active = false) {
+  return `<button class="tab ${active ? "active" : ""}" type="button" data-detail-tab="${id}">${label}</button>`;
+}
+
+function bindServerDetail(server) {
+  $$("[data-detail-tab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      $$("[data-detail-tab]").forEach((node) => node.classList.toggle("active", node === button));
+      $$("[data-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === button.dataset.detailTab));
+    });
+  });
+  $("[data-copy-ip]")?.addEventListener("click", () => copyServerAddress(server, serverAddress(server)));
+  $("[data-copy-bedrock]")?.addEventListener("click", () => copyServerAddress(server, `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}`));
+}
+
+async function copyServerAddress(server, value) {
+  try {
+    await navigator.clipboard.writeText(value);
+  } catch {
+    window.prompt("Copy server address", value);
+  }
+  try {
+    await request("trackCopy", { serverId: server.id });
+  } catch {
+    // Copying should still succeed even if analytics are unavailable.
+  }
+  toast("Server address copied.");
+}
+
+function serverAddress(server) {
+  return `${server.javaHost}:${Number(server.javaPort || CONFIG.defaults.javaPort)}`;
+}
+
+function bannerPreview(server) {
+  const banner = server.bannerUrl ? `background-image:url('${escapeHtml(asset(server.bannerUrl))}')` : "";
+  return `<div class="generated-banner" style="${banner}">
+    <div>
+      <strong>${escapeHtml(server.name)}</strong>
+      <span>${escapeHtml(serverAddress(server))}</span>
+    </div>
+    <div class="generated-banner-stats">
+      <span>${server.online ? "Online" : "Offline"}</span>
+      <span>${Number(server.playersOnline || 0).toLocaleString()} players</span>
+    </div>
+  </div>`;
+}
+
+function htmlBannerCode(server) {
+  return `<a href="${listingUrl(server)}" target="_blank"><img src="${bannerImageUrl(server)}" alt="${server.name}"></a>`;
+}
+
+function bbBannerCode(server) {
+  return `[url=${listingUrl(server)}][img]${bannerImageUrl(server)}[/img][/url]`;
+}
+
+function listingUrl(server) {
+  return new URL(route(`/server/?id=${encodeURIComponent(server.id)}`), location.origin).href;
+}
+
+function bannerImageUrl(server) {
+  return new URL(asset(server.bannerUrl || CONFIG.site.iconPath), location.origin).href;
+}
+
+function trailerEmbed(url) {
+  const embed = youtubeEmbedUrl(url);
+  if (!embed) return `<div class="empty-state"><h2>No trailer added</h2><p>Add a YouTube URL from the dashboard to show a trailer here.</p></div>`;
+  return `<div class="trailer-frame"><iframe src="${escapeHtml(embed)}" title="Server trailer" allowfullscreen loading="lazy"></iframe></div>`;
+}
+
+function youtubeEmbedUrl(url = "") {
+  const value = String(url || "").trim();
+  if (!value) return "";
+  try {
+    const parsed = new URL(value);
+    const id = parsed.hostname.includes("youtu.be") ? parsed.pathname.slice(1) : parsed.searchParams.get("v");
+    return id ? `https://www.youtube.com/embed/${encodeURIComponent(id)}` : "";
+  } catch {
+    return "";
+  }
+}
+
+function playerChart(history, currentPlayers = 0) {
+  const points = (history.length ? history : [{ createdAt: new Date().toISOString(), playersOnline: currentPlayers }]).slice(-30);
+  return lineChart(points.map((point) => Number(point.playersOnline || 0)), points.map((point) => shortDate(point.createdAt)), "Players");
+}
+
+function copyChart(days) {
+  const points = days.length ? days : dailyIpCopies([], 30);
+  return barChart(points.map((point) => Number(point.count || 0)), points.map((point) => shortDate(point.date)), "IP copies");
+}
+
+function lineChart(values, labels, title) {
+  const max = Math.max(1, ...values);
+  const width = 640;
+  const height = 260;
+  const pad = 34;
+  const step = values.length > 1 ? (width - pad * 2) / (values.length - 1) : 0;
+  const path = values.map((value, index) => {
+    const x = pad + step * index;
+    const y = height - pad - (value / max) * (height - pad * 2);
+    return `${index ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`;
+  }).join(" ");
+  return `<figure class="chart-box" aria-label="${escapeHtml(title)} chart">
+    <svg viewBox="0 0 ${width} ${height}" role="img">
+      ${chartGrid(width, height, pad)}
+      <path d="${path}" fill="none" stroke="currentColor" stroke-width="3"></path>
+      ${chartLabels(labels, width, height, pad)}
+    </svg>
+  </figure>`;
+}
+
+function barChart(values, labels, title) {
+  const max = Math.max(1, ...values);
+  const width = 640;
+  const height = 260;
+  const pad = 34;
+  const gap = 4;
+  const barWidth = (width - pad * 2) / values.length - gap;
+  const bars = values.map((value, index) => {
+    const h = (value / max) * (height - pad * 2);
+    const x = pad + index * (barWidth + gap);
+    const y = height - pad - h;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(2, barWidth).toFixed(1)}" height="${h.toFixed(1)}"></rect>`;
+  }).join("");
+  return `<figure class="chart-box" aria-label="${escapeHtml(title)} chart">
+    <svg viewBox="0 0 ${width} ${height}" role="img">
+      ${chartGrid(width, height, pad)}
+      <g class="chart-bars">${bars}</g>
+      ${chartLabels(labels, width, height, pad)}
+    </svg>
+  </figure>`;
+}
+
+function chartGrid(width, height, pad) {
+  const lines = [0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+    const y = pad + ratio * (height - pad * 2);
+    return `<line x1="${pad}" y1="${y}" x2="${width - pad}" y2="${y}"></line>`;
+  }).join("");
+  return `<g class="chart-grid">${lines}<line x1="${pad}" y1="${pad}" x2="${pad}" y2="${height - pad}"></line><line x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}"></line></g>`;
+}
+
+function chartLabels(labels, width, height, pad) {
+  const filtered = labels.filter((_, index) => index === 0 || index === labels.length - 1 || index % Math.ceil(labels.length / 4) === 0);
+  return `<g class="chart-labels">${filtered.map((label, index) => {
+    const x = pad + (index / Math.max(1, filtered.length - 1)) * (width - pad * 2);
+    return `<text x="${x.toFixed(1)}" y="${height - 8}" text-anchor="middle">${escapeHtml(label)}</text>`;
+  }).join("")}</g>`;
+}
+
+function shortDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 function timeAgo(value) {
@@ -664,9 +907,9 @@ function renderSponsored() {
     <section class="hero-band compact">
       <div class="hero-content">
         <div class="eyebrow">Paid placements</div>
-        <h1 class="hero-title"><span>Sponsored Servers</span></h1>
-        <p class="hero-copy">Sponsorship is for server owners who want their listing placed above normal results while still being clearly labeled.</p>
-        <div class="hero-actions"><a class="button primary" href="${CONFIG.site.discordUrl}">Apply on Discord</a></div>
+        <h1 class="hero-title">Sponsored Servers</h1>
+        <p class="hero-copy">Sponsors get placement above normal results. The listing stays labeled so players know what they are looking at.</p>
+        <div class="hero-actions"><a class="button primary" href="${CONFIG.site.discordUrl}">Ask on Discord</a></div>
       </div>
     </section>
     <section class="section grid two">
@@ -688,7 +931,7 @@ function renderClients(state) {
       <div class="section-head">
         <div>
           <h1 class="section-title">Sponsored Clients</h1>
-          <p class="section-copy">Approved client promotions will appear here after staff adds them.</p>
+          <p class="section-copy">Client promotions approved by staff.</p>
         </div>
       </div>
       <div class="grid three">${state.clients.length ? state.clients.map((client) => `<article class="card client-card">
@@ -714,15 +957,15 @@ function renderLogin(state) {
     <section class="section grid two">
       <form id="loginForm" class="card form">
         <h1 class="section-title">Login</h1>
-        <p class="section-copy">Welcome back. Log in to manage your listings.</p>
+        <p class="section-copy">Log in to manage your server listings.</p>
         <div class="field"><label>Username or email</label><input id="loginName" class="input" required></div>
         <div class="field"><label>Password</label><input id="loginPassword" class="input" type="password" required></div>
         <button class="button primary" type="submit">Login</button>
-        <p class="section-copy">Don't have an account? <a class="pill" href="#signup">Sign up here!</a></p>
+        <p class="section-copy">Need an account? <a class="text-link" href="#signup">Sign up below</a>.</p>
       </form>
       <form id="signup" class="card form">
         <h2 class="section-title">Sign Up</h2>
-        <p class="section-copy">Create an account so you can submit and manage servers.</p>
+        <p class="section-copy">Create an account to submit a server.</p>
         <div class="field"><label>Username</label><input id="signupUser" class="input" minlength="3" required></div>
         <div class="field"><label>Email</label><input id="signupEmail" class="input" type="email" required></div>
         <div class="field"><label>Password</label><input id="signupPassword" class="input" type="password" minlength="6" required></div>
@@ -763,7 +1006,7 @@ function renderDashboard(state) {
       <div class="section-head">
         <div>
           <h1 class="section-title">Dashboard</h1>
-          <p class="section-copy">Your listings, ranks, and account tools are all in one place.</p>
+          <p class="section-copy">Edit listings, check rank, or add another server.</p>
         </div>
       </div>
       <div class="dashboard-list">${mine.length ? mine.map((server) => `<article class="card dash-item">
