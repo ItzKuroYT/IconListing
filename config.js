@@ -65,6 +65,90 @@ const IconListingConfig = {
       "Highlighted listing style with a star badge."
     ]
   },
+  copy: {
+    nav: {
+      home: "Home",
+      servers: "Servers",
+      sponsoredServers: "Sponsored",
+      sponsoredClients: "Sponsored Clients",
+      dashboard: "Dashboard",
+      admin: "Admin",
+      login: "Login"
+    },
+    empty: {
+      title: "No servers listed yet",
+      body: "Listings will show here after they are submitted and saved.",
+      action: "Add a Server"
+    },
+    home: {
+      eyebrow: "Minecraft server directory",
+      title: "Icon Listing",
+      body: "A simple place to list servers, check basic status, and send votes. No fake seeded listings.",
+      browseButton: "Browse servers",
+      submitButton: "Submit a server",
+      manageButton: "Manage listings",
+      sponsoredTitle: "Sponsored Servers",
+      sponsoredBody: "Paid placements. Marked separately from the main list.",
+      allTitle: "All Servers",
+      allBody: "Sorted by rank by default. Use search if you already know what you want."
+    },
+    servers: {
+      title: "Servers",
+      taggedTitleSuffix: "Servers",
+      body: "Search by name, IP, or tag.",
+      searchPlaceholder: "Search by name, IP, or tag"
+    },
+    sponsoredServers: {
+      eyebrow: "Paid placements",
+      title: "Sponsored Servers",
+      body: "Sponsors get placement above normal results. The listing stays labeled so players know what they are looking at.",
+      action: "Ask on Discord",
+      benefitsTitle: "What sponsors get",
+      applyTitle: "How to apply"
+    },
+    sponsoredClients: {
+      title: "Sponsored Clients",
+      body: "Client promotions approved by staff.",
+      visitButton: "Website / Download",
+      videoButton: "Watch video",
+      freeLabel: "Free client",
+      paidLabel: "Paid client"
+    },
+    login: {
+      title: "Login",
+      body: "Log in to manage your server listings.",
+      signupPrompt: "Need an account?",
+      signupLink: "Sign up below",
+      signupTitle: "Sign Up",
+      signupBody: "Create an account to submit a server."
+    },
+    dashboard: {
+      loginRequired: "Log in to add and manage server listings.",
+      title: "Dashboard",
+      body: "Edit listings, check rank, or add another server.",
+      addButton: "+ Add Server",
+      settingsButton: "Account Settings"
+    },
+    admin: {
+      accessRequired: "Admin access is required for this page.",
+      title: "Admin Panel",
+      body: "Manage servers, sponsorships, clients, users, and bans.",
+      serverListingsTitle: "Server Listings",
+      sponsoredClientsTitle: "Sponsored Clients",
+      sponsoredClientsBody: "Create and edit sponsored Minecraft client listings.",
+      noSponsoredClients: "No sponsored clients yet."
+    },
+    vote: {
+      body: "Enter your Minecraft username so this vote can count on the monthly board.",
+      emptyLeaderboard: "No monthly votes yet."
+    },
+    staticPages: {
+      terms: ["Terms", "Use Icon Listing honestly. Do not submit listings you do not control, spam the vote system, or post unsafe content."],
+      privacy: ["Privacy", "Icon Listing stores account details, listings, votes, and moderation data needed to run the site."],
+      help: ["Help", "Need help with a listing, vote, sponsorship, or account? Join the Discord or contact the IconRealms team."],
+      contact: ["Contact", "Reach IconRealms at officialfnaffanstudios@gmail.com or through Discord."]
+    }
+  },
   votifier: {
     enabled: true,
     providerEndpoint: "",

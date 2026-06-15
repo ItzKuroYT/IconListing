@@ -137,14 +137,43 @@ async function main() {
     });
     assert(copy.code === 200 && copy.json.analytics.ipCopiesLast30 === 1, "IP copy analytics should count one unique copy");
 
+    const admin = await call("register", {
+      username: "ItzKuroYT",
+      email: `admin${suffix}@example.com`,
+      password: "secret123"
+    });
+    assert(admin.code === 200 && admin.json.user.admin, "configured admin should register as admin");
+
+    const clientDescription =
+      "A sponsored client listing created by the smoke test to verify admins can save Minecraft client advertisements with a website download link, YouTube video, long description, two showcase images, version targeting, and paid/free metadata. This sentence keeps the description beyond the minimum length.";
+    const clientSave = await call(
+      "admin",
+      {
+        command: "saveClient",
+        value: {
+          name: "Smoke Client",
+          url: "https://example.com/download",
+          youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          description: clientDescription,
+          images: ["https://example.com/one.png", "https://example.com/two.png"],
+          version: "both",
+          pricing: "paid"
+        }
+      },
+      admin.json.token
+    );
+    assert(clientSave.code === 200 && clientSave.json.clients.length === 1, "admin should save a sponsored client");
+
     const finalState = await call("state", {}, "", "GET");
     const server = finalState.json.servers.find((item) => item.id === saved.json.server.id);
+    const client = finalState.json.clients.find((item) => item.name === "Smoke Client");
     assert(server && server.votes === 1, "server should have one counted vote");
     assert(server.description.includes("\nLine two") && server.description.includes("\n\nLine four"), "server description should preserve line breaks");
     assert(server.analytics.ipCopiesLast30 === 1, "server should expose public IP copy analytics");
+    assert(client && client.images.length === 2 && client.version === "both" && client.pricing === "paid", "sponsored client fields should be stored");
     assert(finalState.json.votes.length === 1, "monthly vote records should be stored");
 
-    console.log("Smoke test passed: auth, empty state, profanity filter, mcstatus fallback, Votifier, voting.");
+    console.log("Smoke test passed: auth, empty state, profanity filter, mcstatus fallback, Votifier, voting, sponsored clients.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });

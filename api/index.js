@@ -170,7 +170,11 @@ module.exports = async function handler(req, res) {
       if (body.command === "saveClient") {
         const client = sanitizeClient(body.value || {});
         const existing = db.clients.find((item) => item.id === client.id);
-        db.clients = existing ? db.clients.map((item) => (item.id === client.id ? client : item)) : [...db.clients, { ...client, id: createId() }];
+        const next = { ...existing, ...client, id: existing?.id || client.id || createId(), createdAt: existing?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+        db.clients = existing ? db.clients.map((item) => (item.id === existing.id ? next : item)) : [...db.clients, next];
+      }
+      if (body.command === "deleteClient") {
+        db.clients = db.clients.filter((item) => item.id !== id);
       }
       await saveDb(db);
       return json(res, 200, { ...statePayload(db, user), users: db.users.map(publicUser) });
@@ -201,7 +205,7 @@ function migrateDb(db = freshDb()) {
     version: 2,
     users: Array.isArray(db.users) ? db.users : [],
     servers: Array.isArray(db.servers) ? db.servers.filter((server) => !String(server.id || "").startsWith("seed-")).map(normalizeServer) : [],
-    clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")) : [],
+    clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")).map(normalizeClient) : [],
     votes: Array.isArray(db.votes) ? db.votes : []
   };
 }
@@ -213,6 +217,18 @@ function normalizeServer(server) {
       ipCopies: Array.isArray(server.analytics?.ipCopies) ? server.analytics.ipCopies : [],
       playerHistory: Array.isArray(server.analytics?.playerHistory) ? server.analytics.playerHistory : []
     }
+  };
+}
+
+function normalizeClient(client) {
+  const images = Array.isArray(client.images) ? client.images : [client.imageUrl1, client.imageUrl2, client.logoUrl].filter(Boolean);
+  return {
+    ...client,
+    url: client.url || client.websiteUrl || "",
+    youtubeUrl: client.youtubeUrl || "",
+    images: images.filter(Boolean).slice(0, 2),
+    version: ["java", "bedrock", "both"].includes(client.version) ? client.version : "both",
+    pricing: ["free", "paid"].includes(client.pricing) ? client.pricing : "free"
   };
 }
 
@@ -447,13 +463,24 @@ function validateServer(server) {
 }
 
 function sanitizeClient(client) {
-  return {
+  const images = Array.isArray(client.images)
+    ? client.images
+    : [client.imageUrl1, client.imageUrl2, client.logoUrl].filter(Boolean);
+  const next = {
     id: clean(client.id),
     name: cleanText(client.name),
-    logoUrl: clean(client.logoUrl),
+    url: clean(client.url || client.websiteUrl),
+    youtubeUrl: clean(client.youtubeUrl),
     description: cleanText(client.description),
-    url: clean(client.url)
+    images: images.map(clean).filter(Boolean).slice(0, 2),
+    version: ["java", "bedrock", "both"].includes(client.version) ? client.version : "both",
+    pricing: ["free", "paid"].includes(client.pricing) ? client.pricing : "free"
   };
+  if (!next.name) throw httpError(400, "Client name is required.");
+  if (!next.url) throw httpError(400, "Website/download link is required.");
+  if (hasBlockedText(client.name) || hasBlockedText(client.description)) throw httpError(400, "Please remove blocked words from the client listing.");
+  if (next.description.length < CONFIG.limits.descriptionMinLength) throw httpError(400, `Client description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
+  return next;
 }
 
 function votesForServer(votes, serverId) {

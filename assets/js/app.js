@@ -2,7 +2,10 @@ const CONFIG = window.ICON_LISTING_CONFIG;
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
-const EMPTY_TEXT = "No servers listed yet";
+
+function copy(path, fallback = "") {
+  return path.split(".").reduce((value, key) => value?.[key], CONFIG.copy) ?? fallback;
+}
 
 const store = {
   get session() {
@@ -37,7 +40,7 @@ function migrateDb(db) {
     version: 2,
     users: Array.isArray(db.users) ? db.users : [],
     servers: Array.isArray(db.servers) ? db.servers.filter((server) => !String(server.id || "").startsWith("seed-")).map(normalizeServer) : [],
-    clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")) : [],
+    clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")).map(normalizeClient) : [],
     votes: Array.isArray(db.votes) ? db.votes : [],
     voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {}
   };
@@ -52,6 +55,18 @@ function normalizeServer(server) {
       ipCopies: Array.isArray(server.analytics?.ipCopies) ? server.analytics.ipCopies : [],
       playerHistory: Array.isArray(server.analytics?.playerHistory) ? server.analytics.playerHistory : []
     }
+  };
+}
+
+function normalizeClient(client) {
+  const images = Array.isArray(client.images) ? client.images : [client.imageUrl1, client.imageUrl2, client.logoUrl].filter(Boolean);
+  return {
+    ...client,
+    url: client.url || client.websiteUrl || "",
+    youtubeUrl: client.youtubeUrl || "",
+    images: images.filter(Boolean).slice(0, 2),
+    version: ["java", "bedrock", "both"].includes(client.version) ? client.version : "both",
+    pricing: ["free", "paid"].includes(client.pricing) ? client.pricing : "free"
   };
 }
 
@@ -315,7 +330,11 @@ function fallbackRequest(action, payload) {
     if (payload.command === "saveClient") {
       const client = sanitizeClient(payload.value || {});
       const existing = db.clients.find((item) => item.id === client.id);
-      db.clients = existing ? db.clients.map((item) => (item.id === existing.id ? client : item)) : [...db.clients, { ...client, id: createId() }];
+      const next = { ...existing, ...client, id: existing?.id || client.id || createId(), createdAt: existing?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+      db.clients = existing ? db.clients.map((item) => (item.id === existing.id ? next : item)) : [...db.clients, next];
+    }
+    if (payload.command === "deleteClient") {
+      db.clients = db.clients.filter((item) => item.id !== id);
     }
     save();
     return Promise.resolve({ users: db.users.map(publicUser), servers: rankServers(db.servers, db.votes), clients: db.clients });
@@ -352,13 +371,22 @@ function sanitizeServer(server) {
 }
 
 function sanitizeClient(client) {
-  return {
+  const images = Array.isArray(client.images) ? client.images : [client.imageUrl1, client.imageUrl2, client.logoUrl].filter(Boolean);
+  const next = {
     id: cleanText(client.id),
     name: cleanText(client.name),
-    logoUrl: String(client.logoUrl || "").trim(),
     description: cleanText(client.description),
-    url: String(client.url || "").trim()
+    url: String(client.url || client.websiteUrl || "").trim(),
+    youtubeUrl: String(client.youtubeUrl || "").trim(),
+    images: images.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 2),
+    version: ["java", "bedrock", "both"].includes(client.version) ? client.version : "both",
+    pricing: ["free", "paid"].includes(client.pricing) ? client.pricing : "free"
   };
+  if (!next.name) throw new Error("Client name is required.");
+  if (!next.url) throw new Error("Website/download link is required.");
+  if (hasBlockedText(client.name) || hasBlockedText(client.description)) throw new Error("Please remove blocked words from the client listing.");
+  if (next.description.length < CONFIG.limits.descriptionMinLength) throw new Error(`Client description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
+  return next;
 }
 
 function same(a = "", b = "") {
@@ -424,9 +452,9 @@ function renderLayout() {
         </a>
         <button class="mobile-toggle" type="button" aria-label="Toggle menu">Menu</button>
         <div class="nav-links">
-          <a class="nav-link" data-route="home" href="${route("/home/")}">Home</a>
+          <a class="nav-link" data-route="home" href="${route("/home/")}">${escapeHtml(copy("nav.home", "Home"))}</a>
           <div class="dropdown">
-            <button class="drop-button" type="button">Servers <span aria-hidden="true">v</span></button>
+            <button class="drop-button" type="button">${escapeHtml(copy("nav.servers", "Servers"))} <span aria-hidden="true">v</span></button>
             <div class="dropdown-menu">
               <div class="dropdown-section-title">Gamemodes</div>
               <div class="tag-grid">${CONFIG.gamemodes.map((tag) => `<a class="tag-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${tag}</a>`).join("")}</div>
@@ -434,11 +462,11 @@ function renderLayout() {
               <div class="tag-grid">${CONFIG.generalTags.map((tag) => `<a class="tag-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${tag}</a>`).join("")}</div>
             </div>
           </div>
-          <a class="nav-link" data-route="sponsored" href="${route("/sponsored/")}">Sponsored</a>
-          <a class="nav-link" data-route="sponsored-clients" href="${route("/sponsored-clients/")}">Sponsored Clients</a>
-          <a class="nav-link hidden" data-auth="dashboard" data-route="dashboard" href="${route("/dashboard/")}">Dashboard</a>
-          <a class="nav-link hidden" data-auth="admin" data-route="admin" href="${route("/admin/")}">Admin</a>
-          <a class="nav-link" data-auth="login" data-route="login" href="${route("/login/")}">Login</a>
+          <a class="nav-link" data-route="sponsored" href="${route("/sponsored/")}">${escapeHtml(copy("nav.sponsoredServers", "Sponsored"))}</a>
+          <a class="nav-link" data-route="sponsored-clients" href="${route("/sponsored-clients/")}">${escapeHtml(copy("nav.sponsoredClients", "Sponsored Clients"))}</a>
+          <a class="nav-link hidden" data-auth="dashboard" data-route="dashboard" href="${route("/dashboard/")}">${escapeHtml(copy("nav.dashboard", "Dashboard"))}</a>
+          <a class="nav-link hidden" data-auth="admin" data-route="admin" href="${route("/admin/")}">${escapeHtml(copy("nav.admin", "Admin"))}</a>
+          <a class="nav-link" data-auth="login" data-route="login" href="${route("/login/")}">${escapeHtml(copy("nav.login", "Login"))}</a>
         </div>
       </nav>
     </header>
@@ -467,9 +495,9 @@ function syncAuthUi(user) {
 
 function emptyNotice() {
   return `<div class="empty-state">
-    <h2>${EMPTY_TEXT}</h2>
-    <p>Listings will show here after they are submitted and saved.</p>
-    <a class="button primary" href="${store.session ? route("/dashboard/") : route("/login/")}">Add a Server</a>
+    <h2>${escapeHtml(copy("empty.title", "No servers listed yet"))}</h2>
+    <p>${escapeHtml(copy("empty.body", "Listings will show here after they are submitted and saved."))}</p>
+    <a class="button primary" href="${store.session ? route("/dashboard/") : route("/login/")}">${escapeHtml(copy("empty.action", "Add a Server"))}</a>
   </div>`;
 }
 
@@ -524,7 +552,7 @@ function renderServerList(servers, selector = "#serverList") {
 
 function toolbarMarkup(selectedTag = "") {
   return `<div class="toolbar">
-    <input id="searchInput" class="input" type="search" placeholder="Search by name, IP, or tag" autocomplete="off">
+    <input id="searchInput" class="input" type="search" placeholder="${escapeHtml(copy("servers.searchPlaceholder", "Search by name, IP, or tag"))}" autocomplete="off">
     <select id="tagFilter" class="select">
       <option value="">All tags</option>
       ${ALL_TAGS.map((tag) => `<option ${tag === selectedTag ? "selected" : ""}>${tag}</option>`).join("")}
@@ -564,20 +592,20 @@ function renderHome(state) {
   $("#app").innerHTML = `<div class="page">
     <section class="hero-band compact">
       <div class="hero-content">
-        <div class="eyebrow">Minecraft server directory</div>
-        <h1 class="hero-title">${CONFIG.site.name}</h1>
-        <p class="hero-copy">A simple place to list servers, check basic status, and send votes. No fake seeded listings.</p>
+        <div class="eyebrow">${escapeHtml(copy("home.eyebrow", "Minecraft server directory"))}</div>
+        <h1 class="hero-title">${escapeHtml(copy("home.title", CONFIG.site.name))}</h1>
+        <p class="hero-copy">${escapeHtml(copy("home.body", "A simple place to list servers, check basic status, and send votes. No fake seeded listings."))}</p>
         <div class="hero-actions">
-          <a class="button primary" href="${route("/servers/")}">Browse servers</a>
-          <a class="button" href="${state.user ? route("/dashboard/") : route("/login/")}">${state.user ? "Manage listings" : "Submit a server"}</a>
+          <a class="button primary" href="${route("/servers/")}">${escapeHtml(copy("home.browseButton", "Browse servers"))}</a>
+          <a class="button" href="${state.user ? route("/dashboard/") : route("/login/")}">${escapeHtml(state.user ? copy("home.manageButton", "Manage listings") : copy("home.submitButton", "Submit a server"))}</a>
         </div>
       </div>
     </section>
     <section class="section">
       <div class="section-head">
         <div>
-          <h2 class="section-title">Sponsored Servers</h2>
-          <p class="section-copy">Paid placements. Marked separately from the main list.</p>
+          <h2 class="section-title">${escapeHtml(copy("home.sponsoredTitle", "Sponsored Servers"))}</h2>
+          <p class="section-copy">${escapeHtml(copy("home.sponsoredBody", "Paid placements. Marked separately from the main list."))}</p>
         </div>
       </div>
       <div id="sponsoredList" class="server-list"></div>
@@ -585,8 +613,8 @@ function renderHome(state) {
     <section class="section">
       <div class="section-head">
         <div>
-          <h2 class="section-title">All Servers</h2>
-          <p class="section-copy">Sorted by rank by default. Use search if you already know what you want.</p>
+          <h2 class="section-title">${escapeHtml(copy("home.allTitle", "All Servers"))}</h2>
+          <p class="section-copy">${escapeHtml(copy("home.allBody", "Sorted by rank by default. Use search if you already know what you want."))}</p>
         </div>
       </div>
       ${toolbarMarkup()}
@@ -603,8 +631,8 @@ function renderServers(state) {
     <section class="section">
       <div class="section-head">
         <div>
-          <h1 class="section-title">${tag ? `${escapeHtml(tag)} Servers` : "Servers"}</h1>
-          <p class="section-copy">Search by name, IP, or tag.</p>
+          <h1 class="section-title">${tag ? `${escapeHtml(tag)} ${escapeHtml(copy("servers.taggedTitleSuffix", "Servers"))}` : escapeHtml(copy("servers.title", "Servers"))}</h1>
+          <p class="section-copy">${escapeHtml(copy("servers.body", "Search by name, IP, or tag."))}</p>
         </div>
       </div>
       ${toolbarMarkup(tag)}
@@ -879,7 +907,7 @@ function renderVotePage(state) {
   $("#app").innerHTML = `<div class="page vote-layout">
     <section class="card form">
       <h1 class="section-title">Vote for ${escapeHtml(server.name)}</h1>
-      <p class="section-copy">Enter your Minecraft username so this vote can count on the monthly board.</p>
+      <p class="section-copy">${escapeHtml(copy("vote.body", "Enter your Minecraft username so this vote can count on the monthly board."))}</p>
       <form id="voteForm" class="form">
         <div class="field"><label>Minecraft Username</label><input id="minecraftUsername" class="input" autocomplete="username" minlength="3" maxlength="16" pattern="[A-Za-z0-9_]{3,16}" required></div>
         <button class="button primary" type="submit">Submit Vote</button>
@@ -887,7 +915,7 @@ function renderVotePage(state) {
     </section>
     <aside class="card">
       <h2>votes this month</h2>
-      <div class="leaderboard">${leaderboard.length ? leaderboard.map((item, index) => `<div class="leader-row"><strong>#${index + 1} ${escapeHtml(item.minecraftUsername)}</strong><span>${item.votes}</span></div>`).join("") : `<p class="section-copy">No monthly votes yet.</p>`}</div>
+      <div class="leaderboard">${leaderboard.length ? leaderboard.map((item, index) => `<div class="leader-row"><strong>#${index + 1} ${escapeHtml(item.minecraftUsername)}</strong><span>${item.votes}</span></div>`).join("") : `<p class="section-copy">${escapeHtml(copy("vote.emptyLeaderboard", "No monthly votes yet."))}</p>`}</div>
     </aside>
   </div>`;
   $("#voteForm").addEventListener("submit", async (event) => {
@@ -906,19 +934,19 @@ function renderSponsored() {
   $("#app").innerHTML = `<div class="page">
     <section class="hero-band compact">
       <div class="hero-content">
-        <div class="eyebrow">Paid placements</div>
-        <h1 class="hero-title">Sponsored Servers</h1>
-        <p class="hero-copy">Sponsors get placement above normal results. The listing stays labeled so players know what they are looking at.</p>
-        <div class="hero-actions"><a class="button primary" href="${CONFIG.site.discordUrl}">Ask on Discord</a></div>
+        <div class="eyebrow">${escapeHtml(copy("sponsoredServers.eyebrow", "Paid placements"))}</div>
+        <h1 class="hero-title">${escapeHtml(copy("sponsoredServers.title", "Sponsored Servers"))}</h1>
+        <p class="hero-copy">${escapeHtml(copy("sponsoredServers.body", "Sponsors get placement above normal results. The listing stays labeled so players know what they are looking at."))}</p>
+        <div class="hero-actions"><a class="button primary" href="${CONFIG.site.discordUrl}">${escapeHtml(copy("sponsoredServers.action", "Ask on Discord"))}</a></div>
       </div>
     </section>
     <section class="section grid two">
       <div class="card">
-        <h2>What sponsors get</h2>
+        <h2>${escapeHtml(copy("sponsoredServers.benefitsTitle", "What sponsors get"))}</h2>
         <ul class="feature-list">${CONFIG.sponsorship.benefits.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
       </div>
       <div class="card">
-        <h2>How to apply</h2>
+        <h2>${escapeHtml(copy("sponsoredServers.applyTitle", "How to apply"))}</h2>
         <p class="section-copy">${escapeHtml(CONFIG.sponsorship.applicationText)}</p>
       </div>
     </section>
@@ -930,18 +958,30 @@ function renderClients(state) {
     <section class="section">
       <div class="section-head">
         <div>
-          <h1 class="section-title">Sponsored Clients</h1>
-          <p class="section-copy">Client promotions approved by staff.</p>
+          <h1 class="section-title">${escapeHtml(copy("sponsoredClients.title", "Sponsored Clients"))}</h1>
+          <p class="section-copy">${escapeHtml(copy("sponsoredClients.body", "Client promotions approved by staff."))}</p>
         </div>
       </div>
-      <div class="grid three">${state.clients.length ? state.clients.map((client) => `<article class="card client-card">
-        <div class="client-logo" style="background-image:url('${escapeHtml(asset(client.logoUrl))}')"></div>
-        <h2>${escapeHtml(client.name)}</h2>
-        <p class="section-copy">${escapeHtml(client.description)}</p>
-        <a class="button primary" href="${escapeHtml(client.url)}">Visit</a>
-      </article>`).join("") : emptyNotice()}</div>
+      <div class="grid two">${state.clients.length ? state.clients.map(clientCard).join("") : emptyNotice()}</div>
     </section>
   </div>`;
+}
+
+function clientCard(client) {
+  const images = (client.images || []).slice(0, 2);
+  return `<article class="card client-card">
+    <div class="client-gallery">${images.length ? images.map((image) => `<div class="client-image" style="background-image:url('${escapeHtml(asset(image))}')"></div>`).join("") : `<div class="client-image placeholder">${escapeHtml(client.name || "Client")}</div>`}</div>
+    <div class="server-tags">
+      <span class="pill">${escapeHtml(client.version === "both" ? "Java + Bedrock" : client.version === "java" ? "Java" : "Bedrock")}</span>
+      <span class="pill">${escapeHtml(client.pricing === "paid" ? copy("sponsoredClients.paidLabel", "Paid client") : copy("sponsoredClients.freeLabel", "Free client"))}</span>
+    </div>
+    <h2>${escapeHtml(client.name)}</h2>
+    <div class="description-text compact">${escapeHtml(client.description)}</div>
+    <div class="row-actions">
+      <a class="button primary" href="${escapeHtml(client.url)}">${escapeHtml(copy("sponsoredClients.visitButton", "Website / Download"))}</a>
+      ${client.youtubeUrl ? `<a class="button" href="${escapeHtml(client.youtubeUrl)}">${escapeHtml(copy("sponsoredClients.videoButton", "Watch video"))}</a>` : ""}
+    </div>
+  </article>`;
 }
 
 function renderLogin(state) {
@@ -956,16 +996,16 @@ function renderLogin(state) {
   $("#app").innerHTML = `<div class="page">
     <section class="section grid two">
       <form id="loginForm" class="card form">
-        <h1 class="section-title">Login</h1>
-        <p class="section-copy">Log in to manage your server listings.</p>
+        <h1 class="section-title">${escapeHtml(copy("login.title", "Login"))}</h1>
+        <p class="section-copy">${escapeHtml(copy("login.body", "Log in to manage your server listings."))}</p>
         <div class="field"><label>Username or email</label><input id="loginName" class="input" required></div>
         <div class="field"><label>Password</label><input id="loginPassword" class="input" type="password" required></div>
         <button class="button primary" type="submit">Login</button>
-        <p class="section-copy">Need an account? <a class="text-link" href="#signup">Sign up below</a>.</p>
+        <p class="section-copy">${escapeHtml(copy("login.signupPrompt", "Need an account?"))} <a class="text-link" href="#signup">${escapeHtml(copy("login.signupLink", "Sign up below"))}</a>.</p>
       </form>
       <form id="signup" class="card form">
-        <h2 class="section-title">Sign Up</h2>
-        <p class="section-copy">Create an account to submit a server.</p>
+        <h2 class="section-title">${escapeHtml(copy("login.signupTitle", "Sign Up"))}</h2>
+        <p class="section-copy">${escapeHtml(copy("login.signupBody", "Create an account to submit a server."))}</p>
         <div class="field"><label>Username</label><input id="signupUser" class="input" minlength="3" required></div>
         <div class="field"><label>Email</label><input id="signupEmail" class="input" type="email" required></div>
         <div class="field"><label>Password</label><input id="signupPassword" class="input" type="password" minlength="6" required></div>
@@ -997,7 +1037,7 @@ function renderLogin(state) {
 
 function renderDashboard(state) {
   if (!state.user) {
-    $("#app").innerHTML = `<div class="page"><div class="notice">Log in to add and manage server listings.</div><div class="row-actions"><a class="button primary" href="${route("/login/")}">Login</a></div></div>`;
+    $("#app").innerHTML = `<div class="page"><div class="notice">${escapeHtml(copy("dashboard.loginRequired", "Log in to add and manage server listings."))}</div><div class="row-actions"><a class="button primary" href="${route("/login/")}">${escapeHtml(copy("nav.login", "Login"))}</a></div></div>`;
     return;
   }
   const mine = state.servers.filter((server) => server.ownerId === state.user.id);
@@ -1005,8 +1045,8 @@ function renderDashboard(state) {
     <section class="section">
       <div class="section-head">
         <div>
-          <h1 class="section-title">Dashboard</h1>
-          <p class="section-copy">Edit listings, check rank, or add another server.</p>
+          <h1 class="section-title">${escapeHtml(copy("dashboard.title", "Dashboard"))}</h1>
+          <p class="section-copy">${escapeHtml(copy("dashboard.body", "Edit listings, check rank, or add another server."))}</p>
         </div>
       </div>
       <div class="dashboard-list">${mine.length ? mine.map((server) => `<article class="card dash-item">
@@ -1022,8 +1062,8 @@ function renderDashboard(state) {
         </div>
       </article>`).join("") : emptyNotice()}</div>
       <div class="row-actions">
-        <button id="addServerButton" class="button primary">+ Add Server</button>
-        <button id="settingsButton" class="button">Account Settings</button>
+        <button id="addServerButton" class="button primary">${escapeHtml(copy("dashboard.addButton", "+ Add Server"))}</button>
+        <button id="settingsButton" class="button">${escapeHtml(copy("dashboard.settingsButton", "Account Settings"))}</button>
       </div>
     </section>
     <section id="serverFormPanel" class="section hidden">${serverFormMarkup()}</section>
@@ -1241,18 +1281,22 @@ function bindSettingsForms() {
 
 function renderAdmin(state) {
   if (!isAdmin(state.user)) {
-    $("#app").innerHTML = `<div class="page"><div class="notice">Admin access is required for this page.</div></div>`;
+    $("#app").innerHTML = `<div class="page"><div class="notice">${escapeHtml(copy("admin.accessRequired", "Admin access is required for this page."))}</div></div>`;
     return;
   }
   $("#app").innerHTML = `<div class="page">
     <section class="section">
-      <div class="section-head"><div><h1 class="section-title">Admin Panel</h1><p class="section-copy">Manage servers, sponsorships, clients, users, and bans.</p></div></div>
+      <div class="section-head"><div><h1 class="section-title">${escapeHtml(copy("admin.title", "Admin Panel"))}</h1><p class="section-copy">${escapeHtml(copy("admin.body", "Manage servers, sponsorships, clients, users, and bans."))}</p></div></div>
       <div class="grid two">
-        <div class="card"><h2>Server Listings</h2><div class="dashboard-list">${state.servers.length ? state.servers.map((server) => `<div class="dash-item">
+        <div class="card"><h2>${escapeHtml(copy("admin.serverListingsTitle", "Server Listings"))}</h2><div class="dashboard-list">${state.servers.length ? state.servers.map((server) => `<div class="dash-item">
           <div class="rank">#${server.rank}</div><div><strong>${escapeHtml(server.name)}</strong><p class="server-ip">${escapeHtml(server.javaHost)}</p></div>
           <div class="row-actions"><button class="button" data-admin="toggleSponsor" data-id="${server.id}">${server.sponsored ? "Unsponsor" : "Sponsor"}</button><button class="button danger" data-delete="${server.id}">Delete</button></div>
         </div>`).join("") : emptyNotice()}</div></div>
-        <div class="card"><h2>Sponsored Clients</h2><p class="section-copy">Add client promotions through the API or extend this panel for your staff workflow.</p>${state.clients.length ? "" : emptyNotice()}</div>
+        <div class="card admin-client-panel">
+          <h2>${escapeHtml(copy("admin.sponsoredClientsTitle", "Sponsored Clients"))}</h2>
+          <p class="section-copy">${escapeHtml(copy("admin.sponsoredClientsBody", "Create and edit sponsored Minecraft client listings."))}</p>
+          ${adminClientPanel(state.clients)}
+        </div>
       </div>
     </section>
   </div>`;
@@ -1272,16 +1316,99 @@ function renderAdmin(state) {
       toast(error.message);
     }
   }));
+  bindAdminClientForms(state);
+}
+
+function adminClientPanel(clients) {
+  return `<div class="dashboard-list admin-client-list">${clients.length ? clients.map((client) => `<div class="dash-item client-admin-row">
+    <div class="rank">${escapeHtml(client.pricing === "paid" ? "$" : "0")}</div>
+    <div>
+      <strong>${escapeHtml(client.name)}</strong>
+      <p class="server-ip">${escapeHtml(client.version === "both" ? "Java + Bedrock" : client.version)} | ${escapeHtml(client.url)}</p>
+    </div>
+    <div class="row-actions">
+      <button class="button" data-client-edit="${escapeHtml(client.id)}" type="button">Edit</button>
+      <button class="button danger" data-client-delete="${escapeHtml(client.id)}" type="button">Delete</button>
+    </div>
+  </div>`).join("") : `<p class="section-copy">${escapeHtml(copy("admin.noSponsoredClients", "No sponsored clients yet."))}</p>`}</div>
+  <div id="clientFormPanel">${clientFormMarkup()}</div>`;
+}
+
+function clientFormMarkup(client = {}) {
+  const images = client.images || [];
+  return `<form id="clientForm" class="form client-form">
+    <input id="clientId" type="hidden" value="${escapeHtml(client.id || "")}">
+    <div class="form-grid">
+      <div class="field"><label>Client Name</label><input id="clientName" class="input" value="${escapeHtml(client.name || "")}" required></div>
+      <div class="field"><label>Website/download link</label><input id="clientUrl" class="input" type="url" value="${escapeHtml(client.url || "")}" required></div>
+      <div class="field"><label>YouTube video</label><input id="clientYoutube" class="input" type="url" value="${escapeHtml(client.youtubeUrl || "")}"></div>
+      <div class="field"><label>Version</label><select id="clientVersion" class="select">
+        <option value="both" ${client.version === "both" || !client.version ? "selected" : ""}>Java and Bedrock</option>
+        <option value="java" ${client.version === "java" ? "selected" : ""}>Java</option>
+        <option value="bedrock" ${client.version === "bedrock" ? "selected" : ""}>Bedrock</option>
+      </select></div>
+      <div class="field"><label>Pricing</label><select id="clientPricing" class="select">
+        <option value="free" ${client.pricing === "free" || !client.pricing ? "selected" : ""}>Free client</option>
+        <option value="paid" ${client.pricing === "paid" ? "selected" : ""}>Paid client</option>
+      </select></div>
+      <div class="field"><label>Showcase image 1</label><input id="clientImage1" class="input" value="${escapeHtml(images[0] || "")}"></div>
+      <div class="field"><label>Showcase image 2</label><input id="clientImage2" class="input" value="${escapeHtml(images[1] || "")}"></div>
+    </div>
+    <div class="field"><label>Description (${CONFIG.limits.descriptionMinLength}+ characters)</label><textarea id="clientDescription" class="textarea" minlength="${CONFIG.limits.descriptionMinLength}" required>${escapeHtml(client.description || "")}</textarea></div>
+    <div class="row-actions">
+      <button class="button primary" type="submit">${client.id ? "Save Client" : "Create Sponsored Client"}</button>
+      <button id="clearClientForm" class="button" type="button">Clear</button>
+    </div>
+  </form>`;
+}
+
+function bindAdminClientForms(state) {
+  $("#clientForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+      await request("admin", {
+        command: "saveClient",
+        value: {
+          id: $("#clientId").value,
+          name: $("#clientName").value,
+          url: $("#clientUrl").value,
+          youtubeUrl: $("#clientYoutube").value,
+          description: $("#clientDescription").value,
+          images: [$("#clientImage1").value, $("#clientImage2").value].filter(Boolean),
+          version: $("#clientVersion").value,
+          pricing: $("#clientPricing").value
+        }
+      });
+      toast("Sponsored client saved.");
+      boot();
+    } catch (error) {
+      toast(error.message);
+    }
+  });
+  $("#clearClientForm")?.addEventListener("click", () => {
+    $("#clientFormPanel").innerHTML = clientFormMarkup();
+    bindAdminClientForms(state);
+  });
+  $$("[data-client-edit]").forEach((button) => button.addEventListener("click", () => {
+    const client = state.clients.find((item) => item.id === button.dataset.clientEdit);
+    $("#clientFormPanel").innerHTML = clientFormMarkup(client);
+    bindAdminClientForms(state);
+  }));
+  $$("[data-client-delete]").forEach((button) => button.addEventListener("click", async () => {
+    if (!confirm("Delete this sponsored client listing?")) return;
+    try {
+      await request("admin", { command: "deleteClient", value: { id: button.dataset.clientDelete } });
+      toast("Sponsored client deleted.");
+      boot();
+    } catch (error) {
+      toast(error.message);
+    }
+  }));
 }
 
 function renderStatic(page) {
-  const copy = {
-    terms: ["Terms", "Use Icon Listing honestly. Do not submit listings you do not control, spam the vote system, or post unsafe content."],
-    privacy: ["Privacy", "Icon Listing stores account details, listings, votes, and moderation data needed to run the site."],
-    help: ["Help", "Need help with a listing, vote, sponsorship, or account? Join the Discord or contact the IconRealms team."],
-    contact: ["Contact", `Reach ${CONFIG.site.owner} at ${CONFIG.site.contactEmail} or through Discord.`]
-  }[page] || ["Page", "This page is ready to configure."];
-  $("#app").innerHTML = `<div class="page"><section class="section card"><h1 class="section-title">${copy[0]}</h1><p class="section-copy">${copy[1]}</p></section></div>`;
+  const staticCopy = CONFIG.copy?.staticPages?.[page] || ["Page", "This page is ready to configure."];
+  $("#app").innerHTML = `<div class="page"><section class="section card"><h1 class="section-title">${escapeHtml(staticCopy[0])}</h1><p class="section-copy">${escapeHtml(staticCopy[1])}</p></section></div>`;
 }
 
 async function boot() {
