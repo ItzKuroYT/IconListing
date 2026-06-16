@@ -83,7 +83,7 @@
       }
     },
     {
-      "id": "2b8e1f02-596e-4ce4-adcf-4f8287492e5f",
+      "id": "cfd758bc-f7f9-4c23-8b82-fa11c830a1e9",
       "name": "wddwdwd",
       "javaHost": "icongen.minehut.gg",
       "javaPort": 25565,
@@ -118,21 +118,21 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-06-16T05:20:05.134Z",
-      "updatedAt": "2026-06-16T05:20:05.134Z",
-      "lastPingAt": "2026-06-16T05:20:06.438Z",
+      "createdAt": "2026-06-16T05:20:06.557Z",
+      "updatedAt": "2026-06-16T05:20:06.557Z",
+      "lastPingAt": "2026-06-16T05:20:06.567Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
           {
-            "createdAt": "2026-06-16T05:20:06.438Z",
+            "createdAt": "2026-06-16T05:20:06.567Z",
             "playersOnline": 3,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-16T05:20:06.438Z",
+      "lastSuccessfulPingAt": "2026-06-16T05:20:06.567Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1
     }
