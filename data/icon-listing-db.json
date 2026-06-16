@@ -47,21 +47,21 @@
       "sponsored": false,
       "createdAt": "2026-06-16T05:49:35.782Z",
       "updatedAt": "2026-06-16T05:49:35.782Z",
-      "lastPingAt": "2026-06-16T06:07:06.504Z",
+      "lastPingAt": "2026-06-16T06:29:14.343Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
           {
-            "createdAt": "2026-06-16T06:07:06.504Z",
+            "createdAt": "2026-06-16T06:29:14.343Z",
             "playersOnline": 3,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-16T06:07:06.504Z",
-      "uptimeChecks": 4,
-      "uptimeSuccesses": 4
+      "lastSuccessfulPingAt": "2026-06-16T06:29:14.343Z",
+      "uptimeChecks": 5,
+      "uptimeSuccesses": 5
     }
   ],
   "clients": [
