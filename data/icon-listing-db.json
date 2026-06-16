@@ -40,7 +40,7 @@
       ],
       "ownerId": "08ec4f76-24a7-444a-a197-19ed103b8d7a",
       "ownerName": "ItzKuroYT",
-      "votes": 1,
+      "votes": 2,
       "playersOnline": 0,
       "playersMax": 0,
       "version": "Unknown",
@@ -90,6 +90,12 @@
       "serverId": "67e2959b-f2b1-478b-afa3-bfe03d6f0702",
       "minecraftUsername": "ItzKuro_",
       "createdAt": "2026-06-16T01:08:37.237Z"
+    },
+    {
+      "id": "db7ce38b-3d75-46d6-8f0e-4ca9e8e6efe8",
+      "serverId": "67e2959b-f2b1-478b-afa3-bfe03d6f0702",
+      "minecraftUsername": "ItzKuro_",
+      "createdAt": "2026-06-16T04:07:36.165Z"
     }
   ],
   "voteIps": {}
