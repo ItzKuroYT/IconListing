@@ -62,58 +62,6 @@
       "lastSuccessfulPingAt": "2026-06-16T05:54:42.116Z",
       "uptimeChecks": 2,
       "uptimeSuccesses": 2
-    },
-    {
-      "id": "0ace34f4-f8a0-466c-9695-48e932303f3a",
-      "name": "IconMinez",
-      "javaHost": "iconMinez.minehut.gg",
-      "javaPort": 25565,
-      "crossPlay": false,
-      "bedrockHost": "",
-      "bedrockPort": 19132,
-      "votifierEnabled": false,
-      "votifierHost": "",
-      "votifierPort": 8192,
-      "votifierToken": "",
-      "websiteUrl": "https://web.iconrealms.net/home/",
-      "discordUrl": "https://discord.gg/fMbfFW7PWX",
-      "youtubeUrl": "https://www.youtube.com/shorts/HyAGt0ER-ak",
-      "country": "United States",
-      "bannerUrl": "",
-      "description": "This description is coming soon as the server is not yet configured\nThis description is coming soon as the server is not yet configured\nThis description is coming soon as the server is not yet configured\nThis description is coming soon as the server is not yet configured\nThis description is coming soon as the server is not yet configured\nThis description is coming soon as the server is not yet configured\nThis description is coming soon as the server is not yet configured\nThis description is coming soon as the server is not yet configured\nThis description is coming soon as the server is not yet configured\nThis description is coming soon as the server is not yet configured",
-      "tags": [
-        "Economy",
-        "PvP",
-        "BoxPvP",
-        "Gens",
-        "Cross-Play"
-      ],
-      "ownerId": "a470b643-b770-4035-9f34-5f5ec8220704",
-      "ownerName": "ItzKuroYT",
-      "votes": 0,
-      "playersOnline": 2698,
-      "playersMax": 964,
-      "version": "Velocity 1.7.2-26.1.1",
-      "online": true,
-      "uptimePercent": 100,
-      "sponsored": false,
-      "createdAt": "2026-06-16T05:55:53.513Z",
-      "updatedAt": "2026-06-16T05:55:53.513Z",
-      "lastPingAt": "2026-06-16T05:55:54.859Z",
-      "analytics": {
-        "ipCopies": [],
-        "playerHistory": [
-          {
-            "createdAt": "2026-06-16T05:55:54.859Z",
-            "playersOnline": 2698,
-            "playersMax": 964,
-            "online": true
-          }
-        ]
-      },
-      "lastSuccessfulPingAt": "2026-06-16T05:55:54.859Z",
-      "uptimeChecks": 1,
-      "uptimeSuccesses": 1
     }
   ],
   "clients": [],
