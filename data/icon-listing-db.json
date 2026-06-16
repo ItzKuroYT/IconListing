@@ -47,7 +47,7 @@
       "sponsored": false,
       "createdAt": "2026-06-16T05:49:35.782Z",
       "updatedAt": "2026-06-16T05:49:35.782Z",
-      "lastPingAt": "2026-06-16T09:43:23.003Z",
+      "lastPingAt": "2026-06-16T09:43:23.001Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -58,14 +58,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-16T09:43:23.003Z",
+            "createdAt": "2026-06-16T09:43:23.001Z",
             "playersOnline": 4,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-16T09:43:23.003Z",
+      "lastSuccessfulPingAt": "2026-06-16T09:43:23.001Z",
       "uptimeChecks": 10,
       "uptimeSuccesses": 10
     }
