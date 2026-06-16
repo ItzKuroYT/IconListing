@@ -24,11 +24,9 @@ module.exports = async function handler(req, res) {
     const db = migrateDb(await loadDb());
     const user = await userFromRequest(req, db);
 
-    const cleaned = await cleanupStaleServers(db);
-
     if (action === "state") {
       const refreshed = await refreshPings(db);
-      if (cleaned || refreshed) await saveDb(db);
+      if (refreshed) await saveDb(db);
       return json(res, 200, statePayload(db, user));
     }
 
@@ -46,7 +44,7 @@ module.exports = async function handler(req, res) {
         createdAt: new Date().toISOString()
       };
       db.users.push(next);
-      await saveDb(db);
+      await saveDb(db, { touchedUsers: [next.id], uniqueUserId: next.id });
       return json(res, 200, { user: publicUser(next), token: signToken(next.id) });
     }
 
@@ -62,6 +60,7 @@ module.exports = async function handler(req, res) {
       const server = validateServer(body.server || {});
       const existing = db.servers.find((item) => item.id === server.id);
       if (existing && existing.ownerId !== user.id && !isAdmin(user)) throw httpError(403, "You cannot edit that listing.");
+      ensureUniqueServerListing(db, server, existing?.id || server.id);
       const next = {
         ...existing,
         ...server,
@@ -80,7 +79,7 @@ module.exports = async function handler(req, res) {
       };
       await updatePing(next);
       db.servers = existing ? db.servers.map((item) => (item.id === existing.id ? next : item)) : [...db.servers, next];
-      await saveDb(db);
+      await saveDb(db, { touchedServers: [next.id], uniqueServerId: next.id });
       return json(res, 200, { server: publicServer(next) });
     }
 
@@ -92,7 +91,7 @@ module.exports = async function handler(req, res) {
       db.servers = db.servers.filter((item) => item.id !== body.id);
       db.votes = db.votes.filter((vote) => vote.serverId !== body.id);
       if (db.voteIps) delete db.voteIps[body.id];
-      await saveDb(db);
+      await saveDb(db, { deletedServers: [body.id] });
       return json(res, 200, { ok: true });
     }
 
@@ -107,7 +106,7 @@ module.exports = async function handler(req, res) {
       db.votes.push(vote);
       recordVoteCooldown(db, server.id, minecraftUsername, req);
       server.votes = votesForServer(db.votes, server.id).length;
-      await saveDb(db);
+      await saveDb(db, { touchedServers: [server.id], touchedVotes: [vote.id] });
       return json(res, 200, { ok: true, vote, server: publicServer(server) });
     }
 
@@ -115,7 +114,7 @@ module.exports = async function handler(req, res) {
       const server = db.servers.find((item) => item.id === body.serverId);
       if (!server) throw httpError(404, "Listing not found.");
       recordIpCopy(server, req);
-      await saveDb(db);
+      await saveDb(db, { touchedServers: [server.id] });
       return json(res, 200, { ok: true, analytics: publicAnalytics(server) });
     }
 
@@ -125,7 +124,8 @@ module.exports = async function handler(req, res) {
       if (body.username) user.username = cleanText(body.username);
       if (body.email) user.email = cleanText(body.email);
       if (body.password) user.passwordHash = hashPassword(body.password);
-      await saveDb(db);
+      ensureUniqueUser(db, user, user.id);
+      await saveDb(db, { touchedUsers: [user.id], uniqueUserId: user.id });
       return json(res, 200, { user: publicUser(user) });
     }
 
@@ -135,11 +135,12 @@ module.exports = async function handler(req, res) {
       if (body.username !== user.username || body.email !== user.email || !verifyPassword(body.password, user)) {
         throw httpError(400, "Those details do not match your account.");
       }
+      const deletedServerIds = db.servers.filter((item) => item.ownerId === user.id).map((item) => item.id);
       db.users = db.users.filter((item) => item.id !== user.id);
       db.servers = db.servers.filter((item) => item.ownerId !== user.id);
       db.votes = db.votes.filter((vote) => db.servers.some((server) => server.id === vote.serverId));
       pruneVoteCooldowns(db);
-      await saveDb(db);
+      await saveDb(db, { deletedUsers: [user.id], deletedServers: deletedServerIds });
       return json(res, 200, { ok: true });
     }
 
@@ -158,30 +159,42 @@ module.exports = async function handler(req, res) {
     if (action === "admin") {
       requireAdmin(user);
       const id = body.value?.id;
+      const saveOptions = {};
       if (body.command === "toggleSponsor") {
         const server = db.servers.find((item) => item.id === id);
-        if (server) server.sponsored = !server.sponsored;
+        if (server) {
+          server.sponsored = !server.sponsored;
+          saveOptions.touchedServers = [server.id];
+        }
       }
       if (body.command === "banUser") {
         const target = db.users.find((item) => item.id === id);
-        if (target) target.banned = !target.banned;
+        if (target) {
+          target.banned = !target.banned;
+          saveOptions.touchedUsers = [target.id];
+        }
       }
       if (body.command === "deleteUser") {
+        const deletedServerIds = db.servers.filter((item) => item.ownerId === id).map((item) => item.id);
         db.users = db.users.filter((item) => item.id !== id);
         db.servers = db.servers.filter((item) => item.ownerId !== id);
         db.votes = db.votes.filter((vote) => db.servers.some((server) => server.id === vote.serverId));
         pruneVoteCooldowns(db);
+        saveOptions.deletedUsers = [id];
+        saveOptions.deletedServers = deletedServerIds;
       }
       if (body.command === "saveClient") {
         const client = sanitizeClient(body.value || {});
         const existing = db.clients.find((item) => item.id === client.id);
         const next = { ...existing, ...client, id: existing?.id || client.id || createId(), createdAt: existing?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
         db.clients = existing ? db.clients.map((item) => (item.id === existing.id ? next : item)) : [...db.clients, next];
+        saveOptions.touchedClients = [next.id];
       }
       if (body.command === "deleteClient") {
         db.clients = db.clients.filter((item) => item.id !== id);
+        saveOptions.deletedClients = [id];
       }
-      await saveDb(db);
+      await saveDb(db, saveOptions);
       return json(res, 200, { ...statePayload(db, user), users: db.users.map(publicUser) });
     }
 
@@ -248,10 +261,10 @@ async function loadDb() {
   }
 }
 
-async function saveDb(db) {
+async function saveDb(db, options = {}) {
   requireConfiguredProductionDb();
   if (hasGithubStorage()) {
-    await writeGithubDb(db);
+    await writeGithubDb(db, options);
     return;
   }
   await fs.writeFile(TMP_DB, JSON.stringify(db, null, 2));
@@ -269,8 +282,8 @@ function requireConfiguredProductionDb() {
   }
 }
 
-async function readGithubDb() {
-  if (githubDbCache.data && Date.now() - githubDbCache.loadedAt < 1500) return cloneJson(githubDbCache.data);
+async function readGithubDb(options = {}) {
+  if (!options.bypassCache && githubDbCache.data && Date.now() - githubDbCache.loadedAt < 1500) return cloneJson(githubDbCache.data);
   const response = await fetch(githubDbUrl(true), { headers: githubHeaders() });
   if (response.status === 404) {
     const db = migrateDb(freshDb());
@@ -285,9 +298,10 @@ async function readGithubDb() {
   return cloneJson(db);
 }
 
-async function writeGithubDb(db, retry = true) {
-  const normalized = migrateDb(db);
-  if (!githubDbCache.sha) await readGithubDb();
+async function writeGithubDb(db, options = {}, retry = true) {
+  let normalized = migrateDb(db);
+  const latest = await readGithubDb({ bypassCache: true });
+  normalized = mergeDbForWrite(latest, normalized, options);
   const body = {
     message: "Update Icon Listing database",
     content: Buffer.from(JSON.stringify(normalized, null, 2)).toString("base64"),
@@ -301,11 +315,93 @@ async function writeGithubDb(db, retry = true) {
   });
   if (response.status === 409 && retry) {
     githubDbCache = { data: null, sha: null, loadedAt: 0 };
-    return writeGithubDb(normalized, false);
+    return writeGithubDb(normalized, options, false);
   }
   if (!response.ok) throw new Error(`GitHub database write failed (${response.status}).`);
   const payload = await response.json();
   githubDbCache = { data: cloneJson(normalized), sha: payload.content?.sha || githubDbCache.sha, loadedAt: Date.now() };
+}
+
+function mergeDbForWrite(remoteDb, nextDb, options = {}) {
+  const remote = migrateDb(remoteDb);
+  const next = migrateDb(nextDb);
+  const ids = writeIdSets(options);
+  const merged = {
+    ...next,
+    users: mergeById(remote.users, next.users, ids.deletedUsers, ids.touchedUsers),
+    servers: mergeById(remote.servers, next.servers, ids.deletedServers, ids.touchedServers),
+    clients: mergeById(remote.clients, next.clients, ids.deletedClients, ids.touchedClients),
+    votes: mergeVotes(remote.votes, next.votes, ids.deletedServers, ids.touchedVotes),
+    voteIps: mergeVoteIps(remote.voteIps, next.voteIps, ids.deletedServers)
+  };
+  pruneVoteCooldowns(merged);
+  ensureMergedWriteIsValid(merged, options);
+  return migrateDb(merged);
+}
+
+function ensureMergedWriteIsValid(db, options = {}) {
+  if (options.uniqueUserId) {
+    const user = db.users.find((item) => item.id === options.uniqueUserId);
+    if (user) ensureUniqueUser(db, user, user.id);
+  }
+  if (options.uniqueServerId) {
+    const server = db.servers.find((item) => item.id === options.uniqueServerId);
+    if (server) ensureUniqueServerListing(db, server, server.id);
+  }
+}
+
+function writeIdSets(options = {}) {
+  return {
+    deletedUsers: new Set(options.deletedUsers || []),
+    deletedServers: new Set(options.deletedServers || []),
+    deletedClients: new Set(options.deletedClients || []),
+    touchedUsers: new Set(options.touchedUsers || []),
+    touchedServers: new Set(options.touchedServers || []),
+    touchedClients: new Set(options.touchedClients || []),
+    touchedVotes: new Set(options.touchedVotes || [])
+  };
+}
+
+function mergeById(remoteItems = [], nextItems = [], deletedIds = new Set(), touchedIds = new Set()) {
+  const merged = new Map();
+  const remoteIds = new Set();
+  for (const item of remoteItems) {
+    if (item?.id && !deletedIds.has(item.id)) {
+      remoteIds.add(item.id);
+      merged.set(item.id, item);
+    }
+  }
+  for (const item of nextItems) {
+    if (item?.id && !deletedIds.has(item.id) && (remoteIds.has(item.id) || touchedIds.has(item.id))) merged.set(item.id, item);
+  }
+  return [...merged.values()];
+}
+
+function mergeVotes(remoteVotes = [], nextVotes = [], deletedServerIds = new Set(), touchedVoteIds = new Set()) {
+  const merged = new Map();
+  const remoteIds = new Set();
+  const add = (vote) => {
+    if (!vote?.id || deletedServerIds.has(vote.serverId)) return;
+    merged.set(vote.id, vote);
+  };
+  remoteVotes.forEach((vote) => {
+    if (vote?.id && !deletedServerIds.has(vote.serverId)) remoteIds.add(vote.id);
+    add(vote);
+  });
+  nextVotes.forEach((vote) => {
+    if (remoteIds.has(vote?.id) || touchedVoteIds.has(vote?.id)) add(vote);
+  });
+  return [...merged.values()];
+}
+
+function mergeVoteIps(remoteVoteIps = {}, nextVoteIps = {}, deletedServerIds = new Set()) {
+  const merged = cloneJson(remoteVoteIps || {});
+  for (const [serverId, entries] of Object.entries(nextVoteIps || {})) {
+    if (deletedServerIds.has(serverId)) continue;
+    merged[serverId] = { ...(merged[serverId] || {}), ...(entries || {}) };
+  }
+  for (const serverId of deletedServerIds) delete merged[serverId];
+  return merged;
 }
 
 function githubDbUrl(includeRef) {
@@ -337,10 +433,7 @@ function statePayload(db, user) {
 }
 
 async function cleanupStaleServers(db) {
-  const cutoff = Date.now() - CONFIG.limits.staleServerDeleteDays * 24 * 60 * 60 * 1000;
-  const before = db.servers.length;
-  db.servers = db.servers.filter((server) => !server.lastSuccessfulPingAt || new Date(server.lastSuccessfulPingAt).getTime() >= cutoff);
-  return db.servers.length !== before;
+  return false;
 }
 
 async function refreshPings(db) {
@@ -467,6 +560,56 @@ function validateServer(server) {
   if (next.crossPlay && !next.bedrockHost) throw httpError(400, "Bedrock host is required for cross-play listings.");
   if (isBlockedServerHost(next.javaHost) || isBlockedServerHost(next.bedrockHost)) throw httpError(400, "FalixSrv and Aternos servers are not allowed on this listing site.");
   return next;
+}
+
+function ensureUniqueUser(db, user, currentId = "") {
+  for (const existing of db.users || []) {
+    if (existing.id && existing.id === currentId) continue;
+    if (same(existing.username, user.username) || same(existing.email, user.email)) {
+      throw httpError(409, "That username or email is already taken.");
+    }
+  }
+}
+
+function ensureUniqueServerListing(db, server, currentId = "") {
+  const name = comparableText(server.name);
+  const description = comparableText(server.description);
+  const addresses = new Set(serverAddressKeys(server));
+  for (const existing of db.servers || []) {
+    if (existing.id && existing.id === currentId) continue;
+    if (name && comparableText(existing.name) === name) {
+      throw httpError(409, "A listing with that server name already exists.");
+    }
+    if (description && comparableText(existing.description) === description) {
+      throw httpError(409, "A listing with that description already exists.");
+    }
+    if (serverAddressKeys(existing).some((key) => addresses.has(key))) {
+      throw httpError(409, "A listing with that server IP already exists.");
+    }
+  }
+}
+
+function comparableText(value = "") {
+  return String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function serverAddressKeys(server) {
+  return [
+    hostPortKey(server.javaHost, server.javaPort, CONFIG.defaults.javaPort),
+    server.crossPlay || server.bedrockHost ? hostPortKey(server.bedrockHost, server.bedrockPort, CONFIG.defaults.bedrockPort) : ""
+  ].filter(Boolean);
+}
+
+function hostPortKey(host = "", port, defaultPort) {
+  let value = String(host || "").trim().toLowerCase();
+  if (!value) return "";
+  value = value.replace(/^https?:\/\//, "").split("/")[0].replace(/\.$/, "");
+  const match = value.match(/^(.+):(\d+)$/);
+  if (match) {
+    value = match[1];
+    port = Number(match[2]);
+  }
+  return `${value}:${Number(port || defaultPort)}`;
 }
 
 function sanitizeClient(client) {

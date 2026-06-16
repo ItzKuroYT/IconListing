@@ -132,6 +132,70 @@ async function main() {
     );
     assert(saved.code === 200 && saved.json.server.id, "server save should succeed");
 
+    const duplicateName = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Smoke Test SMP",
+          javaHost: "name-dupe.example.org",
+          javaPort: 25565,
+          country: "United States",
+          description: "This smoke listing has a new address and a new description, but it reuses the server name so the duplicate-name protection should reject it.".repeat(2),
+          tags: ["SMP", "Survival"]
+        }
+      },
+      login.json.token
+    );
+    assert(duplicateName.code === 409, "duplicate server names should be rejected");
+
+    const duplicateIp = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Smoke Test Duplicate IP",
+          javaHost: "example.org",
+          javaPort: 25565,
+          country: "United States",
+          description: "This smoke listing has a different name and different words, but it reuses the same server address so duplicate IP protection should reject it.".repeat(2),
+          tags: ["SMP", "Survival"]
+        }
+      },
+      login.json.token
+    );
+    assert(duplicateIp.code === 409, "duplicate server IPs should be rejected");
+
+    const duplicateDescription = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Smoke Test Duplicate Description",
+          javaHost: "description-dupe.example.org",
+          javaPort: 25565,
+          country: "United States",
+          description,
+          tags: ["SMP", "Survival"]
+        }
+      },
+      login.json.token
+    );
+    assert(duplicateDescription.code === 409, "duplicate descriptions should be rejected");
+
+    const secondServer = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Smoke Test Network",
+          javaHost: "network.example.org",
+          javaPort: 25565,
+          country: "United States",
+          description: "A second unique listing from the same account to verify users can own multiple server listings as long as the name, address, and description are not duplicates. This should stay saved beside the first listing without replacing it.",
+          tags: ["SMP", "Survival"]
+        }
+      },
+      login.json.token
+    );
+    assert(secondServer.code === 200 && secondServer.json.server.id !== saved.json.server.id, "same account should save multiple unique servers");
+
     const testVote = await call(
       "testVote",
       { host: "127.0.0.1", port: 8192, token: "token" },
@@ -188,14 +252,16 @@ async function main() {
 
     const finalState = await call("state", {}, "", "GET");
     const server = finalState.json.servers.find((item) => item.id === saved.json.server.id);
+    const otherServer = finalState.json.servers.find((item) => item.id === secondServer.json.server.id);
     const client = finalState.json.clients.find((item) => item.name === "Smoke Client");
     assert(server && server.votes === 1, "server should have one counted vote");
+    assert(otherServer && otherServer.ownerId === server.ownerId, "same account should keep multiple unique listings");
     assert(server.description.includes("\nLine two") && server.description.includes("\n\nLine four"), "server description should preserve line breaks");
     assert(server.analytics.ipCopiesLast30 === 1, "server should expose public IP copy analytics");
     assert(client && client.images.length === 2 && client.version === "both" && client.pricing === "paid", "sponsored client fields should be stored");
     assert(finalState.json.votes.length === 1, "monthly vote records should be stored");
 
-    console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, mcstatus fallback, Votifier, voting cooldown, sponsored clients.");
+    console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, duplicate listing checks, multiple listings per account, mcstatus fallback, Votifier, voting cooldown, sponsored clients.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });

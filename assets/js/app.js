@@ -228,6 +228,11 @@ function fallbackRequest(action, payload) {
     const server = sanitizeServer(payload.server || {});
     const existing = db.servers.find((item) => item.id === server.id);
     if (existing && existing.ownerId !== user.id && !isAdmin(user)) return Promise.reject(new Error("You cannot edit that listing."));
+    try {
+      ensureUniqueServerListing(db, server, existing?.id || server.id);
+    } catch (error) {
+      return Promise.reject(error);
+    }
     const next = {
       ...existing,
       ...server,
@@ -298,6 +303,11 @@ function fallbackRequest(action, payload) {
     if (payload.username) user.username = cleanText(payload.username);
     if (payload.email) user.email = cleanText(payload.email);
     if (payload.password) user.password = payload.password;
+    try {
+      ensureUniqueUser(db, user, user.id);
+    } catch (error) {
+      return Promise.reject(error);
+    }
     save();
     store.session = { ...store.session, user: publicUser(user) };
     return Promise.resolve({ user: publicUser(user) });
@@ -380,6 +390,15 @@ function sanitizeServer(server) {
   return next;
 }
 
+function ensureUniqueUser(db, user, currentId = "") {
+  for (const existing of db.users || []) {
+    if (existing.id && existing.id === currentId) continue;
+    if (same(existing.username, user.username) || same(existing.email, user.email)) {
+      throw new Error("That username or email is already taken.");
+    }
+  }
+}
+
 function isBlockedServerHost(host = "") {
   const value = String(host || "").trim().toLowerCase();
   if (!value) return false;
@@ -387,6 +406,41 @@ function isBlockedServerHost(host = "") {
     const next = String(blocked || "").trim().toLowerCase();
     return value === next || value.endsWith(`.${next}`) || value.includes(next);
   });
+}
+
+function ensureUniqueServerListing(db, server, currentId = "") {
+  const name = comparableText(server.name);
+  const description = comparableText(server.description);
+  const addresses = new Set(serverAddressKeys(server));
+  for (const existing of db.servers || []) {
+    if (existing.id && existing.id === currentId) continue;
+    if (name && comparableText(existing.name) === name) throw new Error("A listing with that server name already exists.");
+    if (description && comparableText(existing.description) === description) throw new Error("A listing with that description already exists.");
+    if (serverAddressKeys(existing).some((key) => addresses.has(key))) throw new Error("A listing with that server IP already exists.");
+  }
+}
+
+function comparableText(value = "") {
+  return String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function serverAddressKeys(server) {
+  return [
+    hostPortKey(server.javaHost, server.javaPort, CONFIG.defaults.javaPort),
+    server.crossPlay || server.bedrockHost ? hostPortKey(server.bedrockHost, server.bedrockPort, CONFIG.defaults.bedrockPort) : ""
+  ].filter(Boolean);
+}
+
+function hostPortKey(host = "", port, defaultPort) {
+  let value = String(host || "").trim().toLowerCase();
+  if (!value) return "";
+  value = value.replace(/^https?:\/\//, "").split("/")[0].replace(/\.$/, "");
+  const match = value.match(/^(.+):(\d+)$/);
+  if (match) {
+    value = match[1];
+    port = Number(match[2]);
+  }
+  return `${value}:${Number(port || defaultPort)}`;
 }
 
 function sanitizeClient(client) {
