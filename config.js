@@ -43,6 +43,7 @@ const IconListingConfig = {
     descriptionMinLength: 200,
     tagsMin: 1,
     tagsMax: 7,
+    voteCooldownHours: 24,
     staleServerDeleteDays: 90
   },
   ranking: {

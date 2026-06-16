@@ -257,6 +257,7 @@ function fallbackRequest(action, payload) {
     if (server.ownerId !== user.id && !isAdmin(user)) return Promise.reject(new Error("You cannot delete that listing."));
     db.servers = db.servers.filter((item) => item.id !== payload.id);
     db.votes = db.votes.filter((vote) => vote.serverId !== payload.id);
+    if (db.voteIps) delete db.voteIps[payload.id];
     save();
     return Promise.resolve({ ok: true });
   }
@@ -265,8 +266,14 @@ function fallbackRequest(action, payload) {
     const username = cleanText(payload.minecraftUsername || "");
     if (!server) return Promise.reject(new Error("Listing not found."));
     if (!/^[A-Za-z0-9_]{3,16}$/.test(username)) return Promise.reject(new Error("Enter a valid Minecraft username."));
+    try {
+      enforceVoteCooldown(db, server.id, username);
+    } catch (error) {
+      return Promise.reject(error);
+    }
     const vote = { id: createId(), serverId: server.id, minecraftUsername: username, createdAt: new Date().toISOString() };
     db.votes.push(vote);
+    recordVoteCooldown(db, server.id, username);
     server.votes = db.votes.filter((item) => item.serverId === server.id).length;
     save();
     return Promise.resolve({ ok: true, vote, server: { ...server, analytics: publicAnalytics(server) } });
@@ -302,6 +309,7 @@ function fallbackRequest(action, payload) {
     }
     db.users = db.users.filter((item) => item.id !== user.id);
     db.servers = db.servers.filter((item) => item.ownerId !== user.id);
+    pruneVoteCooldowns(db);
     save();
     store.session = null;
     return Promise.resolve({ ok: true });
@@ -326,6 +334,7 @@ function fallbackRequest(action, payload) {
     if (payload.command === "deleteUser") {
       db.users = db.users.filter((item) => item.id !== id);
       db.servers = db.servers.filter((item) => item.ownerId !== id);
+      pruneVoteCooldowns(db);
     }
     if (payload.command === "saveClient") {
       const client = sanitizeClient(payload.value || {});
@@ -409,6 +418,66 @@ function monthKey(date = new Date()) {
 
 function votesForServer(votes, serverId) {
   return votes.filter((vote) => vote.serverId === serverId);
+}
+
+function voteCooldownMs() {
+  return Number(CONFIG.limits?.voteCooldownHours || 24) * 60 * 60 * 1000;
+}
+
+function enforceVoteCooldown(db, serverId, minecraftUsername) {
+  if (!db.voteIps) db.voteIps = {};
+  const entries = db.voteIps[serverId] || {};
+  const now = Date.now();
+  const cooldown = voteCooldownMs();
+  const lastVoteAt = voteCooldownKeys(minecraftUsername)
+    .map((key) => entries[key])
+    .filter(Boolean)
+    .map((value) => new Date(value).getTime())
+    .filter((value) => Number.isFinite(value))
+    .sort((a, b) => b - a)[0];
+  if (lastVoteAt && now - lastVoteAt < cooldown) {
+    throw new Error(`You can vote for this server again in ${formatDuration(cooldown - (now - lastVoteAt))}.`);
+  }
+}
+
+function recordVoteCooldown(db, serverId, minecraftUsername) {
+  if (!db.voteIps) db.voteIps = {};
+  const entries = db.voteIps[serverId] || {};
+  const now = new Date().toISOString();
+  for (const key of voteCooldownKeys(minecraftUsername)) entries[key] = now;
+  db.voteIps[serverId] = pruneVoteCooldownEntries(entries);
+}
+
+function voteCooldownKeys(minecraftUsername) {
+  return [
+    `visitor:${store.session?.user?.id || "local"}`,
+    `name:${String(minecraftUsername || "").trim().toLowerCase()}`
+  ];
+}
+
+function pruneVoteCooldownEntries(entries) {
+  const cutoff = Date.now() - voteCooldownMs();
+  return Object.fromEntries(Object.entries(entries || {}).filter(([, value]) => new Date(value).getTime() >= cutoff));
+}
+
+function pruneVoteCooldowns(db) {
+  if (!db.voteIps) db.voteIps = {};
+  const serverIds = new Set(db.servers.map((server) => server.id));
+  db.voteIps = Object.fromEntries(
+    Object.entries(db.voteIps)
+      .filter(([serverId]) => serverIds.has(serverId))
+      .map(([serverId, entries]) => [serverId, pruneVoteCooldownEntries(entries)])
+      .filter(([, entries]) => Object.keys(entries).length)
+  );
+}
+
+function formatDuration(ms) {
+  const minutes = Math.max(1, Math.ceil(ms / 60000));
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (hours && remainingMinutes) return `${hours}h ${remainingMinutes}m`;
+  if (hours) return `${hours}h`;
+  return `${minutes}m`;
 }
 
 function monthlyVotes(votes, serverId) {

@@ -91,6 +91,7 @@ module.exports = async function handler(req, res) {
       if (server.ownerId !== user.id && !isAdmin(user)) throw httpError(403, "You cannot delete that listing.");
       db.servers = db.servers.filter((item) => item.id !== body.id);
       db.votes = db.votes.filter((vote) => vote.serverId !== body.id);
+      if (db.voteIps) delete db.voteIps[body.id];
       await saveDb(db);
       return json(res, 200, { ok: true });
     }
@@ -100,9 +101,11 @@ module.exports = async function handler(req, res) {
       if (!server) throw httpError(404, "Listing not found.");
       const minecraftUsername = cleanText(body.minecraftUsername || "");
       if (!/^[A-Za-z0-9_]{3,16}$/.test(minecraftUsername)) throw httpError(400, "Enter a valid Minecraft username.");
+      enforceVoteCooldown(db, server.id, minecraftUsername, req);
       if (server.votifierEnabled) await sendVotifierVote(server, minecraftUsername);
       const vote = { id: createId(), serverId: server.id, minecraftUsername, createdAt: new Date().toISOString() };
       db.votes.push(vote);
+      recordVoteCooldown(db, server.id, minecraftUsername, req);
       server.votes = votesForServer(db.votes, server.id).length;
       await saveDb(db);
       return json(res, 200, { ok: true, vote, server: publicServer(server) });
@@ -135,6 +138,7 @@ module.exports = async function handler(req, res) {
       db.users = db.users.filter((item) => item.id !== user.id);
       db.servers = db.servers.filter((item) => item.ownerId !== user.id);
       db.votes = db.votes.filter((vote) => db.servers.some((server) => server.id === vote.serverId));
+      pruneVoteCooldowns(db);
       await saveDb(db);
       return json(res, 200, { ok: true });
     }
@@ -166,6 +170,7 @@ module.exports = async function handler(req, res) {
         db.users = db.users.filter((item) => item.id !== id);
         db.servers = db.servers.filter((item) => item.ownerId !== id);
         db.votes = db.votes.filter((vote) => db.servers.some((server) => server.id === vote.serverId));
+        pruneVoteCooldowns(db);
       }
       if (body.command === "saveClient") {
         const client = sanitizeClient(body.value || {});
@@ -206,7 +211,8 @@ function migrateDb(db = freshDb()) {
     users: Array.isArray(db.users) ? db.users : [],
     servers: Array.isArray(db.servers) ? db.servers.filter((server) => !String(server.id || "").startsWith("seed-")).map(normalizeServer) : [],
     clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")).map(normalizeClient) : [],
-    votes: Array.isArray(db.votes) ? db.votes : []
+    votes: Array.isArray(db.votes) ? db.votes : [],
+    voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {}
   };
 }
 
@@ -486,6 +492,67 @@ function sanitizeClient(client) {
 
 function votesForServer(votes, serverId) {
   return votes.filter((vote) => vote.serverId === serverId);
+}
+
+function voteCooldownMs() {
+  return Number(CONFIG.limits?.voteCooldownHours || 24) * 60 * 60 * 1000;
+}
+
+function enforceVoteCooldown(db, serverId, minecraftUsername, req) {
+  if (!db.voteIps) db.voteIps = {};
+  const entries = db.voteIps[serverId] || {};
+  const now = Date.now();
+  const cooldown = voteCooldownMs();
+  const keys = voteCooldownKeys(minecraftUsername, req);
+  const lastVoteAt = keys
+    .map((key) => entries[key])
+    .filter(Boolean)
+    .map((value) => new Date(value).getTime())
+    .filter((value) => Number.isFinite(value))
+    .sort((a, b) => b - a)[0];
+  if (lastVoteAt && now - lastVoteAt < cooldown) {
+    throw httpError(429, `You can vote for this server again in ${formatDuration(cooldown - (now - lastVoteAt))}.`);
+  }
+}
+
+function recordVoteCooldown(db, serverId, minecraftUsername, req) {
+  if (!db.voteIps) db.voteIps = {};
+  const entries = db.voteIps[serverId] || {};
+  const now = new Date().toISOString();
+  for (const key of voteCooldownKeys(minecraftUsername, req)) entries[key] = now;
+  db.voteIps[serverId] = pruneVoteCooldownEntries(entries);
+}
+
+function voteCooldownKeys(minecraftUsername, req) {
+  return [
+    `visitor:${clientHash(req)}`,
+    `name:${String(minecraftUsername || "").trim().toLowerCase()}`
+  ];
+}
+
+function pruneVoteCooldownEntries(entries) {
+  const cutoff = Date.now() - voteCooldownMs();
+  return Object.fromEntries(Object.entries(entries || {}).filter(([, value]) => new Date(value).getTime() >= cutoff));
+}
+
+function pruneVoteCooldowns(db) {
+  if (!db.voteIps) db.voteIps = {};
+  const serverIds = new Set(db.servers.map((server) => server.id));
+  db.voteIps = Object.fromEntries(
+    Object.entries(db.voteIps)
+      .filter(([serverId]) => serverIds.has(serverId))
+      .map(([serverId, entries]) => [serverId, pruneVoteCooldownEntries(entries)])
+      .filter(([, entries]) => Object.keys(entries).length)
+  );
+}
+
+function formatDuration(ms) {
+  const minutes = Math.max(1, Math.ceil(ms / 60000));
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (hours && remainingMinutes) return `${hours}h ${remainingMinutes}m`;
+  if (hours) return `${hours}h`;
+  return `${minutes}m`;
 }
 
 function publicServer(server) {

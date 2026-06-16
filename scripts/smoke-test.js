@@ -146,6 +146,13 @@ async function main() {
     assert(vote.code === 200, "vote should be accepted");
     assert(received.length === 2, "Votifier provider should receive test vote and real vote");
 
+    const repeatVote = await call("vote", {
+      serverId: saved.json.server.id,
+      minecraftUsername: `Alex_${String(suffix).slice(-4)}`
+    });
+    assert(repeatVote.code === 429, "repeat vote should be blocked for 24 hours");
+    assert(received.length === 2, "blocked repeat vote should not call the Votifier provider");
+
     const copy = await call("trackCopy", { serverId: saved.json.server.id }, "", "POST", {
       "x-forwarded-for": "203.0.113.10",
       "user-agent": "IconListingSmoke"
@@ -188,7 +195,7 @@ async function main() {
     assert(client && client.images.length === 2 && client.version === "both" && client.pricing === "paid", "sponsored client fields should be stored");
     assert(finalState.json.votes.length === 1, "monthly vote records should be stored");
 
-    console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, mcstatus fallback, Votifier, voting, sponsored clients.");
+    console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, mcstatus fallback, Votifier, voting cooldown, sponsored clients.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });
