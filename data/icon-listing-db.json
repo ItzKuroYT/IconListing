@@ -38,7 +38,7 @@
       ],
       "ownerId": "a470b643-b770-4035-9f34-5f5ec8220704",
       "ownerName": "ItzKuroYT",
-      "votes": 0,
+      "votes": 1,
       "playersOnline": 3,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.1.1",
@@ -65,6 +65,18 @@
     }
   ],
   "clients": [],
-  "votes": [],
-  "voteIps": {}
+  "votes": [
+    {
+      "id": "d9afe776-a738-4298-9cc4-ba8c1b4d9ba9",
+      "serverId": "17a88ec6-5ee7-4d1b-85eb-8b0bd4bd319a",
+      "minecraftUsername": "ItzKuro_",
+      "createdAt": "2026-06-16T05:49:58.254Z"
+    }
+  ],
+  "voteIps": {
+    "17a88ec6-5ee7-4d1b-85eb-8b0bd4bd319a": {
+      "visitor:e5e0e20a75b3e490987b2ee8045de4bb5da3cf0f6afdec0f7705c0aad9603d16": "2026-06-16T05:49:58.254Z",
+      "name:itzkuro_": "2026-06-16T05:49:58.254Z"
+    }
+  }
 }
