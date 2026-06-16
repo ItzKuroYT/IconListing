@@ -45,14 +45,14 @@
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.1.1",
       "online": true,
-      "uptimePercent": 95,
+      "uptimePercent": 95.23809523809523,
       "sponsored": true,
       "createdAt": "2026-06-15T22:08:11.216Z",
       "updatedAt": "2026-06-15T23:37:06.513Z",
-      "lastPingAt": "2026-06-16T04:53:54.927Z",
-      "lastSuccessfulPingAt": "2026-06-16T04:53:54.927Z",
-      "uptimeChecks": 20,
-      "uptimeSuccesses": 19,
+      "lastPingAt": "2026-06-16T05:15:24.603Z",
+      "lastSuccessfulPingAt": "2026-06-16T05:15:24.603Z",
+      "uptimeChecks": 21,
+      "uptimeSuccesses": 20,
       "analytics": {
         "ipCopies": [
           {
@@ -74,7 +74,7 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-16T04:53:54.927Z",
+            "createdAt": "2026-06-16T05:15:24.603Z",
             "playersOnline": 3,
             "playersMax": 500,
             "online": true
