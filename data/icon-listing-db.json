@@ -47,7 +47,7 @@
       "sponsored": false,
       "createdAt": "2026-06-16T05:49:35.782Z",
       "updatedAt": "2026-06-16T05:49:35.782Z",
-      "lastPingAt": "2026-06-17T04:18:25.038Z",
+      "lastPingAt": "2026-06-17T06:23:34.830Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -98,12 +98,18 @@
             "playersOnline": 4,
             "playersMax": 500,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-17T06:23:34.830Z",
+            "playersOnline": 4,
+            "playersMax": 500,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-17T04:18:25.038Z",
-      "uptimeChecks": 23,
-      "uptimeSuccesses": 23
+      "lastSuccessfulPingAt": "2026-06-17T06:23:34.830Z",
+      "uptimeChecks": 24,
+      "uptimeSuccesses": 24
     }
   ],
   "clients": [
@@ -131,10 +137,5 @@
       "createdAt": "2026-06-16T05:49:58.254Z"
     }
   ],
-  "voteIps": {
-    "17a88ec6-5ee7-4d1b-85eb-8b0bd4bd319a": {
-      "visitor:e5e0e20a75b3e490987b2ee8045de4bb5da3cf0f6afdec0f7705c0aad9603d16": "2026-06-16T05:49:58.254Z",
-      "name:itzkuro_": "2026-06-16T05:49:58.254Z"
-    }
-  }
+  "voteIps": {}
 }
