@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://icon-listing.vercel.app/home/</loc>
+    <loc>https://listing.iconrealms.net/home/</loc>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://icon-listing.vercel.app/servers/</loc>
+    <loc>https://listing.iconrealms.net/servers/</loc>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://icon-listing.vercel.app/sponsored/</loc>
+    <loc>https://listing.iconrealms.net/sponsored/</loc>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://icon-listing.vercel.app/sponsored-clients/</loc>
+    <loc>https://listing.iconrealms.net/sponsored-clients/</loc>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://icon-listing.vercel.app/help/</loc>
+    <loc>https://listing.iconrealms.net/help/</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://icon-listing.vercel.app/contact/</loc>
+    <loc>https://listing.iconrealms.net/contact/</loc>
     <priority>0.4</priority>
   </url>
 </urlset>

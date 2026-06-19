@@ -2,7 +2,7 @@ const IconListingConfig = {
   site: {
     name: "Icon Listing",
     owner: "IconRealms",
-    url: "https://icon-listing.vercel.app",
+    url: "https://listing.iconrealms.net",
     basePath: "",
     iconPath: "/assets/icon.png",
     discordUrl: "https://discord.gg/fMbfFW7PWX",
