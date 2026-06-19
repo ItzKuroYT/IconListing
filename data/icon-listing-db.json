@@ -39,7 +39,7 @@
       "ownerId": "a470b643-b770-4035-9f34-5f5ec8220704",
       "ownerName": "ItzKuroYT",
       "votes": 1,
-      "playersOnline": 3,
+      "playersOnline": 4,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
@@ -47,7 +47,7 @@
       "sponsored": false,
       "createdAt": "2026-06-16T05:49:35.782Z",
       "updatedAt": "2026-06-16T05:49:35.782Z",
-      "lastPingAt": "2026-06-19T05:51:15.149Z",
+      "lastPingAt": "2026-06-19T20:34:14.571Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -176,12 +176,18 @@
             "playersOnline": 3,
             "playersMax": 500,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-19T20:34:14.571Z",
+            "playersOnline": 4,
+            "playersMax": 500,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-19T05:51:15.149Z",
-      "uptimeChecks": 52,
-      "uptimeSuccesses": 52
+      "lastSuccessfulPingAt": "2026-06-19T20:34:14.571Z",
+      "uptimeChecks": 53,
+      "uptimeSuccesses": 53
     }
   ],
   "clients": [
