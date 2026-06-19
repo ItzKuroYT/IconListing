@@ -573,9 +573,107 @@ function pageTitle(page) {
   return page.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
 }
 
+function trimSeo(value = "", max = 160) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  if (text.length <= max) return text;
+  return `${text.slice(0, Math.max(0, max - 3)).trim()}...`;
+}
+
+function absoluteUrl(path = "/") {
+  const base = String(CONFIG.site.url || (location.origin && location.origin !== "null" ? location.origin : "")).replace(/\/$/, "");
+  const next = String(path || "/");
+  if (/^https?:\/\//i.test(next)) return next;
+  if (!base) return route(next.startsWith("/") ? next : `/${next}`);
+  return new URL(route(next.startsWith("/") ? next : `/${next}`), `${base}/`).href;
+}
+
+function upsertMeta(attribute, key, content) {
+  if (!content) return;
+  let node = document.head.querySelector(`meta[${attribute}="${key}"]`);
+  if (!node) {
+    node = document.createElement("meta");
+    node.setAttribute(attribute, key);
+    document.head.append(node);
+  }
+  node.setAttribute("content", content);
+}
+
+function upsertLink(rel, href) {
+  if (!href) return;
+  let node = document.head.querySelector(`link[rel="${rel}"]`);
+  if (!node) {
+    node = document.createElement("link");
+    node.setAttribute("rel", rel);
+    document.head.append(node);
+  }
+  node.setAttribute("href", href);
+}
+
+function upsertJsonLd(data) {
+  if (!data) return;
+  let node = document.head.querySelector("#seo-jsonld");
+  if (!node) {
+    node = document.createElement("script");
+    node.id = "seo-jsonld";
+    node.type = "application/ld+json";
+    document.head.append(node);
+  }
+  node.textContent = JSON.stringify(data);
+}
+
+function setSeoMeta(options = {}) {
+  const seo = CONFIG.seo || {};
+  const title = trimSeo(options.title || seo.defaultTitle || `${CONFIG.site.name} | ${pageTitle(document.body.dataset.page || "home")}`, 59);
+  const description = trimSeo(options.description || seo.defaultDescription || copy("home.body", ""), 158);
+  const canonical = absoluteUrl(options.path || location.pathname || "/");
+  const image = absoluteUrl(options.image || CONFIG.site.iconPath || "/assets/icon.png");
+  const keywords = [...new Set([...(seo.keywords || []), ...(options.keywords || [])].filter(Boolean))].join(", ");
+  document.title = title;
+  upsertMeta("name", "description", description);
+  upsertMeta("name", "robots", "index, follow, max-image-preview:large");
+  upsertMeta("name", "keywords", keywords);
+  upsertMeta("name", "application-name", CONFIG.site.name);
+  upsertMeta("name", "theme-color", CONFIG.theme?.colors?.purple || "#8b5cf6");
+  upsertLink("canonical", canonical);
+  upsertMeta("property", "og:site_name", CONFIG.site.name);
+  upsertMeta("property", "og:type", options.type || "website");
+  upsertMeta("property", "og:title", title);
+  upsertMeta("property", "og:description", description);
+  upsertMeta("property", "og:url", canonical);
+  upsertMeta("property", "og:image", image);
+  upsertMeta("name", "twitter:card", "summary_large_image");
+  upsertMeta("name", "twitter:title", title);
+  upsertMeta("name", "twitter:description", description);
+  upsertMeta("name", "twitter:image", image);
+  upsertJsonLd(options.jsonLd || {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: CONFIG.site.name,
+    url: absoluteUrl("/home/"),
+    description,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${absoluteUrl("/servers/")}?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  });
+}
+
+function defaultPageSeo(page) {
+  const seo = CONFIG.seo || {};
+  const key = page === "sponsored-clients" ? "sponsoredClients" : page;
+  const pageSeo = seo.pages?.[key] || {};
+  const path = page === "home" ? "/home/" : `/${page}/`;
+  return {
+    title: pageSeo.title || `${CONFIG.site.name} | ${pageTitle(page)}`,
+    description: pageSeo.description || seo.defaultDescription || copy("home.body", ""),
+    path
+  };
+}
+
 function renderLayout() {
   const page = document.body.dataset.page || "home";
-  document.title = `${CONFIG.site.name} | ${pageTitle(page)}`;
+  setSeoMeta(defaultPageSeo(page));
   document.body.innerHTML = `<div class="site-shell">
     <header class="topbar">
       <nav class="nav" aria-label="Main navigation">
@@ -720,7 +818,47 @@ function setupFilters(servers) {
   apply();
 }
 
+function serverSeoTitle(server) {
+  const base = `${server.name} Minecraft Server`;
+  return base.length <= 43 ? `${base} | ${CONFIG.site.name}` : base;
+}
+
+function serverSeoDescription(server) {
+  const tags = (server.tags || []).slice(0, 4).join(", ");
+  const status = server.online ? `${Number(server.playersOnline || 0).toLocaleString()} players online` : "status, tags, votes";
+  return trimSeo(`${server.name} is a Minecraft server${tags ? ` for ${tags}` : ""}. Join at ${serverAddress(server)} and view ${status}, details, trailer, and voting.`, 158);
+}
+
+function serverJsonLd(server) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "GameServer",
+    name: server.name,
+    url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
+    description: trimSeo(server.description || serverSeoDescription(server), 300),
+    game: "Minecraft",
+    keywords: [...(server.tags || []), "Minecraft server", "Minecraft server list"].join(", "),
+    image: absoluteUrl(asset(server.bannerUrl || CONFIG.site.iconPath)),
+    serverStatus: server.online ? "Online" : "Offline"
+  };
+}
+
 function renderHome(state) {
+  setSeoMeta({
+    ...defaultPageSeo("home"),
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: CONFIG.site.name,
+      url: absoluteUrl("/home/"),
+      description: CONFIG.seo?.pages?.home?.description || CONFIG.seo?.defaultDescription,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${absoluteUrl("/servers/")}?q={search_term_string}`,
+        "query-input": "required name=search_term_string"
+      }
+    }
+  });
   const sponsored = state.servers.filter((server) => server.sponsored);
   $("#app").innerHTML = `<div class="page">
     <section class="hero-band compact">
@@ -760,6 +898,27 @@ function renderHome(state) {
 
 function renderServers(state) {
   const tag = new URLSearchParams(location.search).get("tag") || "";
+  setSeoMeta({
+    ...defaultPageSeo("servers"),
+    title: tag ? `${tag} Minecraft Servers | ${CONFIG.site.name}` : CONFIG.seo?.pages?.servers?.title,
+    description: tag
+      ? `Browse ${tag} Minecraft servers by votes, players, rank, and status. Find active ${tag} communities and vote for your favorites.`
+      : CONFIG.seo?.pages?.servers?.description,
+    path: tag ? `/servers/?tag=${encodeURIComponent(tag)}` : "/servers/",
+    keywords: tag ? [tag, `${tag} Minecraft servers`] : [],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: tag ? `${tag} Minecraft Servers` : "Minecraft Servers",
+      url: absoluteUrl(tag ? `/servers/?tag=${encodeURIComponent(tag)}` : "/servers/"),
+      itemListElement: state.servers.slice(0, 20).map((server, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
+        name: server.name
+      }))
+    }
+  });
   $("#app").innerHTML = `<div class="page">
     <section class="section">
       <div class="section-head">
@@ -779,6 +938,11 @@ function renderServerDetail(state) {
   const id = new URLSearchParams(location.search).get("id");
   const server = state.servers.find((item) => item.id === id);
   if (!server) {
+    setSeoMeta({
+      title: `Server Not Found | ${CONFIG.site.name}`,
+      description: "This Minecraft server listing could not be found. Browse active Minecraft servers by players, votes, tags, and status.",
+      path: "/server/"
+    });
     $("#app").innerHTML = `<div class="page">${emptyNotice()}</div>`;
     return;
   }
@@ -787,6 +951,15 @@ function renderServerDetail(state) {
   const canEdit = state.user && (server.ownerId === state.user.id || isAdmin(state.user));
   const ip = serverAddress(server);
   const bedrockIp = server.crossPlay ? `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}` : "";
+  setSeoMeta({
+    title: serverSeoTitle(server),
+    description: serverSeoDescription(server),
+    path: `/server/?id=${encodeURIComponent(server.id)}`,
+    image: server.bannerUrl || CONFIG.site.iconPath,
+    type: "article",
+    keywords: [...(server.tags || []), server.name, server.javaHost],
+    jsonLd: serverJsonLd(server)
+  });
   $("#app").innerHTML = `<div class="page detail-layout">
     <aside class="info-panel">
       <h1>${escapeHtml(server.name)}</h1>
@@ -1045,9 +1218,20 @@ function renderVotePage(state) {
   const id = new URLSearchParams(location.search).get("server");
   const server = state.servers.find((item) => item.id === id);
   if (!server) {
+    setSeoMeta({
+      title: `Vote for Minecraft Servers | ${CONFIG.site.name}`,
+      description: "Vote for Minecraft servers and support your favorite communities on Icon Listing.",
+      path: "/vote/"
+    });
     $("#app").innerHTML = `<div class="page">${emptyNotice()}</div>`;
     return;
   }
+  setSeoMeta({
+    title: `Vote for ${server.name} | ${CONFIG.site.name}`,
+    description: `Vote for ${server.name}, a Minecraft server listed on Icon Listing. Votes help players find active servers and communities.`,
+    path: `/vote/?server=${encodeURIComponent(server.id)}`,
+    keywords: [server.name, "Minecraft server vote", ...(server.tags || [])]
+  });
   const leaderboard = voteLeaderboard(state.votes, server.id);
   $("#app").innerHTML = `<div class="page vote-layout">
     <section class="card form">
@@ -1076,6 +1260,7 @@ function renderVotePage(state) {
 }
 
 function renderSponsored() {
+  setSeoMeta(defaultPageSeo("sponsored"));
   $("#app").innerHTML = `<div class="page">
     <section class="hero-band compact">
       <div class="hero-content">
@@ -1099,6 +1284,21 @@ function renderSponsored() {
 }
 
 function renderClients(state) {
+  setSeoMeta({
+    ...defaultPageSeo("sponsored-clients"),
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Sponsored Minecraft Clients",
+      url: absoluteUrl("/sponsored-clients/"),
+      itemListElement: state.clients.slice(0, 20).map((client, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: client.url,
+        name: client.name
+      }))
+    }
+  });
   $("#app").innerHTML = `<div class="page">
     <section class="section">
       <div class="section-head">
@@ -1130,6 +1330,11 @@ function clientCard(client) {
 }
 
 function renderLogin(state) {
+  setSeoMeta({
+    title: `Login | ${CONFIG.site.name}`,
+    description: "Log in to Icon Listing to submit and manage Minecraft server listings.",
+    path: "/login/"
+  });
   if (state.user) {
     $("#app").innerHTML = `<div class="page"><div class="card"><h1>You are logged in as ${escapeHtml(state.user.username)}.</h1><button id="logoutButton" class="button danger">Logout</button></div></div>`;
     $("#logoutButton").addEventListener("click", () => {
@@ -1553,6 +1758,11 @@ function bindAdminClientForms(state) {
 
 function renderStatic(page) {
   const staticCopy = CONFIG.copy?.staticPages?.[page] || ["Page", "This page is ready to configure."];
+  setSeoMeta({
+    title: `${staticCopy[0]} | ${CONFIG.site.name}`,
+    description: staticCopy[1],
+    path: `/${page}/`
+  });
   $("#app").innerHTML = `<div class="page"><section class="section card"><h1 class="section-title">${escapeHtml(staticCopy[0])}</h1><p class="section-copy">${escapeHtml(staticCopy[1])}</p></section></div>`;
 }
 

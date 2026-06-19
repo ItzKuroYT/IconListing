@@ -2,6 +2,7 @@ const IconListingConfig = {
   site: {
     name: "Icon Listing",
     owner: "IconRealms",
+    url: "https://icon-listing.vercel.app",
     basePath: "",
     iconPath: "/assets/icon.png",
     discordUrl: "https://discord.gg/fMbfFW7PWX",
@@ -31,6 +32,43 @@ const IconListingConfig = {
     useLocalFallback: true,
     localFallbackHosts: ["", "localhost", "127.0.0.1"],
     requestTimeoutMs: 8000
+  },
+  seo: {
+    defaultTitle: "Top Minecraft Servers | Best Server List 2026",
+    defaultDescription:
+      "Find the best Minecraft servers. Filter by Skyblock, Factions, SMP, Lifesteal, Prison, and more. Vote for your favorite server today!",
+    keywords: [
+      "minecraft servers",
+      "minecraft server list",
+      "best minecraft servers",
+      "minecraft voting",
+      "factions servers",
+      "lifesteal servers",
+      "minecraft server finder",
+      "top minecraft servers"
+    ],
+    pages: {
+      home: {
+        title: "Top Minecraft Servers | Best Server List 2026",
+        description:
+          "Find the best Minecraft servers. Filter by Skyblock, Factions, SMP, Lifesteal, Prison, and more. Vote for your favorite server today."
+      },
+      servers: {
+        title: "Minecraft Servers | Browse and Vote",
+        description:
+          "Browse Minecraft servers by players, votes, tags, and status. Find SMP, Skyblock, Factions, Lifesteal, Prison, PvP, and cross-play servers."
+      },
+      sponsored: {
+        title: "Best Minecraft Servers | Icon Listing",
+        description:
+          "Discover sponsored Minecraft servers with highlighted placements, server details, live status, tags, trailers, and voting."
+      },
+      sponsoredClients: {
+        title: "Best Minecraft Clients | Icon Listing",
+        description:
+          "Browse approved sponsored Minecraft clients with download links, videos, images, version support, and pricing details."
+      }
+    }
   },
   admins: {
     users: ["ItzKuroYT"],
