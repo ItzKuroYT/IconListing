@@ -147,8 +147,8 @@ function isLocalFallbackAllowed() {
   return !!CONFIG.api.useLocalFallback && (location.protocol === "file:" || (CONFIG.api.localFallbackHosts || []).includes(location.hostname));
 }
 
-function apiBasePath() {
-  return CONFIG.api.productionBasePath || CONFIG.api.basePath;
+function apiBasePaths() {
+  return [...new Set([CONFIG.api.productionBasePath, CONFIG.api.basePath].filter(Boolean))];
 }
 
 function productionApiMessage() {
@@ -166,16 +166,25 @@ async function request(action, payload = {}, method = "POST") {
         signal: controller.signal
       };
       if (method !== "GET") options.body = JSON.stringify(payload);
-      const response = await fetch(`${apiBasePath()}?action=${encodeURIComponent(action)}`, options);
-      let json = null;
-      try {
-        json = await response.json();
-      } catch {
-        if (!response.ok) throw new Error(productionApiMessage());
-        throw new Error("The API returned an unreadable response.");
+      let lastError = null;
+      for (const basePath of apiBasePaths()) {
+        try {
+          const url = `${basePath}?action=${encodeURIComponent(action)}`;
+          const response = await fetch(url, options);
+          let json = null;
+          try {
+            json = await response.json();
+          } catch {
+            const body = await response.text().catch(() => "");
+            throw new Error(response.ok ? `The API at ${url} returned an unreadable response.` : `${productionApiMessage()} (${response.status} from ${url})${body ? ` ${body.slice(0, 80)}` : ""}`);
+          }
+          if (!response.ok || json.error) throw new Error(json.error || `${productionApiMessage()} (${response.status} from ${url})`);
+          return json;
+        } catch (error) {
+          lastError = error;
+        }
       }
-      if (!response.ok || json.error) throw new Error(json.error || productionApiMessage());
-      return json;
+      throw lastError || new Error(productionApiMessage());
     } catch (error) {
       if (!isLocalFallbackAllowed()) throw error.message ? error : new Error(productionApiMessage());
     } finally {

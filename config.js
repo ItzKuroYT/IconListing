@@ -34,7 +34,7 @@ const IconListingConfig = {
     requestTimeoutMs: 8000
   },
   seo: {
-    defaultTitle: "Top Minecraft Servers | Best Server List 2026",
+    defaultTitle: "Top Minecraft Servers | Best Minecraft Server List",
     defaultDescription:
       "Find the best Minecraft servers. Filter by Skyblock, Factions, SMP, Lifesteal, Prison, and more. Vote for your favorite server today!",
     keywords: [
@@ -49,7 +49,7 @@ const IconListingConfig = {
     ],
     pages: {
       home: {
-        title: "Top Minecraft Servers | Best Server List 2026",
+        title: "Top Minecraft Servers | Best Minecraft Server List",
         description:
           "Find the best Minecraft servers. Filter by Skyblock, Factions, SMP, Lifesteal, Prison, and more. Vote for your favorite server today."
       },
