@@ -31,6 +31,7 @@ function response() {
 async function call(action, body = {}, token = "", method = "POST", headers = {}) {
   const req = {
     method,
+    url: `/api?action=${encodeURIComponent(action)}`,
     query: { action },
     body,
     headers: { authorization: token ? `Bearer ${token}` : "", ...headers }
@@ -38,6 +39,19 @@ async function call(action, body = {}, token = "", method = "POST", headers = {}
   const res = response();
   await handler(req, res);
   return { code: res.code, json: JSON.parse(res.body) };
+}
+
+async function callRaw(action, body = {}, method = "GET") {
+  const req = {
+    method,
+    url: action === "sitemap" ? "/sitemap.xml" : `/api?action=${encodeURIComponent(action)}`,
+    query: action === "sitemap" ? {} : { action },
+    body,
+    headers: {}
+  };
+  const res = response();
+  await handler(req, res);
+  return { code: res.code, body: res.body, headers: res.headers };
 }
 
 function assert(condition, message) {
@@ -250,6 +264,11 @@ async function main() {
     );
     assert(clientSave.code === 200 && clientSave.json.clients.length === 1, "admin should save a sponsored client");
 
+    const sitemap = await callRaw("sitemap");
+    assert(sitemap.code === 200 && sitemap.headers["Content-Type"]?.includes("application/xml"), "sitemap should return XML");
+    assert(sitemap.body.includes("https://listing.iconrealms.net/"), "sitemap should include the canonical homepage");
+    assert(sitemap.body.includes(`/server/?id=${saved.json.server.id}`), "sitemap should include saved server listing URLs");
+
     const finalState = await call("state", {}, "", "GET");
     const server = finalState.json.servers.find((item) => item.id === saved.json.server.id);
     const otherServer = finalState.json.servers.find((item) => item.id === secondServer.json.server.id);
@@ -261,7 +280,7 @@ async function main() {
     assert(client && client.images.length === 2 && client.version === "both" && client.pricing === "paid", "sponsored client fields should be stored");
     assert(finalState.json.votes.length === 1, "monthly vote records should be stored");
 
-    console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, duplicate listing checks, multiple listings per account, mcstatus fallback, Votifier, voting cooldown, sponsored clients.");
+    console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, duplicate listing checks, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, voting cooldown, sponsored clients.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });

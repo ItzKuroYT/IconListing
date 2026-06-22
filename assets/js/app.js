@@ -765,6 +765,16 @@ function dailyIpCopies(copies = [], days) {
   });
 }
 
+function descriptionSnippet(value = "", max = 150) {
+  return trimSeo(value, max);
+}
+
+function popularTagLinks(limit = 12) {
+  return [...CONFIG.gamemodes.slice(0, limit - 3), "Bedrock", "Cross-Play", "New"].slice(0, limit).map((tag) => (
+    `<a class="pill" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)} servers</a>`
+  )).join("");
+}
+
 function serverCard(server) {
   const banner = server.bannerUrl ? `background-image:url('${escapeHtml(asset(server.bannerUrl))}')` : "";
   return `<article class="server-card ${server.sponsored ? "sponsored" : ""}" data-server-id="${escapeHtml(server.id)}">
@@ -774,6 +784,7 @@ function serverCard(server) {
     <div class="server-main">
       <h3 class="server-title">${escapeHtml(server.name)} ${server.sponsored ? `<span class="pill">Sponsored</span>` : ""}</h3>
       <p class="server-ip">${escapeHtml(server.javaHost)}:${Number(server.javaPort || CONFIG.defaults.javaPort)}</p>
+      <p class="server-summary">${escapeHtml(descriptionSnippet(server.description || `${server.name} is a Minecraft server listed with tags, votes, player counts, and status.`))}</p>
       <div class="server-tags">${(server.tags || []).map((tag) => `<a class="pill above-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)}</a>`).join("")}</div>
     </div>
     <div class="stats">
@@ -841,14 +852,22 @@ function serverSeoDescription(server) {
 function serverJsonLd(server) {
   return {
     "@context": "https://schema.org",
-    "@type": "GameServer",
+    "@type": "WebPage",
     name: server.name,
     url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
     description: trimSeo(server.description || serverSeoDescription(server), 300),
-    game: "Minecraft",
     keywords: [...(server.tags || []), "Minecraft server", "Minecraft server list"].join(", "),
     image: absoluteUrl(asset(server.bannerUrl || CONFIG.site.iconPath)),
-    serverStatus: server.online ? "Online" : "Offline"
+    about: {
+      "@type": "VideoGame",
+      name: "Minecraft"
+    },
+    mainEntity: {
+      "@type": "Thing",
+      name: server.name,
+      description: trimSeo(server.description || serverSeoDescription(server), 300),
+      url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`)
+    }
   };
 }
 
@@ -900,6 +919,15 @@ function renderHome(state) {
       ${toolbarMarkup()}
       <div id="serverList" class="server-list"></div>
     </section>
+    <section class="section seo-section">
+      <h2 class="section-title">Browse Minecraft Servers by Gamemode</h2>
+      <p class="section-copy">Find servers by the way you actually play: survival worlds, SMP communities, economy servers, PvP networks, Skyblock islands, prison progression, Bedrock support, and cross-play servers for friends on different editions.</p>
+      <div class="server-tags">${popularTagLinks()}</div>
+    </section>
+    <section class="section seo-section">
+      <h2 class="section-title">How Icon Listing Helps Players Choose</h2>
+      <p class="section-copy">Each listing can include a formatted description, server IP, tags, owner, country, player counts, status checks, vote totals, banners, trailers, and links. That gives players more context before joining and gives owners a cleaner place to advertise real communities.</p>
+    </section>
   </div>`;
   renderServerList(sponsored, "#sponsoredList");
   setupFilters(state.servers);
@@ -937,6 +965,11 @@ function renderServers(state) {
         </div>
       </div>
       ${toolbarMarkup(tag)}
+      <section class="seo-section">
+        <h2 class="section-title">${tag ? `Find ${escapeHtml(tag)} Minecraft Servers` : "Find the Right Minecraft Server"}</h2>
+        <p class="section-copy">${tag ? `Compare ${escapeHtml(tag)} servers by activity, votes, tags, descriptions, and status. Open a listing to view the server IP, details, trailer, banners, and vote page.` : "Use search, tags, and sorting to compare Minecraft servers by activity, votes, newest listings, and gamemode. Every listing links to a detail page with server information and voting."}</p>
+        <div class="server-tags">${popularTagLinks()}</div>
+      </section>
       <div id="serverList" class="server-list"></div>
     </section>
   </div>`;

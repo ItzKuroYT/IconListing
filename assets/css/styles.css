@@ -335,6 +335,10 @@ main {
   line-height: 1.6;
 }
 
+.seo-section {
+  max-width: 920px;
+}
+
 .toolbar {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) minmax(150px, 220px) minmax(150px, 220px);
@@ -388,6 +392,13 @@ main {
   border-radius: 5px;
   background: #121217;
   box-shadow: none;
+}
+
+.server-summary {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: .93rem;
+  line-height: 1.45;
 }
 
 .server-card-link {

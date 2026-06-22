@@ -19,10 +19,14 @@ module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
 
   try {
-    const action = req.query.action || "state";
+    const action = actionFromRequest(req);
     const body = req.method === "GET" ? {} : await readBody(req);
     const db = migrateDb(await loadDb());
     const user = await userFromRequest(req, db);
+
+    if (action === "sitemap") {
+      return xml(res, 200, sitemapXml(db));
+    }
 
     if (action === "state") {
       const refreshed = await refreshPings(db);
@@ -210,6 +214,12 @@ async function readBody(req) {
   const chunks = [];
   for await (const chunk of req) chunks.push(chunk);
   return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+}
+
+function actionFromRequest(req) {
+  const url = new URL(req.url || "/", "https://listing.iconrealms.net");
+  if (url.pathname.endsWith("/sitemap.xml")) return "sitemap";
+  return req.query?.action || url.searchParams.get("action") || "state";
 }
 
 function freshDb() {
@@ -430,6 +440,45 @@ function cloneJson(value) {
 
 function statePayload(db, user) {
   return { servers: rankServers(db.servers, db.votes).map(publicServer), clients: db.clients, votes: db.votes, user: publicUser(user) };
+}
+
+function siteUrl(pathname = "/") {
+  const base = String(CONFIG.site.url || "https://listing.iconrealms.net").replace(/\/$/, "");
+  const path = String(pathname || "/");
+  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+function sitemapXml(db) {
+  const now = new Date().toISOString();
+  const staticUrls = [
+    { loc: siteUrl("/"), priority: "1.0", changefreq: "daily" },
+    { loc: siteUrl("/servers/"), priority: "0.9", changefreq: "daily" },
+    { loc: siteUrl("/sponsored/"), priority: "0.7", changefreq: "weekly" },
+    { loc: siteUrl("/sponsored-clients/"), priority: "0.7", changefreq: "weekly" },
+    { loc: siteUrl("/help/"), priority: "0.4", changefreq: "monthly" },
+    { loc: siteUrl("/contact/"), priority: "0.4", changefreq: "monthly" }
+  ];
+  const serverUrls = rankServers(db.servers, db.votes).map((server) => ({
+    loc: siteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
+    priority: server.sponsored ? "0.8" : "0.6",
+    changefreq: "daily",
+    lastmod: server.updatedAt || server.createdAt || server.lastPingAt || now
+  }));
+  const urls = [...staticUrls, ...serverUrls];
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(sitemapUrlEntry).join("\n")}\n</urlset>`;
+}
+
+function sitemapUrlEntry(item) {
+  return `  <url>\n    <loc>${escapeXml(item.loc)}</loc>\n    <lastmod>${escapeXml(item.lastmod || new Date().toISOString())}</lastmod>\n    <changefreq>${escapeXml(item.changefreq || "weekly")}</changefreq>\n    <priority>${escapeXml(item.priority || "0.5")}</priority>\n  </url>`;
+}
+
+function escapeXml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }
 
 async function cleanupStaleServers(db) {
@@ -877,4 +926,9 @@ function httpError(status, message) {
 
 function json(res, status, payload) {
   return res.status(status).end(JSON.stringify(payload));
+}
+
+function xml(res, status, body) {
+  res.setHeader("Content-Type", "application/xml; charset=utf-8");
+  return res.status(status).end(body);
 }

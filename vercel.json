@@ -6,6 +6,10 @@
   },
   "routes": [
     {
+      "src": "/sitemap.xml",
+      "dest": "/api/index.js?action=sitemap"
+    },
+    {
       "src": "/api",
       "dest": "/api/index.js"
     },
