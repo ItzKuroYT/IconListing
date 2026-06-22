@@ -59,14 +59,14 @@ const IconListingConfig = {
           "Browse Minecraft servers by players, votes, tags, and status. Find SMP, Skyblock, Factions, Lifesteal, Prison, PvP, and cross-play servers."
       },
       sponsored: {
-        title: "Best Minecraft Servers | Icon Listing",
+        title: "Sponsored Minecraft Servers | Icon Listing",
         description:
           "Discover sponsored Minecraft servers with highlighted placements, server details, live status, tags, trailers, and voting."
       },
       sponsoredClients: {
-        title: "Best Minecraft Clients | Icon Listing",
+        title: "Sponsored Minecraft Clients | Icon Listing",
         description:
-          "Browse approved sponsored Minecraft clients with download links, videos, images, version support, and pricing details."
+          "Browse sponsored Minecraft clients with download links, videos, images, Java and Bedrock support, pricing details, and approved client promotions."
       }
     }
   },

@@ -1301,16 +1301,52 @@ function renderVotePage(state) {
   });
 }
 
-function renderSponsored() {
-  setSeoMeta(defaultPageSeo("sponsored"));
+function renderSponsored(state) {
+  const sponsoredServers = state.servers.filter((server) => server.sponsored);
+  setSeoMeta({
+    ...defaultPageSeo("sponsored"),
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Sponsored Minecraft Servers",
+      url: absoluteUrl("/sponsored/"),
+      description: CONFIG.seo?.pages?.sponsored?.description,
+      mainEntity: {
+        "@type": "ItemList",
+        itemListElement: sponsoredServers.slice(0, 20).map((server, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
+          name: server.name
+        }))
+      }
+    }
+  });
   $("#app").innerHTML = `<div class="page">
     <section class="hero-band compact">
       <div class="hero-content">
         <div class="eyebrow">${escapeHtml(copy("sponsoredServers.eyebrow", "Paid placements"))}</div>
         <h1 class="hero-title">${escapeHtml(copy("sponsoredServers.title", "Sponsored Servers"))}</h1>
         <p class="hero-copy">${escapeHtml(copy("sponsoredServers.body", "Sponsors get placement above normal results. The listing stays labeled so players know what they are looking at."))}</p>
-        <div class="hero-actions"><a class="button primary" href="${CONFIG.site.discordUrl}">${escapeHtml(copy("sponsoredServers.action", "Ask on Discord"))}</a></div>
+        <div class="hero-actions">
+          <a class="button primary" href="${CONFIG.site.discordUrl}">${escapeHtml(copy("sponsoredServers.action", "Ask on Discord"))}</a>
+          <a class="button" href="${route("/servers/")}">Browse all servers</a>
+        </div>
       </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Featured Sponsored Minecraft Servers</h2>
+          <p class="section-copy">Sponsored listings are promoted placements for Minecraft servers that want more visibility. They still include useful server information like IP address, tags, status, player counts, descriptions, trailers, banners, and vote links.</p>
+        </div>
+      </div>
+      <div class="server-list">${sponsoredServers.length ? sponsoredServers.map(serverCard).join("") : emptyNotice()}</div>
+    </section>
+    <section class="section seo-section">
+      <h2 class="section-title">Sponsored Server Categories</h2>
+      <p class="section-copy">Players can find sponsored Minecraft servers across common categories including SMP, Survival, Skyblock, Factions, Lifesteal, Prison, Economy, Bedrock, and cross-play communities.</p>
+      <div class="server-tags">${popularTagLinks()}</div>
     </section>
     <section class="section grid two">
       <div class="card">
@@ -1330,15 +1366,19 @@ function renderClients(state) {
     ...defaultPageSeo("sponsored-clients"),
     jsonLd: {
       "@context": "https://schema.org",
-      "@type": "ItemList",
+      "@type": "CollectionPage",
       name: "Sponsored Minecraft Clients",
       url: absoluteUrl("/sponsored-clients/"),
-      itemListElement: state.clients.slice(0, 20).map((client, index) => ({
-        "@type": "ListItem",
-        position: index + 1,
-        url: client.url,
-        name: client.name
-      }))
+      description: CONFIG.seo?.pages?.sponsoredClients?.description,
+      mainEntity: {
+        "@type": "ItemList",
+        itemListElement: state.clients.slice(0, 20).map((client, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          url: client.url,
+          name: client.name
+        }))
+      }
     }
   });
   $("#app").innerHTML = `<div class="page">
@@ -1346,10 +1386,19 @@ function renderClients(state) {
       <div class="section-head">
         <div>
           <h1 class="section-title">${escapeHtml(copy("sponsoredClients.title", "Sponsored Clients"))}</h1>
-          <p class="section-copy">${escapeHtml(copy("sponsoredClients.body", "Client promotions approved by staff."))}</p>
+          <p class="section-copy">${escapeHtml(copy("sponsoredClients.body", "Client promotions approved by staff."))} Browse approved Minecraft client advertisements with download links, videos, images, pricing, and Java or Bedrock support.</p>
         </div>
       </div>
       <div class="grid two">${state.clients.length ? state.clients.map(clientCard).join("") : emptyNotice()}</div>
+    </section>
+    <section class="section seo-section">
+      <h2 class="section-title">What Sponsored Minecraft Clients Include</h2>
+      <p class="section-copy">Sponsored client listings can include a website or download link, a YouTube video, up to two showcase images, pricing information, and whether the client supports Java Edition, Bedrock Edition, or both. This helps players compare client promotions before visiting the download page.</p>
+    </section>
+    <section class="section seo-section">
+      <h2 class="section-title">Related Minecraft Server Discovery</h2>
+      <p class="section-copy">Client users can also explore Minecraft servers by category and vote for active communities on Icon Listing.</p>
+      <div class="server-tags">${popularTagLinks()}</div>
     </section>
   </div>`;
 }
@@ -1818,7 +1867,7 @@ async function boot() {
     else if (page === "servers") renderServers(state);
     else if (page === "server") renderServerDetail(state);
     else if (page === "vote") renderVotePage(state);
-    else if (page === "sponsored") renderSponsored();
+    else if (page === "sponsored") renderSponsored(state);
     else if (page === "sponsored-clients") renderClients(state);
     else if (page === "login") renderLogin(state);
     else if (page === "dashboard") renderDashboard(state);

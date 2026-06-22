@@ -21,10 +21,14 @@
   </url>
   <url>
     <loc>https://listing.iconrealms.net/sponsored/</loc>
+    <lastmod>2026-06-22T00:00:00.000Z</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://listing.iconrealms.net/sponsored-clients/</loc>
+    <lastmod>2026-06-22T00:00:00.000Z</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
