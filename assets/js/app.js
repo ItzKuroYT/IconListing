@@ -658,7 +658,7 @@ function setSeoMeta(options = {}) {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: CONFIG.site.name,
-    url: absoluteUrl("/home/"),
+    url: absoluteUrl("/"),
     description,
     potentialAction: {
       "@type": "SearchAction",
@@ -672,7 +672,7 @@ function defaultPageSeo(page) {
   const seo = CONFIG.seo || {};
   const key = page === "sponsored-clients" ? "sponsoredClients" : page;
   const pageSeo = seo.pages?.[key] || {};
-  const path = page === "home" ? "/home/" : `/${page}/`;
+  const path = page === "home" ? "/" : `/${page}/`;
   return {
     title: pageSeo.title || `${CONFIG.site.name} | ${pageTitle(page)}`,
     description: pageSeo.description || seo.defaultDescription || copy("home.body", ""),
@@ -686,13 +686,13 @@ function renderLayout() {
   document.body.innerHTML = `<div class="site-shell">
     <header class="topbar">
       <nav class="nav" aria-label="Main navigation">
-        <a class="brand" href="${route("/home/")}" aria-label="${CONFIG.site.name} home">
+        <a class="brand" href="${route("/")}" aria-label="${CONFIG.site.name} home">
           <img class="brand-icon" src="${asset(CONFIG.site.iconPath)}" alt="">
           <span>${CONFIG.site.name}</span>
         </a>
         <button class="mobile-toggle" type="button" aria-label="Toggle menu">Menu</button>
         <div class="nav-links">
-          <a class="nav-link" data-route="home" href="${route("/home/")}">${escapeHtml(copy("nav.home", "Home"))}</a>
+          <a class="nav-link" data-route="home" href="${route("/")}">${escapeHtml(copy("nav.home", "Home"))}</a>
           <div class="dropdown">
             <button class="drop-button" type="button">${escapeHtml(copy("nav.servers", "Servers"))} <span aria-hidden="true">v</span></button>
             <div class="dropdown-menu">
@@ -859,7 +859,7 @@ function renderHome(state) {
       "@context": "https://schema.org",
       "@type": "WebSite",
       name: CONFIG.site.name,
-      url: absoluteUrl("/home/"),
+      url: absoluteUrl("/"),
       description: CONFIG.seo?.pages?.home?.description || CONFIG.seo?.defaultDescription,
       potentialAction: {
         "@type": "SearchAction",
@@ -1348,7 +1348,7 @@ function renderLogin(state) {
     $("#app").innerHTML = `<div class="page"><div class="card"><h1>You are logged in as ${escapeHtml(state.user.username)}.</h1><button id="logoutButton" class="button danger">Logout</button></div></div>`;
     $("#logoutButton").addEventListener("click", () => {
       store.session = null;
-      location.href = route("/home/");
+      location.href = route("/");
     });
     return;
   }
@@ -1631,7 +1631,7 @@ function bindSettingsForms() {
     if (!confirm("Delete your account and every listing you own?")) return;
     try {
       await request("deleteAccount", { username: $("#deleteUsername").value, email: $("#deleteEmail").value, password: $("#deletePassword").value });
-      location.href = route("/home/");
+      location.href = route("/");
     } catch (error) {
       toast(error.message);
     }

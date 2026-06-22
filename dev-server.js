@@ -35,5 +35,5 @@ http.createServer((req, res) => {
     res.end(body);
   });
 }).listen(port, "127.0.0.1", () => {
-  console.log(`Icon Listing static server running at http://127.0.0.1:${port}/home/`);
+  console.log(`Icon Listing static server running at http://127.0.0.1:${port}/`);
 });
