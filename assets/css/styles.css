@@ -510,6 +510,59 @@ main {
   color: var(--muted);
 }
 
+.list-footer {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  margin: 26px 0 4px;
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.pager-button,
+.pager-ellipsis {
+  min-width: 34px;
+  min-height: 32px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 5px;
+  font-weight: 800;
+}
+
+.pager-button {
+  border: 1px solid transparent;
+  color: var(--text);
+  background: transparent;
+}
+
+.pager-button:hover,
+.pager-button.active {
+  border-color: rgba(139, 92, 246, .58);
+  background: linear-gradient(135deg, rgba(139, 92, 246, .86), rgba(236, 72, 153, .72));
+  color: #fff;
+}
+
+.pager-button.next {
+  min-width: 58px;
+  background: #24242d;
+}
+
+.pager-ellipsis {
+  color: var(--muted);
+}
+
+.listing-count {
+  margin: 0;
+  color: #d9dbeb;
+  font-size: 1rem;
+}
+
 .grid {
   display: grid;
   gap: 14px;

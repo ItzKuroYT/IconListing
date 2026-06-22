@@ -795,10 +795,98 @@ function serverCard(server) {
   </article>`;
 }
 
-function renderServerList(servers, selector = "#serverList") {
+function pageSize() {
+  return Math.max(1, Number(CONFIG.limits?.pageSize || 20));
+}
+
+function pageFromParams(pageParam = "page") {
+  const page = Number(new URLSearchParams(location.search).get(pageParam) || 1);
+  return Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+}
+
+function clampListPage(page, totalPages) {
+  return Math.min(Math.max(1, Number(page) || 1), Math.max(1, totalPages));
+}
+
+function onlineServerCount(servers) {
+  return servers.filter((server) => server.online).length;
+}
+
+function paginationPages(current, total) {
+  const pages = new Set([1, total, current - 1, current, current + 1]);
+  if (current <= 3) [2, 3].forEach((page) => pages.add(page));
+  if (current >= total - 2) [total - 2, total - 1].forEach((page) => pages.add(page));
+  const sorted = [...pages].filter((page) => page >= 1 && page <= total).sort((a, b) => a - b);
+  return sorted.reduce((items, page, index) => {
+    if (index && page - sorted[index - 1] > 1) items.push("...");
+    items.push(page);
+    return items;
+  }, []);
+}
+
+function pageHref(basePath, page, pageParam = "page", params = {}) {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) query.set(key, value);
+  });
+  if (page > 1) query.set(pageParam, page);
+  else query.delete(pageParam);
+  const search = query.toString();
+  return `${route(basePath)}${search ? `?${search}` : ""}`;
+}
+
+function paginationMarkup(totalItems, currentPage, options = {}) {
+  if (!totalItems) return "";
+  const size = options.pageSize || pageSize();
+  const totalPages = Math.ceil(totalItems / size);
+  const count = Number(options.count ?? totalItems).toLocaleString();
+  const noun = options.noun || "servers";
+  const basePath = options.basePath || location.pathname || "/";
+  const pageParam = options.pageParam || "page";
+  const params = options.params || {};
+  const pageItems = totalPages > 1
+    ? `<nav class="pager" aria-label="Listing pages">
+        ${currentPage > 1 ? `<a class="pager-button" data-page-number="${currentPage - 1}" href="${pageHref(basePath, currentPage - 1, pageParam, params)}">prev</a>` : ""}
+        ${paginationPages(currentPage, totalPages).map((page) => page === "..."
+          ? `<span class="pager-ellipsis">...</span>`
+          : `<a class="pager-button ${page === currentPage ? "active" : ""}" data-page-number="${page}" href="${pageHref(basePath, page, pageParam, params)}" aria-current="${page === currentPage ? "page" : "false"}">${page}</a>`
+        ).join("")}
+        ${currentPage < totalPages ? `<a class="pager-button next" data-page-number="${currentPage + 1}" href="${pageHref(basePath, currentPage + 1, pageParam, params)}">next</a>` : ""}
+      </nav>`
+    : "";
+  return `<div class="list-footer">${pageItems}<p class="listing-count">listing ${count} ${escapeHtml(noun)}</p></div>`;
+}
+
+function bindPager(pagerSelector, onPage) {
+  const pager = $(pagerSelector);
+  if (!pager) return;
+  $$("[data-page-number]", pager).forEach((link) => link.addEventListener("click", (event) => {
+    event.preventDefault();
+    history.replaceState(null, "", link.href);
+    onPage(Number(link.dataset.pageNumber || 1));
+  }));
+}
+
+function renderServerList(servers, selector = "#serverList", options = {}) {
   const root = $(selector);
   if (!root) return;
-  root.innerHTML = servers.length ? servers.map(serverCard).join("") : emptyNotice();
+  const size = options.pageSize || pageSize();
+  const totalPages = Math.ceil(servers.length / size);
+  const page = clampListPage(options.page || pageFromParams(options.pageParam), totalPages);
+  const start = (page - 1) * size;
+  const visible = servers.slice(start, start + size);
+  root.innerHTML = visible.length ? visible.map(serverCard).join("") : emptyNotice();
+  if (options.pagerSelector) {
+    const pager = $(options.pagerSelector);
+    if (pager) {
+      pager.innerHTML = paginationMarkup(servers.length, page, {
+        ...options,
+        count: options.count ?? onlineServerCount(servers),
+        noun: options.noun || "servers"
+      });
+    }
+  }
+  return page;
 }
 
 function toolbarMarkup(selectedTag = "") {
@@ -817,10 +905,16 @@ function toolbarMarkup(selectedTag = "") {
   </div>`;
 }
 
-function setupFilters(servers) {
+function setupFilters(servers, options = {}) {
   const params = new URLSearchParams(location.search);
   const initialTag = params.get("tag") || $("#tagFilter")?.value || "";
+  const initialSearch = params.get("q") || "";
+  const initialSort = params.get("sort") || "rank";
+  const pageParam = options.pageParam || "page";
+  let currentPage = pageFromParams(pageParam);
   if ($("#tagFilter")) $("#tagFilter").value = initialTag;
+  if ($("#searchInput")) $("#searchInput").value = initialSearch;
+  if ($("#sortMode")) $("#sortMode").value = initialSort;
   const apply = () => {
     const search = ($("#searchInput")?.value || "").toLowerCase();
     const tag = $("#tagFilter")?.value || "";
@@ -832,9 +926,22 @@ function setupFilters(servers) {
     if (sort === "players") result = [...result].sort((a, b) => (b.playersOnline || 0) - (a.playersOnline || 0));
     if (sort === "votes") result = [...result].sort((a, b) => (b.votes || 0) - (a.votes || 0));
     if (sort === "new") result = [...result].sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
-    renderServerList(result);
+    currentPage = renderServerList(result, options.selector || "#serverList", {
+      pagerSelector: options.pagerSelector || "#serverPager",
+      page: currentPage,
+      pageParam,
+      basePath: options.basePath || (document.body.dataset.page === "servers" ? "/servers/" : "/"),
+      params: { q: search, tag, sort: sort === "rank" ? "" : sort }
+    });
+    bindPager(options.pagerSelector || "#serverPager", (page) => {
+      currentPage = page;
+      apply();
+    });
   };
-  ["searchInput", "tagFilter", "sortMode"].forEach((id) => $(`#${id}`)?.addEventListener("input", apply));
+  ["searchInput", "tagFilter", "sortMode"].forEach((id) => $(`#${id}`)?.addEventListener("input", () => {
+    currentPage = 1;
+    apply();
+  }));
   apply();
 }
 
@@ -908,6 +1015,7 @@ function renderHome(state) {
         </div>
       </div>
       <div id="sponsoredList" class="server-list"></div>
+      <div id="sponsoredPager"></div>
     </section>
     <section class="section">
       <div class="section-head">
@@ -918,6 +1026,7 @@ function renderHome(state) {
       </div>
       ${toolbarMarkup()}
       <div id="serverList" class="server-list"></div>
+      <div id="serverPager"></div>
     </section>
     <section class="section seo-section">
       <h2 class="section-title">Browse Minecraft Servers by Gamemode</h2>
@@ -929,8 +1038,12 @@ function renderHome(state) {
       <p class="section-copy">Each listing can include a formatted description, server IP, tags, owner, country, player counts, status checks, vote totals, banners, trailers, and links. That gives players more context before joining and gives owners a cleaner place to advertise real communities.</p>
     </section>
   </div>`;
-  renderServerList(sponsored, "#sponsoredList");
-  setupFilters(state.servers);
+  renderServerList(sponsored, "#sponsoredList", {
+    pagerSelector: "#sponsoredPager",
+    pageParam: "sponsoredPage",
+    basePath: "/"
+  });
+  setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: "/" });
 }
 
 function renderServers(state) {
@@ -971,9 +1084,10 @@ function renderServers(state) {
         <div class="server-tags">${popularTagLinks()}</div>
       </section>
       <div id="serverList" class="server-list"></div>
+      <div id="serverPager"></div>
     </section>
   </div>`;
-  setupFilters(state.servers);
+  setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: "/servers/" });
 }
 
 function renderServerDetail(state) {
@@ -1341,7 +1455,8 @@ function renderSponsored(state) {
           <p class="section-copy">Sponsored listings are promoted placements for Minecraft servers that want more visibility. They still include useful server information like IP address, tags, status, player counts, descriptions, trailers, banners, and vote links.</p>
         </div>
       </div>
-      <div class="server-list">${sponsoredServers.length ? sponsoredServers.map(serverCard).join("") : emptyNotice()}</div>
+      <div id="sponsoredServerList" class="server-list"></div>
+      <div id="sponsoredServerPager"></div>
     </section>
     <section class="section seo-section">
       <h2 class="section-title">Sponsored Server Categories</h2>
@@ -1359,6 +1474,12 @@ function renderSponsored(state) {
       </div>
     </section>
   </div>`;
+  const page = renderServerList(sponsoredServers, "#sponsoredServerList", {
+    pagerSelector: "#sponsoredServerPager",
+    pageParam: "page",
+    basePath: "/sponsored/"
+  });
+  bindPager("#sponsoredServerPager", () => renderSponsored(state));
 }
 
 function renderClients(state) {
@@ -1389,7 +1510,8 @@ function renderClients(state) {
           <p class="section-copy">${escapeHtml(copy("sponsoredClients.body", "Client promotions approved by staff."))} Browse approved Minecraft client advertisements with download links, videos, images, pricing, and Java or Bedrock support.</p>
         </div>
       </div>
-      <div class="grid two">${state.clients.length ? state.clients.map(clientCard).join("") : emptyNotice()}</div>
+      <div id="clientList" class="grid two"></div>
+      <div id="clientPager"></div>
     </section>
     <section class="section seo-section">
       <h2 class="section-title">What Sponsored Minecraft Clients Include</h2>
@@ -1401,6 +1523,34 @@ function renderClients(state) {
       <div class="server-tags">${popularTagLinks()}</div>
     </section>
   </div>`;
+  const page = renderClientList(state.clients, "#clientList", {
+    pagerSelector: "#clientPager",
+    pageParam: "page",
+    basePath: "/sponsored-clients/"
+  });
+  bindPager("#clientPager", () => renderClients(state));
+}
+
+function renderClientList(clients, selector = "#clientList", options = {}) {
+  const root = $(selector);
+  if (!root) return;
+  const size = options.pageSize || pageSize();
+  const totalPages = Math.ceil(clients.length / size);
+  const page = clampListPage(options.page || pageFromParams(options.pageParam), totalPages);
+  const start = (page - 1) * size;
+  const visible = clients.slice(start, start + size);
+  root.innerHTML = visible.length ? visible.map(clientCard).join("") : emptyNotice();
+  if (options.pagerSelector) {
+    const pager = $(options.pagerSelector);
+    if (pager) {
+      pager.innerHTML = paginationMarkup(clients.length, page, {
+        ...options,
+        count: clients.length,
+        noun: "clients"
+      });
+    }
+  }
+  return page;
 }
 
 function clientCard(client) {
