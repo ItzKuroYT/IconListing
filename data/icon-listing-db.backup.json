@@ -8,6 +8,14 @@
       "passwordHash": "b947950d5ea1d1c7969aa657109333c3:2a40a27889278208b2d2c879bf0497c582345f5789d2de27ce1db3e7b0d4ddad",
       "banned": false,
       "createdAt": "2026-06-23T07:02:02.460Z"
+    },
+    {
+      "id": "ccefa1b1-e6d1-478b-be14-4dd96760b95d",
+      "username": "p3rth",
+      "email": "talenbishop60@gmail.com",
+      "passwordHash": "a6be4e01985c4a2ebc900916c90f11be:f7a36c737b8c174456bf27529b85af485efbb76288e618de3520b0f6c71b36f5",
+      "banned": false,
+      "createdAt": "2026-06-23T14:28:37.898Z"
     }
   ],
   "servers": [
