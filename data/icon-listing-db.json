@@ -16,6 +16,14 @@
       "passwordHash": "a6be4e01985c4a2ebc900916c90f11be:f7a36c737b8c174456bf27529b85af485efbb76288e618de3520b0f6c71b36f5",
       "banned": false,
       "createdAt": "2026-06-23T14:28:37.898Z"
+    },
+    {
+      "id": "0857ceca-7b66-4180-91cc-bb1cb7d11b67",
+      "username": "armageddon",
+      "email": "leviticusmediagroup@gmail.com",
+      "passwordHash": "d6cd8a3c9a9a024a62c2466840b2bb79:2032c72bf9178356ac754208f1895afc15de9545738201a5f4e5c01a1e2f7b60",
+      "banned": false,
+      "createdAt": "2026-06-23T22:25:00.265Z"
     }
   ],
   "servers": [
