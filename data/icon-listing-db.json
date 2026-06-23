@@ -47,15 +47,15 @@
       "ownerId": "a470b643-b770-4035-9f34-5f5ec8220704",
       "ownerName": "ItzKuroYT",
       "votes": 1,
-      "playersOnline": 1,
-      "playersMax": 500,
+      "playersOnline": 3379,
+      "playersMax": 1187,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-16T05:49:35.782Z",
       "updatedAt": "2026-06-16T05:49:35.782Z",
-      "lastPingAt": "2026-06-23T02:05:46.456Z",
+      "lastPingAt": "2026-06-23T03:20:58.165Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -274,12 +274,18 @@
             "playersOnline": 1,
             "playersMax": 500,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-23T03:20:58.165Z",
+            "playersOnline": 3379,
+            "playersMax": 1187,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-23T02:05:46.456Z",
-      "uptimeChecks": 91,
-      "uptimeSuccesses": 91
+      "lastSuccessfulPingAt": "2026-06-23T03:20:58.165Z",
+      "uptimeChecks": 92,
+      "uptimeSuccesses": 92
     },
     {
       "id": "31d8afda-7746-4b44-9bdf-79d3c322906e",
@@ -318,7 +324,7 @@
       "sponsored": true,
       "createdAt": "2026-06-23T01:18:49.672Z",
       "updatedAt": "2026-06-23T01:18:49.672Z",
-      "lastPingAt": "2026-06-23T02:05:48.211Z",
+      "lastPingAt": "2026-06-23T03:20:59.904Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -327,12 +333,18 @@
             "playersOnline": 0,
             "playersMax": 100,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-23T03:20:59.904Z",
+            "playersOnline": 0,
+            "playersMax": 100,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-23T02:05:48.211Z",
-      "uptimeChecks": 5,
-      "uptimeSuccesses": 5
+      "lastSuccessfulPingAt": "2026-06-23T03:20:59.904Z",
+      "uptimeChecks": 6,
+      "uptimeSuccesses": 6
     }
   ],
   "clients": [
