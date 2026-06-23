@@ -321,7 +321,7 @@
       ],
       "ownerId": "3c337a8a-90d3-4ad9-bfd7-2e90721943d2",
       "ownerName": "p3rth",
-      "votes": 1,
+      "votes": 3,
       "playersOnline": 0,
       "playersMax": 100,
       "version": "Paper 26.1.2",
@@ -394,12 +394,20 @@
       "serverId": "31d8afda-7746-4b44-9bdf-79d3c322906e",
       "minecraftUsername": "p3rth",
       "createdAt": "2026-06-23T01:28:11.872Z"
+    },
+    {
+      "id": "b8e353c3-7fc8-4599-9833-ec35e5d6cb90",
+      "serverId": "31d8afda-7746-4b44-9bdf-79d3c322906e",
+      "minecraftUsername": "ItzKuro_",
+      "createdAt": "2026-06-23T06:42:03.539Z"
     }
   ],
   "voteIps": {
     "31d8afda-7746-4b44-9bdf-79d3c322906e": {
       "visitor:77cb1a9f987ee746a411d7bcaa034987baa6af226395a3964c2ed7ec9f42bb9c": "2026-06-23T01:28:11.872Z",
-      "name:p3rth": "2026-06-23T01:28:11.872Z"
+      "name:p3rth": "2026-06-23T01:28:11.872Z",
+      "visitor:7bf8254886368219c5d59e63b71f7dc81eff64ff565510f907a1fba47f7c358f": "2026-06-23T06:42:03.539Z",
+      "name:itzkuro_": "2026-06-23T06:42:03.539Z"
     }
   }
 }
