@@ -66,7 +66,23 @@
       "uptimeSuccesses": 1
     }
   ],
-  "clients": [],
+  "clients": [
+    {
+      "id": "2bc7137c-980e-43ed-9303-e6c9e58089aa",
+      "name": "Pulsed Client",
+      "url": "https://pulsedclient.com",
+      "youtubeUrl": "",
+      "description": "The Minecraft client\nbuilt to perform.\nInstant installs, 10,000+ mods, server hosting, and real FPS gains all in one launcher. Free forever.\n\nEverything competitive players actually need, without the clutter.\n\nBrowse and install from Modrinth's entire catalogue directly inside the launcher. Pulsed matches mods to your version and loads them with Fabric automatically.\n\nCreate isolated instances for each Minecraft version. Separate mods, worlds, and resource packs per instance - no cross-contamination, no breakage.\n\nPreview skins on a real 3D model, import any player's skin by username, and save a personal collection. Swap in seconds before you launch.\n\nBrowse popular servers with live player counts and ping. Hit join and you're in - no copying IPs, no alt-tabbing, no fuss.",
+      "images": [
+        "https://i.imgur.com/UptcEQM.png",
+        "https://i.imgur.com/qGYnKUg.png"
+      ],
+      "version": "java",
+      "pricing": "free",
+      "createdAt": "2026-06-23T07:06:33.833Z",
+      "updatedAt": "2026-06-23T07:06:33.833Z"
+    }
+  ],
   "votes": [],
   "voteIps": {}
 }
