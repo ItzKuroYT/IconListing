@@ -364,12 +364,18 @@
       "serverId": "31d8afda-7746-4b44-9bdf-79d3c322906e",
       "minecraftUsername": "p3rth",
       "createdAt": "2026-06-23T01:28:11.435Z"
+    },
+    {
+      "id": "7d1fd026-c14b-4211-8184-860bfe3f6a17",
+      "serverId": "31d8afda-7746-4b44-9bdf-79d3c322906e",
+      "minecraftUsername": "p3rth",
+      "createdAt": "2026-06-23T01:28:11.872Z"
     }
   ],
   "voteIps": {
     "31d8afda-7746-4b44-9bdf-79d3c322906e": {
-      "visitor:77cb1a9f987ee746a411d7bcaa034987baa6af226395a3964c2ed7ec9f42bb9c": "2026-06-23T01:28:11.435Z",
-      "name:p3rth": "2026-06-23T01:28:11.435Z"
+      "visitor:77cb1a9f987ee746a411d7bcaa034987baa6af226395a3964c2ed7ec9f42bb9c": "2026-06-23T01:28:11.872Z",
+      "name:p3rth": "2026-06-23T01:28:11.872Z"
     }
   }
 }
