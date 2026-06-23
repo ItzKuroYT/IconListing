@@ -47,15 +47,15 @@
       "ownerId": "a470b643-b770-4035-9f34-5f5ec8220704",
       "ownerName": "ItzKuroYT",
       "votes": 1,
-      "playersOnline": 3306,
-      "playersMax": 1142,
+      "playersOnline": 2715,
+      "playersMax": 1005,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-16T05:49:35.782Z",
       "updatedAt": "2026-06-16T05:49:35.782Z",
-      "lastPingAt": "2026-06-23T03:38:34.193Z",
+      "lastPingAt": "2026-06-23T06:12:34.087Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -280,12 +280,18 @@
             "playersOnline": 3306,
             "playersMax": 1142,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-23T06:12:34.087Z",
+            "playersOnline": 2715,
+            "playersMax": 1005,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-23T03:38:34.193Z",
-      "uptimeChecks": 93,
-      "uptimeSuccesses": 93
+      "lastSuccessfulPingAt": "2026-06-23T06:12:34.087Z",
+      "uptimeChecks": 94,
+      "uptimeSuccesses": 94
     },
     {
       "id": "31d8afda-7746-4b44-9bdf-79d3c322906e",
@@ -324,7 +330,7 @@
       "sponsored": true,
       "createdAt": "2026-06-23T01:18:49.672Z",
       "updatedAt": "2026-06-23T01:18:49.672Z",
-      "lastPingAt": "2026-06-23T03:38:35.918Z",
+      "lastPingAt": "2026-06-23T06:12:35.830Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -339,12 +345,18 @@
             "playersOnline": 0,
             "playersMax": 100,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-23T06:12:35.830Z",
+            "playersOnline": 0,
+            "playersMax": 100,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-23T03:38:35.918Z",
-      "uptimeChecks": 7,
-      "uptimeSuccesses": 7
+      "lastSuccessfulPingAt": "2026-06-23T06:12:35.830Z",
+      "uptimeChecks": 8,
+      "uptimeSuccesses": 8
     }
   ],
   "clients": [
