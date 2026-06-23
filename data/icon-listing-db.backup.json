@@ -57,7 +57,7 @@
       "sponsored": false,
       "createdAt": "2026-06-23T07:05:03.226Z",
       "updatedAt": "2026-06-23T07:05:03.226Z",
-      "lastPingAt": "2026-06-23T21:42:17.666Z",
+      "lastPingAt": "2026-06-23T22:01:06.863Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -80,16 +80,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-23T21:42:17.666Z",
+            "createdAt": "2026-06-23T22:01:06.863Z",
             "playersOnline": 7,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-23T21:42:17.666Z",
-      "uptimeChecks": 5,
-      "uptimeSuccesses": 5
+      "lastSuccessfulPingAt": "2026-06-23T22:01:06.863Z",
+      "uptimeChecks": 6,
+      "uptimeSuccesses": 6
     },
     {
       "id": "5ece91df-94e4-46be-89ed-da0763db6b27",
@@ -120,11 +120,11 @@
       "playersMax": 0,
       "version": "Unknown",
       "online": false,
-      "uptimePercent": 66.66666666666666,
+      "uptimePercent": 50,
       "sponsored": false,
       "createdAt": "2026-06-23T14:30:26.667Z",
       "updatedAt": "2026-06-23T14:30:26.667Z",
-      "lastPingAt": "2026-06-23T21:42:22.920Z",
+      "lastPingAt": "2026-06-23T22:01:06.872Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -141,7 +141,7 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-23T21:42:22.920Z",
+            "createdAt": "2026-06-23T22:01:06.872Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -149,7 +149,7 @@
         ]
       },
       "lastSuccessfulPingAt": "2026-06-23T16:17:16.527Z",
-      "uptimeChecks": 3,
+      "uptimeChecks": 4,
       "uptimeSuccesses": 2
     }
   ],
