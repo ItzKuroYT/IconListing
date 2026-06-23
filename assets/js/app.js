@@ -775,6 +775,53 @@ function popularTagLinks(limit = 12) {
   )).join("");
 }
 
+const HOME_FAQS = [
+  {
+    question: "How do I find the best Minecraft server for me?",
+    answer: "Start by filtering for the gamemode you want, such as SMP, Survival, Skyblock, Factions, Lifesteal, Prison, PvP, Bedrock, or Cross-Play. Then compare player counts, votes, server status, tags, descriptions, and banners before joining."
+  },
+  {
+    question: "Can server owners submit their Minecraft server?",
+    answer: "Yes. Server owners can create an account, submit a unique listing, add a formatted description, choose tags, upload a banner, add trailer links, and connect voting details."
+  },
+  {
+    question: "How are Minecraft servers ranked?",
+    answer: "Icon Listing ranks servers using player activity, votes, and listing data. Sponsored servers are clearly marked separately so players can tell promoted placements apart from normal listings."
+  }
+];
+
+const SERVER_LIST_FAQS = [
+  {
+    question: "What types of Minecraft servers are listed?",
+    answer: "The server list supports SMP, Survival, Economy, Skyblock, Factions, Lifesteal, Prison, PvP, Minigames, Bedrock, Java, and cross-play Minecraft communities."
+  },
+  {
+    question: "Can I search by server IP or gamemode?",
+    answer: "Yes. You can search by server name, IP address, tag, or gamemode, then sort by rank, votes, newest listings, or online player counts."
+  }
+];
+
+function faqJsonLd(items) {
+  return {
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer
+      }
+    }))
+  };
+}
+
+function faqMarkup(items) {
+  return `<div class="faq-list">${items.map((item) => `<article class="faq-item">
+    <h3>${escapeHtml(item.question)}</h3>
+    <p>${escapeHtml(item.answer)}</p>
+  </article>`).join("")}</div>`;
+}
+
 function serverCard(server) {
   const banner = server.bannerUrl ? `background-image:url('${escapeHtml(asset(server.bannerUrl))}')` : "";
   return `<article class="server-card ${server.sponsored ? "sponsored" : ""}" data-server-id="${escapeHtml(server.id)}">
@@ -953,7 +1000,7 @@ function serverSeoTitle(server) {
 function serverSeoDescription(server) {
   const tags = (server.tags || []).slice(0, 4).join(", ");
   const status = server.online ? `${Number(server.playersOnline || 0).toLocaleString()} players online` : "status, tags, votes";
-  return trimSeo(`${server.name} is a Minecraft server${tags ? ` for ${tags}` : ""}. Join at ${serverAddress(server)} and view ${status}, details, trailer, and voting.`, 158);
+  return trimSeo(`Join ${server.name}${tags ? `, a ${tags} Minecraft server` : " Minecraft server"}. View IP, live ${status}, votes, tags, trailer, banner, and details.`, 158);
 }
 
 function serverJsonLd(server) {
@@ -983,15 +1030,26 @@ function renderHome(state) {
     ...defaultPageSeo("home"),
     jsonLd: {
       "@context": "https://schema.org",
-      "@type": "WebSite",
-      name: CONFIG.site.name,
-      url: absoluteUrl("/"),
-      description: CONFIG.seo?.pages?.home?.description || CONFIG.seo?.defaultDescription,
-      potentialAction: {
-        "@type": "SearchAction",
-        target: `${absoluteUrl("/servers/")}?q={search_term_string}`,
-        "query-input": "required name=search_term_string"
-      }
+      "@graph": [
+        {
+          "@type": "WebSite",
+          name: CONFIG.site.name,
+          url: absoluteUrl("/"),
+          description: CONFIG.seo?.pages?.home?.description || CONFIG.seo?.defaultDescription,
+          potentialAction: {
+            "@type": "SearchAction",
+            target: `${absoluteUrl("/servers/")}?q={search_term_string}`,
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Organization",
+          name: CONFIG.site.owner || CONFIG.site.name,
+          url: absoluteUrl("/"),
+          logo: absoluteUrl(CONFIG.site.iconPath)
+        },
+        faqJsonLd(HOME_FAQS)
+      ]
     }
   });
   const sponsored = state.servers.filter((server) => server.sponsored);
@@ -1034,8 +1092,16 @@ function renderHome(state) {
       <div class="server-tags">${popularTagLinks()}</div>
     </section>
     <section class="section seo-section">
+      <h2 class="section-title">Popular Minecraft Server Searches</h2>
+      <p class="section-copy">Players often search for active SMP servers, survival servers with land claims, Skyblock servers with economies, Lifesteal servers with PvP, Prison servers with progression, and Bedrock or cross-play servers they can join with friends. Icon Listing keeps those searches connected to real listings with status, votes, descriptions, and server details.</p>
+    </section>
+    <section class="section seo-section">
       <h2 class="section-title">How Icon Listing Helps Players Choose</h2>
       <p class="section-copy">Each listing can include a formatted description, server IP, tags, owner, country, player counts, status checks, vote totals, banners, trailers, and links. That gives players more context before joining and gives owners a cleaner place to advertise real communities.</p>
+    </section>
+    <section class="section seo-section">
+      <h2 class="section-title">Minecraft Server List FAQ</h2>
+      ${faqMarkup(HOME_FAQS)}
     </section>
   </div>`;
   renderServerList(sponsored, "#sponsoredList", {
@@ -1052,21 +1118,34 @@ function renderServers(state) {
     ...defaultPageSeo("servers"),
     title: tag ? `${tag} Minecraft Servers | ${CONFIG.site.name}` : CONFIG.seo?.pages?.servers?.title,
     description: tag
-      ? `Browse ${tag} Minecraft servers by votes, players, rank, and status. Find active ${tag} communities and vote for your favorites.`
+      ? `Browse ${tag} Minecraft servers by rank, votes, players, tags, and status. Find active ${tag} communities and vote for your favorites.`
       : CONFIG.seo?.pages?.servers?.description,
     path: tag ? `/servers/?tag=${encodeURIComponent(tag)}` : "/servers/",
     keywords: tag ? [tag, `${tag} Minecraft servers`] : [],
     jsonLd: {
       "@context": "https://schema.org",
-      "@type": "ItemList",
-      name: tag ? `${tag} Minecraft Servers` : "Minecraft Servers",
-      url: absoluteUrl(tag ? `/servers/?tag=${encodeURIComponent(tag)}` : "/servers/"),
-      itemListElement: state.servers.slice(0, 20).map((server, index) => ({
-        "@type": "ListItem",
-        position: index + 1,
-        url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
-        name: server.name
-      }))
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          name: tag ? `${tag} Minecraft Servers` : "Minecraft Server List",
+          url: absoluteUrl(tag ? `/servers/?tag=${encodeURIComponent(tag)}` : "/servers/"),
+          description: tag
+            ? `Browse ${tag} Minecraft servers by rank, votes, players, tags, and status.`
+            : CONFIG.seo?.pages?.servers?.description
+        },
+        {
+          "@type": "ItemList",
+          name: tag ? `${tag} Minecraft Servers` : "Minecraft Servers",
+          url: absoluteUrl(tag ? `/servers/?tag=${encodeURIComponent(tag)}` : "/servers/"),
+          itemListElement: state.servers.slice(0, 20).map((server, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
+            name: server.name
+          }))
+        },
+        faqJsonLd(SERVER_LIST_FAQS)
+      ]
     }
   });
   $("#app").innerHTML = `<div class="page">
@@ -1082,6 +1161,11 @@ function renderServers(state) {
         <h2 class="section-title">${tag ? `Find ${escapeHtml(tag)} Minecraft Servers` : "Find the Right Minecraft Server"}</h2>
         <p class="section-copy">${tag ? `Compare ${escapeHtml(tag)} servers by activity, votes, tags, descriptions, and status. Open a listing to view the server IP, details, trailer, banners, and vote page.` : "Use search, tags, and sorting to compare Minecraft servers by activity, votes, newest listings, and gamemode. Every listing links to a detail page with server information and voting."}</p>
         <div class="server-tags">${popularTagLinks()}</div>
+      </section>
+      <section class="seo-section">
+        <h2 class="section-title">Compare Minecraft Servers Before Joining</h2>
+        <p class="section-copy">A useful Minecraft server list should show more than a name. Icon Listing lets players compare server IPs, online status, player counts, votes, tags, formatted descriptions, banners, trailers, and owner links so they can pick a community that matches how they play.</p>
+        ${faqMarkup(SERVER_LIST_FAQS)}
       </section>
       <div id="serverList" class="server-list"></div>
       <div id="serverPager"></div>

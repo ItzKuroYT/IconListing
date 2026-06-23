@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://listing.iconrealms.net/sitemap.xml
+Sitemap: https://icon-listing.vercel.app/sitemap.xml
