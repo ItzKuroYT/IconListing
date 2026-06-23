@@ -5,6 +5,7 @@ const path = require("path");
 const CONFIG = require("../config.js");
 
 const TMP_DB = process.env.ICON_LISTING_DB_PATH || path.join(os.tmpdir(), "icon-listing-db.json");
+const TMP_DB_BACKUP = process.env.ICON_LISTING_DB_BACKUP_PATH || `${TMP_DB}.backup.json`;
 const SESSION_SECRET = process.env.SESSION_SECRET || "replace-this-secret-in-vercel";
 const PING_TTL_MS = 5 * 60 * 1000;
 const JSON_HEADERS = {
@@ -110,7 +111,7 @@ module.exports = async function handler(req, res) {
       db.votes.push(vote);
       recordVoteCooldown(db, server.id, minecraftUsername, req);
       server.votes = votesForServer(db.votes, server.id).length;
-      await saveDb(db, { touchedServers: [server.id], touchedVotes: [vote.id] });
+      await saveDb(db, { requireExistingServers: [server.id], touchedVotes: [vote.id] });
       return json(res, 200, { ok: true, vote, server: publicServer(server) });
     }
 
@@ -118,7 +119,7 @@ module.exports = async function handler(req, res) {
       const server = db.servers.find((item) => item.id === body.serverId);
       if (!server) throw httpError(404, "Listing not found.");
       recordIpCopy(server, req);
-      await saveDb(db, { touchedServers: [server.id] });
+      await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
       return json(res, 200, { ok: true, analytics: publicAnalytics(server) });
     }
 
@@ -129,7 +130,7 @@ module.exports = async function handler(req, res) {
       if (body.email) user.email = cleanText(body.email);
       if (body.password) user.passwordHash = hashPassword(body.password);
       ensureUniqueUser(db, user, user.id);
-      await saveDb(db, { touchedUsers: [user.id], uniqueUserId: user.id });
+      await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
       return json(res, 200, { user: publicUser(user) });
     }
 
@@ -204,7 +205,9 @@ module.exports = async function handler(req, res) {
 
     throw httpError(404, "Unknown action.");
   } catch (error) {
-    return json(res, error.status || 500, { error: error.message || "Server error" });
+    const status = error.status || 500;
+    const message = status >= 500 ? "This action is temporarily unavailable. Error: 67." : error.message || "Request failed.";
+    return json(res, status, { error: message });
   }
 };
 
@@ -265,7 +268,7 @@ async function loadDb() {
   requireConfiguredProductionDb();
   if (hasGithubStorage()) return readGithubDb();
   try {
-    return JSON.parse(await fs.readFile(TMP_DB, "utf8"));
+    return parseDbFromStorage(await fs.readFile(TMP_DB, "utf8"));
   } catch {
     return freshDb();
   }
@@ -277,7 +280,8 @@ async function saveDb(db, options = {}) {
     await writeGithubDb(db, options);
     return;
   }
-  await fs.writeFile(TMP_DB, JSON.stringify(db, null, 2));
+  await writeLocalBackup();
+  await fs.writeFile(TMP_DB, serializeDbForStorage(db));
 }
 
 let githubDbCache = { data: null, sha: null, loadedAt: 0 };
@@ -287,8 +291,8 @@ function hasGithubStorage() {
 }
 
 function requireConfiguredProductionDb() {
-  if (process.env.VERCEL && !hasGithubStorage() && process.env.ICON_LISTING_ALLOW_TMP_DB !== "true") {
-    throw httpError(500, "Database is not configured. Add the GitHub storage variables in Vercel so listings are shared publicly.");
+  if (process.env.VERCEL && !hasGithubStorage()) {
+    throw httpError(500, "This action is temporarily unavailable. Error: 67.");
   }
 }
 
@@ -303,7 +307,7 @@ async function readGithubDb(options = {}) {
   if (!response.ok) throw new Error(`GitHub database read failed (${response.status}).`);
   const payload = await response.json();
   const content = Buffer.from(String(payload.content || "").replace(/\n/g, ""), "base64").toString("utf8");
-  const db = migrateDb(JSON.parse(content || "{}"));
+  const db = parseDbFromStorage(content);
   githubDbCache = { data: db, sha: payload.sha, loadedAt: Date.now() };
   return cloneJson(db);
 }
@@ -311,10 +315,13 @@ async function readGithubDb(options = {}) {
 async function writeGithubDb(db, options = {}, retry = true) {
   let normalized = migrateDb(db);
   const latest = await readGithubDb({ bypassCache: true });
+  ensureRequiredRecordsExist(latest, options);
   normalized = mergeDbForWrite(latest, normalized, options);
+  ensureWriteDoesNotLoseData(latest, normalized, options);
+  await writeGithubBackup(latest);
   const body = {
     message: "Update Icon Listing database",
-    content: Buffer.from(JSON.stringify(normalized, null, 2)).toString("base64"),
+    content: Buffer.from(serializeDbForStorage(normalized)).toString("base64"),
     branch: githubBranch()
   };
   if (githubDbCache.sha) body.sha = githubDbCache.sha;
@@ -332,6 +339,44 @@ async function writeGithubDb(db, options = {}, retry = true) {
   githubDbCache = { data: cloneJson(normalized), sha: payload.content?.sha || githubDbCache.sha, loadedAt: Date.now() };
 }
 
+async function writeLocalBackup() {
+  try {
+    const current = await fs.readFile(TMP_DB, "utf8");
+    await fs.writeFile(TMP_DB_BACKUP, current);
+  } catch {
+    // A missing local DB is normal before the first local save.
+  }
+}
+
+async function writeGithubBackup(db) {
+  const latest = migrateDb(db);
+  if (!hasAnyStoredData(latest)) return;
+  try {
+    const backupPath = process.env.GITHUB_DB_BACKUP_PATH || backupPathFor(githubDbPath());
+    const existing = await readGithubFile(backupPath);
+    const body = {
+      message: "Backup Icon Listing database",
+      content: Buffer.from(serializeDbForStorage(latest)).toString("base64"),
+      branch: githubBranch()
+    };
+    if (existing.sha) body.sha = existing.sha;
+    await fetch(githubFileUrl(backupPath, false), {
+      method: "PUT",
+      headers: githubHeaders(),
+      body: JSON.stringify(body)
+    });
+  } catch (error) {
+    console.error("Icon Listing backup write failed", error.message);
+  }
+}
+
+async function readGithubFile(filePath) {
+  const response = await fetch(githubFileUrl(filePath, true), { headers: githubHeaders() });
+  if (response.status === 404) return { sha: null, content: "" };
+  if (!response.ok) throw new Error(`GitHub file read failed (${response.status}).`);
+  return response.json();
+}
+
 function mergeDbForWrite(remoteDb, nextDb, options = {}) {
   const remote = migrateDb(remoteDb);
   const next = migrateDb(nextDb);
@@ -347,6 +392,42 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
   pruneVoteCooldowns(merged);
   ensureMergedWriteIsValid(merged, options);
   return migrateDb(merged);
+}
+
+function ensureRequiredRecordsExist(remoteDb, options = {}) {
+  const remote = migrateDb(remoteDb);
+  const missingServer = (options.requireExistingServers || []).find((id) => !remote.servers.some((item) => item.id === id));
+  const missingUser = (options.requireExistingUsers || []).find((id) => !remote.users.some((item) => item.id === id));
+  const missingClient = (options.requireExistingClients || []).find((id) => !remote.clients.some((item) => item.id === id));
+  if (missingServer || missingUser || missingClient) throw httpError(409, "Storage changed before this action finished. Please refresh and try again.");
+}
+
+function ensureWriteDoesNotLoseData(remoteDb, nextDb, options = {}) {
+  const remote = migrateDb(remoteDb);
+  const next = migrateDb(nextDb);
+  const ids = writeIdSets(options);
+  assertNoUnexpectedLoss("server", remote.servers, next.servers, ids.deletedServers);
+  assertNoUnexpectedLoss("user", remote.users, next.users, ids.deletedUsers);
+  assertNoUnexpectedLoss("client", remote.clients, next.clients, ids.deletedClients);
+  assertNoUnexpectedVoteLoss(remote.votes, next.votes, ids.deletedServers);
+}
+
+function assertNoUnexpectedLoss(label, remoteItems = [], nextItems = [], deletedIds = new Set()) {
+  const allowedLoss = [...deletedIds].length;
+  if (nextItems.length + allowedLoss < remoteItems.length) {
+    throw httpError(409, `Storage protection blocked an unexpected ${label} data change. Please refresh and try again.`);
+  }
+}
+
+function assertNoUnexpectedVoteLoss(remoteVotes = [], nextVotes = [], deletedServerIds = new Set()) {
+  const allowedLoss = remoteVotes.filter((vote) => deletedServerIds.has(vote.serverId)).length;
+  if (nextVotes.length + allowedLoss < remoteVotes.length) {
+    throw httpError(409, "Storage protection blocked an unexpected vote data change. Please refresh and try again.");
+  }
+}
+
+function hasAnyStoredData(db) {
+  return !!(db.users.length || db.servers.length || db.clients.length || db.votes.length || Object.keys(db.voteIps || {}).length);
 }
 
 function ensureMergedWriteIsValid(db, options = {}) {
@@ -415,7 +496,19 @@ function mergeVoteIps(remoteVoteIps = {}, nextVoteIps = {}, deletedServerIds = n
 }
 
 function githubDbUrl(includeRef) {
-  const filePath = process.env.GITHUB_DB_PATH || "data/icon-listing-db.json";
+  return githubFileUrl(githubDbPath(), includeRef);
+}
+
+function githubDbPath() {
+  return process.env.GITHUB_DB_PATH || "data/icon-listing-db.json";
+}
+
+function backupPathFor(filePath) {
+  const parsed = path.posix.parse(filePath.replace(/\\/g, "/"));
+  return path.posix.join(parsed.dir, `${parsed.name}.backup${parsed.ext || ".json"}`);
+}
+
+function githubFileUrl(filePath, includeRef) {
   const contentPath = encodeURIComponent(filePath).replace(/%2F/g, "/");
   const base = `https://api.github.com/repos/${process.env.GITHUB_REPO}/contents/${contentPath}`;
   return includeRef ? `${base}?ref=${encodeURIComponent(githubBranch())}` : base;
@@ -436,6 +529,42 @@ function githubHeaders() {
 
 function cloneJson(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function parseDbFromStorage(content = "") {
+  const parsed = JSON.parse(content || "{}");
+  if (!parsed?.encrypted) return migrateDb(parsed);
+  if (parsed.algorithm !== "aes-256-gcm") throw new Error("Unsupported database encryption.");
+  const secret = storageEncryptionSecret();
+  if (!secret) throw new Error("Database encryption key is missing.");
+  const key = crypto.createHash("sha256").update(secret).digest();
+  const decipher = crypto.createDecipheriv("aes-256-gcm", key, Buffer.from(parsed.iv, "base64"));
+  decipher.setAuthTag(Buffer.from(parsed.tag, "base64"));
+  const decrypted = Buffer.concat([decipher.update(Buffer.from(parsed.data, "base64")), decipher.final()]).toString("utf8");
+  return migrateDb(JSON.parse(decrypted || "{}"));
+}
+
+function serializeDbForStorage(db) {
+  const normalized = migrateDb(db);
+  const jsonBody = JSON.stringify(normalized, null, 2);
+  const secret = storageEncryptionSecret();
+  if (!secret) return jsonBody;
+  const key = crypto.createHash("sha256").update(secret).digest();
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const encrypted = Buffer.concat([cipher.update(jsonBody, "utf8"), cipher.final()]);
+  return JSON.stringify({
+    version: 1,
+    encrypted: true,
+    algorithm: "aes-256-gcm",
+    iv: iv.toString("base64"),
+    tag: cipher.getAuthTag().toString("base64"),
+    data: encrypted.toString("base64")
+  }, null, 2);
+}
+
+function storageEncryptionSecret() {
+  return process.env.DATABASE_ENCRYPTION_KEY || process.env.ICON_LISTING_DB_ENCRYPTION_KEY || "";
 }
 
 function statePayload(db, user) {
@@ -703,7 +832,7 @@ function enforceVoteCooldown(db, serverId, minecraftUsername, req) {
     .filter((value) => Number.isFinite(value))
     .sort((a, b) => b - a)[0];
   if (lastVoteAt && now - lastVoteAt < cooldown) {
-    throw httpError(429, `You can vote for this server again in ${formatDuration(cooldown - (now - lastVoteAt))}.`);
+    throw httpError(429, "You can only vote once every 24 hours.");
   }
 }
 

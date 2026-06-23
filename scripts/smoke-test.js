@@ -4,7 +4,9 @@ const os = require("os");
 const path = require("path");
 
 const dbPath = path.join(os.tmpdir(), `icon-listing-smoke-${Date.now()}.json`);
+const backupPath = `${dbPath}.backup.json`;
 process.env.ICON_LISTING_DB_PATH = dbPath;
+process.env.ICON_LISTING_DB_BACKUP_PATH = backupPath;
 
 const CONFIG = require("../config.js");
 const handler = require("../api/index.js");
@@ -279,16 +281,20 @@ async function main() {
     assert(server.analytics.ipCopiesLast30 === 1, "server should expose public IP copy analytics");
     assert(client && client.images.length === 2 && client.version === "both" && client.pricing === "paid", "sponsored client fields should be stored");
     assert(finalState.json.votes.length === 1, "monthly vote records should be stored");
+    const backup = JSON.parse(await fs.readFile(backupPath, "utf8"));
+    assert(Array.isArray(backup.servers) && backup.servers.length >= 2, "backup JSON should preserve server listings");
 
     console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, duplicate listing checks, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, voting cooldown, sponsored clients.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });
+    await fs.rm(backupPath, { force: true });
   }
 }
 
 main().catch(async (error) => {
   await fs.rm(dbPath, { force: true });
+  await fs.rm(backupPath, { force: true });
   console.error(error);
   process.exit(1);
 });

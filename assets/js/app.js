@@ -152,7 +152,21 @@ function apiBasePaths() {
 }
 
 function productionApiMessage() {
-  return "Public listings are not connected yet. Set the production API URL and GitHub storage variables in Vercel so listings can be shared.";
+  return "This action is temporarily unavailable. Error: 67.";
+}
+
+function publicApiMessage(action, status) {
+  if (action === "vote") return "You can only vote once every 24 hours.";
+  if (status === 401) return "Log in again before doing that.";
+  if (status === 403) return "You do not have permission to do that.";
+  if (status === 404) return "That listing could not be found.";
+  if (status === 409) return "That listing already exists.";
+  return productionApiMessage();
+}
+
+function publicRequestError(action, error) {
+  if (action === "vote") return "You can only vote once every 24 hours.";
+  return error?.publicMessage || error?.message || productionApiMessage();
 }
 
 async function request(action, payload = {}, method = "POST") {
@@ -175,18 +189,31 @@ async function request(action, payload = {}, method = "POST") {
           try {
             json = await response.json();
           } catch {
-            const body = await response.text().catch(() => "");
-            throw new Error(response.ok ? `The API at ${url} returned an unreadable response.` : `${productionApiMessage()} (${response.status} from ${url})${body ? ` ${body.slice(0, 80)}` : ""}`);
+            const error = new Error(response.ok ? "The site service returned an unreadable response. Error: 67." : publicApiMessage(action, response.status));
+            error.status = response.status;
+            error.stopRetry = response.status >= 400 && response.status < 500;
+            throw error;
           }
-          if (!response.ok || json.error) throw new Error(json.error || `${productionApiMessage()} (${response.status} from ${url})`);
+          if (!response.ok || json.error) {
+            const error = new Error(json.error || publicApiMessage(action, response.status));
+            error.status = response.status;
+            if (action === "vote" || !json.error) error.publicMessage = publicApiMessage(action, response.status);
+            error.stopRetry = response.status >= 400 && response.status < 500;
+            throw error;
+          }
           return json;
         } catch (error) {
           lastError = error;
+          if (error.stopRetry) throw error;
         }
       }
       throw lastError || new Error(productionApiMessage());
     } catch (error) {
-      if (!isLocalFallbackAllowed()) throw error.message ? error : new Error(productionApiMessage());
+      if (!isLocalFallbackAllowed()) {
+        const next = new Error(publicRequestError(action, error));
+        next.originalError = error;
+        throw next;
+      }
     } finally {
       window.clearTimeout(timeout);
     }
@@ -499,7 +526,7 @@ function enforceVoteCooldown(db, serverId, minecraftUsername) {
     .filter((value) => Number.isFinite(value))
     .sort((a, b) => b - a)[0];
   if (lastVoteAt && now - lastVoteAt < cooldown) {
-    throw new Error(`You can vote for this server again in ${formatDuration(cooldown - (now - lastVoteAt))}.`);
+    throw new Error("You can only vote once every 24 hours.");
   }
 }
 
@@ -1494,7 +1521,7 @@ function renderVotePage(state) {
       toast("Vote counted. Thanks for supporting this server.");
       location.reload();
     } catch (error) {
-      toast(error.message);
+      toast(publicRequestError("vote", error));
     }
   });
 }
