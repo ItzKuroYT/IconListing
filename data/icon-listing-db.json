@@ -47,7 +47,7 @@
       "ownerId": "a470b643-b770-4035-9f34-5f5ec8220704",
       "ownerName": "ItzKuroYT",
       "votes": 1,
-      "playersOnline": 2,
+      "playersOnline": 1,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
@@ -55,7 +55,7 @@
       "sponsored": false,
       "createdAt": "2026-06-16T05:49:35.782Z",
       "updatedAt": "2026-06-16T05:49:35.782Z",
-      "lastPingAt": "2026-06-23T01:49:33.409Z",
+      "lastPingAt": "2026-06-23T02:05:46.456Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -270,16 +270,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-23T01:49:33.409Z",
-            "playersOnline": 2,
+            "createdAt": "2026-06-23T02:05:46.456Z",
+            "playersOnline": 1,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-23T01:49:33.409Z",
-      "uptimeChecks": 90,
-      "uptimeSuccesses": 90
+      "lastSuccessfulPingAt": "2026-06-23T02:05:46.456Z",
+      "uptimeChecks": 91,
+      "uptimeSuccesses": 91
     },
     {
       "id": "31d8afda-7746-4b44-9bdf-79d3c322906e",
@@ -318,21 +318,21 @@
       "sponsored": true,
       "createdAt": "2026-06-23T01:18:49.672Z",
       "updatedAt": "2026-06-23T01:18:49.672Z",
-      "lastPingAt": "2026-06-23T01:49:35.173Z",
+      "lastPingAt": "2026-06-23T02:05:48.211Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
           {
-            "createdAt": "2026-06-23T01:49:35.173Z",
+            "createdAt": "2026-06-23T02:05:48.211Z",
             "playersOnline": 0,
             "playersMax": 100,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-23T01:49:35.173Z",
-      "uptimeChecks": 4,
-      "uptimeSuccesses": 4
+      "lastSuccessfulPingAt": "2026-06-23T02:05:48.211Z",
+      "uptimeChecks": 5,
+      "uptimeSuccesses": 5
     }
   ],
   "clients": [
