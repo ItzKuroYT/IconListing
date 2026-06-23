@@ -49,15 +49,15 @@
       "ownerId": "418e8ef3-c92e-44a9-9fd9-cba603b2f629",
       "ownerName": "ItzKuroYT",
       "votes": 0,
-      "playersOnline": 4378,
-      "playersMax": 1237,
+      "playersOnline": 7,
+      "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-23T07:05:03.226Z",
       "updatedAt": "2026-06-23T07:05:03.226Z",
-      "lastPingAt": "2026-06-23T16:17:14.515Z",
+      "lastPingAt": "2026-06-23T21:42:17.666Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -78,12 +78,18 @@
             "playersOnline": 4378,
             "playersMax": 1237,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-23T21:42:17.666Z",
+            "playersOnline": 7,
+            "playersMax": 500,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-23T16:17:14.515Z",
-      "uptimeChecks": 4,
-      "uptimeSuccesses": 4
+      "lastSuccessfulPingAt": "2026-06-23T21:42:17.666Z",
+      "uptimeChecks": 5,
+      "uptimeSuccesses": 5
     },
     {
       "id": "5ece91df-94e4-46be-89ed-da0763db6b27",
@@ -111,14 +117,14 @@
       "ownerName": "p3rth",
       "votes": 0,
       "playersOnline": 0,
-      "playersMax": 100,
-      "version": "Paper 26.1.2",
-      "online": true,
-      "uptimePercent": 100,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 66.66666666666666,
       "sponsored": false,
       "createdAt": "2026-06-23T14:30:26.667Z",
       "updatedAt": "2026-06-23T14:30:26.667Z",
-      "lastPingAt": "2026-06-23T16:17:16.527Z",
+      "lastPingAt": "2026-06-23T21:42:22.920Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -133,11 +139,17 @@
             "playersOnline": 0,
             "playersMax": 100,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-23T21:42:22.920Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
           }
         ]
       },
       "lastSuccessfulPingAt": "2026-06-23T16:17:16.527Z",
-      "uptimeChecks": 2,
+      "uptimeChecks": 3,
       "uptimeSuccesses": 2
     }
   ],
