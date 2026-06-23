@@ -280,6 +280,59 @@
       "lastSuccessfulPingAt": "2026-06-23T01:16:02.065Z",
       "uptimeChecks": 87,
       "uptimeSuccesses": 87
+    },
+    {
+      "id": "31d8afda-7746-4b44-9bdf-79d3c322906e",
+      "name": "Hiearchy SMP",
+      "javaHost": "courses-blog.gl.joinmc.link",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "votifierEnabled": false,
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/g92rt9p77y",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "data:image/png;base64,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",
+      "description": "🌍 Build Your Nation. Shape the World.\n⚔️ Welcome to Hierarchy SMP\nWhere every border is drawn in blood, diplomacy, and determination.\n\n🗺️ What is Hierarchy?\n\nHierarchy is a geopolitical Minecraft SMP where you don't just survive — you rise to power. Found your own nation, forge alliances, wage wars, or manipulate the global economy from the shadows. The world is yours to claim.\n🏛️ What You Can Do:\n🔹 Found & Name Your Own Nation — Write your constitution, design your flag, and claim your territory\n\n🔹 Forge Alliances & Sign Treaties — Diplomacy is just as powerful as a sword\n\n🔹 Wage War & Conquer — Lead armies, siege cities, and expand your borders\n\n🔹 Build a Thriving Economy — Trade resources, set tariffs, and dominate global markets\n\n🔹 Rise Through the Ranks — From lone settler to world superpower\n🌐 Server Features:\n✅ Custom Nations Plugin with full territory control\n\n✅ Player-run governments — democracy, monarchy, dictatorship — your choice\n\n✅ Dynamic world map updated in real time\n\n✅ Active staff & balanced gameplay\n\n✅ Friendly community for new & veteran players",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP",
+        "Roleplay",
+        "Towny",
+        "New"
+      ],
+      "ownerId": "3c337a8a-90d3-4ad9-bfd7-2e90721943d2",
+      "ownerName": "p3rth",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 100,
+      "version": "Paper 26.1.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-06-23T01:18:49.672Z",
+      "updatedAt": "2026-06-23T01:18:49.672Z",
+      "lastPingAt": "2026-06-23T01:18:51.460Z",
+      "analytics": {
+        "ipCopies": [],
+        "playerHistory": [
+          {
+            "createdAt": "2026-06-23T01:18:51.460Z",
+            "playersOnline": 0,
+            "playersMax": 100,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-06-23T01:18:51.460Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1
     }
   ],
   "clients": [
