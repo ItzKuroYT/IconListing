@@ -159,6 +159,58 @@
       "lastSuccessfulPingAt": "2026-06-23T16:17:16.527Z",
       "uptimeChecks": 5,
       "uptimeSuccesses": 2
+    },
+    {
+      "id": "52db8bb5-0a8e-40c4-82c8-ab3e6e1ab58a",
+      "name": "infinite horizons",
+      "javaHost": "shop-espn.gl.joinmc.link",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "votifierEnabled": false,
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/cnbeVZWAFz",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "**Infinite Horizons** is a community-driven Minecraft network built around exploration, freedom, and adventure. Our goal is simple: create a place where every player can forge their own path and leave their mark on a world full of possibilities.\n\nWhether you're building a thriving base, exploring distant lands, trading with other players, or embarking on new challenges, there's always another horizon waiting to be discovered.\n\nWith custom features, an active community, dedicated staff, and a focus on long-term gameplay, Infinite Horizons is more than just a server—it's a world where your journey never truly ends.\n\n**Adventure Without Limits.**",
+      "tags": [
+        "Survival",
+        "Economy",
+        "PvP",
+        "SMP",
+        "Vanilla"
+      ],
+      "ownerId": "0857ceca-7b66-4180-91cc-bb1cb7d11b67",
+      "ownerName": "armageddon",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 20,
+      "version": "Paper 26.1.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-06-23T22:27:54.091Z",
+      "updatedAt": "2026-06-23T22:27:54.091Z",
+      "lastPingAt": "2026-06-23T22:27:55.714Z",
+      "analytics": {
+        "ipCopies": [],
+        "playerHistory": [
+          {
+            "createdAt": "2026-06-23T22:27:55.714Z",
+            "playersOnline": 0,
+            "playersMax": 20,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-06-23T22:27:55.714Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1
     }
   ],
   "clients": [
