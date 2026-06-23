@@ -47,15 +47,15 @@
       "ownerId": "a470b643-b770-4035-9f34-5f5ec8220704",
       "ownerName": "ItzKuroYT",
       "votes": 1,
-      "playersOnline": 2682,
-      "playersMax": 994,
+      "playersOnline": 2707,
+      "playersMax": 986,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-16T05:49:35.782Z",
       "updatedAt": "2026-06-16T05:49:35.782Z",
-      "lastPingAt": "2026-06-23T06:27:19.938Z",
+      "lastPingAt": "2026-06-23T06:40:34.027Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -282,16 +282,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-23T06:27:19.938Z",
-            "playersOnline": 2682,
-            "playersMax": 994,
+            "createdAt": "2026-06-23T06:40:34.027Z",
+            "playersOnline": 2707,
+            "playersMax": 986,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-23T06:27:19.938Z",
-      "uptimeChecks": 95,
-      "uptimeSuccesses": 95
+      "lastSuccessfulPingAt": "2026-06-23T06:40:34.027Z",
+      "uptimeChecks": 96,
+      "uptimeSuccesses": 96
     },
     {
       "id": "31d8afda-7746-4b44-9bdf-79d3c322906e",
@@ -330,7 +330,7 @@
       "sponsored": true,
       "createdAt": "2026-06-23T01:18:49.672Z",
       "updatedAt": "2026-06-23T01:18:49.672Z",
-      "lastPingAt": "2026-06-23T06:27:21.752Z",
+      "lastPingAt": "2026-06-23T06:40:35.693Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -347,16 +347,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-23T06:27:21.752Z",
+            "createdAt": "2026-06-23T06:40:35.693Z",
             "playersOnline": 0,
             "playersMax": 100,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-23T06:27:21.752Z",
-      "uptimeChecks": 9,
-      "uptimeSuccesses": 9
+      "lastSuccessfulPingAt": "2026-06-23T06:40:35.693Z",
+      "uptimeChecks": 10,
+      "uptimeSuccesses": 10
     }
   ],
   "clients": [
