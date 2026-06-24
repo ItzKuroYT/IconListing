@@ -16,6 +16,14 @@
       "passwordHash": "be26fc3dd560282810aecbd594aa2a4b:f9b8e0013e5c2cd174b380e2e608f40baea8ac4101757d22fb79a8dd3a2c9aaa",
       "banned": false,
       "createdAt": "2026-06-24T22:13:21.041Z"
+    },
+    {
+      "id": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
+      "username": "ItzKuroYT",
+      "email": "isaaccooper926@gmail.com",
+      "passwordHash": "157b7a344965baf0056be479b29fb573:63681ef58487ce60714743f756ec276c9e879746b7f02989f812f3646eb2de41",
+      "banned": false,
+      "createdAt": "2026-06-24T23:05:19.939Z"
     }
   ],
   "servers": [
