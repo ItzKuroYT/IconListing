@@ -24,6 +24,14 @@
       "passwordHash": "d6cd8a3c9a9a024a62c2466840b2bb79:2032c72bf9178356ac754208f1895afc15de9545738201a5f4e5c01a1e2f7b60",
       "banned": false,
       "createdAt": "2026-06-23T22:25:00.265Z"
+    },
+    {
+      "id": "bd813e43-bf7a-45fd-869e-f092d2dde82e",
+      "username": "MaxFullCalypse",
+      "email": "maxfullcalypse@gmail.com",
+      "passwordHash": "8ce62e7766c9c289308f10e27191d57f:10ea7fe950611d66816167a719a6eb3d94e70913735e785dbfec493556965153",
+      "banned": false,
+      "createdAt": "2026-06-24T14:24:20.045Z"
     }
   ],
   "servers": [
