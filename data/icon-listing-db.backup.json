@@ -57,7 +57,7 @@
       "ownerId": "418e8ef3-c92e-44a9-9fd9-cba603b2f629",
       "ownerName": "ItzKuroYT",
       "votes": 0,
-      "playersOnline": 10,
+      "playersOnline": 11,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
@@ -65,7 +65,7 @@
       "sponsored": false,
       "createdAt": "2026-06-23T07:05:03.226Z",
       "updatedAt": "2026-06-23T07:05:03.226Z",
-      "lastPingAt": "2026-06-24T00:39:05.491Z",
+      "lastPingAt": "2026-06-24T00:46:47.610Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -94,16 +94,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T00:39:05.491Z",
-            "playersOnline": 10,
+            "createdAt": "2026-06-24T00:46:47.610Z",
+            "playersOnline": 11,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T00:39:05.491Z",
-      "uptimeChecks": 8,
-      "uptimeSuccesses": 8
+      "lastSuccessfulPingAt": "2026-06-24T00:46:47.610Z",
+      "uptimeChecks": 9,
+      "uptimeSuccesses": 9
     },
     {
       "id": "5ece91df-94e4-46be-89ed-da0763db6b27",
@@ -134,11 +134,11 @@
       "playersMax": 0,
       "version": "Unknown",
       "online": false,
-      "uptimePercent": 33.33333333333333,
+      "uptimePercent": 28.57142857142857,
       "sponsored": true,
       "createdAt": "2026-06-23T14:30:26.667Z",
       "updatedAt": "2026-06-23T14:30:26.667Z",
-      "lastPingAt": "2026-06-24T00:39:05.534Z",
+      "lastPingAt": "2026-06-24T00:46:47.637Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -161,7 +161,7 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-24T00:39:05.534Z",
+            "createdAt": "2026-06-24T00:46:47.637Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -169,7 +169,7 @@
         ]
       },
       "lastSuccessfulPingAt": "2026-06-23T16:17:16.527Z",
-      "uptimeChecks": 6,
+      "uptimeChecks": 7,
       "uptimeSuccesses": 2
     },
     {
@@ -208,7 +208,7 @@
       "sponsored": false,
       "createdAt": "2026-06-23T22:27:58.331Z",
       "updatedAt": "2026-06-23T22:27:58.331Z",
-      "lastPingAt": "2026-06-24T00:39:05.546Z",
+      "lastPingAt": "2026-06-24T00:46:47.647Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -219,16 +219,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T00:39:05.546Z",
+            "createdAt": "2026-06-24T00:46:47.647Z",
             "playersOnline": 1,
             "playersMax": 20,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T00:39:05.546Z",
-      "uptimeChecks": 2,
-      "uptimeSuccesses": 2
+      "lastSuccessfulPingAt": "2026-06-24T00:46:47.647Z",
+      "uptimeChecks": 3,
+      "uptimeSuccesses": 3
     }
   ],
   "clients": [
