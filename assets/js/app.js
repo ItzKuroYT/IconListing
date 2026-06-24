@@ -50,8 +50,14 @@ function migrateDb(db) {
 }
 
 function normalizeServer(server) {
+  const edition = ["java", "bedrock"].includes(server.edition) ? server.edition : "java";
+  const bedrockType = ["server", "realm"].includes(server.bedrockType) ? server.bedrockType : "server";
   return {
     ...server,
+    edition,
+    bedrockType,
+    crossPlay: edition === "java" && !!server.crossPlay,
+    realmCode: server.realmCode || "",
     analytics: {
       ipCopies: Array.isArray(server.analytics?.ipCopies) ? server.analytics.ipCopies : [],
       playerHistory: Array.isArray(server.analytics?.playerHistory) ? server.analytics.playerHistory : []
@@ -419,14 +425,19 @@ function fallbackRequest(action, payload) {
 
 function sanitizeServer(server) {
   const tags = Array.isArray(server.tags) ? server.tags.filter((tag) => ALL_TAGS.includes(tag)).slice(0, CONFIG.limits.tagsMax) : [];
+  const edition = server.edition === "bedrock" ? "bedrock" : "java";
+  const bedrockType = server.bedrockType === "realm" ? "realm" : "server";
   const next = {
     id: cleanText(server.id),
     name: cleanText(server.name),
-    javaHost: cleanText(server.javaHost),
+    edition,
+    javaHost: edition === "java" ? cleanText(server.javaHost) : "",
     javaPort: Number(server.javaPort || CONFIG.defaults.javaPort),
-    crossPlay: !!server.crossPlay,
+    crossPlay: edition === "java" && !!server.crossPlay,
+    bedrockType,
     bedrockHost: cleanText(server.bedrockHost),
     bedrockPort: Number(server.bedrockPort || CONFIG.defaults.bedrockPort),
+    realmCode: cleanText(server.realmCode),
     votifierEnabled: !!server.votifierEnabled,
     votifierHost: cleanText(server.votifierHost),
     votifierPort: Number(server.votifierPort || 8192),
@@ -439,7 +450,11 @@ function sanitizeServer(server) {
     description: cleanText(server.description),
     tags
   };
-  if (!next.name || !next.javaHost) throw new Error("Server name and Java host are required.");
+  if (!next.name) throw new Error("Server name is required.");
+  if (next.edition === "java" && !next.javaHost) throw new Error("Java host is required.");
+  if (next.edition === "java" && next.crossPlay && !next.bedrockHost) throw new Error("Bedrock host is required for cross-play listings.");
+  if (next.edition === "bedrock" && next.bedrockType === "server" && !next.bedrockHost) throw new Error("Bedrock server IP or host is required.");
+  if (next.edition === "bedrock" && next.bedrockType === "realm" && !next.realmCode) throw new Error("Realm code is required.");
   if (next.description.length < CONFIG.limits.descriptionMinLength) throw new Error(`Description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
   if (tags.length < CONFIG.limits.tagsMin || tags.length > CONFIG.limits.tagsMax) throw new Error(`Select ${CONFIG.limits.tagsMin} to ${CONFIG.limits.tagsMax} tags.`);
   if (isBlockedServerHost(next.javaHost) || isBlockedServerHost(next.bedrockHost)) throw new Error("FalixSrv and Aternos servers are not allowed on this listing site.");
@@ -482,8 +497,9 @@ function comparableText(value = "") {
 
 function serverAddressKeys(server) {
   return [
-    hostPortKey(server.javaHost, server.javaPort, CONFIG.defaults.javaPort),
-    server.crossPlay || server.bedrockHost ? hostPortKey(server.bedrockHost, server.bedrockPort, CONFIG.defaults.bedrockPort) : ""
+    server.edition !== "bedrock" ? hostPortKey(server.javaHost, server.javaPort, CONFIG.defaults.javaPort) : "",
+    server.edition === "bedrock" || server.crossPlay || server.bedrockHost ? hostPortKey(server.bedrockHost, server.bedrockPort, CONFIG.defaults.bedrockPort) : "",
+    server.edition === "bedrock" && server.bedrockType === "realm" ? `realm:${comparableText(server.realmCode)}` : ""
   ].filter(Boolean);
 }
 
@@ -891,15 +907,16 @@ function faqMarkup(items) {
 
 function serverCard(server) {
   const banner = server.bannerUrl ? `background-image:url('${escapeHtml(asset(server.bannerUrl))}')` : "";
+  const editionLabel = serverEditionLabel(server);
   return `<article class="server-card ${server.sponsored ? "sponsored" : ""}" data-server-id="${escapeHtml(server.id)}">
     <a class="server-card-link" href="${route(`/server/?id=${encodeURIComponent(server.id)}`)}" aria-label="Open ${escapeHtml(server.name)} listing"></a>
     <div class="rank">${server.sponsored ? `<span class="star">*</span>` : ""}#${server.rank || "-"}</div>
     <div class="banner" style="${banner}" role="img" aria-label="${escapeHtml(server.name)} banner"></div>
     <div class="server-main">
       <h3 class="server-title">${escapeHtml(server.name)} ${server.sponsored ? `<span class="pill">Sponsored</span>` : ""}</h3>
-      <p class="server-ip">${escapeHtml(server.javaHost)}:${Number(server.javaPort || CONFIG.defaults.javaPort)}</p>
+      <p class="server-ip">${escapeHtml(serverAddress(server))}</p>
       <p class="server-summary">${escapeHtml(descriptionSnippet(server.description || `${server.name} is a Minecraft server listed with tags, votes, player counts, and status.`))}</p>
-      <div class="server-tags">${(server.tags || []).map((tag) => `<a class="pill above-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)}</a>`).join("")}</div>
+      <div class="server-tags"><span class="pill">${escapeHtml(editionLabel)}</span>${(server.tags || []).map((tag) => `<a class="pill above-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)}</a>`).join("")}</div>
     </div>
     <div class="stats">
       <span class="status"><span class="dot ${server.online ? "online" : ""}"></span>${server.online ? "Online" : "Offline"}</span>
@@ -1034,7 +1051,7 @@ function setupFilters(servers, options = {}) {
     const tag = $("#tagFilter")?.value || "";
     const sort = $("#sortMode")?.value || "rank";
     let result = servers.filter((server) => {
-      const text = `${server.name} ${server.javaHost} ${(server.tags || []).join(" ")}`.toLowerCase();
+      const text = `${server.name} ${server.javaHost} ${server.bedrockHost} ${server.realmCode} ${serverEditionLabel(server)} ${(server.tags || []).join(" ")}`.toLowerCase();
       return (!search || text.includes(search)) && (!tag || (server.tags || []).includes(tag));
     });
     if (sort === "players") result = [...result].sort((a, b) => (b.playersOnline || 0) - (a.playersOnline || 0));
@@ -1257,14 +1274,15 @@ function renderServerDetail(state) {
   const owner = server.ownerName || "Server owner";
   const canEdit = state.user && (server.ownerId === state.user.id || isAdmin(state.user));
   const ip = serverAddress(server);
-  const bedrockIp = server.crossPlay ? `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}` : "";
+  const bedrockIp = bedrockAddress(server);
+  const isBedrockRealm = server.edition === "bedrock" && server.bedrockType === "realm";
   setSeoMeta({
     title: serverSeoTitle(server),
     description: serverSeoDescription(server),
     path: `/server/?id=${encodeURIComponent(server.id)}`,
     image: server.bannerUrl || CONFIG.site.iconPath,
     type: "article",
-    keywords: [...(server.tags || []), server.name, server.javaHost],
+    keywords: [...(server.tags || []), server.name, server.javaHost, server.bedrockHost, server.realmCode].filter(Boolean),
     jsonLd: serverJsonLd(server)
   });
   $("#app").innerHTML = `<div class="page detail-layout">
@@ -1272,8 +1290,10 @@ function renderServerDetail(state) {
       <h1>${escapeHtml(server.name)}</h1>
       ${infoRow("Owner", owner)}
       ${infoRow("Status", `<span class="status inline"><span class="dot ${server.online ? "online" : ""}"></span>${server.online ? "Online" : "Offline"}</span>`)}
-      ${infoRow("Java IP", `<span class="copy-row"><span>${escapeHtml(ip)}</span><button class="mini-button" data-copy-ip type="button">Copy</button></span>`)}
-      ${server.crossPlay ? infoRow("Bedrock IP", `<span class="copy-row"><span>${escapeHtml(bedrockIp)}</span><button class="mini-button" data-copy-bedrock type="button">Copy</button></span>`) : ""}
+      ${infoRow("Edition", `<span class="pill">${escapeHtml(serverEditionLabel(server))}</span>`)}
+      ${server.edition !== "bedrock" ? infoRow("Java IP", `<span class="copy-row"><span>${escapeHtml(ip)}</span><button class="mini-button" data-copy-ip type="button">Copy</button></span>`) : ""}
+      ${server.edition === "bedrock" && isBedrockRealm ? infoRow("Realm Code", `<span class="copy-row"><span>${escapeHtml(server.realmCode)}</span><button class="mini-button" data-copy-realm type="button">Copy</button></span>`) : ""}
+      ${(server.crossPlay || (server.edition === "bedrock" && !isBedrockRealm)) ? infoRow("Bedrock IP", `<span class="copy-row"><span>${escapeHtml(bedrockIp)}</span><button class="mini-button" data-copy-bedrock type="button">Copy</button></span>`) : ""}
       ${server.websiteUrl ? infoRow("Website", `<a href="${escapeHtml(server.websiteUrl)}">${escapeHtml(server.websiteUrl)}</a>`) : ""}
       ${server.discordUrl ? infoRow("Discord", `<a href="${escapeHtml(server.discordUrl)}">Click to join</a>`) : ""}
       ${infoRow("Players", `${Number(server.playersOnline || 0).toLocaleString()}${server.playersMax ? `/${Number(server.playersMax).toLocaleString()}` : ""}`)}
@@ -1365,7 +1385,8 @@ function bindServerDetail(server) {
     });
   });
   $("[data-copy-ip]")?.addEventListener("click", () => copyServerAddress(server, serverAddress(server)));
-  $("[data-copy-bedrock]")?.addEventListener("click", () => copyServerAddress(server, `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}`));
+  $("[data-copy-bedrock]")?.addEventListener("click", () => copyServerAddress(server, bedrockAddress(server)));
+  $("[data-copy-realm]")?.addEventListener("click", () => copyServerAddress(server, server.realmCode));
 }
 
 async function copyServerAddress(server, value) {
@@ -1383,7 +1404,19 @@ async function copyServerAddress(server, value) {
 }
 
 function serverAddress(server) {
+  if (server.edition === "bedrock") {
+    return server.bedrockType === "realm" ? server.realmCode : bedrockAddress(server);
+  }
   return `${server.javaHost}:${Number(server.javaPort || CONFIG.defaults.javaPort)}`;
+}
+
+function bedrockAddress(server) {
+  return `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}`;
+}
+
+function serverEditionLabel(server) {
+  if (server.edition === "bedrock") return server.bedrockType === "realm" ? "Bedrock Realm" : "Bedrock";
+  return server.crossPlay ? "Java + Bedrock" : "Java";
 }
 
 function bannerPreview(server) {
@@ -1884,7 +1917,7 @@ function renderDashboard(state) {
         <div class="rank">#${server.rank}</div>
         <div>
           <h2 class="server-title">${escapeHtml(server.name)}</h2>
-          <p class="server-ip">${escapeHtml(server.javaHost)}:${server.javaPort}</p>
+          <p class="server-ip">${escapeHtml(serverAddress(server))}</p>
         </div>
         <div class="row-actions">
           <a class="button" href="${route(`/server/?id=${encodeURIComponent(server.id)}`)}">View</a>
@@ -1904,16 +1937,31 @@ function renderDashboard(state) {
 }
 
 function serverFormMarkup(server = {}) {
+  const edition = server.edition === "bedrock" ? "bedrock" : "java";
+  const bedrockType = server.bedrockType === "realm" ? "realm" : "server";
   return `<form id="serverForm" class="card form">
     <input type="hidden" id="serverId" value="${escapeHtml(server.id || "")}">
     <h2 class="section-title">${server.id ? "Edit Server" : "Add Server"}</h2>
     <div class="form-grid">
       <div class="field"><label>Server Name</label><input id="serverName" class="input" value="${escapeHtml(server.name || "")}" required></div>
       <div class="field"><label>Country</label><select id="serverCountry" class="select" required>${CONFIG.countries.map((country) => `<option ${country === server.country ? "selected" : ""}>${country}</option>`).join("")}</select></div>
+      <div class="field"><label>Server Edition</label><select id="serverEdition" class="select">
+        <option value="java" ${edition === "java" ? "selected" : ""}>Mainly Java</option>
+        <option value="bedrock" ${edition === "bedrock" ? "selected" : ""}>Bedrock only</option>
+      </select></div>
+    </div>
+    <div id="javaFields" class="form-grid">
       <div class="field"><label>Java IP / Host</label><input id="javaHost" class="input" value="${escapeHtml(server.javaHost || "")}" required></div>
       <div class="field"><label>Java Port</label><input id="javaPort" class="input" type="number" value="${Number(server.javaPort || CONFIG.defaults.javaPort)}" required></div>
     </div>
-    <label class="check-row"><input id="crossPlay" type="checkbox" ${server.crossPlay ? "checked" : ""}> Cross-Play Server</label>
+    <label id="crossPlayRow" class="check-row"><input id="crossPlay" type="checkbox" ${server.crossPlay ? "checked" : ""}> Also supports Bedrock / cross-play</label>
+    <div id="bedrockModeFields" class="form-grid hidden">
+      <div class="field"><label>Bedrock address type</label><select id="bedrockType" class="select">
+        <option value="server" ${bedrockType === "server" ? "selected" : ""}>Server IP / Host</option>
+        <option value="realm" ${bedrockType === "realm" ? "selected" : ""}>Realm code</option>
+      </select></div>
+      <div id="realmCodeField" class="field hidden"><label>Realm Code</label><input id="realmCode" class="input" value="${escapeHtml(server.realmCode || "")}"></div>
+    </div>
     <div id="bedrockFields" class="form-grid hidden">
       <div class="field"><label>Bedrock IP / Host</label><input id="bedrockHost" class="input" value="${escapeHtml(server.bedrockHost || "")}"></div>
       <div class="field"><label>Bedrock Port</label><input id="bedrockPort" class="input" type="number" value="${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}"></div>
@@ -1974,13 +2022,27 @@ function bindDashboard(state) {
 }
 
 function bindServerForm() {
+  const edition = $("#serverEdition");
   const crossPlay = $("#crossPlay");
+  const bedrockType = $("#bedrockType");
   const votifier = $("#votifierEnabled");
   const sync = () => {
-    $("#bedrockFields")?.classList.toggle("hidden", !crossPlay?.checked);
+    const isBedrock = edition?.value === "bedrock";
+    const isRealm = bedrockType?.value === "realm";
+    $("#javaFields")?.classList.toggle("hidden", isBedrock);
+    $("#crossPlayRow")?.classList.toggle("hidden", isBedrock);
+    $("#bedrockModeFields")?.classList.toggle("hidden", !isBedrock);
+    $("#realmCodeField")?.classList.toggle("hidden", !isBedrock || !isRealm);
+    $("#bedrockFields")?.classList.toggle("hidden", isBedrock ? isRealm : !crossPlay?.checked);
+    $("#javaHost")?.toggleAttribute("required", !isBedrock);
+    $("#javaPort")?.toggleAttribute("required", !isBedrock);
+    $("#bedrockHost")?.toggleAttribute("required", isBedrock ? !isRealm : !!crossPlay?.checked);
+    $("#realmCode")?.toggleAttribute("required", isBedrock && isRealm);
     $("#votifierFields")?.classList.toggle("hidden", !votifier?.checked);
   };
+  edition?.addEventListener("change", sync);
   crossPlay?.addEventListener("change", sync);
+  bedrockType?.addEventListener("change", sync);
   votifier?.addEventListener("change", sync);
   sync();
   $$(".tag-choice").forEach((button) => {
@@ -2041,11 +2103,14 @@ async function submitServerForm(event) {
       server: {
         id: $("#serverId").value,
         name: $("#serverName").value,
+        edition: $("#serverEdition").value,
         javaHost: $("#javaHost").value,
         javaPort: $("#javaPort").value,
         crossPlay: $("#crossPlay").checked,
+        bedrockType: $("#bedrockType").value,
         bedrockHost: $("#bedrockHost").value,
         bedrockPort: $("#bedrockPort").value,
+        realmCode: $("#realmCode").value,
         votifierEnabled: $("#votifierEnabled").checked,
         votifierHost: $("#votifierHost").value,
         votifierPort: $("#votifierPort").value,
@@ -2120,7 +2185,7 @@ function renderAdmin(state) {
       <div class="section-head"><div><h1 class="section-title">${escapeHtml(copy("admin.title", "Admin Panel"))}</h1><p class="section-copy">${escapeHtml(copy("admin.body", "Manage servers, sponsorships, clients, users, and bans."))}</p></div></div>
       <div class="grid two">
         <div class="card"><h2>${escapeHtml(copy("admin.serverListingsTitle", "Server Listings"))}</h2><div class="dashboard-list">${state.servers.length ? state.servers.map((server) => `<div class="dash-item">
-          <div class="rank">#${server.rank}</div><div><strong>${escapeHtml(server.name)}</strong><p class="server-ip">${escapeHtml(server.javaHost)}</p></div>
+          <div class="rank">#${server.rank}</div><div><strong>${escapeHtml(server.name)}</strong><p class="server-ip">${escapeHtml(serverAddress(server))}</p></div>
           <div class="row-actions"><button class="button" data-admin="toggleSponsor" data-id="${server.id}">${server.sponsored ? "Unsponsor" : "Sponsor"}</button><button class="button danger" data-delete="${server.id}">Delete</button></div>
         </div>`).join("") : emptyNotice()}</div></div>
         <div class="card admin-client-panel">

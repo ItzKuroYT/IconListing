@@ -332,8 +332,14 @@ function migrateDb(db = freshDb()) {
 }
 
 function normalizeServer(server) {
+  const edition = ["java", "bedrock"].includes(server.edition) ? server.edition : "java";
+  const bedrockType = ["server", "realm"].includes(server.bedrockType) ? server.bedrockType : "server";
   return {
     ...server,
+    edition,
+    bedrockType,
+    crossPlay: edition === "java" && !!server.crossPlay,
+    realmCode: server.realmCode || "",
     analytics: {
       ipCopies: Array.isArray(server.analytics?.ipCopies) ? server.analytics.ipCopies : [],
       playerHistory: Array.isArray(server.analytics?.playerHistory) ? server.analytics.playerHistory : []
@@ -820,7 +826,7 @@ async function refreshPings(db) {
 }
 
 async function updatePing(server) {
-  const ping = await pingJava(server.javaHost, server.javaPort);
+  const ping = server.edition === "bedrock" ? await pingBedrock(server) : await pingJava(server.javaHost, server.javaPort);
   const now = new Date().toISOString();
   server.lastPingAt = now;
   server.online = ping.online;
@@ -878,9 +884,29 @@ async function pingJava(host, port) {
   }
 }
 
+async function pingBedrock(server) {
+  if (server.bedrockType === "realm") {
+    return { online: false, playersOnline: 0, playersMax: 0, version: "Bedrock Realm" };
+  }
+  try {
+    const target = `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}`;
+    const response = await fetch(`https://api.mcstatus.io/v2/status/bedrock/${encodeURIComponent(target)}`);
+    if (!response.ok) throw new Error("mcstatus bedrock request failed");
+    const data = await response.json();
+    return {
+      online: !!data.online,
+      playersOnline: Number(data.players?.online || 0),
+      playersMax: Number(data.players?.max || 0),
+      version: data.version?.name_clean || data.version?.name_raw || data.version?.name || "Bedrock"
+    };
+  } catch {
+    return { online: false, playersOnline: 0, playersMax: 0, version: "Bedrock" };
+  }
+}
+
 async function sendVotifierVote(server, minecraftUsername) {
   return sendVotifierPayload({
-    host: server.votifierHost || server.javaHost,
+    host: server.votifierHost || server.javaHost || server.bedrockHost,
     port: Number(server.votifierPort || 8192),
     token: server.votifierToken,
     minecraftUsername,
@@ -904,14 +930,19 @@ async function sendVotifierPayload(payload) {
 }
 
 function validateServer(server) {
+  const edition = server.edition === "bedrock" ? "bedrock" : "java";
+  const bedrockType = server.bedrockType === "realm" ? "realm" : "server";
   const next = {
     id: clean(server.id),
     name: cleanText(server.name),
-    javaHost: cleanText(server.javaHost),
+    edition,
+    javaHost: edition === "java" ? cleanText(server.javaHost) : "",
     javaPort: Number(server.javaPort || CONFIG.defaults.javaPort),
-    crossPlay: !!server.crossPlay,
+    crossPlay: edition === "java" && !!server.crossPlay,
+    bedrockType,
     bedrockHost: cleanText(server.bedrockHost),
     bedrockPort: Number(server.bedrockPort || CONFIG.defaults.bedrockPort),
+    realmCode: cleanText(server.realmCode),
     votifierEnabled: !!server.votifierEnabled,
     votifierHost: cleanText(server.votifierHost),
     votifierPort: Number(server.votifierPort || 8192),
@@ -924,12 +955,15 @@ function validateServer(server) {
     description: cleanText(server.description),
     tags: Array.isArray(server.tags) ? server.tags.filter((tag) => allTags().includes(tag)).slice(0, CONFIG.limits.tagsMax) : []
   };
-  if (!next.name || !next.javaHost) throw httpError(400, "Server name and Java host are required.");
+  if (!next.name) throw httpError(400, "Server name is required.");
+  if (next.edition === "java" && !next.javaHost) throw httpError(400, "Java host is required.");
+  if (next.edition === "java" && next.crossPlay && !next.bedrockHost) throw httpError(400, "Bedrock host is required for cross-play listings.");
+  if (next.edition === "bedrock" && next.bedrockType === "server" && !next.bedrockHost) throw httpError(400, "Bedrock server IP or host is required.");
+  if (next.edition === "bedrock" && next.bedrockType === "realm" && !next.realmCode) throw httpError(400, "Realm code is required.");
   if (hasBlockedText(server.name) || hasBlockedText(server.description)) throw httpError(400, "Please remove blocked words from the listing.");
   if (next.description.length < CONFIG.limits.descriptionMinLength) throw httpError(400, `Description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
   if (next.tags.length < CONFIG.limits.tagsMin || next.tags.length > CONFIG.limits.tagsMax) throw httpError(400, `Select ${CONFIG.limits.tagsMin} to ${CONFIG.limits.tagsMax} tags.`);
   if (!CONFIG.countries.includes(next.country)) throw httpError(400, "Select a valid country.");
-  if (next.crossPlay && !next.bedrockHost) throw httpError(400, "Bedrock host is required for cross-play listings.");
   if (isBlockedServerHost(next.javaHost) || isBlockedServerHost(next.bedrockHost)) throw httpError(400, "FalixSrv and Aternos servers are not allowed on this listing site.");
   return next;
 }
@@ -967,8 +1001,9 @@ function comparableText(value = "") {
 
 function serverAddressKeys(server) {
   return [
-    hostPortKey(server.javaHost, server.javaPort, CONFIG.defaults.javaPort),
-    server.crossPlay || server.bedrockHost ? hostPortKey(server.bedrockHost, server.bedrockPort, CONFIG.defaults.bedrockPort) : ""
+    server.edition !== "bedrock" ? hostPortKey(server.javaHost, server.javaPort, CONFIG.defaults.javaPort) : "",
+    server.edition === "bedrock" || server.crossPlay || server.bedrockHost ? hostPortKey(server.bedrockHost, server.bedrockPort, CONFIG.defaults.bedrockPort) : "",
+    server.edition === "bedrock" && server.bedrockType === "realm" ? `realm:${comparableText(server.realmCode)}` : ""
   ].filter(Boolean);
 }
 

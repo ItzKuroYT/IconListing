@@ -250,6 +250,41 @@ async function main() {
     );
     assert(secondServer.code === 200 && secondServer.json.server.id !== saved.json.server.id, "same account should save multiple unique servers");
 
+    const bedrockServer = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Smoke Bedrock Server",
+          edition: "bedrock",
+          bedrockType: "server",
+          bedrockHost: "bedrock.example.org",
+          bedrockPort: 19132,
+          country: "United States",
+          description: "A Bedrock-only smoke listing that uses a Bedrock server address instead of a Java host. This verifies Bedrock servers can be listed, saved, pinged through the Bedrock status path, and shown beside Java listings without requiring Java fields.",
+          tags: ["Bedrock", "Survival"]
+        }
+      },
+      login.json.token
+    );
+    assert(bedrockServer.code === 200 && bedrockServer.json.server.edition === "bedrock", "bedrock server listings should save without Java host");
+
+    const bedrockRealm = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Smoke Bedrock Realm",
+          edition: "bedrock",
+          bedrockType: "realm",
+          realmCode: "abc123Realm",
+          country: "United States",
+          description: "A Bedrock Realm smoke listing that uses a realm code instead of a server IP. This verifies realm codes can be stored, displayed, copied, and kept separate from normal Bedrock server address listings safely.",
+          tags: ["Bedrock", "SMP"]
+        }
+      },
+      login.json.token
+    );
+    assert(bedrockRealm.code === 200 && bedrockRealm.json.server.bedrockType === "realm", "bedrock realm listings should save with a realm code");
+
     const testVote = await call(
       "testVote",
       { host: "127.0.0.1", port: 8192, token: "token" },
@@ -331,22 +366,26 @@ async function main() {
     const finalState = await call("state", {}, "", "GET");
     const server = finalState.json.servers.find((item) => item.id === saved.json.server.id);
     const otherServer = finalState.json.servers.find((item) => item.id === secondServer.json.server.id);
+    const bedrockSaved = finalState.json.servers.find((item) => item.id === bedrockServer.json.server.id);
+    const realmSaved = finalState.json.servers.find((item) => item.id === bedrockRealm.json.server.id);
     const client = finalState.json.clients.find((item) => item.name === "Smoke Client");
     const host = finalState.json.hosts.find((item) => item.name === "Smoke Hosting");
     assert(server && server.votes === 1, "server should have one counted vote");
     assert(otherServer && otherServer.ownerId === server.ownerId, "same account should keep multiple unique listings");
+    assert(bedrockSaved && bedrockSaved.edition === "bedrock" && bedrockSaved.bedrockHost === "bedrock.example.org", "bedrock server fields should be stored");
+    assert(realmSaved && realmSaved.edition === "bedrock" && realmSaved.bedrockType === "realm" && realmSaved.realmCode === "abc123Realm", "bedrock realm fields should be stored");
     assert(server.description.includes("\nLine two") && server.description.includes("\n\nLine four"), "server description should preserve line breaks");
     assert(server.analytics.ipCopiesLast30 === 1, "server should expose public IP copy analytics");
     assert(client && client.images.length === 2 && client.version === "both" && client.pricing === "paid", "sponsored client fields should be stored");
     assert(host && host.images.length === 3 && host.pricing === "paid", "sponsored host fields should be stored");
     assert(finalState.json.votes.length === 1, "monthly vote records should be stored");
     const backup = JSON.parse(await fs.readFile(backupPath, "utf8"));
-    assert(Array.isArray(backup.servers) && backup.servers.length >= 2, "backup JSON should preserve server listings");
+    assert(Array.isArray(backup.servers) && backup.servers.length >= 4, "backup JSON should preserve server listings");
     await fs.writeFile(recoveryPath, JSON.stringify({ version: 2, users: [], servers: [{ ...saved.json.server, id: "recovery-server", name: "Recovery SMP", javaHost: "recovery.example.org", description: "Recovery server listing used to verify bundled JSON recovery merges into an incomplete API state without replacing existing listings." }], clients: [], votes: [], voteIps: {} }));
     const recoveredState = await call("state", {}, "", "GET");
     assert(recoveredState.json.servers.some((item) => item.id === "recovery-server"), "state should merge bundled recovery servers");
 
-    console.log("Smoke test passed: auth, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, duplicate listing checks, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, voting cooldown, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, voting cooldown, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });
