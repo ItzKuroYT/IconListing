@@ -57,7 +57,7 @@
       "ownerId": "418e8ef3-c92e-44a9-9fd9-cba603b2f629",
       "ownerName": "ItzKuroYT",
       "votes": 0,
-      "playersOnline": 7,
+      "playersOnline": 6,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
@@ -65,7 +65,7 @@
       "sponsored": false,
       "createdAt": "2026-06-23T07:05:03.226Z",
       "updatedAt": "2026-06-23T07:05:03.226Z",
-      "lastPingAt": "2026-06-24T02:39:17.461Z",
+      "lastPingAt": "2026-06-24T03:28:25.781Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -100,16 +100,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T02:39:17.461Z",
-            "playersOnline": 7,
+            "createdAt": "2026-06-24T03:28:25.781Z",
+            "playersOnline": 6,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T02:39:17.461Z",
-      "uptimeChecks": 12,
-      "uptimeSuccesses": 12
+      "lastSuccessfulPingAt": "2026-06-24T03:28:25.781Z",
+      "uptimeChecks": 13,
+      "uptimeSuccesses": 13
     },
     {
       "id": "5ece91df-94e4-46be-89ed-da0763db6b27",
@@ -140,11 +140,11 @@
       "playersMax": 0,
       "version": "Unknown",
       "online": false,
-      "uptimePercent": 20,
+      "uptimePercent": 18.181818181818183,
       "sponsored": true,
       "createdAt": "2026-06-23T14:30:26.667Z",
       "updatedAt": "2026-06-23T14:30:26.667Z",
-      "lastPingAt": "2026-06-24T02:39:17.492Z",
+      "lastPingAt": "2026-06-24T03:28:25.811Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -173,7 +173,7 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-24T02:39:17.492Z",
+            "createdAt": "2026-06-24T03:28:25.811Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -181,7 +181,7 @@
         ]
       },
       "lastSuccessfulPingAt": "2026-06-23T16:17:16.527Z",
-      "uptimeChecks": 10,
+      "uptimeChecks": 11,
       "uptimeSuccesses": 2
     },
     {
@@ -212,7 +212,7 @@
       "ownerId": "0857ceca-7b66-4180-91cc-bb1cb7d11b67",
       "ownerName": "armageddon",
       "votes": 0,
-      "playersOnline": 1,
+      "playersOnline": 0,
       "playersMax": 20,
       "version": "Paper 26.1.2",
       "online": true,
@@ -220,7 +220,7 @@
       "sponsored": false,
       "createdAt": "2026-06-23T22:27:58.331Z",
       "updatedAt": "2026-06-23T22:27:58.331Z",
-      "lastPingAt": "2026-06-24T02:39:17.502Z",
+      "lastPingAt": "2026-06-24T03:28:25.820Z",
       "analytics": {
         "ipCopies": [
           {
@@ -242,16 +242,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T02:39:17.502Z",
-            "playersOnline": 1,
+            "createdAt": "2026-06-24T03:28:25.820Z",
+            "playersOnline": 0,
             "playersMax": 20,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T02:39:17.502Z",
-      "uptimeChecks": 6,
-      "uptimeSuccesses": 6
+      "lastSuccessfulPingAt": "2026-06-24T03:28:25.820Z",
+      "uptimeChecks": 7,
+      "uptimeSuccesses": 7
     }
   ],
   "clients": [
