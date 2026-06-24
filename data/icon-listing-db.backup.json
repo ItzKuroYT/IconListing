@@ -1,6 +1,15 @@
 {
   "version": 2,
-  "users": [],
+  "users": [
+    {
+      "id": "00b2b31b-bcd8-4bae-8da3-4abbd13e7417",
+      "username": "ItsYaBoiJason6",
+      "email": "azyr50791@gmail.com",
+      "passwordHash": "b435c6b6c537ab1b2f9ac3a13651b46f:352a00f25b76c2ede2e092d20ebdfd75bf11c11407fd2d06a2e8f1c8a6d37b66",
+      "banned": false,
+      "createdAt": "2026-06-24T19:45:36.672Z"
+    }
+  ],
   "servers": [
     {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
