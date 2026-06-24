@@ -6,6 +6,10 @@
   },
   "routes": [
     {
+      "src": "/data/(.*)",
+      "dest": "/api/index.js?action=blockedData"
+    },
+    {
       "src": "/sitemap.xml",
       "dest": "/api/index.js?action=sitemap"
     },

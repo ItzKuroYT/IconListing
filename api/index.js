@@ -6,6 +6,7 @@ const CONFIG = require("../config.js");
 
 const TMP_DB = process.env.ICON_LISTING_DB_PATH || path.join(os.tmpdir(), "icon-listing-db.json");
 const TMP_DB_BACKUP = process.env.ICON_LISTING_DB_BACKUP_PATH || `${TMP_DB}.backup.json`;
+const RECOVERY_DB_PATH = process.env.ICON_LISTING_RECOVERY_DB_PATH || path.join(__dirname, "..", "data", "icon-listing-db.json");
 const SESSION_SECRET = process.env.SESSION_SECRET || "replace-this-secret-in-vercel";
 const PING_TTL_MS = 5 * 60 * 1000;
 const JSON_HEADERS = {
@@ -22,7 +23,7 @@ module.exports = async function handler(req, res) {
   try {
     const action = actionFromRequest(req);
     const body = req.method === "GET" ? {} : await readBody(req);
-    const db = migrateDb(await loadDb());
+    const db = migrateDb(await loadDb({ allowRecoveryOnly: ["state", "sitemap", "login"].includes(action) }));
     const user = await userFromRequest(req, db);
 
     if (action === "sitemap") {
@@ -199,6 +200,17 @@ module.exports = async function handler(req, res) {
         db.clients = db.clients.filter((item) => item.id !== id);
         saveOptions.deletedClients = [id];
       }
+      if (body.command === "saveHost") {
+        const host = sanitizeHost(body.value || {});
+        const existing = db.hosts.find((item) => item.id === host.id);
+        const next = { ...existing, ...host, id: existing?.id || host.id || createId(), createdAt: existing?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+        db.hosts = existing ? db.hosts.map((item) => (item.id === existing.id ? next : item)) : [...db.hosts, next];
+        saveOptions.touchedHosts = [next.id];
+      }
+      if (body.command === "deleteHost") {
+        db.hosts = db.hosts.filter((item) => item.id !== id);
+        saveOptions.deletedHosts = [id];
+      }
       await saveDb(db, saveOptions);
       return json(res, 200, { ...statePayload(db, user), users: db.users.map(publicUser) });
     }
@@ -226,7 +238,7 @@ function actionFromRequest(req) {
 }
 
 function freshDb() {
-  return { version: 2, users: [], servers: [], clients: [], votes: [], voteIps: {} };
+  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {} };
 }
 
 function migrateDb(db = freshDb()) {
@@ -237,6 +249,7 @@ function migrateDb(db = freshDb()) {
     users: Array.isArray(db.users) ? db.users : [],
     servers: Array.isArray(db.servers) ? db.servers.filter((server) => !String(server.id || "").startsWith("seed-")).map(normalizeServer) : [],
     clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")).map(normalizeClient) : [],
+    hosts: Array.isArray(db.hosts) ? db.hosts.filter((host) => !String(host.id || "").startsWith("host-")).map(normalizeHost) : [],
     votes: Array.isArray(db.votes) ? db.votes : [],
     voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {}
   };
@@ -264,13 +277,24 @@ function normalizeClient(client) {
   };
 }
 
-async function loadDb() {
-  requireConfiguredProductionDb();
-  if (hasGithubStorage()) return readGithubDb();
+function normalizeHost(host) {
+  const images = Array.isArray(host.images) ? host.images : [host.imageUrl1, host.imageUrl2, host.imageUrl3, host.logoUrl].filter(Boolean);
+  return {
+    ...host,
+    url: host.url || host.websiteUrl || "",
+    images: images.filter(Boolean).slice(0, 3),
+    pricing: "paid"
+  };
+}
+
+async function loadDb(options = {}) {
+  if (!options.allowRecoveryOnly) requireConfiguredProductionDb();
+  if (hasGithubStorage()) return mergeRecoveryDb(await readGithubDb(), await readRecoveryDb());
+  if (process.env.VERCEL && options.allowRecoveryOnly) return readRecoveryDb();
   try {
-    return parseDbFromStorage(await fs.readFile(TMP_DB, "utf8"));
+    return mergeRecoveryDb(parseDbFromStorage(await fs.readFile(TMP_DB, "utf8")), await readRecoveryDb());
   } catch {
-    return freshDb();
+    return readRecoveryDb();
   }
 }
 
@@ -282,6 +306,94 @@ async function saveDb(db, options = {}) {
   }
   await writeLocalBackup();
   await fs.writeFile(TMP_DB, serializeDbForStorage(db));
+}
+
+let recoveryDbCache = { data: null, loadedAt: 0 };
+
+async function readRecoveryDb() {
+  if (recoveryDbCache.data && Date.now() - recoveryDbCache.loadedAt < 2000) return cloneJson(recoveryDbCache.data);
+  try {
+    const db = parseDbFromStorage(await fs.readFile(RECOVERY_DB_PATH, "utf8"));
+    recoveryDbCache = { data: db, loadedAt: Date.now() };
+    return cloneJson(db);
+  } catch {
+    return freshDb();
+  }
+}
+
+function mergeRecoveryDb(primaryDb, recoveryDb) {
+  const primary = migrateDb(primaryDb);
+  const recovery = migrateDb(recoveryDb);
+  if (!hasAnyStoredData(recovery)) return primary;
+  const servers = mergeServersWithRecovery(primary.servers, recovery.servers);
+  return migrateDb({
+    ...primary,
+    users: mergeUsersWithRecovery(primary.users, recovery.users),
+    servers,
+    clients: mergeClientsWithRecovery(primary.clients, recovery.clients),
+    hosts: mergeHostsWithRecovery(primary.hosts, recovery.hosts),
+    votes: mergeVotesWithRecovery(primary.votes, recovery.votes, servers),
+    voteIps: mergeVoteIps(recovery.voteIps, primary.voteIps)
+  });
+}
+
+function mergeUsersWithRecovery(primaryUsers = [], recoveryUsers = []) {
+  const merged = [...primaryUsers];
+  for (const user of recoveryUsers) {
+    if (!user?.id) continue;
+    const exists = merged.some((item) => item.id === user.id || same(item.username, user.username) || same(item.email, user.email));
+    if (!exists) merged.push(user);
+  }
+  return merged;
+}
+
+function mergeServersWithRecovery(primaryServers = [], recoveryServers = []) {
+  const merged = [...primaryServers];
+  for (const server of recoveryServers) {
+    if (!server?.id) continue;
+    const recoveryKeys = new Set(serverAddressKeys(server));
+    const recoveryDescription = comparableText(server.description);
+    const exists = merged.some((item) => (
+      item.id === server.id ||
+      comparableText(item.name) === comparableText(server.name) ||
+      (recoveryDescription && comparableText(item.description) === recoveryDescription) ||
+      serverAddressKeys(item).some((key) => recoveryKeys.has(key))
+    ));
+    if (!exists) merged.push(server);
+  }
+  return merged;
+}
+
+function mergeClientsWithRecovery(primaryClients = [], recoveryClients = []) {
+  const merged = [...primaryClients];
+  for (const client of recoveryClients) {
+    if (!client?.id && !client?.name) continue;
+    const exists = merged.some((item) => item.id === client.id || same(item.name, client.name) || same(item.url, client.url));
+    if (!exists) merged.push(client);
+  }
+  return merged;
+}
+
+function mergeHostsWithRecovery(primaryHosts = [], recoveryHosts = []) {
+  const merged = [...primaryHosts];
+  for (const host of recoveryHosts) {
+    if (!host?.id && !host?.name) continue;
+    const exists = merged.some((item) => item.id === host.id || same(item.name, host.name) || same(item.url, host.url));
+    if (!exists) merged.push(host);
+  }
+  return merged;
+}
+
+function mergeVotesWithRecovery(primaryVotes = [], recoveryVotes = [], servers = []) {
+  const serverIds = new Set(servers.map((server) => server.id));
+  const merged = new Map();
+  for (const vote of recoveryVotes) {
+    if (vote?.id && serverIds.has(vote.serverId)) merged.set(vote.id, vote);
+  }
+  for (const vote of primaryVotes) {
+    if (vote?.id && serverIds.has(vote.serverId)) merged.set(vote.id, vote);
+  }
+  return [...merged.values()];
 }
 
 let githubDbCache = { data: null, sha: null, loadedAt: 0 };
@@ -314,7 +426,7 @@ async function readGithubDb(options = {}) {
 
 async function writeGithubDb(db, options = {}, retry = true) {
   let normalized = migrateDb(db);
-  const latest = await readGithubDb({ bypassCache: true });
+  const latest = mergeRecoveryDb(await readGithubDb({ bypassCache: true }), await readRecoveryDb());
   ensureRequiredRecordsExist(latest, options);
   normalized = mergeDbForWrite(latest, normalized, options);
   ensureWriteDoesNotLoseData(latest, normalized, options);
@@ -386,6 +498,7 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
     users: mergeById(remote.users, next.users, ids.deletedUsers, ids.touchedUsers),
     servers: mergeById(remote.servers, next.servers, ids.deletedServers, ids.touchedServers),
     clients: mergeById(remote.clients, next.clients, ids.deletedClients, ids.touchedClients),
+    hosts: mergeById(remote.hosts, next.hosts, ids.deletedHosts, ids.touchedHosts),
     votes: mergeVotes(remote.votes, next.votes, ids.deletedServers, ids.touchedVotes),
     voteIps: mergeVoteIps(remote.voteIps, next.voteIps, ids.deletedServers)
   };
@@ -399,7 +512,8 @@ function ensureRequiredRecordsExist(remoteDb, options = {}) {
   const missingServer = (options.requireExistingServers || []).find((id) => !remote.servers.some((item) => item.id === id));
   const missingUser = (options.requireExistingUsers || []).find((id) => !remote.users.some((item) => item.id === id));
   const missingClient = (options.requireExistingClients || []).find((id) => !remote.clients.some((item) => item.id === id));
-  if (missingServer || missingUser || missingClient) throw httpError(409, "Storage changed before this action finished. Please refresh and try again.");
+  const missingHost = (options.requireExistingHosts || []).find((id) => !remote.hosts.some((item) => item.id === id));
+  if (missingServer || missingUser || missingClient || missingHost) throw httpError(409, "Storage changed before this action finished. Please refresh and try again.");
 }
 
 function ensureWriteDoesNotLoseData(remoteDb, nextDb, options = {}) {
@@ -409,6 +523,7 @@ function ensureWriteDoesNotLoseData(remoteDb, nextDb, options = {}) {
   assertNoUnexpectedLoss("server", remote.servers, next.servers, ids.deletedServers);
   assertNoUnexpectedLoss("user", remote.users, next.users, ids.deletedUsers);
   assertNoUnexpectedLoss("client", remote.clients, next.clients, ids.deletedClients);
+  assertNoUnexpectedLoss("host", remote.hosts, next.hosts, ids.deletedHosts);
   assertNoUnexpectedVoteLoss(remote.votes, next.votes, ids.deletedServers);
 }
 
@@ -427,7 +542,7 @@ function assertNoUnexpectedVoteLoss(remoteVotes = [], nextVotes = [], deletedSer
 }
 
 function hasAnyStoredData(db) {
-  return !!(db.users.length || db.servers.length || db.clients.length || db.votes.length || Object.keys(db.voteIps || {}).length);
+  return !!(db.users.length || db.servers.length || db.clients.length || db.hosts.length || db.votes.length || Object.keys(db.voteIps || {}).length);
 }
 
 function ensureMergedWriteIsValid(db, options = {}) {
@@ -446,9 +561,11 @@ function writeIdSets(options = {}) {
     deletedUsers: new Set(options.deletedUsers || []),
     deletedServers: new Set(options.deletedServers || []),
     deletedClients: new Set(options.deletedClients || []),
+    deletedHosts: new Set(options.deletedHosts || []),
     touchedUsers: new Set(options.touchedUsers || []),
     touchedServers: new Set(options.touchedServers || []),
     touchedClients: new Set(options.touchedClients || []),
+    touchedHosts: new Set(options.touchedHosts || []),
     touchedVotes: new Set(options.touchedVotes || [])
   };
 }
@@ -568,7 +685,7 @@ function storageEncryptionSecret() {
 }
 
 function statePayload(db, user) {
-  return { servers: rankServers(db.servers, db.votes).map(publicServer), clients: db.clients, votes: db.votes, user: publicUser(user) };
+  return { servers: rankServers(db.servers, db.votes).map(publicServer), clients: db.clients, hosts: db.hosts, votes: db.votes, user: publicUser(user) };
 }
 
 function siteUrl(pathname = "/") {
@@ -584,6 +701,7 @@ function sitemapXml(db) {
     { loc: siteUrl("/servers/"), priority: "0.9", changefreq: "daily" },
     { loc: siteUrl("/sponsored/"), priority: "0.7", changefreq: "weekly" },
     { loc: siteUrl("/sponsored-clients/"), priority: "0.7", changefreq: "weekly" },
+    { loc: siteUrl("/sponsored-hosts/"), priority: "0.7", changefreq: "weekly" },
     { loc: siteUrl("/help/"), priority: "0.4", changefreq: "monthly" },
     { loc: siteUrl("/contact/"), priority: "0.4", changefreq: "monthly" }
   ];
@@ -808,6 +926,26 @@ function sanitizeClient(client) {
   if (!next.url) throw httpError(400, "Website/download link is required.");
   if (hasBlockedText(client.name) || hasBlockedText(client.description)) throw httpError(400, "Please remove blocked words from the client listing.");
   if (next.description.length < CONFIG.limits.descriptionMinLength) throw httpError(400, `Client description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
+  return next;
+}
+
+function sanitizeHost(host) {
+  const images = Array.isArray(host.images)
+    ? host.images
+    : [host.imageUrl1, host.imageUrl2, host.imageUrl3, host.logoUrl].filter(Boolean);
+  const next = {
+    id: clean(host.id),
+    name: cleanText(host.name),
+    url: clean(host.url || host.websiteUrl),
+    youtubeUrl: clean(host.youtubeUrl),
+    description: cleanText(host.description),
+    images: images.map(clean).filter(Boolean).slice(0, 3),
+    pricing: "paid"
+  };
+  if (!next.name) throw httpError(400, "Host name is required.");
+  if (!next.url) throw httpError(400, "Website link is required.");
+  if (hasBlockedText(host.name) || hasBlockedText(host.description)) throw httpError(400, "Please remove blocked words from the host listing.");
+  if (next.description.length < CONFIG.limits.descriptionMinLength) throw httpError(400, `Host description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
   return next;
 }
 

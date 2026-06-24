@@ -636,6 +636,10 @@ main {
   gap: 10px;
 }
 
+.host-gallery {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .client-image {
   min-height: 150px;
   display: grid;

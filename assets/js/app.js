@@ -30,7 +30,7 @@ const store = {
 };
 
 function freshDb() {
-  return { version: 2, users: [], servers: [], clients: [], votes: [], voteIps: {} };
+  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {} };
 }
 
 function migrateDb(db) {
@@ -41,6 +41,7 @@ function migrateDb(db) {
     users: Array.isArray(db.users) ? db.users : [],
     servers: Array.isArray(db.servers) ? db.servers.filter((server) => !String(server.id || "").startsWith("seed-")).map(normalizeServer) : [],
     clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")).map(normalizeClient) : [],
+    hosts: Array.isArray(db.hosts) ? db.hosts.filter((host) => !String(host.id || "").startsWith("host-")).map(normalizeHost) : [],
     votes: Array.isArray(db.votes) ? db.votes : [],
     voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {}
   };
@@ -67,6 +68,16 @@ function normalizeClient(client) {
     images: images.filter(Boolean).slice(0, 2),
     version: ["java", "bedrock", "both"].includes(client.version) ? client.version : "both",
     pricing: ["free", "paid"].includes(client.pricing) ? client.pricing : "free"
+  };
+}
+
+function normalizeHost(host) {
+  const images = Array.isArray(host.images) ? host.images : [host.imageUrl1, host.imageUrl2, host.imageUrl3, host.logoUrl].filter(Boolean);
+  return {
+    ...host,
+    url: host.url || host.websiteUrl || "",
+    images: images.filter(Boolean).slice(0, 3),
+    pricing: "paid"
   };
 }
 
@@ -240,7 +251,7 @@ function fallbackRequest(action, payload) {
   };
 
   if (action === "state") {
-    return Promise.resolve({ servers: rankServers(db.servers, db.votes), clients: db.clients, user: publicUser(user), votes: db.votes });
+    return Promise.resolve({ servers: rankServers(db.servers, db.votes), clients: db.clients, hosts: db.hosts, user: publicUser(user), votes: db.votes });
   }
   if (action === "register") {
     if (!payload.username || !payload.email || !payload.password) return Promise.reject(new Error("Fill out every signup field."));
@@ -391,8 +402,17 @@ function fallbackRequest(action, payload) {
     if (payload.command === "deleteClient") {
       db.clients = db.clients.filter((item) => item.id !== id);
     }
+    if (payload.command === "saveHost") {
+      const host = sanitizeHost(payload.value || {});
+      const existing = db.hosts.find((item) => item.id === host.id);
+      const next = { ...existing, ...host, id: existing?.id || host.id || createId(), createdAt: existing?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+      db.hosts = existing ? db.hosts.map((item) => (item.id === existing.id ? next : item)) : [...db.hosts, next];
+    }
+    if (payload.command === "deleteHost") {
+      db.hosts = db.hosts.filter((item) => item.id !== id);
+    }
     save();
-    return Promise.resolve({ users: db.users.map(publicUser), servers: rankServers(db.servers, db.votes), clients: db.clients });
+    return Promise.resolve({ users: db.users.map(publicUser), servers: rankServers(db.servers, db.votes), clients: db.clients, hosts: db.hosts });
   }
   return Promise.reject(new Error("Unknown action."));
 }
@@ -495,6 +515,24 @@ function sanitizeClient(client) {
   if (!next.url) throw new Error("Website/download link is required.");
   if (hasBlockedText(client.name) || hasBlockedText(client.description)) throw new Error("Please remove blocked words from the client listing.");
   if (next.description.length < CONFIG.limits.descriptionMinLength) throw new Error(`Client description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
+  return next;
+}
+
+function sanitizeHost(host) {
+  const images = Array.isArray(host.images) ? host.images : [host.imageUrl1, host.imageUrl2, host.imageUrl3, host.logoUrl].filter(Boolean);
+  const next = {
+    id: cleanText(host.id),
+    name: cleanText(host.name),
+    description: cleanText(host.description),
+    url: String(host.url || host.websiteUrl || "").trim(),
+    youtubeUrl: String(host.youtubeUrl || "").trim(),
+    images: images.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 3),
+    pricing: "paid"
+  };
+  if (!next.name) throw new Error("Host name is required.");
+  if (!next.url) throw new Error("Website link is required.");
+  if (hasBlockedText(host.name) || hasBlockedText(host.description)) throw new Error("Please remove blocked words from the host listing.");
+  if (next.description.length < CONFIG.limits.descriptionMinLength) throw new Error(`Host description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
   return next;
 }
 
@@ -697,7 +735,7 @@ function setSeoMeta(options = {}) {
 
 function defaultPageSeo(page) {
   const seo = CONFIG.seo || {};
-  const key = page === "sponsored-clients" ? "sponsoredClients" : page;
+  const key = page === "sponsored-clients" ? "sponsoredClients" : page === "sponsored-hosts" ? "sponsoredHosts" : page;
   const pageSeo = seo.pages?.[key] || {};
   const path = page === "home" ? "/" : `/${page}/`;
   return {
@@ -731,6 +769,7 @@ function renderLayout() {
           </div>
           <a class="nav-link" data-route="sponsored" href="${route("/sponsored/")}">${escapeHtml(copy("nav.sponsoredServers", "Sponsored"))}</a>
           <a class="nav-link" data-route="sponsored-clients" href="${route("/sponsored-clients/")}">${escapeHtml(copy("nav.sponsoredClients", "Sponsored Clients"))}</a>
+          <a class="nav-link" data-route="sponsored-hosts" href="${route("/sponsored-hosts/")}">${escapeHtml(copy("nav.sponsoredHosts", "Sponsored Hosts"))}</a>
           <a class="nav-link hidden" data-auth="dashboard" data-route="dashboard" href="${route("/dashboard/")}">${escapeHtml(copy("nav.dashboard", "Dashboard"))}</a>
           <a class="nav-link hidden" data-auth="admin" data-route="admin" href="${route("/admin/")}">${escapeHtml(copy("nav.admin", "Admin"))}</a>
           <a class="nav-link" data-auth="login" data-route="login" href="${route("/login/")}">${escapeHtml(copy("nav.login", "Login"))}</a>
@@ -760,11 +799,12 @@ function syncAuthUi(user) {
   $$("[data-auth='login']").forEach((node) => node.classList.toggle("hidden", !!user));
 }
 
-function emptyNotice() {
+function emptyNotice(title = copy("empty.title", "No servers listed yet"), body = copy("empty.body", "Listings will show here after they are submitted and saved."), action = copy("empty.action", "Add a Server"), actionHref = null) {
+  const href = actionHref || (store.session ? route("/dashboard/") : route("/login/"));
   return `<div class="empty-state">
-    <h2>${escapeHtml(copy("empty.title", "No servers listed yet"))}</h2>
-    <p>${escapeHtml(copy("empty.body", "Listings will show here after they are submitted and saved."))}</p>
-    <a class="button primary" href="${store.session ? route("/dashboard/") : route("/login/")}">${escapeHtml(copy("empty.action", "Add a Server"))}</a>
+    <h2>${escapeHtml(title)}</h2>
+    <p>${escapeHtml(body)}</p>
+    <a class="button primary" href="${href}">${escapeHtml(action)}</a>
   </div>`;
 }
 
@@ -1642,6 +1682,56 @@ function renderClients(state) {
   bindPager("#clientPager", () => renderClients(state));
 }
 
+function renderHosts(state) {
+  const hosts = state.hosts || [];
+  setSeoMeta({
+    ...defaultPageSeo("sponsored-hosts"),
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Sponsored Minecraft Hosts",
+      url: absoluteUrl("/sponsored-hosts/"),
+      description: CONFIG.seo?.pages?.sponsoredHosts?.description,
+      mainEntity: {
+        "@type": "ItemList",
+        itemListElement: hosts.slice(0, 20).map((host, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          url: host.url,
+          name: host.name
+        }))
+      }
+    }
+  });
+  $("#app").innerHTML = `<div class="page">
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h1 class="section-title">${escapeHtml(copy("sponsoredHosts.title", "Sponsored Hosts"))}</h1>
+          <p class="section-copy">${escapeHtml(copy("sponsoredHosts.body", "Paid Minecraft hosting sponsors approved by staff."))} Compare sponsored Minecraft hosting providers with showcase images, descriptions, videos, and website links.</p>
+        </div>
+      </div>
+      <div id="hostList" class="grid two"></div>
+      <div id="hostPager"></div>
+    </section>
+    <section class="section seo-section">
+      <h2 class="section-title">What Sponsored Minecraft Hosts Include</h2>
+      <p class="section-copy">Sponsored host listings can include a website link, YouTube video, up to three showcase images, and a long description of the hosting service. These are paid sponsor placements and are kept separate from server and client listings.</p>
+    </section>
+    <section class="section seo-section">
+      <h2 class="section-title">Related Minecraft Discovery</h2>
+      <p class="section-copy">Hosting sponsors can reach server owners while players continue browsing Minecraft servers, clients, and active communities on Icon Listing.</p>
+      <div class="server-tags">${popularTagLinks()}</div>
+    </section>
+  </div>`;
+  renderHostList(hosts, "#hostList", {
+    pagerSelector: "#hostPager",
+    pageParam: "page",
+    basePath: "/sponsored-hosts/"
+  });
+  bindPager("#hostPager", () => renderHosts(state));
+}
+
 function renderClientList(clients, selector = "#clientList", options = {}) {
   const root = $(selector);
   if (!root) return;
@@ -1664,6 +1754,28 @@ function renderClientList(clients, selector = "#clientList", options = {}) {
   return page;
 }
 
+function renderHostList(hosts, selector = "#hostList", options = {}) {
+  const root = $(selector);
+  if (!root) return;
+  const size = options.pageSize || pageSize();
+  const totalPages = Math.ceil(hosts.length / size);
+  const page = clampListPage(options.page || pageFromParams(options.pageParam), totalPages);
+  const start = (page - 1) * size;
+  const visible = hosts.slice(start, start + size);
+  root.innerHTML = visible.length ? visible.map(hostCard).join("") : emptyNotice("No sponsored hosts yet", "Paid Minecraft hosting sponsors will show here after staff adds them.", "Contact staff", route("/contact/"));
+  if (options.pagerSelector) {
+    const pager = $(options.pagerSelector);
+    if (pager) {
+      pager.innerHTML = paginationMarkup(hosts.length, page, {
+        ...options,
+        count: hosts.length,
+        noun: "hosts"
+      });
+    }
+  }
+  return page;
+}
+
 function clientCard(client) {
   const images = (client.images || []).slice(0, 2);
   return `<article class="card client-card">
@@ -1677,6 +1789,23 @@ function clientCard(client) {
     <div class="row-actions">
       <a class="button primary" href="${escapeHtml(client.url)}">${escapeHtml(copy("sponsoredClients.visitButton", "Website / Download"))}</a>
       ${client.youtubeUrl ? `<a class="button" href="${escapeHtml(client.youtubeUrl)}">${escapeHtml(copy("sponsoredClients.videoButton", "Watch video"))}</a>` : ""}
+    </div>
+  </article>`;
+}
+
+function hostCard(host) {
+  const images = (host.images || []).slice(0, 3);
+  return `<article class="card client-card host-card">
+    <div class="client-gallery host-gallery">${images.length ? images.map((image) => `<div class="client-image" style="background-image:url('${escapeHtml(asset(image))}')"></div>`).join("") : `<div class="client-image placeholder">${escapeHtml(host.name || "Host")}</div>`}</div>
+    <div class="server-tags">
+      <span class="pill">${escapeHtml(copy("sponsoredHosts.paidLabel", "Paid sponsor"))}</span>
+      <span class="pill">Minecraft hosting</span>
+    </div>
+    <h2>${escapeHtml(host.name)}</h2>
+    <div class="description-text compact">${escapeHtml(host.description)}</div>
+    <div class="row-actions">
+      <a class="button primary" href="${escapeHtml(host.url)}">${escapeHtml(copy("sponsoredHosts.moreInfoButton", "More info"))}</a>
+      ${host.youtubeUrl ? `<a class="button" href="${escapeHtml(host.youtubeUrl)}">${escapeHtml(copy("sponsoredHosts.videoButton", "Watch video"))}</a>` : ""}
     </div>
   </article>`;
 }
@@ -1999,6 +2128,11 @@ function renderAdmin(state) {
           <p class="section-copy">${escapeHtml(copy("admin.sponsoredClientsBody", "Create and edit sponsored Minecraft client listings."))}</p>
           ${adminClientPanel(state.clients)}
         </div>
+        <div class="card admin-client-panel">
+          <h2>${escapeHtml(copy("admin.sponsoredHostsTitle", "Sponsored Hosts"))}</h2>
+          <p class="section-copy">${escapeHtml(copy("admin.sponsoredHostsBody", "Create and edit paid Minecraft hosting sponsor listings."))}</p>
+          ${adminHostPanel(state.hosts || [])}
+        </div>
       </div>
     </section>
   </div>`;
@@ -2019,6 +2153,7 @@ function renderAdmin(state) {
     }
   }));
   bindAdminClientForms(state);
+  bindAdminHostForms(state);
 }
 
 function adminClientPanel(clients) {
@@ -2108,6 +2243,83 @@ function bindAdminClientForms(state) {
   }));
 }
 
+function adminHostPanel(hosts) {
+  return `<div class="dashboard-list admin-client-list">${hosts.length ? hosts.map((host) => `<div class="dash-item client-admin-row">
+    <div class="rank">$</div>
+    <div>
+      <strong>${escapeHtml(host.name)}</strong>
+      <p class="server-ip">${escapeHtml(host.url)}</p>
+    </div>
+    <div class="row-actions">
+      <button class="button" data-host-edit="${escapeHtml(host.id)}" type="button">Edit</button>
+      <button class="button danger" data-host-delete="${escapeHtml(host.id)}" type="button">Delete</button>
+    </div>
+  </div>`).join("") : `<p class="section-copy">${escapeHtml(copy("admin.noSponsoredHosts", "No sponsored hosts yet."))}</p>`}</div>
+  <div id="hostFormPanel">${hostFormMarkup()}</div>`;
+}
+
+function hostFormMarkup(host = {}) {
+  const images = host.images || [];
+  return `<form id="hostForm" class="form client-form">
+    <input id="hostId" type="hidden" value="${escapeHtml(host.id || "")}">
+    <div class="form-grid">
+      <div class="field"><label>Host Name</label><input id="hostName" class="input" value="${escapeHtml(host.name || "")}" required></div>
+      <div class="field"><label>Website link</label><input id="hostUrl" class="input" type="url" value="${escapeHtml(host.url || "")}" required></div>
+      <div class="field"><label>YouTube video</label><input id="hostYoutube" class="input" type="url" value="${escapeHtml(host.youtubeUrl || "")}"></div>
+      <div class="field"><label>Showcase image 1</label><input id="hostImage1" class="input" value="${escapeHtml(images[0] || "")}"></div>
+      <div class="field"><label>Showcase image 2</label><input id="hostImage2" class="input" value="${escapeHtml(images[1] || "")}"></div>
+      <div class="field"><label>Showcase image 3</label><input id="hostImage3" class="input" value="${escapeHtml(images[2] || "")}"></div>
+    </div>
+    <div class="field"><label>Description (${CONFIG.limits.descriptionMinLength}+ characters)</label><textarea id="hostDescription" class="textarea" minlength="${CONFIG.limits.descriptionMinLength}" required>${escapeHtml(host.description || "")}</textarea></div>
+    <div class="row-actions">
+      <button class="button primary" type="submit">${host.id ? "Save Host" : "Create Sponsored Host"}</button>
+      <button id="clearHostForm" class="button" type="button">Clear</button>
+    </div>
+  </form>`;
+}
+
+function bindAdminHostForms(state) {
+  $("#hostForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+      await request("admin", {
+        command: "saveHost",
+        value: {
+          id: $("#hostId").value,
+          name: $("#hostName").value,
+          url: $("#hostUrl").value,
+          youtubeUrl: $("#hostYoutube").value,
+          description: $("#hostDescription").value,
+          images: [$("#hostImage1").value, $("#hostImage2").value, $("#hostImage3").value].filter(Boolean)
+        }
+      });
+      toast("Sponsored host saved.");
+      boot();
+    } catch (error) {
+      toast(error.message);
+    }
+  });
+  $("#clearHostForm")?.addEventListener("click", () => {
+    $("#hostFormPanel").innerHTML = hostFormMarkup();
+    bindAdminHostForms(state);
+  });
+  $$("[data-host-edit]").forEach((button) => button.addEventListener("click", () => {
+    const host = (state.hosts || []).find((item) => item.id === button.dataset.hostEdit);
+    $("#hostFormPanel").innerHTML = hostFormMarkup(host);
+    bindAdminHostForms(state);
+  }));
+  $$("[data-host-delete]").forEach((button) => button.addEventListener("click", async () => {
+    if (!confirm("Delete this sponsored host listing?")) return;
+    try {
+      await request("admin", { command: "deleteHost", value: { id: button.dataset.hostDelete } });
+      toast("Sponsored host deleted.");
+      boot();
+    } catch (error) {
+      toast(error.message);
+    }
+  }));
+}
+
 function renderStatic(page) {
   const staticCopy = CONFIG.copy?.staticPages?.[page] || ["Page", "This page is ready to configure."];
   setSeoMeta({
@@ -2130,6 +2342,7 @@ async function boot() {
     else if (page === "vote") renderVotePage(state);
     else if (page === "sponsored") renderSponsored(state);
     else if (page === "sponsored-clients") renderClients(state);
+    else if (page === "sponsored-hosts") renderHosts(state);
     else if (page === "login") renderLogin(state);
     else if (page === "dashboard") renderDashboard(state);
     else if (page === "admin") renderAdmin(state);

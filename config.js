@@ -75,6 +75,11 @@ const IconListingConfig = {
         title: "Minecraft Clients | Sponsored Downloads",
         description:
           "Browse sponsored Minecraft clients with download links, videos, images, pricing, Java and Bedrock support, and client promotion details."
+      },
+      sponsoredHosts: {
+        title: "Minecraft Hosting | Sponsored Hosts",
+        description:
+          "Browse sponsored Minecraft hosting providers with website links, videos, showcase images, paid sponsor details, and hosting descriptions."
       }
     }
   },
@@ -119,6 +124,7 @@ const IconListingConfig = {
       servers: "Servers",
       sponsoredServers: "Sponsored",
       sponsoredClients: "Sponsored Clients",
+      sponsoredHosts: "Sponsored Hosts",
       dashboard: "Dashboard",
       admin: "Admin",
       login: "Login"
@@ -162,6 +168,13 @@ const IconListingConfig = {
       freeLabel: "Free client",
       paidLabel: "Paid client"
     },
+    sponsoredHosts: {
+      title: "Sponsored Hosts",
+      body: "Paid Minecraft hosting sponsors approved by staff.",
+      moreInfoButton: "More info",
+      videoButton: "Watch video",
+      paidLabel: "Paid sponsor"
+    },
     login: {
       title: "Login",
       body: "Log in to manage your server listings.",
@@ -184,7 +197,10 @@ const IconListingConfig = {
       serverListingsTitle: "Server Listings",
       sponsoredClientsTitle: "Sponsored Clients",
       sponsoredClientsBody: "Create and edit sponsored Minecraft client listings.",
-      noSponsoredClients: "No sponsored clients yet."
+      noSponsoredClients: "No sponsored clients yet.",
+      sponsoredHostsTitle: "Sponsored Hosts",
+      sponsoredHostsBody: "Create and edit paid Minecraft hosting sponsor listings.",
+      noSponsoredHosts: "No sponsored hosts yet."
     },
     vote: {
       body: "Enter your Minecraft username so this vote can count on the monthly board.",

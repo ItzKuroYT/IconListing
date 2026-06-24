@@ -5,8 +5,10 @@ const path = require("path");
 
 const dbPath = path.join(os.tmpdir(), `icon-listing-smoke-${Date.now()}.json`);
 const backupPath = `${dbPath}.backup.json`;
+const recoveryPath = `${dbPath}.recovery.json`;
 process.env.ICON_LISTING_DB_PATH = dbPath;
 process.env.ICON_LISTING_DB_BACKUP_PATH = backupPath;
+process.env.ICON_LISTING_RECOVERY_DB_PATH = recoveryPath;
 
 const CONFIG = require("../config.js");
 const handler = require("../api/index.js");
@@ -81,6 +83,7 @@ async function main() {
     const firstState = await call("state", {}, "", "GET");
     assert(firstState.json.servers.length === 0, "initial server list should be empty");
     assert(firstState.json.clients.length === 0, "initial client list should be empty");
+    assert(firstState.json.hosts.length === 0, "initial host list should be empty");
 
     const suffix = Date.now();
     const register = await call("register", {
@@ -266,35 +269,61 @@ async function main() {
     );
     assert(clientSave.code === 200 && clientSave.json.clients.length === 1, "admin should save a sponsored client");
 
+    const hostDescription =
+      "A sponsored Minecraft hosting listing created by the smoke test to verify admins can save paid host advertisements with a website link, optional YouTube video, three showcase images, and enough detail for server owners to compare the provider before clicking through.";
+    const hostSave = await call(
+      "admin",
+      {
+        command: "saveHost",
+        value: {
+          name: "Smoke Hosting",
+          url: "https://example.com/minecraft-hosting",
+          youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          description: hostDescription,
+          images: ["https://example.com/host-one.png", "https://example.com/host-two.png", "https://example.com/host-three.png"]
+        }
+      },
+      admin.json.token
+    );
+    assert(hostSave.code === 200 && hostSave.json.hosts.length === 1, "admin should save a sponsored host");
+
     const sitemap = await callRaw("sitemap");
     assert(sitemap.code === 200 && sitemap.headers["Content-Type"]?.includes("application/xml"), "sitemap should return XML");
     assert(sitemap.body.includes("https://minecraft-listing.iconrealms.net/"), "sitemap should include the canonical homepage");
+    assert(sitemap.body.includes("https://minecraft-listing.iconrealms.net/sponsored-hosts/"), "sitemap should include sponsored hosts");
     assert(sitemap.body.includes(`/server/?id=${saved.json.server.id}`), "sitemap should include saved server listing URLs");
 
     const finalState = await call("state", {}, "", "GET");
     const server = finalState.json.servers.find((item) => item.id === saved.json.server.id);
     const otherServer = finalState.json.servers.find((item) => item.id === secondServer.json.server.id);
     const client = finalState.json.clients.find((item) => item.name === "Smoke Client");
+    const host = finalState.json.hosts.find((item) => item.name === "Smoke Hosting");
     assert(server && server.votes === 1, "server should have one counted vote");
     assert(otherServer && otherServer.ownerId === server.ownerId, "same account should keep multiple unique listings");
     assert(server.description.includes("\nLine two") && server.description.includes("\n\nLine four"), "server description should preserve line breaks");
     assert(server.analytics.ipCopiesLast30 === 1, "server should expose public IP copy analytics");
     assert(client && client.images.length === 2 && client.version === "both" && client.pricing === "paid", "sponsored client fields should be stored");
+    assert(host && host.images.length === 3 && host.pricing === "paid", "sponsored host fields should be stored");
     assert(finalState.json.votes.length === 1, "monthly vote records should be stored");
     const backup = JSON.parse(await fs.readFile(backupPath, "utf8"));
     assert(Array.isArray(backup.servers) && backup.servers.length >= 2, "backup JSON should preserve server listings");
+    await fs.writeFile(recoveryPath, JSON.stringify({ version: 2, users: [], servers: [{ ...saved.json.server, id: "recovery-server", name: "Recovery SMP", javaHost: "recovery.example.org", description: "Recovery server listing used to verify bundled JSON recovery merges into an incomplete API state without replacing existing listings." }], clients: [], votes: [], voteIps: {} }));
+    const recoveredState = await call("state", {}, "", "GET");
+    assert(recoveredState.json.servers.some((item) => item.id === "recovery-server"), "state should merge bundled recovery servers");
 
-    console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, duplicate listing checks, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, voting cooldown, sponsored clients.");
+    console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, duplicate listing checks, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, voting cooldown, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });
     await fs.rm(backupPath, { force: true });
+    await fs.rm(recoveryPath, { force: true });
   }
 }
 
 main().catch(async (error) => {
   await fs.rm(dbPath, { force: true });
   await fs.rm(backupPath, { force: true });
+  await fs.rm(recoveryPath, { force: true });
   console.error(error);
   process.exit(1);
 });
