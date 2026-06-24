@@ -173,7 +173,7 @@
       ],
       "ownerId": "85aaa295-12ad-430a-95f3-bb38e0b32d5f",
       "ownerName": "TTDirt",
-      "votes": 0,
+      "votes": 1,
       "playersOnline": 0,
       "playersMax": 0,
       "version": "Unknown",
@@ -204,12 +204,22 @@
       "serverId": "e624d227-5bd0-45ce-9aea-270560258b62",
       "minecraftUsername": "ItsYaBoiJason6",
       "createdAt": "2026-06-24T19:52:42.777Z"
+    },
+    {
+      "id": "aff09171-201c-43ba-929f-3803428594ca",
+      "serverId": "b7954ebf-59a6-4ccd-aab0-0fce95a476e1",
+      "minecraftUsername": "TTDirt",
+      "createdAt": "2026-06-24T22:20:48.092Z"
     }
   ],
   "voteIps": {
     "e624d227-5bd0-45ce-9aea-270560258b62": {
       "visitor:b04d32cd40ecd84699c89140dd5d4f89cbf2093c6d2b264de047e91fe3869906": "2026-06-24T19:52:42.777Z",
       "name:itsyaboijason6": "2026-06-24T19:52:42.777Z"
+    },
+    "b7954ebf-59a6-4ccd-aab0-0fce95a476e1": {
+      "visitor:a74a866b1a19fabd27adeda3825d20af502d1a6877040e00f839d113f5ff4ba2": "2026-06-24T22:20:48.092Z",
+      "name:ttdirt": "2026-06-24T22:20:48.092Z"
     }
   }
 }
