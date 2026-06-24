@@ -56,7 +56,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-24T22:35:51.196Z",
+      "lastPingAt": "2026-06-24T22:35:51.201Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -79,14 +79,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T22:35:51.196Z",
+            "createdAt": "2026-06-24T22:35:51.201Z",
             "playersOnline": 58,
             "playersMax": 59,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T22:35:51.196Z",
+      "lastSuccessfulPingAt": "2026-06-24T22:35:51.201Z",
       "uptimeChecks": 9,
       "uptimeSuccesses": 9
     },
@@ -125,7 +125,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-      "lastPingAt": "2026-06-24T22:35:51.317Z",
+      "lastPingAt": "2026-06-24T22:35:51.268Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -136,7 +136,7 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-24T22:35:51.317Z",
+            "createdAt": "2026-06-24T22:35:51.268Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -182,12 +182,12 @@
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
       "updatedAt": "2026-06-24T22:20:23.472Z",
-      "lastPingAt": "2026-06-24T22:35:51.613Z",
+      "lastPingAt": "2026-06-24T22:35:51.615Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
           {
-            "createdAt": "2026-06-24T22:35:51.613Z",
+            "createdAt": "2026-06-24T22:35:51.615Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
