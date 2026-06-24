@@ -220,7 +220,7 @@ async function readBody(req) {
 }
 
 function actionFromRequest(req) {
-  const url = new URL(req.url || "/", "https://listing.iconrealms.net");
+  const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
   if (url.pathname.endsWith("/sitemap.xml")) return "sitemap";
   return req.query?.action || url.searchParams.get("action") || "state";
 }
@@ -572,7 +572,7 @@ function statePayload(db, user) {
 }
 
 function siteUrl(pathname = "/") {
-  const base = String(CONFIG.site.url || "https://listing.iconrealms.net").replace(/\/$/, "");
+  const base = String(CONFIG.site.url || "https://minecraft-listing.iconrealms.net").replace(/\/$/, "");
   const path = String(pathname || "/");
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }

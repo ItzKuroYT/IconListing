@@ -268,7 +268,7 @@ async function main() {
 
     const sitemap = await callRaw("sitemap");
     assert(sitemap.code === 200 && sitemap.headers["Content-Type"]?.includes("application/xml"), "sitemap should return XML");
-    assert(sitemap.body.includes("https://listing.iconrealms.net/"), "sitemap should include the canonical homepage");
+    assert(sitemap.body.includes("https://minecraft-listing.iconrealms.net/"), "sitemap should include the canonical homepage");
     assert(sitemap.body.includes(`/server/?id=${saved.json.server.id}`), "sitemap should include saved server listing URLs");
 
     const finalState = await call("state", {}, "", "GET");
