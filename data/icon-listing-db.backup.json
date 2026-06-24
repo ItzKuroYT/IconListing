@@ -65,7 +65,7 @@
       "sponsored": false,
       "createdAt": "2026-06-23T07:05:03.226Z",
       "updatedAt": "2026-06-23T07:05:03.226Z",
-      "lastPingAt": "2026-06-24T11:34:56.996Z",
+      "lastPingAt": "2026-06-24T11:35:00.780Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -118,14 +118,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T11:34:56.996Z",
+            "createdAt": "2026-06-24T11:35:00.780Z",
             "playersOnline": 9,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T11:34:56.996Z",
+      "lastSuccessfulPingAt": "2026-06-24T11:35:00.780Z",
       "uptimeChecks": 26,
       "uptimeSuccesses": 26
     },
@@ -162,7 +162,7 @@
       "sponsored": true,
       "createdAt": "2026-06-23T14:30:26.667Z",
       "updatedAt": "2026-06-23T14:30:26.667Z",
-      "lastPingAt": "2026-06-24T11:34:57.020Z",
+      "lastPingAt": "2026-06-24T11:35:00.789Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -209,14 +209,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T11:34:57.020Z",
+            "createdAt": "2026-06-24T11:35:00.789Z",
             "playersOnline": 0,
             "playersMax": 100,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T11:34:57.020Z",
+      "lastSuccessfulPingAt": "2026-06-24T11:35:00.789Z",
       "uptimeChecks": 24,
       "uptimeSuccesses": 12
     },
@@ -256,7 +256,7 @@
       "sponsored": false,
       "createdAt": "2026-06-23T22:27:58.331Z",
       "updatedAt": "2026-06-23T22:27:58.331Z",
-      "lastPingAt": "2026-06-24T11:34:57.028Z",
+      "lastPingAt": "2026-06-24T11:35:00.801Z",
       "analytics": {
         "ipCopies": [
           {
@@ -296,7 +296,7 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T11:34:57.028Z",
+            "createdAt": "2026-06-24T11:35:00.801Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
