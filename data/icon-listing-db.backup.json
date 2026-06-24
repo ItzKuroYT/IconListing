@@ -8,6 +8,14 @@
       "passwordHash": "b435c6b6c537ab1b2f9ac3a13651b46f:352a00f25b76c2ede2e092d20ebdfd75bf11c11407fd2d06a2e8f1c8a6d37b66",
       "banned": false,
       "createdAt": "2026-06-24T19:45:36.672Z"
+    },
+    {
+      "id": "85aaa295-12ad-430a-95f3-bb38e0b32d5f",
+      "username": "TTDirt",
+      "email": "xeroofficialgear@gmail.com",
+      "passwordHash": "be26fc3dd560282810aecbd594aa2a4b:f9b8e0013e5c2cd174b380e2e608f40baea8ac4101757d22fb79a8dd3a2c9aaa",
+      "banned": false,
+      "createdAt": "2026-06-24T22:13:21.041Z"
     }
   ],
   "servers": [
