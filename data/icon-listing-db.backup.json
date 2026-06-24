@@ -102,7 +102,7 @@
       ],
       "ownerId": "00b2b31b-bcd8-4bae-8da3-4abbd13e7417",
       "ownerName": "ItsYaBoiJason6",
-      "votes": 0,
+      "votes": 1,
       "playersOnline": 0,
       "playersMax": 0,
       "version": "Unknown",
@@ -127,6 +127,18 @@
     }
   ],
   "clients": [],
-  "votes": [],
-  "voteIps": {}
+  "votes": [
+    {
+      "id": "c6873b08-998c-45e8-9095-66447d8e5e20",
+      "serverId": "e624d227-5bd0-45ce-9aea-270560258b62",
+      "minecraftUsername": "ItsYaBoiJason6",
+      "createdAt": "2026-06-24T19:52:42.777Z"
+    }
+  ],
+  "voteIps": {
+    "e624d227-5bd0-45ce-9aea-270560258b62": {
+      "visitor:b04d32cd40ecd84699c89140dd5d4f89cbf2093c6d2b264de047e91fe3869906": "2026-06-24T19:52:42.777Z",
+      "name:itsyaboijason6": "2026-06-24T19:52:42.777Z"
+    }
+  }
 }
