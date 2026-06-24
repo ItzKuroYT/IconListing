@@ -58,6 +58,19 @@ async function callRaw(action, body = {}, method = "GET") {
   return { code: res.code, body: res.body, headers: res.headers };
 }
 
+async function callText(action, body = "", method = "POST", headers = {}) {
+  const req = {
+    method,
+    url: `/api?action=${encodeURIComponent(action)}`,
+    query: { action },
+    body,
+    headers
+  };
+  const res = response();
+  await handler(req, res);
+  return { code: res.code, json: JSON.parse(res.body) };
+}
+
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -85,6 +98,19 @@ async function main() {
     assert(firstState.json.clients.length === 0, "initial client list should be empty");
     assert(firstState.json.hosts.length === 0, "initial host list should be empty");
 
+    const getLogin = await call("login", {}, "", "GET");
+    assert(getLogin.code === 405, "login should reject GET requests");
+
+    const invalidJson = await callText("login", "{bad json", "POST");
+    assert(invalidJson.code === 400, "invalid JSON bodies should be rejected cleanly");
+
+    const badOrigin = await call("register", {
+      username: "BlockedOrigin",
+      email: "blocked-origin@example.com",
+      password: "secret123"
+    }, "", "POST", { origin: "https://evil.example" });
+    assert(badOrigin.code === 403, "write actions should reject unapproved browser origins");
+
     const suffix = Date.now();
     const register = await call("register", {
       username: `Smoke${suffix}`,
@@ -98,6 +124,15 @@ async function main() {
       password: "secret123"
     });
     assert(login.code === 200 && login.json.user.username.startsWith("Smoke"), "login should return the user");
+
+    let throttledLogin = null;
+    for (let index = 0; index < 9; index += 1) {
+      throttledLogin = await call("login", {
+        login: `smoke${suffix}@example.com`,
+        password: "wrong-password"
+      });
+    }
+    assert(throttledLogin.code === 429, "repeated bad logins should be rate limited");
 
     const badListing = await call(
       "saveServer",
@@ -311,7 +346,7 @@ async function main() {
     const recoveredState = await call("state", {}, "", "GET");
     assert(recoveredState.json.servers.some((item) => item.id === "recovery-server"), "state should merge bundled recovery servers");
 
-    console.log("Smoke test passed: auth, empty state, profanity filter, host blacklist, duplicate listing checks, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, voting cooldown, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, duplicate listing checks, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, voting cooldown, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });

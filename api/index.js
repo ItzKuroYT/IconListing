@@ -9,19 +9,21 @@ const TMP_DB_BACKUP = process.env.ICON_LISTING_DB_BACKUP_PATH || `${TMP_DB}.back
 const RECOVERY_DB_PATH = process.env.ICON_LISTING_RECOVERY_DB_PATH || path.join(__dirname, "..", "data", "icon-listing-db.json");
 const SESSION_SECRET = process.env.SESSION_SECRET || "replace-this-secret-in-vercel";
 const PING_TTL_MS = 5 * 60 * 1000;
-const JSON_HEADERS = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
-};
+const MAX_BODY_BYTES = 2 * 1024 * 1024;
+const LOGIN_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const LOGIN_LIMIT_MAX_FAILURES = 8;
+const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "admin"]);
+const READ_ACTIONS = new Set(["state", "sitemap"]);
+const loginFailures = new Map();
 
 module.exports = async function handler(req, res) {
-  Object.entries(JSON_HEADERS).forEach(([key, value]) => res.setHeader(key, value));
+  applySecurityHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
 
   try {
     const action = actionFromRequest(req);
+    requireAllowedMethod(action, req.method);
+    enforceBrowserOrigin(req, action);
     const body = req.method === "GET" ? {} : await readBody(req);
     const db = migrateDb(await loadDb({ allowRecoveryOnly: ["state", "sitemap", "login"].includes(action) }));
     const user = await userFromRequest(req, db);
@@ -56,8 +58,13 @@ module.exports = async function handler(req, res) {
 
     if (action === "login") {
       requireFields(body, ["login", "password"]);
+      enforceLoginRateLimit(req, body.login);
       const next = db.users.find((item) => same(item.email, body.login) || same(item.username, body.login));
-      if (!next || next.banned || !verifyPassword(body.password, next)) throw httpError(401, "That login did not match an account.");
+      if (!next || next.banned || !verifyPassword(body.password, next)) {
+        recordLoginFailure(req, body.login);
+        throw httpError(401, "That login did not match an account.");
+      }
+      clearLoginFailures(req, body.login);
       return json(res, 200, { user: publicUser(next), token: signToken(next.id) });
     }
 
@@ -225,16 +232,85 @@ module.exports = async function handler(req, res) {
 
 async function readBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
-  if (typeof req.body === "string") return JSON.parse(req.body || "{}");
+  if (typeof req.body === "string") {
+    if (Buffer.byteLength(req.body, "utf8") > MAX_BODY_BYTES) throw httpError(413, "Request body is too large.");
+    try {
+      return JSON.parse(req.body || "{}");
+    } catch {
+      throw httpError(400, "Request body must be valid JSON.");
+    }
+  }
   const chunks = [];
-  for await (const chunk of req) chunks.push(chunk);
-  return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+  let size = 0;
+  for await (const chunk of req) {
+    size += chunk.length;
+    if (size > MAX_BODY_BYTES) throw httpError(413, "Request body is too large.");
+    chunks.push(chunk);
+  }
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+  } catch {
+    throw httpError(400, "Request body must be valid JSON.");
+  }
 }
 
 function actionFromRequest(req) {
   const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
   if (url.pathname.endsWith("/sitemap.xml")) return "sitemap";
   return req.query?.action || url.searchParams.get("action") || "state";
+}
+
+function applySecurityHeaders(req, res) {
+  const origin = requestOrigin(req);
+  const allowOrigin = allowedOrigins().has(origin) ? origin : CONFIG.site.url;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Access-Control-Allow-Origin", allowOrigin);
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Max-Age", "86400");
+  res.setHeader("Vary", "Origin");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Cache-Control", "no-store");
+}
+
+function requireAllowedMethod(action, method = "GET") {
+  const next = String(method || "GET").toUpperCase();
+  if (!READ_ACTIONS.has(action) && !WRITE_ACTIONS.has(action)) throw httpError(404, "Unknown action.");
+  if (READ_ACTIONS.has(action) && next !== "GET") throw httpError(405, "Method not allowed.");
+  if (WRITE_ACTIONS.has(action) && next !== "POST") throw httpError(405, "Method not allowed.");
+}
+
+function enforceBrowserOrigin(req, action) {
+  if (!WRITE_ACTIONS.has(action)) return;
+  const origin = requestOrigin(req);
+  if (!origin) return;
+  if (!allowedOrigins().has(origin)) throw httpError(403, "Request origin is not allowed.");
+}
+
+function requestOrigin(req) {
+  return String(req.headers?.origin || req.headers?.Origin || "").replace(/\/$/, "");
+}
+
+function allowedOrigins() {
+  const origins = [
+    CONFIG.site.url,
+    apiOrigin(CONFIG.api?.productionBasePath),
+    apiOrigin(CONFIG.api?.basePath),
+    process.env.ALLOWED_ORIGINS
+  ]
+    .flatMap((item) => String(item || "").split(","))
+    .map((item) => item.trim().replace(/\/$/, ""))
+    .filter((item) => item.startsWith("https://") || item.startsWith("http://localhost") || item.startsWith("http://127.0.0.1"));
+  return new Set(origins);
+}
+
+function apiOrigin(value = "") {
+  try {
+    return new URL(value, CONFIG.site.url).origin;
+  } catch {
+    return "";
+  }
 }
 
 function freshDb() {
@@ -1067,6 +1143,41 @@ function clientHash(req) {
   const ip = String(forwarded).split(",")[0].trim() || req.socket?.remoteAddress || "unknown";
   const agent = req.headers["user-agent"] || req.headers["User-Agent"] || "";
   return crypto.createHmac("sha256", SESSION_SECRET).update(`${ip}|${agent}`).digest("hex");
+}
+
+function loginRateKey(req, login = "") {
+  const account = clean(login).toLowerCase();
+  return crypto.createHmac("sha256", SESSION_SECRET).update(`${clientHash(req)}|${account}`).digest("hex");
+}
+
+function enforceLoginRateLimit(req, login) {
+  pruneLoginFailures();
+  const entry = loginFailures.get(loginRateKey(req, login));
+  if (entry && entry.count >= LOGIN_LIMIT_MAX_FAILURES) {
+    throw httpError(429, "Too many login attempts. Please wait and try again.");
+  }
+}
+
+function recordLoginFailure(req, login) {
+  const key = loginRateKey(req, login);
+  const now = Date.now();
+  const entry = loginFailures.get(key);
+  if (!entry || now - entry.firstAt > LOGIN_LIMIT_WINDOW_MS) {
+    loginFailures.set(key, { count: 1, firstAt: now });
+    return;
+  }
+  entry.count += 1;
+}
+
+function clearLoginFailures(req, login) {
+  loginFailures.delete(loginRateKey(req, login));
+}
+
+function pruneLoginFailures() {
+  const cutoff = Date.now() - LOGIN_LIMIT_WINDOW_MS;
+  for (const [key, entry] of loginFailures.entries()) {
+    if (!entry?.firstAt || entry.firstAt < cutoff) loginFailures.delete(key);
+  }
 }
 
 function createId() {
