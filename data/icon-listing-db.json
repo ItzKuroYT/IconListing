@@ -146,7 +146,7 @@
       "uptimeChecks": 2
     },
     {
-      "id": "b8914d4c-1966-4d74-9cbd-3b6b4c1b48e5",
+      "id": "b7954ebf-59a6-4ccd-aab0-0fce95a476e1",
       "name": "EnchantedMC",
       "javaHost": "enchantedmc.minecra.fr",
       "javaPort": 25555,
@@ -180,14 +180,14 @@
       "online": false,
       "uptimePercent": 0,
       "sponsored": false,
-      "createdAt": "2026-06-24T22:19:41.260Z",
-      "updatedAt": "2026-06-24T22:19:41.260Z",
-      "lastPingAt": "2026-06-24T22:19:41.269Z",
+      "createdAt": "2026-06-24T22:19:40.168Z",
+      "updatedAt": "2026-06-24T22:19:40.168Z",
+      "lastPingAt": "2026-06-24T22:19:40.483Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
           {
-            "createdAt": "2026-06-24T22:19:41.269Z",
+            "createdAt": "2026-06-24T22:19:40.483Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
