@@ -48,15 +48,15 @@
       "ownerId": "bd813e43-bf7a-45fd-869e-f092d2dde82e",
       "ownerName": "MaxFullCalypse",
       "votes": 0,
-      "playersOnline": 69,
-      "playersMax": 70,
+      "playersOnline": 63,
+      "playersMax": 64,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-24T22:12:52.542Z",
+      "lastPingAt": "2026-06-24T22:19:44.253Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -79,16 +79,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T22:12:52.542Z",
-            "playersOnline": 69,
-            "playersMax": 70,
+            "createdAt": "2026-06-24T22:19:44.253Z",
+            "playersOnline": 63,
+            "playersMax": 64,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T22:12:52.542Z",
-      "uptimeChecks": 7,
-      "uptimeSuccesses": 7
+      "lastSuccessfulPingAt": "2026-06-24T22:19:44.253Z",
+      "uptimeChecks": 8,
+      "uptimeSuccesses": 8
     },
     {
       "id": "e624d227-5bd0-45ce-9aea-270560258b62",
@@ -125,7 +125,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-      "lastPingAt": "2026-06-24T22:12:52.618Z",
+      "lastPingAt": "2026-06-24T22:19:44.368Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -136,14 +136,14 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-24T22:12:52.618Z",
+            "createdAt": "2026-06-24T22:19:44.368Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
           }
         ]
       },
-      "uptimeChecks": 2
+      "uptimeChecks": 3
     },
     {
       "id": "b7954ebf-59a6-4ccd-aab0-0fce95a476e1",
