@@ -75,6 +75,55 @@
       "lastSuccessfulPingAt": "2026-06-24T19:44:27.097Z",
       "uptimeChecks": 5,
       "uptimeSuccesses": 5
+    },
+    {
+      "id": "7cdc4062-bcf5-4a30-9503-d29ea06446b9",
+      "name": "Pixelmonia",
+      "javaHost": "Only bedrock not java",
+      "javaPort": 67676767,
+      "crossPlay": true,
+      "bedrockHost": "Teebz.serveminecraft.net",
+      "bedrockPort": 19160,
+      "votifierEnabled": false,
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/yCRvxedGw7",
+      "youtubeUrl": "https://youtube.com/@itsyaboijason6?si=MkpLqkL23A6pOpc9",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "🎮 **Join Our Pokémon Server pixelmonia!** 🗺️\n**How do to Join:**\nAdd Pixelmonia3114 and click pixelmonia\nExplore the world with the **Serp pokemon Mod** explore different biomes and special events!\n\n**Features:**\n* 🎵 Custom music mod\n* 🏟️ Battle tournaments\n* 🏆Gyms & custom badges\n* 🪻 Tp menu and TPA\n* ✨ 30 player limit\n*  🏆 tournaments\n\nCome hang out and start your adventure today!\n\nhttps://discord.gg/yCRvxedGw7",
+      "tags": [
+        "Pixelmon",
+        "Cobblemon",
+        "Bedrock",
+        "New"
+      ],
+      "ownerId": "00b2b31b-bcd8-4bae-8da3-4abbd13e7417",
+      "ownerName": "ItsYaBoiJason6",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 0,
+      "sponsored": false,
+      "createdAt": "2026-06-24T19:52:17.080Z",
+      "updatedAt": "2026-06-24T19:52:17.080Z",
+      "lastPingAt": "2026-06-24T19:52:17.207Z",
+      "analytics": {
+        "ipCopies": [],
+        "playerHistory": [
+          {
+            "createdAt": "2026-06-24T19:52:17.207Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          }
+        ]
+      },
+      "uptimeChecks": 1
     }
   ],
   "clients": [],
