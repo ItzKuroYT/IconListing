@@ -31,15 +31,15 @@
       "ownerId": "bd813e43-bf7a-45fd-869e-f092d2dde82e",
       "ownerName": "MaxFullCalypse",
       "votes": 0,
-      "playersOnline": 79,
-      "playersMax": 80,
+      "playersOnline": 81,
+      "playersMax": 82,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-24T17:53:56.909Z",
+      "lastPingAt": "2026-06-24T19:44:27.097Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -54,12 +54,18 @@
             "playersOnline": 79,
             "playersMax": 80,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-24T19:44:27.097Z",
+            "playersOnline": 81,
+            "playersMax": 82,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T17:53:56.909Z",
-      "uptimeChecks": 4,
-      "uptimeSuccesses": 4
+      "lastSuccessfulPingAt": "2026-06-24T19:44:27.097Z",
+      "uptimeChecks": 5,
+      "uptimeSuccesses": 5
     }
   ],
   "clients": [],
