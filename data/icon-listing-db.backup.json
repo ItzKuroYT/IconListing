@@ -65,7 +65,7 @@
       "sponsored": false,
       "createdAt": "2026-06-23T07:05:03.226Z",
       "updatedAt": "2026-06-23T07:05:03.226Z",
-      "lastPingAt": "2026-06-24T08:45:34.828Z",
+      "lastPingAt": "2026-06-24T08:45:41.734Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -112,14 +112,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T08:45:34.828Z",
+            "createdAt": "2026-06-24T08:45:41.734Z",
             "playersOnline": 5,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T08:45:34.828Z",
+      "lastSuccessfulPingAt": "2026-06-24T08:45:41.734Z",
       "uptimeChecks": 24,
       "uptimeSuccesses": 24
     },
@@ -156,7 +156,7 @@
       "sponsored": true,
       "createdAt": "2026-06-23T14:30:26.667Z",
       "updatedAt": "2026-06-23T14:30:26.667Z",
-      "lastPingAt": "2026-06-24T08:45:36.825Z",
+      "lastPingAt": "2026-06-24T08:45:41.759Z",
       "analytics": {
         "ipCopies": [],
         "playerHistory": [
@@ -197,14 +197,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T08:45:36.825Z",
+            "createdAt": "2026-06-24T08:45:41.759Z",
             "playersOnline": 0,
             "playersMax": 100,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T08:45:36.825Z",
+      "lastSuccessfulPingAt": "2026-06-24T08:45:41.759Z",
       "uptimeChecks": 22,
       "uptimeSuccesses": 10
     },
@@ -244,7 +244,7 @@
       "sponsored": false,
       "createdAt": "2026-06-23T22:27:58.331Z",
       "updatedAt": "2026-06-23T22:27:58.331Z",
-      "lastPingAt": "2026-06-24T08:45:38.767Z",
+      "lastPingAt": "2026-06-24T08:45:41.767Z",
       "analytics": {
         "ipCopies": [
           {
@@ -278,14 +278,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-24T08:45:38.767Z",
+            "createdAt": "2026-06-24T08:45:41.767Z",
             "playersOnline": 0,
             "playersMax": 20,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-24T08:45:38.767Z",
+      "lastSuccessfulPingAt": "2026-06-24T08:45:41.767Z",
       "uptimeChecks": 18,
       "uptimeSuccesses": 16
     }
