@@ -332,6 +332,59 @@
       "lastSuccessfulPingAt": "2026-06-24T09:19:59.666Z",
       "uptimeChecks": 21,
       "uptimeSuccesses": 17
+    },
+    {
+      "id": "1660c423-1557-484d-b348-179b7b5be03b",
+      "name": "GTM - GTA-based minecraft server for Java",
+      "javaHost": "maxfullcalypse.gtm.network",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "votifierEnabled": false,
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "websiteUrl": "",
+      "discordUrl": "",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "https://i.imgur.com/xEuBBmu.png",
+      "description": "Grand Theft Minecart is the most played Grand Theft Auto server in Minecraft. We provide a completely custom gamemode, GTM, where you can use our 48 custom weapons from shotguns to snipers, all unique to GTM. Not only do we provide a variety of weapons, but also custom vehicles from cars to tanks, and even planes. You can become one of the richest criminals and own your own big penthouse apartment in our custom-built map. At GTM you can find a big community, with gangs and multiple languages. Our frequent, large updates can be enjoyed as we make the server even cooler and fun for everyone. ​\n\nGrand Theft Minecart is our oldest gamemode - hop into the city of MineSantos, loot chests full of awesome gear, and have fun with your friends. Be careful though, there are police roaming the streets, and they do not like murderers! As you rank up, gain access to more and more powerful weapons and vehicles, and purchase a wonderful apartment or house to store all your stuff. Join a Gang, or make your own, and become the Crime Lord of Los Santos. At Grand Theft Minecart the opportunities are limitless.\n\nYou can only join with original (paid) Minecraft Java Edition version 1.19.4 -> 26.2+",
+      "tags": [
+        "Survival",
+        "Economy",
+        "PvP",
+        "RPG",
+        "Farming",
+        "Minigames"
+      ],
+      "ownerId": "bd813e43-bf7a-45fd-869e-f092d2dde82e",
+      "ownerName": "MaxFullCalypse",
+      "votes": 0,
+      "playersOnline": 77,
+      "playersMax": 78,
+      "version": "Velocity 1.7.2-26.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-06-24T14:32:10.963Z",
+      "updatedAt": "2026-06-24T14:32:10.963Z",
+      "lastPingAt": "2026-06-24T14:32:12.267Z",
+      "analytics": {
+        "ipCopies": [],
+        "playerHistory": [
+          {
+            "createdAt": "2026-06-24T14:32:12.267Z",
+            "playersOnline": 77,
+            "playersMax": 78,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-06-24T14:32:12.267Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1
     }
   ],
   "clients": [
