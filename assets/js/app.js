@@ -172,6 +172,15 @@ function productionApiMessage() {
   return "This action is temporarily unavailable. Error: 67.";
 }
 
+function networkApiMessage() {
+  return "Error: network error. Refreshing...";
+}
+
+function isNetworkAbort(error) {
+  const message = String(error?.message || "").toLowerCase();
+  return error?.name === "AbortError" || message.includes("signal is aborted") || message.includes("aborted without reason") || message.includes("failed to fetch") || message.includes("networkerror");
+}
+
 function publicApiMessage(action, status) {
   if (action === "vote") return "You can only vote once every 24 hours.";
   if (status === 401) return "Log in again before doing that.";
@@ -183,6 +192,7 @@ function publicApiMessage(action, status) {
 
 function publicRequestError(action, error) {
   if (action === "vote") return "You can only vote once every 24 hours.";
+  if (isNetworkAbort(error) || isNetworkAbort(error?.originalError)) return networkApiMessage();
   return error?.publicMessage || error?.message || productionApiMessage();
 }
 
@@ -221,6 +231,9 @@ async function request(action, payload = {}, method = "POST") {
           return json;
         } catch (error) {
           lastError = error;
+          if (isNetworkAbort(error)) {
+            error.publicMessage = networkApiMessage();
+          }
           if (error.stopRetry) throw error;
         }
       }
@@ -655,8 +668,19 @@ function rankServers(servers, votes = []) {
 
 async function getState() {
   const state = await request("state", {}, "GET");
+  sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
   return { ...state, votes: state.votes || [] };
+}
+
+function scheduleNetworkRefresh(error) {
+  if (!isNetworkAbort(error) && !isNetworkAbort(error?.originalError) && error?.message !== networkApiMessage()) return false;
+  const key = "iconListingBootRetries";
+  const attempts = Number(sessionStorage.getItem(key) || 0);
+  if (attempts >= 5) return false;
+  sessionStorage.setItem(key, String(attempts + 1));
+  window.setTimeout(() => location.reload(), Math.min(1200 + attempts * 800, 5000));
+  return true;
 }
 
 function pageTitle(page) {
@@ -2413,7 +2437,9 @@ async function boot() {
     else if (page === "admin") renderAdmin(state);
     else renderStatic(page);
   } catch (error) {
-    $("#app").innerHTML = `<div class="page"><div class="notice">${escapeHtml(error.message)}</div></div>`;
+    const refreshing = scheduleNetworkRefresh(error);
+    const message = refreshing ? networkApiMessage() : publicRequestError("state", error);
+    $("#app").innerHTML = `<div class="page"><div class="notice">${escapeHtml(message)}</div></div>`;
   }
 }
 
