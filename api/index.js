@@ -104,6 +104,7 @@ module.exports = async function handler(req, res) {
       db.servers = db.servers.filter((item) => item.id !== body.id);
       db.votes = db.votes.filter((vote) => vote.serverId !== body.id);
       if (db.voteIps) delete db.voteIps[body.id];
+      markDeleted(db, "servers", [body.id]);
       await saveDb(db, { deletedServers: [body.id] });
       return json(res, 200, { ok: true });
     }
@@ -153,6 +154,8 @@ module.exports = async function handler(req, res) {
       db.servers = db.servers.filter((item) => item.ownerId !== user.id);
       db.votes = db.votes.filter((vote) => db.servers.some((server) => server.id === vote.serverId));
       pruneVoteCooldowns(db);
+      markDeleted(db, "users", [user.id]);
+      markDeleted(db, "servers", deletedServerIds);
       await saveDb(db, { deletedUsers: [user.id], deletedServers: deletedServerIds });
       return json(res, 200, { ok: true });
     }
@@ -193,6 +196,8 @@ module.exports = async function handler(req, res) {
         db.servers = db.servers.filter((item) => item.ownerId !== id);
         db.votes = db.votes.filter((vote) => db.servers.some((server) => server.id === vote.serverId));
         pruneVoteCooldowns(db);
+        markDeleted(db, "users", [id]);
+        markDeleted(db, "servers", deletedServerIds);
         saveOptions.deletedUsers = [id];
         saveOptions.deletedServers = deletedServerIds;
       }
@@ -205,6 +210,7 @@ module.exports = async function handler(req, res) {
       }
       if (body.command === "deleteClient") {
         db.clients = db.clients.filter((item) => item.id !== id);
+        markDeleted(db, "clients", [id]);
         saveOptions.deletedClients = [id];
       }
       if (body.command === "saveHost") {
@@ -216,6 +222,7 @@ module.exports = async function handler(req, res) {
       }
       if (body.command === "deleteHost") {
         db.hosts = db.hosts.filter((item) => item.id !== id);
+        markDeleted(db, "hosts", [id]);
         saveOptions.deletedHosts = [id];
       }
       await saveDb(db, saveOptions);
@@ -314,7 +321,7 @@ function apiOrigin(value = "") {
 }
 
 function freshDb() {
-  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {} };
+  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {}, deleted: { users: {}, servers: {}, clients: {}, hosts: {} } };
 }
 
 function migrateDb(db = freshDb()) {
@@ -327,7 +334,8 @@ function migrateDb(db = freshDb()) {
     clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")).map(normalizeClient) : [],
     hosts: Array.isArray(db.hosts) ? db.hosts.filter((host) => !String(host.id || "").startsWith("host-")).map(normalizeHost) : [],
     votes: Array.isArray(db.votes) ? db.votes : [],
-    voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {}
+    voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {},
+    deleted: normalizeDeleted(db.deleted)
   };
 }
 
@@ -369,14 +377,31 @@ function normalizeHost(host) {
   };
 }
 
+function normalizeDeleted(deleted = {}) {
+  return {
+    users: normalizeDeletedMap(deleted.users),
+    servers: normalizeDeletedMap(deleted.servers),
+    clients: normalizeDeletedMap(deleted.clients),
+    hosts: normalizeDeletedMap(deleted.hosts)
+  };
+}
+
+function normalizeDeletedMap(value = {}) {
+  if (Array.isArray(value)) {
+    return Object.fromEntries(value.filter(Boolean).map((id) => [String(id), new Date().toISOString()]));
+  }
+  if (!value || typeof value !== "object") return {};
+  return Object.fromEntries(Object.entries(value).filter(([id]) => id).map(([id, deletedAt]) => [String(id), String(deletedAt || new Date().toISOString())]));
+}
+
 async function loadDb(options = {}) {
   if (!options.allowRecoveryOnly) requireConfiguredProductionDb();
-  if (hasGithubStorage()) return mergeRecoveryDb(await readGithubDb(), await readRecoveryDb());
+  if (hasGithubStorage()) return mergeDurableDb(await readGithubDb(), await readGithubBackupDb(), await readRecoveryDb());
   if (process.env.VERCEL && options.allowRecoveryOnly) return readRecoveryDb();
   try {
-    return mergeRecoveryDb(parseDbFromStorage(await fs.readFile(TMP_DB, "utf8")), await readRecoveryDb());
+    return mergeDurableDb(parseDbFromStorage(await fs.readFile(TMP_DB, "utf8")), await readLocalBackupDb(), await readRecoveryDb());
   } catch {
-    return readRecoveryDb();
+    return mergeDurableDb(freshDb(), await readLocalBackupDb(), await readRecoveryDb());
   }
 }
 
@@ -387,7 +412,17 @@ async function saveDb(db, options = {}) {
     return;
   }
   await writeLocalBackup();
-  await fs.writeFile(TMP_DB, serializeDbForStorage(db));
+  const serialized = serializeDbForStorage(db);
+  await fs.writeFile(TMP_DB, serialized);
+  await fs.writeFile(TMP_DB_BACKUP, serialized);
+}
+
+async function readLocalBackupDb() {
+  try {
+    return parseDbFromStorage(await fs.readFile(TMP_DB_BACKUP, "utf8"));
+  } catch {
+    return freshDb();
+  }
 }
 
 let recoveryDbCache = { data: null, loadedAt: 0 };
@@ -406,33 +441,58 @@ async function readRecoveryDb() {
 function mergeRecoveryDb(primaryDb, recoveryDb) {
   const primary = migrateDb(primaryDb);
   const recovery = migrateDb(recoveryDb);
-  if (!hasAnyStoredData(recovery)) return primary;
-  const servers = mergeServersWithRecovery(primary.servers, recovery.servers);
+  const deleted = mergeDeleted(primary.deleted, recovery.deleted);
+  if (!hasAnyStoredData(recovery)) return migrateDb({ ...primary, deleted });
+  const servers = mergeServersWithRecovery(primary.servers, recovery.servers, deleted.servers);
   return migrateDb({
     ...primary,
-    users: mergeUsersWithRecovery(primary.users, recovery.users),
+    deleted,
+    users: mergeUsersWithRecovery(primary.users, recovery.users, deleted.users),
     servers,
-    clients: mergeClientsWithRecovery(primary.clients, recovery.clients),
-    hosts: mergeHostsWithRecovery(primary.hosts, recovery.hosts),
-    votes: mergeVotesWithRecovery(primary.votes, recovery.votes, servers),
-    voteIps: mergeVoteIps(recovery.voteIps, primary.voteIps)
+    clients: mergeClientsWithRecovery(primary.clients, recovery.clients, deleted.clients),
+    hosts: mergeHostsWithRecovery(primary.hosts, recovery.hosts, deleted.hosts),
+    votes: mergeVotesWithRecovery(primary.votes, recovery.votes, servers, deleted.servers),
+    voteIps: pruneDeletedVoteIps(mergeVoteIps(recovery.voteIps, primary.voteIps), deleted.servers)
   });
 }
 
-function mergeUsersWithRecovery(primaryUsers = [], recoveryUsers = []) {
+function mergeDurableDb(primaryDb, ...fallbackDbs) {
+  return fallbackDbs.reduce((merged, fallback) => mergeRecoveryDb(merged, fallback), migrateDb(primaryDb));
+}
+
+function mergeDeleted(...deletedItems) {
+  const merged = normalizeDeleted();
+  for (const deleted of deletedItems) {
+    const normalized = normalizeDeleted(deleted);
+    for (const kind of ["users", "servers", "clients", "hosts"]) {
+      merged[kind] = { ...merged[kind], ...normalized[kind] };
+    }
+  }
+  return merged;
+}
+
+function markDeleted(db, kind, ids = []) {
+  db.deleted = normalizeDeleted(db.deleted);
+  const now = new Date().toISOString();
+  for (const id of ids.filter(Boolean)) db.deleted[kind][id] = now;
+}
+
+function mergeUsersWithRecovery(primaryUsers = [], recoveryUsers = [], deletedUsers = {}) {
   const merged = [...primaryUsers];
   for (const user of recoveryUsers) {
     if (!user?.id) continue;
+    if (deletedUsers[user.id]) continue;
     const exists = merged.some((item) => item.id === user.id || same(item.username, user.username) || same(item.email, user.email));
     if (!exists) merged.push(user);
   }
   return merged;
 }
 
-function mergeServersWithRecovery(primaryServers = [], recoveryServers = []) {
+function mergeServersWithRecovery(primaryServers = [], recoveryServers = [], deletedServers = {}) {
   const merged = [...primaryServers];
   for (const server of recoveryServers) {
     if (!server?.id) continue;
+    if (deletedServers[server.id]) continue;
     const recoveryKeys = new Set(serverAddressKeys(server));
     const recoveryDescription = comparableText(server.description);
     const exists = merged.some((item) => (
@@ -446,34 +506,36 @@ function mergeServersWithRecovery(primaryServers = [], recoveryServers = []) {
   return merged;
 }
 
-function mergeClientsWithRecovery(primaryClients = [], recoveryClients = []) {
+function mergeClientsWithRecovery(primaryClients = [], recoveryClients = [], deletedClients = {}) {
   const merged = [...primaryClients];
   for (const client of recoveryClients) {
     if (!client?.id && !client?.name) continue;
+    if (client.id && deletedClients[client.id]) continue;
     const exists = merged.some((item) => item.id === client.id || same(item.name, client.name) || same(item.url, client.url));
     if (!exists) merged.push(client);
   }
   return merged;
 }
 
-function mergeHostsWithRecovery(primaryHosts = [], recoveryHosts = []) {
+function mergeHostsWithRecovery(primaryHosts = [], recoveryHosts = [], deletedHosts = {}) {
   const merged = [...primaryHosts];
   for (const host of recoveryHosts) {
     if (!host?.id && !host?.name) continue;
+    if (host.id && deletedHosts[host.id]) continue;
     const exists = merged.some((item) => item.id === host.id || same(item.name, host.name) || same(item.url, host.url));
     if (!exists) merged.push(host);
   }
   return merged;
 }
 
-function mergeVotesWithRecovery(primaryVotes = [], recoveryVotes = [], servers = []) {
+function mergeVotesWithRecovery(primaryVotes = [], recoveryVotes = [], servers = [], deletedServers = {}) {
   const serverIds = new Set(servers.map((server) => server.id));
   const merged = new Map();
   for (const vote of recoveryVotes) {
-    if (vote?.id && serverIds.has(vote.serverId)) merged.set(vote.id, vote);
+    if (vote?.id && serverIds.has(vote.serverId) && !deletedServers[vote.serverId]) merged.set(vote.id, vote);
   }
   for (const vote of primaryVotes) {
-    if (vote?.id && serverIds.has(vote.serverId)) merged.set(vote.id, vote);
+    if (vote?.id && serverIds.has(vote.serverId) && !deletedServers[vote.serverId]) merged.set(vote.id, vote);
   }
   return [...merged.values()];
 }
@@ -508,11 +570,10 @@ async function readGithubDb(options = {}) {
 
 async function writeGithubDb(db, options = {}, retry = true) {
   let normalized = migrateDb(db);
-  const latest = mergeRecoveryDb(await readGithubDb({ bypassCache: true }), await readRecoveryDb());
+  const latest = mergeDurableDb(await readGithubDb({ bypassCache: true }), await readGithubBackupDb(), await readRecoveryDb());
   ensureRequiredRecordsExist(latest, options);
   normalized = mergeDbForWrite(latest, normalized, options);
   ensureWriteDoesNotLoseData(latest, normalized, options);
-  await writeGithubBackup(latest);
   const body = {
     message: "Update Icon Listing database",
     content: Buffer.from(serializeDbForStorage(normalized)).toString("base64"),
@@ -531,6 +592,7 @@ async function writeGithubDb(db, options = {}, retry = true) {
   if (!response.ok) throw new Error(`GitHub database write failed (${response.status}).`);
   const payload = await response.json();
   githubDbCache = { data: cloneJson(normalized), sha: payload.content?.sha || githubDbCache.sha, loadedAt: Date.now() };
+  await writeGithubBackup(normalized);
 }
 
 async function writeLocalBackup() {
@@ -546,7 +608,7 @@ async function writeGithubBackup(db) {
   const latest = migrateDb(db);
   if (!hasAnyStoredData(latest)) return;
   try {
-    const backupPath = process.env.GITHUB_DB_BACKUP_PATH || backupPathFor(githubDbPath());
+    const backupPath = githubBackupPath();
     const existing = await readGithubFile(backupPath);
     const body = {
       message: "Backup Icon Listing database",
@@ -564,11 +626,26 @@ async function writeGithubBackup(db) {
   }
 }
 
+async function readGithubBackupDb() {
+  try {
+    const payload = await readGithubFile(githubBackupPath());
+    if (!payload.content) return freshDb();
+    const content = Buffer.from(String(payload.content || "").replace(/\n/g, ""), "base64").toString("utf8");
+    return parseDbFromStorage(content);
+  } catch {
+    return freshDb();
+  }
+}
+
 async function readGithubFile(filePath) {
   const response = await fetch(githubFileUrl(filePath, true), { headers: githubHeaders() });
   if (response.status === 404) return { sha: null, content: "" };
   if (!response.ok) throw new Error(`GitHub file read failed (${response.status}).`);
   return response.json();
+}
+
+function githubBackupPath() {
+  return process.env.GITHUB_DB_BACKUP_PATH || backupPathFor(githubDbPath());
 }
 
 function mergeDbForWrite(remoteDb, nextDb, options = {}) {
@@ -577,6 +654,7 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
   const ids = writeIdSets(options);
   const merged = {
     ...next,
+    deleted: mergeDeleted(remote.deleted, next.deleted, deletedFromIdSets(ids)),
     users: mergeById(remote.users, next.users, ids.deletedUsers, ids.touchedUsers),
     servers: mergeById(remote.servers, next.servers, ids.deletedServers, ids.touchedServers),
     clients: mergeById(remote.clients, next.clients, ids.deletedClients, ids.touchedClients),
@@ -624,7 +702,16 @@ function assertNoUnexpectedVoteLoss(remoteVotes = [], nextVotes = [], deletedSer
 }
 
 function hasAnyStoredData(db) {
-  return !!(db.users.length || db.servers.length || db.clients.length || db.hosts.length || db.votes.length || Object.keys(db.voteIps || {}).length);
+  const deleted = normalizeDeleted(db.deleted);
+  return !!(
+    db.users.length ||
+    db.servers.length ||
+    db.clients.length ||
+    db.hosts.length ||
+    db.votes.length ||
+    Object.keys(db.voteIps || {}).length ||
+    Object.values(deleted).some((items) => Object.keys(items).length)
+  );
 }
 
 function ensureMergedWriteIsValid(db, options = {}) {
@@ -650,6 +737,16 @@ function writeIdSets(options = {}) {
     touchedHosts: new Set(options.touchedHosts || []),
     touchedVotes: new Set(options.touchedVotes || [])
   };
+}
+
+function deletedFromIdSets(ids) {
+  const now = new Date().toISOString();
+  return normalizeDeleted({
+    users: Object.fromEntries([...ids.deletedUsers].map((id) => [id, now])),
+    servers: Object.fromEntries([...ids.deletedServers].map((id) => [id, now])),
+    clients: Object.fromEntries([...ids.deletedClients].map((id) => [id, now])),
+    hosts: Object.fromEntries([...ids.deletedHosts].map((id) => [id, now]))
+  });
 }
 
 function mergeById(remoteItems = [], nextItems = [], deletedIds = new Set(), touchedIds = new Set()) {
@@ -691,6 +788,12 @@ function mergeVoteIps(remoteVoteIps = {}, nextVoteIps = {}, deletedServerIds = n
     merged[serverId] = { ...(merged[serverId] || {}), ...(entries || {}) };
   }
   for (const serverId of deletedServerIds) delete merged[serverId];
+  return merged;
+}
+
+function pruneDeletedVoteIps(voteIps = {}, deletedServers = {}) {
+  const merged = cloneJson(voteIps || {});
+  for (const serverId of Object.keys(deletedServers || {})) delete merged[serverId];
   return merged;
 }
 
