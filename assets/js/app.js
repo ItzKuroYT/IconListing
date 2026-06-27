@@ -58,6 +58,9 @@ function normalizeServer(server) {
     bedrockType,
     crossPlay: edition === "java" && !!server.crossPlay,
     realmCode: server.realmCode || "",
+    iconListingPluginEnabled: !!server.iconListingPluginEnabled,
+    iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey || ""),
+    iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
     analytics: {
       ipCopies: Array.isArray(server.analytics?.ipCopies) ? server.analytics.ipCopies : [],
       playerHistory: Array.isArray(server.analytics?.playerHistory) ? server.analytics.playerHistory : []
@@ -320,6 +323,8 @@ function fallbackRequest(action, payload) {
       lastSuccessfulPingAt: existing?.lastSuccessfulPingAt || null,
       lastPingAt: existing?.lastPingAt || null
     };
+    if (next.iconListingPluginEnabled && !next.iconListingVoteKey) next.iconListingVoteKey = createVoteKey();
+    ensureUniqueVoteKey(db, next, existing?.id || next.id);
     db.servers = existing ? db.servers.map((item) => (item.id === existing.id ? next : item)) : [...db.servers, next];
     save();
     return Promise.resolve({ server: { ...next, analytics: publicAnalytics(next) } });
@@ -347,6 +352,7 @@ function fallbackRequest(action, payload) {
     }
     const vote = { id: createId(), serverId: server.id, minecraftUsername: username, createdAt: new Date().toISOString() };
     db.votes.push(vote);
+    queueIconListingPluginVote(server, vote);
     recordVoteCooldown(db, server.id, username);
     server.votes = db.votes.filter((item) => item.serverId === server.id).length;
     save();
@@ -458,6 +464,8 @@ function sanitizeServer(server) {
     votifierHost: cleanText(server.votifierHost),
     votifierPort: Number(server.votifierPort || 8192),
     votifierToken: cleanText(server.votifierToken),
+    iconListingPluginEnabled: !!server.iconListingPluginEnabled,
+    iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey),
     websiteUrl: cleanText(server.websiteUrl),
     discordUrl: cleanText(server.discordUrl),
     youtubeUrl: cleanText(server.youtubeUrl),
@@ -472,6 +480,7 @@ function sanitizeServer(server) {
   if (next.edition === "bedrock" && next.bedrockType === "server" && !next.bedrockHost) throw new Error("Bedrock server IP or host is required.");
   if (next.edition === "bedrock" && next.bedrockType === "realm" && !next.realmCode) throw new Error("Realm code is required.");
   if (next.description.length < CONFIG.limits.descriptionMinLength) throw new Error(`Description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
+  if (next.iconListingVoteKey && !isValidVoteKey(next.iconListingVoteKey)) throw new Error("IconListing vote key must be 12-96 characters using letters, numbers, dots, dashes, underscores, or colons.");
   if (tags.length < CONFIG.limits.tagsMin || tags.length > CONFIG.limits.tagsMax) throw new Error(`Select ${CONFIG.limits.tagsMin} to ${CONFIG.limits.tagsMax} tags.`);
   if (isBlockedServerHost(next.javaHost) || isBlockedServerHost(next.bedrockHost)) throw new Error("FalixSrv and Aternos servers are not allowed on this listing site.");
   return next;
@@ -505,6 +514,63 @@ function ensureUniqueServerListing(db, server, currentId = "") {
     if (description && comparableText(existing.description) === description) throw new Error("A listing with that description already exists.");
     if (serverAddressKeys(existing).some((key) => addresses.has(key))) throw new Error("A listing with that server IP already exists.");
   }
+}
+
+function ensureUniqueVoteKey(db, server, currentId = "") {
+  const key = cleanVoteKey(server.iconListingVoteKey);
+  if (!key) return;
+  for (const existing of db.servers || []) {
+    if (existing.id && existing.id === currentId) continue;
+    if (sameVoteKey(existing.iconListingVoteKey, key)) throw new Error("That IconListing vote plugin key is already being used.");
+  }
+}
+
+function createVoteKey() {
+  const bytes = window.crypto?.getRandomValues ? window.crypto.getRandomValues(new Uint8Array(18)) : Array.from({ length: 18 }, () => Math.floor(Math.random() * 256));
+  return `ilv_${Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function cleanVoteKey(value = "") {
+  return cleanText(value).replace(/\s+/g, "");
+}
+
+function sameVoteKey(a = "", b = "") {
+  return cleanVoteKey(a).toLowerCase() === cleanVoteKey(b).toLowerCase();
+}
+
+function isValidVoteKey(value = "") {
+  return /^[A-Za-z0-9._:-]{12,96}$/.test(cleanVoteKey(value));
+}
+
+function normalizeIconListingVoteQueue(queue = []) {
+  if (!Array.isArray(queue)) return [];
+  return queue
+    .filter((item) => item?.id && item?.minecraftUsername)
+    .map((item) => ({
+      id: cleanText(item.id),
+      voteId: cleanText(item.voteId),
+      serverId: cleanText(item.serverId),
+      serverName: cleanText(item.serverName),
+      minecraftUsername: cleanText(item.minecraftUsername),
+      createdAt: cleanText(item.createdAt),
+      deliveredAt: cleanText(item.deliveredAt)
+    }))
+    .slice(-500);
+}
+
+function queueIconListingPluginVote(server, vote) {
+  if (!server.iconListingPluginEnabled || !server.iconListingVoteKey) return;
+  server.iconListingVoteQueue = normalizeIconListingVoteQueue(server.iconListingVoteQueue);
+  server.iconListingVoteQueue.push({
+    id: createId(),
+    voteId: vote.id,
+    serverId: server.id,
+    serverName: server.name,
+    minecraftUsername: vote.minecraftUsername,
+    createdAt: vote.createdAt,
+    deliveredAt: ""
+  });
+  server.iconListingVoteQueue = server.iconListingVoteQueue.slice(-500);
 }
 
 function comparableText(value = "") {
@@ -2013,6 +2079,17 @@ function serverFormMarkup(server = {}) {
       <div class="field"><label>&nbsp;</label><button id="testVote" class="button blue" type="button">Send Test Vote</button></div>
     </div>
     <div class="form-grid">
+      <div class="field"><label>IconListing vote plugin</label><select id="iconListingPluginEnabled" class="select">
+        <option value="disabled" ${server.iconListingPluginEnabled ? "" : "selected"}>Disabled</option>
+        <option value="enabled" ${server.iconListingPluginEnabled ? "selected" : ""}>Enabled</option>
+      </select></div>
+    </div>
+    <div id="iconListingPluginFields" class="form-grid hidden">
+      <div class="field"><label>Server Vote Key</label><input id="iconListingVoteKey" class="input" value="${escapeHtml(server.iconListingVoteKey || createVoteKey())}" maxlength="96"></div>
+      <div class="field"><label>&nbsp;</label><button id="generateIconListingVoteKey" class="button blue" type="button">Generate Key</button></div>
+      <div class="field"><label>&nbsp;</label><a class="button secondary" href="${route(CONFIG.iconListingVotePlugin?.downloadPath || "/download/IconListingVotePlugin.jar")}" download>${escapeHtml(CONFIG.iconListingVotePlugin?.downloadLabel || "Download Plugin")}</a></div>
+    </div>
+    <div class="form-grid">
       <div class="field"><label>Website URL</label><input id="websiteUrl" class="input" type="url" value="${escapeHtml(server.websiteUrl || "")}"></div>
       <div class="field"><label>Discord Invite Link</label><input id="discordUrl" class="input" type="url" value="${escapeHtml(server.discordUrl || "")}"></div>
       <div class="field"><label>YouTube Video URL</label><input id="youtubeUrl" class="input" type="url" value="${escapeHtml(server.youtubeUrl || "")}"></div>
@@ -2065,6 +2142,7 @@ function bindServerForm() {
   const crossPlay = $("#crossPlay");
   const bedrockType = $("#bedrockType");
   const votifier = $("#votifierEnabled");
+  const iconListingPlugin = $("#iconListingPluginEnabled");
   const sync = () => {
     const isBedrock = edition?.value === "bedrock";
     const isRealm = bedrockType?.value === "realm";
@@ -2078,11 +2156,13 @@ function bindServerForm() {
     $("#bedrockHost")?.toggleAttribute("required", isBedrock ? !isRealm : !!crossPlay?.checked);
     $("#realmCode")?.toggleAttribute("required", isBedrock && isRealm);
     $("#votifierFields")?.classList.toggle("hidden", !votifier?.checked);
+    $("#iconListingPluginFields")?.classList.toggle("hidden", iconListingPlugin?.value !== "enabled");
   };
   edition?.addEventListener("change", sync);
   crossPlay?.addEventListener("change", sync);
   bedrockType?.addEventListener("change", sync);
   votifier?.addEventListener("change", sync);
+  iconListingPlugin?.addEventListener("change", sync);
   sync();
   $$(".tag-choice").forEach((button) => {
     button.addEventListener("click", () => {
@@ -2099,6 +2179,9 @@ function bindServerForm() {
     } catch (error) {
       toast(error.message);
     }
+  });
+  $("#generateIconListingVoteKey")?.addEventListener("click", () => {
+    $("#iconListingVoteKey").value = createVoteKey();
   });
   $("#serverForm")?.addEventListener("submit", submitServerForm);
 }
@@ -2154,6 +2237,8 @@ async function submitServerForm(event) {
         votifierHost: $("#votifierHost").value,
         votifierPort: $("#votifierPort").value,
         votifierToken: $("#votifierToken").value,
+        iconListingPluginEnabled: $("#iconListingPluginEnabled").value === "enabled",
+        iconListingVoteKey: $("#iconListingVoteKey").value,
         websiteUrl: $("#websiteUrl").value,
         discordUrl: $("#discordUrl").value,
         youtubeUrl: $("#youtubeUrl").value,

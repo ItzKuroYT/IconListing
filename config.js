@@ -219,6 +219,10 @@ const IconListingConfig = {
     documentationUrl: "https://github.com/NuVotifier/NuVotifier",
     testUsername: "IconListingTest"
   },
+  iconListingVotePlugin: {
+    downloadPath: "/download/IconListingVotePlugin.jar",
+    downloadLabel: "Download Plugin"
+  },
   moderation: {
     replacement: "***",
     blockedServerHosts: [

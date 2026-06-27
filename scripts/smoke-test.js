@@ -179,12 +179,15 @@ async function main() {
           votifierEnabled: true,
           votifierHost: "127.0.0.1",
           votifierPort: 8192,
-          votifierToken: "token"
+          votifierToken: "token",
+          iconListingPluginEnabled: true,
+          iconListingVoteKey: `smoke-key-${suffix}`
         }
       },
       login.json.token
     );
     assert(saved.code === 200 && saved.json.server.id, "server save should succeed");
+    assert(saved.json.server.iconListingVoteKey === `smoke-key-${suffix}`, "server owner should receive the IconListing vote plugin key");
 
     const duplicateName = await call(
       "saveServer",
@@ -233,6 +236,24 @@ async function main() {
       login.json.token
     );
     assert(duplicateDescription.code === 409, "duplicate descriptions should be rejected");
+
+    const duplicateVoteKey = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Smoke Test Duplicate Vote Key",
+          javaHost: "vote-key-dupe.example.org",
+          javaPort: 25565,
+          country: "United States",
+          description: "This smoke listing has unique public fields, but it reuses the IconListing vote plugin key so duplicate key protection should reject it before a plugin can claim another server's votes. The extra sentence keeps this fixture above the listing description length requirement.",
+          tags: ["SMP", "Survival"],
+          iconListingPluginEnabled: true,
+          iconListingVoteKey: `smoke-key-${suffix}`
+        }
+      },
+      login.json.token
+    );
+    assert(duplicateVoteKey.code === 409, "duplicate IconListing vote plugin keys should be rejected");
 
     const secondServer = await call(
       "saveServer",
@@ -298,6 +319,12 @@ async function main() {
     });
     assert(vote.code === 200, "vote should be accepted");
     assert(received.length === 2, "Votifier provider should receive test vote and real vote");
+
+    const pluginPoll = await call("pluginPoll", { key: `smoke-key-${suffix}` });
+    assert(pluginPoll.code === 200 && pluginPoll.json.votes.length === 1, "IconListing vote plugin should receive queued votes");
+    assert(pluginPoll.json.votes[0].minecraftUsername === `Alex_${String(suffix).slice(-4)}`, "IconListing plugin vote should include the Minecraft username");
+    const pluginAck = await call("pluginPoll", { key: `smoke-key-${suffix}`, ackIds: [pluginPoll.json.votes[0].id] });
+    assert(pluginAck.code === 200 && pluginAck.json.votes.length === 0, "IconListing vote plugin should acknowledge delivered votes");
 
     const repeatVote = await call("vote", {
       serverId: saved.json.server.id,
@@ -371,6 +398,7 @@ async function main() {
     const client = finalState.json.clients.find((item) => item.name === "Smoke Client");
     const host = finalState.json.hosts.find((item) => item.name === "Smoke Hosting");
     assert(server && server.votes === 1, "server should have one counted vote");
+    assert(!server.iconListingVoteKey && !server.iconListingVoteQueue && !server.votifierToken, "public state should not expose private vote delivery keys or queues");
     assert(otherServer && otherServer.ownerId === server.ownerId, "same account should keep multiple unique listings");
     assert(bedrockSaved && bedrockSaved.edition === "bedrock" && bedrockSaved.bedrockHost === "bedrock.example.org", "bedrock server fields should be stored");
     assert(realmSaved && realmSaved.edition === "bedrock" && realmSaved.bedrockType === "realm" && realmSaved.realmCode === "abc123Realm", "bedrock realm fields should be stored");
@@ -399,7 +427,7 @@ async function main() {
     const backupAfterDelete = JSON.parse(await fs.readFile(backupPath, "utf8"));
     assert(backupAfterDelete.deleted?.servers?.[secondServer.json.server.id], "backup JSON should preserve server deletion tombstones");
 
-    console.log("Smoke test passed: auth, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, backup/recovery fill, deletion tombstones, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, voting cooldown, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, IconListing vote plugin polling, voting cooldown, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });

@@ -12,7 +12,7 @@ const PING_TTL_MS = 5 * 60 * 1000;
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const LOGIN_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const LOGIN_LIMIT_MAX_FAILURES = 8;
-const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "admin"]);
+const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "pluginPoll", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap"]);
 const loginFailures = new Map();
 
@@ -90,10 +90,12 @@ module.exports = async function handler(req, res) {
         createdAt: existing?.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
+      if (next.iconListingPluginEnabled && !next.iconListingVoteKey) next.iconListingVoteKey = createUniqueVoteKey(db, next.id);
+      ensureUniqueVoteKey(db, next, existing?.id || next.id);
       await updatePing(next);
       db.servers = existing ? db.servers.map((item) => (item.id === existing.id ? next : item)) : [...db.servers, next];
       await saveDb(db, { touchedServers: [next.id], uniqueServerId: next.id });
-      return json(res, 200, { server: publicServer(next) });
+      return json(res, 200, { server: publicServer(next, user) });
     }
 
     if (action === "deleteServer") {
@@ -118,10 +120,28 @@ module.exports = async function handler(req, res) {
       if (server.votifierEnabled) await sendVotifierVote(server, minecraftUsername);
       const vote = { id: createId(), serverId: server.id, minecraftUsername, createdAt: new Date().toISOString() };
       db.votes.push(vote);
+      queueIconListingPluginVote(server, vote);
       recordVoteCooldown(db, server.id, minecraftUsername, req);
       server.votes = votesForServer(db.votes, server.id).length;
-      await saveDb(db, { requireExistingServers: [server.id], touchedVotes: [vote.id] });
-      return json(res, 200, { ok: true, vote, server: publicServer(server) });
+      await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id], touchedVotes: [vote.id] });
+      return json(res, 200, { ok: true, vote, server: publicServer(server, user) });
+    }
+
+    if (action === "pluginPoll") {
+      requireFields(body, ["key"]);
+      const key = cleanVoteKey(body.key);
+      const server = db.servers.find((item) => item.iconListingPluginEnabled && sameVoteKey(item.iconListingVoteKey, key));
+      if (!server) throw httpError(404, "Vote key not found.");
+      const ackIds = Array.isArray(body.ackIds) ? body.ackIds.map(clean).filter(Boolean).slice(0, 100) : [];
+      const changed = acknowledgeIconListingPluginVotes(server, ackIds);
+      const limit = Math.max(1, Math.min(50, Number(body.limit || 20)));
+      const pending = iconListingPluginPendingVotes(server).slice(0, limit);
+      if (changed) await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
+      return json(res, 200, {
+        ok: true,
+        server: { id: server.id, name: server.name },
+        votes: pending.map(publicIconListingPluginVote)
+      });
     }
 
     if (action === "trackCopy") {
@@ -348,6 +368,9 @@ function normalizeServer(server) {
     bedrockType,
     crossPlay: edition === "java" && !!server.crossPlay,
     realmCode: server.realmCode || "",
+    iconListingPluginEnabled: !!server.iconListingPluginEnabled,
+    iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey || ""),
+    iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
     analytics: {
       ipCopies: Array.isArray(server.analytics?.ipCopies) ? server.analytics.ipCopies : [],
       playerHistory: Array.isArray(server.analytics?.playerHistory) ? server.analytics.playerHistory : []
@@ -870,7 +893,7 @@ function storageEncryptionSecret() {
 }
 
 function statePayload(db, user) {
-  return { servers: rankServers(db.servers, db.votes).map(publicServer), clients: db.clients, hosts: db.hosts, votes: db.votes, user: publicUser(user) };
+  return { servers: rankServers(db.servers, db.votes).map((server) => publicServer(server, user)), clients: db.clients, hosts: db.hosts, votes: db.votes, user: publicUser(user) };
 }
 
 function siteUrl(pathname = "/") {
@@ -1050,6 +1073,8 @@ function validateServer(server) {
     votifierHost: cleanText(server.votifierHost),
     votifierPort: Number(server.votifierPort || 8192),
     votifierToken: cleanText(server.votifierToken),
+    iconListingPluginEnabled: !!server.iconListingPluginEnabled,
+    iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey),
     websiteUrl: clean(server.websiteUrl),
     discordUrl: clean(server.discordUrl),
     youtubeUrl: clean(server.youtubeUrl),
@@ -1064,6 +1089,7 @@ function validateServer(server) {
   if (next.edition === "bedrock" && next.bedrockType === "server" && !next.bedrockHost) throw httpError(400, "Bedrock server IP or host is required.");
   if (next.edition === "bedrock" && next.bedrockType === "realm" && !next.realmCode) throw httpError(400, "Realm code is required.");
   if (hasBlockedText(server.name) || hasBlockedText(server.description)) throw httpError(400, "Please remove blocked words from the listing.");
+  if (next.iconListingVoteKey && !isValidVoteKey(next.iconListingVoteKey)) throw httpError(400, "IconListing vote key must be 12-96 characters using letters, numbers, dots, dashes, underscores, or colons.");
   if (next.description.length < CONFIG.limits.descriptionMinLength) throw httpError(400, `Description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
   if (next.tags.length < CONFIG.limits.tagsMin || next.tags.length > CONFIG.limits.tagsMax) throw httpError(400, `Select ${CONFIG.limits.tagsMin} to ${CONFIG.limits.tagsMax} tags.`);
   if (!CONFIG.countries.includes(next.country)) throw httpError(400, "Select a valid country.");
@@ -1096,6 +1122,37 @@ function ensureUniqueServerListing(db, server, currentId = "") {
       throw httpError(409, "A listing with that server IP already exists.");
     }
   }
+}
+
+function ensureUniqueVoteKey(db, server, currentId = "") {
+  const key = cleanVoteKey(server.iconListingVoteKey);
+  if (!key) return;
+  for (const existing of db.servers || []) {
+    if (existing.id && existing.id === currentId) continue;
+    if (sameVoteKey(existing.iconListingVoteKey, key)) {
+      throw httpError(409, "That IconListing vote plugin key is already being used.");
+    }
+  }
+}
+
+function createUniqueVoteKey(db, currentId = "") {
+  for (let tries = 0; tries < 20; tries += 1) {
+    const key = `ilv_${crypto.randomBytes(18).toString("hex")}`;
+    if (!(db.servers || []).some((server) => server.id !== currentId && sameVoteKey(server.iconListingVoteKey, key))) return key;
+  }
+  throw httpError(500, "Could not generate a unique vote plugin key.");
+}
+
+function cleanVoteKey(value = "") {
+  return clean(value).replace(/\s+/g, "");
+}
+
+function sameVoteKey(a = "", b = "") {
+  return cleanVoteKey(a).toLowerCase() === cleanVoteKey(b).toLowerCase();
+}
+
+function isValidVoteKey(value = "") {
+  return /^[A-Za-z0-9._:-]{12,96}$/.test(cleanVoteKey(value));
 }
 
 function comparableText(value = "") {
@@ -1228,8 +1285,79 @@ function formatDuration(ms) {
   return `${minutes}m`;
 }
 
-function publicServer(server) {
-  return { ...server, analytics: publicAnalytics(server) };
+function publicServer(server, user = null) {
+  const canSeePrivate = !!user && (server.ownerId === user.id || isAdmin(user));
+  const next = { ...server, analytics: publicAnalytics(server) };
+  delete next.iconListingVoteQueue;
+  if (!canSeePrivate) {
+    delete next.votifierToken;
+    delete next.iconListingVoteKey;
+  }
+  return next;
+}
+
+function normalizeIconListingVoteQueue(queue = []) {
+  if (!Array.isArray(queue)) return [];
+  return queue
+    .filter((item) => item?.id && item?.minecraftUsername)
+    .map((item) => ({
+      id: clean(item.id),
+      voteId: clean(item.voteId),
+      serverId: clean(item.serverId),
+      serverName: cleanText(item.serverName),
+      minecraftUsername: cleanText(item.minecraftUsername),
+      createdAt: cleanText(item.createdAt),
+      deliveredAt: cleanText(item.deliveredAt)
+    }))
+    .slice(-500);
+}
+
+function queueIconListingPluginVote(server, vote) {
+  if (!server.iconListingPluginEnabled || !server.iconListingVoteKey) return;
+  server.iconListingVoteQueue = normalizeIconListingVoteQueue(server.iconListingVoteQueue);
+  server.iconListingVoteQueue.push({
+    id: createId(),
+    voteId: vote.id,
+    serverId: server.id,
+    serverName: server.name,
+    minecraftUsername: vote.minecraftUsername,
+    createdAt: vote.createdAt,
+    deliveredAt: ""
+  });
+  server.iconListingVoteQueue = server.iconListingVoteQueue.slice(-500);
+}
+
+function iconListingPluginPendingVotes(server) {
+  return normalizeIconListingVoteQueue(server.iconListingVoteQueue).filter((vote) => !vote.deliveredAt);
+}
+
+function acknowledgeIconListingPluginVotes(server, ackIds = []) {
+  if (!ackIds.length) return false;
+  const ids = new Set(ackIds.map(clean).filter(Boolean));
+  let changed = false;
+  const now = new Date().toISOString();
+  server.iconListingVoteQueue = normalizeIconListingVoteQueue(server.iconListingVoteQueue)
+    .map((vote) => {
+      if (ids.has(vote.id) && !vote.deliveredAt) {
+        changed = true;
+        return { ...vote, deliveredAt: now };
+      }
+      return vote;
+    })
+    .filter((vote) => !vote.deliveredAt || Date.now() - new Date(vote.deliveredAt).getTime() < 7 * 24 * 60 * 60 * 1000)
+    .slice(-500);
+  return changed;
+}
+
+function publicIconListingPluginVote(vote) {
+  return {
+    id: vote.id,
+    voteId: vote.voteId,
+    serverId: vote.serverId,
+    serverName: vote.serverName,
+    minecraftUsername: vote.minecraftUsername,
+    createdAt: vote.createdAt
+  };
 }
 
 function isBlockedServerHost(host = "") {
