@@ -13,6 +13,9 @@ const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const LOGIN_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const LOGIN_LIMIT_MAX_FAILURES = 8;
 const VOTIFIER_TIMEOUT_MS = 3000;
+const ANALYTICS_DAYS = 30;
+const PLAYER_HISTORY_LIMIT = 48;
+const COPY_HASHES_PER_DAY_LIMIT = 120;
 const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "pluginPoll", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap"]);
 const loginFailures = new Map();
@@ -26,7 +29,10 @@ module.exports = async function handler(req, res) {
     requireAllowedMethod(action, req.method);
     enforceBrowserOrigin(req, action);
     const body = req.method === "GET" ? {} : await readBody(req);
-    const db = migrateDb(await loadDb({ allowRecoveryOnly: ["state", "sitemap", "login"].includes(action) }));
+    const db = migrateDb(await loadDb({
+      allowRecoveryOnly: ["state", "sitemap", "login"].includes(action),
+      forceFresh: WRITE_ACTIONS.has(action) || action === "state"
+    }));
     const user = await userFromRequest(req, db);
 
     if (action === "sitemap") {
@@ -36,7 +42,7 @@ module.exports = async function handler(req, res) {
     if (action === "state") {
       const refreshed = await refreshPings(db);
       if (refreshed) await saveDb(db);
-      return json(res, 200, statePayload(db, user));
+      return json(res, 200, statePayload(db, user, { detailServerId: stateDetailServerId(req) }));
     }
 
     if (action === "register") {
@@ -54,7 +60,7 @@ module.exports = async function handler(req, res) {
       };
       db.users.push(next);
       await saveDb(db, { touchedUsers: [next.id], uniqueUserId: next.id });
-      return json(res, 200, { user: publicUser(next), token: signToken(next.id) });
+      return json(res, 200, { user: publicUser(next), token: signToken(next) });
     }
 
     if (action === "login") {
@@ -66,7 +72,7 @@ module.exports = async function handler(req, res) {
         throw httpError(401, "That login did not match an account.");
       }
       clearLoginFailures(req, body.login);
-      return json(res, 200, { user: publicUser(next), token: signToken(next.id) });
+      return json(res, 200, { user: publicUser(next), token: signToken(next) });
     }
 
     if (action === "saveServer") {
@@ -96,7 +102,7 @@ module.exports = async function handler(req, res) {
       await updatePing(next);
       db.servers = existing ? db.servers.map((item) => (item.id === existing.id ? next : item)) : [...db.servers, next];
       await saveDb(db, { touchedServers: [next.id], uniqueServerId: next.id });
-      return json(res, 200, { server: publicServer(next, user) });
+      return json(res, 200, { server: publicServer(next, user, { fullAnalytics: true }) });
     }
 
     if (action === "deleteServer") {
@@ -125,7 +131,7 @@ module.exports = async function handler(req, res) {
       server.votes = votesForServer(db.votes, server.id).length;
       await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id], touchedVotes: [vote.id] });
       const deliveries = await deliverVoteRewards(server, minecraftUsername);
-      return json(res, 200, { ok: true, vote, deliveries, server: publicServer(server, user) });
+      return json(res, 200, { ok: true, vote, deliveries, server: publicServer(server, user, { fullAnalytics: true }) });
     }
 
     if (action === "pluginPoll") {
@@ -150,7 +156,7 @@ module.exports = async function handler(req, res) {
       if (!server) throw httpError(404, "Listing not found.");
       recordIpCopy(server, req);
       await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
-      return json(res, 200, { ok: true, analytics: publicAnalytics(server) });
+      return json(res, 200, { ok: true, analytics: publicAnalytics(server, { full: true }) });
     }
 
     if (action === "accountUpdate") {
@@ -293,7 +299,7 @@ function applySecurityHeaders(req, res) {
   const allowOrigin = allowedOrigins().has(origin) ? origin : CONFIG.site.url;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Access-Control-Allow-Origin", allowOrigin);
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-IconListing-Token, X-Icon-Listing-Token");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.setHeader("Access-Control-Max-Age", "86400");
   res.setHeader("Vary", "Origin");
@@ -372,10 +378,7 @@ function normalizeServer(server) {
     iconListingPluginEnabled: !!server.iconListingPluginEnabled,
     iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey || ""),
     iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
-    analytics: {
-      ipCopies: Array.isArray(server.analytics?.ipCopies) ? server.analytics.ipCopies : [],
-      playerHistory: Array.isArray(server.analytics?.playerHistory) ? server.analytics.playerHistory : []
-    }
+    analytics: normalizeAnalytics(server.analytics)
   };
 }
 
@@ -420,7 +423,7 @@ function normalizeDeletedMap(value = {}) {
 
 async function loadDb(options = {}) {
   if (!options.allowRecoveryOnly) requireConfiguredProductionDb();
-  if (hasGithubStorage()) return mergeDurableDb(await readGithubDb(), await readGithubBackupDb(), await readRecoveryDb());
+  if (hasGithubStorage()) return mergeDurableDb(await readGithubDb({ bypassCache: !!options.forceFresh }), await readGithubBackupDb({ bypassCache: !!options.forceFresh }), await readRecoveryDb());
   if (process.env.VERCEL && options.allowRecoveryOnly) return readRecoveryDb();
   try {
     return mergeDurableDb(parseDbFromStorage(await fs.readFile(TMP_DB, "utf8")), await readLocalBackupDb(), await readRecoveryDb());
@@ -578,7 +581,7 @@ function requireConfiguredProductionDb() {
 
 async function readGithubDb(options = {}) {
   if (!options.bypassCache && githubDbCache.data && Date.now() - githubDbCache.loadedAt < 1500) return cloneJson(githubDbCache.data);
-  const response = await fetch(githubDbUrl(true), { headers: githubHeaders() });
+  const response = await fetch(githubDbUrl(true, options), { headers: githubReadHeaders() });
   if (response.status === 404) {
     const db = migrateDb(freshDb());
     githubDbCache = { data: db, sha: null, loadedAt: Date.now() };
@@ -594,7 +597,7 @@ async function readGithubDb(options = {}) {
 
 async function writeGithubDb(db, options = {}, retry = true) {
   let normalized = migrateDb(db);
-  const latest = mergeDurableDb(await readGithubDb({ bypassCache: true }), await readGithubBackupDb(), await readRecoveryDb());
+  const latest = mergeDurableDb(await readGithubDb({ bypassCache: true }), await readGithubBackupDb({ bypassCache: true }), await readRecoveryDb());
   ensureRequiredRecordsExist(latest, options);
   normalized = mergeDbForWrite(latest, normalized, options);
   ensureWriteDoesNotLoseData(latest, normalized, options);
@@ -650,9 +653,9 @@ async function writeGithubBackup(db) {
   }
 }
 
-async function readGithubBackupDb() {
+async function readGithubBackupDb(options = {}) {
   try {
-    const payload = await readGithubFile(githubBackupPath());
+    const payload = await readGithubFile(githubBackupPath(), options);
     if (!payload.content) return freshDb();
     const content = Buffer.from(String(payload.content || "").replace(/\n/g, ""), "base64").toString("utf8");
     return parseDbFromStorage(content);
@@ -661,8 +664,8 @@ async function readGithubBackupDb() {
   }
 }
 
-async function readGithubFile(filePath) {
-  const response = await fetch(githubFileUrl(filePath, true), { headers: githubHeaders() });
+async function readGithubFile(filePath, options = {}) {
+  const response = await fetch(githubFileUrl(filePath, true, options), { headers: githubReadHeaders() });
   if (response.status === 404) return { sha: null, content: "" };
   if (!response.ok) throw new Error(`GitHub file read failed (${response.status}).`);
   return response.json();
@@ -683,7 +686,7 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
     servers: mergeById(remote.servers, next.servers, ids.deletedServers, ids.touchedServers),
     clients: mergeById(remote.clients, next.clients, ids.deletedClients, ids.touchedClients),
     hosts: mergeById(remote.hosts, next.hosts, ids.deletedHosts, ids.touchedHosts),
-    votes: mergeVotes(remote.votes, next.votes, ids.deletedServers, ids.touchedVotes),
+    votes: mergeVotes(remote.votes, next.votes, ids.deletedServers, ids.touchedVotes, ids.touchedServers),
     voteIps: mergeVoteIps(remote.voteIps, next.voteIps, ids.deletedServers)
   };
   pruneVoteCooldowns(merged);
@@ -788,7 +791,7 @@ function mergeById(remoteItems = [], nextItems = [], deletedIds = new Set(), tou
   return [...merged.values()];
 }
 
-function mergeVotes(remoteVotes = [], nextVotes = [], deletedServerIds = new Set(), touchedVoteIds = new Set()) {
+function mergeVotes(remoteVotes = [], nextVotes = [], deletedServerIds = new Set(), touchedVoteIds = new Set(), touchedServerIds = new Set()) {
   const merged = new Map();
   const remoteIds = new Set();
   const add = (vote) => {
@@ -800,7 +803,7 @@ function mergeVotes(remoteVotes = [], nextVotes = [], deletedServerIds = new Set
     add(vote);
   });
   nextVotes.forEach((vote) => {
-    if (remoteIds.has(vote?.id) || touchedVoteIds.has(vote?.id)) add(vote);
+    if (remoteIds.has(vote?.id) || touchedVoteIds.has(vote?.id) || touchedServerIds.has(vote?.serverId)) add(vote);
   });
   return [...merged.values()];
 }
@@ -821,8 +824,8 @@ function pruneDeletedVoteIps(voteIps = {}, deletedServers = {}) {
   return merged;
 }
 
-function githubDbUrl(includeRef) {
-  return githubFileUrl(githubDbPath(), includeRef);
+function githubDbUrl(includeRef, options = {}) {
+  return githubFileUrl(githubDbPath(), includeRef, options);
 }
 
 function githubDbPath() {
@@ -834,10 +837,13 @@ function backupPathFor(filePath) {
   return path.posix.join(parsed.dir, `${parsed.name}.backup${parsed.ext || ".json"}`);
 }
 
-function githubFileUrl(filePath, includeRef) {
+function githubFileUrl(filePath, includeRef, options = {}) {
   const contentPath = encodeURIComponent(filePath).replace(/%2F/g, "/");
   const base = `https://api.github.com/repos/${process.env.GITHUB_REPO}/contents/${contentPath}`;
-  return includeRef ? `${base}?ref=${encodeURIComponent(githubBranch())}` : base;
+  if (!includeRef) return base;
+  const params = new URLSearchParams({ ref: githubBranch() });
+  if (options.bypassCache) params.set("_", String(Date.now()));
+  return `${base}?${params.toString()}`;
 }
 
 function githubBranch() {
@@ -850,6 +856,13 @@ function githubHeaders() {
     authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
     "content-type": "application/json",
     "user-agent": "IconListing"
+  };
+}
+
+function githubReadHeaders() {
+  return {
+    ...githubHeaders(),
+    "cache-control": "no-cache"
   };
 }
 
@@ -893,8 +906,20 @@ function storageEncryptionSecret() {
   return process.env.DATABASE_ENCRYPTION_KEY || process.env.ICON_LISTING_DB_ENCRYPTION_KEY || "";
 }
 
-function statePayload(db, user) {
-  return { servers: rankServers(db.servers, db.votes).map((server) => publicServer(server, user)), clients: db.clients, hosts: db.hosts, votes: db.votes, user: publicUser(user) };
+function statePayload(db, user, options = {}) {
+  const detailServerId = clean(options.detailServerId || "");
+  return {
+    servers: rankServers(db.servers, db.votes).map((server) => publicServer(server, user, { fullAnalytics: server.id === detailServerId })),
+    clients: db.clients,
+    hosts: db.hosts,
+    votes: detailServerId ? publicVotesForServer(db.votes, detailServerId) : [],
+    user: publicUser(user)
+  };
+}
+
+function stateDetailServerId(req) {
+  const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
+  return clean(req.query?.serverId || url.searchParams.get("serverId") || url.searchParams.get("id") || "");
 }
 
 function siteUrl(pathname = "/") {
@@ -972,8 +997,7 @@ async function updatePing(server) {
 }
 
 function recordPlayerSnapshot(server, createdAt) {
-  if (!server.analytics) server.analytics = { ipCopies: [], playerHistory: [] };
-  if (!server.analytics.playerHistory) server.analytics.playerHistory = [];
+  server.analytics = normalizeAnalytics(server.analytics || {});
   const last = server.analytics.playerHistory[server.analytics.playerHistory.length - 1];
   if (last && new Date(createdAt).getTime() - new Date(last.createdAt).getTime() < 60 * 60 * 1000) {
     server.analytics.playerHistory[server.analytics.playerHistory.length - 1] = {
@@ -990,8 +1014,7 @@ function recordPlayerSnapshot(server, createdAt) {
       online: !!server.online
     });
   }
-  const cutoff = Date.now() - 31 * 24 * 60 * 60 * 1000;
-  server.analytics.playerHistory = server.analytics.playerHistory.filter((item) => new Date(item.createdAt).getTime() >= cutoff).slice(-120);
+  server.analytics.playerHistory = compactPlayerHistory(server.analytics.playerHistory);
 }
 
 async function pingJava(host, port) {
@@ -1249,6 +1272,17 @@ function votesForServer(votes, serverId) {
   return votes.filter((vote) => vote.serverId === serverId);
 }
 
+function publicVotesForServer(votes = [], serverId = "") {
+  const month = new Date().toISOString().slice(0, 7);
+  return votesForServer(votes, serverId)
+    .filter((vote) => String(vote.createdAt || "").startsWith(month))
+    .map((vote) => ({
+      serverId: vote.serverId,
+      minecraftUsername: vote.minecraftUsername,
+      createdAt: vote.createdAt
+    }));
+}
+
 function voteCooldownMs() {
   return Number(CONFIG.limits?.voteCooldownHours || 24) * 60 * 60 * 1000;
 }
@@ -1310,9 +1344,9 @@ function formatDuration(ms) {
   return `${minutes}m`;
 }
 
-function publicServer(server, user = null) {
+function publicServer(server, user = null, options = {}) {
   const canSeePrivate = !!user && (server.ownerId === user.id || isAdmin(user));
-  const next = { ...server, analytics: publicAnalytics(server) };
+  const next = { ...server, analytics: publicAnalytics(server, { full: !!options.fullAnalytics }) };
   delete next.iconListingVoteQueue;
   if (!canSeePrivate) {
     delete next.votifierToken;
@@ -1394,39 +1428,127 @@ function isBlockedServerHost(host = "") {
   });
 }
 
-function publicAnalytics(server) {
-  const analytics = server.analytics || {};
+function publicAnalytics(server, options = {}) {
+  const analytics = normalizeAnalytics(server.analytics || {});
+  const result = {
+    ipCopiesLast7: countDailyCopies(analytics.ipCopyDaily, 7),
+    ipCopiesLast30: countDailyCopies(analytics.ipCopyDaily, ANALYTICS_DAYS)
+  };
+  if (options.full) {
+    result.ipCopyDaily = denseDailyCopies(analytics.ipCopyDaily, ANALYTICS_DAYS);
+    result.playerHistory = compactPlayerHistory(analytics.playerHistory);
+  }
+  return result;
+}
+
+function normalizeAnalytics(analytics = {}) {
+  const daily = new Map();
+  const visitorDays = normalizeIpCopyVisitorDays(analytics.ipCopyVisitorDays);
+  for (const item of Array.isArray(analytics.ipCopyDaily) ? analytics.ipCopyDaily : []) {
+    const date = dateKey(item.date);
+    if (date) daily.set(date, Math.max(Number(daily.get(date) || 0), Number(item.count || 0)));
+  }
+  for (const copy of Array.isArray(analytics.ipCopies) ? analytics.ipCopies : []) {
+    const date = dateKey(copy.createdAt);
+    if (!date || !isRecentDateKey(date, ANALYTICS_DAYS)) continue;
+    const hash = shortVisitorHash(copy.visitorHash || "");
+    const visitors = visitorDays[date] || [];
+    if (hash && !visitors.includes(hash)) {
+      if (visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(hash);
+      visitorDays[date] = visitors;
+      daily.set(date, Number(daily.get(date) || 0) + 1);
+    }
+  }
+  pruneVisitorDays(visitorDays);
   return {
-    ipCopiesLast7: uniqueIpCopies(analytics.ipCopies, 7),
-    ipCopiesLast30: uniqueIpCopies(analytics.ipCopies, 30),
-    ipCopyDaily: dailyIpCopies(analytics.ipCopies, 30),
-    playerHistory: Array.isArray(analytics.playerHistory) ? analytics.playerHistory.slice(-120) : []
+    ipCopyDaily: sparseDailyCopies(daily, ANALYTICS_DAYS),
+    ipCopyVisitorDays: visitorDays,
+    playerHistory: compactPlayerHistory(analytics.playerHistory)
   };
 }
 
-function uniqueIpCopies(copies = [], days) {
-  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
-  return new Set(copies.filter((copy) => new Date(copy.createdAt).getTime() >= cutoff).map((copy) => copy.visitorHash)).size;
-}
-
-function dailyIpCopies(copies = [], days) {
-  return Array.from({ length: days }, (_, index) => {
-    const date = new Date(Date.now() - (days - index - 1) * 24 * 60 * 60 * 1000);
-    const key = date.toISOString().slice(0, 10);
-    const visitors = new Set(copies.filter((copy) => String(copy.createdAt || "").startsWith(key)).map((copy) => copy.visitorHash));
-    return { date: key, count: visitors.size };
-  });
+function normalizeIpCopyVisitorDays(value = {}) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const next = {};
+  for (const [date, hashes] of Object.entries(value)) {
+    const key = dateKey(date);
+    if (!key || !isRecentDateKey(key, ANALYTICS_DAYS) || !Array.isArray(hashes)) continue;
+    const unique = [...new Set(hashes.map(shortVisitorHash).filter(Boolean))].slice(0, COPY_HASHES_PER_DAY_LIMIT);
+    if (unique.length) next[key] = unique;
+  }
+  return next;
 }
 
 function recordIpCopy(server, req) {
-  if (!server.analytics) server.analytics = { ipCopies: [], playerHistory: [] };
-  if (!server.analytics.ipCopies) server.analytics.ipCopies = [];
-  const visitorHash = clientHash(req);
-  const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
-  server.analytics.ipCopies = server.analytics.ipCopies.filter((copy) => new Date(copy.createdAt).getTime() >= cutoff);
-  if (!server.analytics.ipCopies.some((copy) => copy.visitorHash === visitorHash)) {
-    server.analytics.ipCopies.push({ visitorHash, createdAt: new Date().toISOString() });
+  const analytics = normalizeAnalytics(server.analytics || {});
+  const date = new Date().toISOString().slice(0, 10);
+  const visitorHash = shortVisitorHash(clientHash(req));
+  const visitors = analytics.ipCopyVisitorDays[date] || [];
+  const alreadyCounted = visitorHash && visitors.includes(visitorHash);
+  if (!alreadyCounted) {
+    if (visitorHash && visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(visitorHash);
+    analytics.ipCopyVisitorDays[date] = visitors;
+    const daily = new Map(analytics.ipCopyDaily.map((item) => [item.date, Number(item.count || 0)]));
+    daily.set(date, Number(daily.get(date) || 0) + 1);
+    analytics.ipCopyDaily = sparseDailyCopies(daily, ANALYTICS_DAYS);
   }
+  pruneVisitorDays(analytics.ipCopyVisitorDays);
+  server.analytics = analytics;
+}
+
+function countDailyCopies(entries = [], days = ANALYTICS_DAYS) {
+  return denseDailyCopies(entries, days).reduce((sum, item) => sum + Number(item.count || 0), 0);
+}
+
+function denseDailyCopies(entries = [], days = ANALYTICS_DAYS) {
+  const counts = new Map((Array.isArray(entries) ? entries : []).map((item) => [dateKey(item.date), Number(item.count || 0)]).filter(([date]) => date));
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date(Date.now() - (days - index - 1) * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    return { date, count: Number(counts.get(date) || 0) };
+  });
+}
+
+function sparseDailyCopies(counts, days = ANALYTICS_DAYS) {
+  const map = counts instanceof Map ? counts : new Map((Array.isArray(counts) ? counts : []).map((item) => [dateKey(item.date), Number(item.count || 0)]).filter(([date]) => date));
+  return [...map.entries()]
+    .filter(([date, count]) => isRecentDateKey(date, days) && Number(count || 0) > 0)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, count]) => ({ date, count: Number(count || 0) }));
+}
+
+function compactPlayerHistory(history = []) {
+  return (Array.isArray(history) ? history : [])
+    .filter((item) => Number.isFinite(new Date(item.createdAt).getTime()))
+    .map((item) => ({
+      createdAt: new Date(item.createdAt).toISOString(),
+      playersOnline: Number(item.playersOnline || 0),
+      playersMax: Number(item.playersMax || 0),
+      online: !!item.online
+    }))
+    .filter((item) => isRecentDateKey(item.createdAt.slice(0, 10), ANALYTICS_DAYS + 1))
+    .slice(-PLAYER_HISTORY_LIMIT);
+}
+
+function pruneVisitorDays(visitorDays = {}) {
+  for (const date of Object.keys(visitorDays)) {
+    if (!isRecentDateKey(date, ANALYTICS_DAYS) || !visitorDays[date]?.length) delete visitorDays[date];
+  }
+}
+
+function dateKey(value = "") {
+  const date = String(value || "").slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "";
+}
+
+function isRecentDateKey(date, days) {
+  const time = new Date(`${date}T00:00:00.000Z`).getTime();
+  if (!Number.isFinite(time)) return false;
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  return time >= cutoff;
+}
+
+function shortVisitorHash(hash = "") {
+  return String(hash || "").replace(/[^a-f0-9]/gi, "").slice(0, 16);
 }
 
 function clientHash(req) {
@@ -1484,14 +1606,18 @@ function createId() {
 
 function rankServers(servers, votes = []) {
   return [...servers]
-    .map((server) => ({ ...server, votes: votesForServer(votes, server.id).length || server.votes || 0 }))
+    .map((server) => ({ ...server, votes: displayedVoteCount(server, votes) }))
     .sort((a, b) => scoreServer(b, votes) - scoreServer(a, votes))
     .map((server, index) => ({ ...server, rank: index + 1 }));
 }
 
 function scoreServer(server, votes) {
-  const voteCount = votesForServer(votes, server.id).length || server.votes || 0;
+  const voteCount = displayedVoteCount(server, votes);
   return (server.playersOnline || 0) * CONFIG.ranking.playerWeight + voteCount * CONFIG.ranking.voteWeight + (server.sponsored ? CONFIG.ranking.sponsoredBoost : 0);
+}
+
+function displayedVoteCount(server, votes = []) {
+  return Math.max(votesForServer(votes, server.id).length, Number(server.votes || 0));
 }
 
 function hashPassword(password) {
@@ -1509,23 +1635,36 @@ function verifyPassword(password, user) {
   return crypto.timingSafeEqual(Buffer.from(hash, "hex"), Buffer.from(check, "hex"));
 }
 
-function signToken(userId) {
+function signToken(user) {
   const expires = Date.now() + 1000 * 60 * 60 * 24 * 14;
-  const body = `${userId}.${expires}`;
-  const sig = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("hex");
-  return `${body}.${sig}`;
+  const snapshot = typeof user === "object" && user ? user : { id: user };
+  const payload = {
+    v: 2,
+    id: snapshot.id,
+    username: snapshot.username || "",
+    email: snapshot.email || "",
+    expires
+  };
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const sig = crypto.createHmac("sha256", tokenSecrets()[0]).update(body).digest("hex");
+  return `v2.${body}.${sig}`;
 }
 
 async function userFromRequest(req, db) {
-  const header = req.headers.authorization || req.headers.Authorization || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  const token = tokenFromRequest(req);
   if (!token) return null;
-  const [userId, expires, sig] = token.split(".");
-  if (!userId || !expires || !sig || Date.now() > Number(expires)) return null;
-  const body = `${userId}.${expires}`;
-  const expected = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("hex");
-  if (expected !== sig) return null;
-  return db.users.find((item) => item.id === userId && !item.banned) || null;
+  const session = verifyToken(token);
+  if (!session) return null;
+  const storedUser = db.users.find((item) => item.id === session.id && !item.banned);
+  if (storedUser) return storedUser;
+  if (!session.username && !session.email) return null;
+  return {
+    id: session.id,
+    username: session.username,
+    email: session.email,
+    banned: false,
+    fromTokenSnapshot: true
+  };
 }
 
 function publicUser(user) {
@@ -1534,7 +1673,72 @@ function publicUser(user) {
 }
 
 function isAdmin(user) {
-  return !!user && (CONFIG.admins.users.includes(user.username) || CONFIG.admins.emails.includes(user.email));
+  return !!user && !user.fromTokenSnapshot && (CONFIG.admins.users.includes(user.username) || CONFIG.admins.emails.includes(user.email));
+}
+
+function tokenFromRequest(req) {
+  const header = req.headers.authorization || req.headers.Authorization || "";
+  const bearer = header.startsWith("Bearer ") ? header.slice(7) : "";
+  return clean(req.headers["x-iconlisting-token"] || req.headers["X-IconListing-Token"] || req.headers["x-icon-listing-token"] || req.headers["X-Icon-Listing-Token"] || bearer);
+}
+
+function verifyToken(token) {
+  if (token.startsWith("v2.")) return verifySnapshotToken(token);
+  return verifyLegacyToken(token);
+}
+
+function verifySnapshotToken(token) {
+  const [, body, sig] = token.split(".");
+  if (!body || !sig || !verifySignedBody(body, sig)) return null;
+  try {
+    const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8"));
+    if (!payload?.id || !payload.expires || Date.now() > Number(payload.expires)) return null;
+    return {
+      id: String(payload.id),
+      username: clean(payload.username || ""),
+      email: clean(payload.email || ""),
+      expires: Number(payload.expires)
+    };
+  } catch {
+    return null;
+  }
+}
+
+function verifyLegacyToken(token) {
+  const [userId, expires, sig] = token.split(".");
+  if (!userId || !expires || !sig || Date.now() > Number(expires)) return null;
+  const body = `${userId}.${expires}`;
+  if (!verifySignedBody(body, sig)) return null;
+  return { id: userId, username: "", email: "", expires: Number(expires) };
+}
+
+function verifySignedBody(body, sig) {
+  return tokenSecrets().some((secret) => {
+    const expected = crypto.createHmac("sha256", secret).update(body).digest("hex");
+    return safeEqualHex(expected, sig);
+  });
+}
+
+function safeEqualHex(left, right) {
+  try {
+    const a = Buffer.from(String(left || ""), "hex");
+    const b = Buffer.from(String(right || ""), "hex");
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+}
+
+function tokenSecrets() {
+  const secrets = [
+    process.env.SESSION_SECRET,
+    process.env.ICON_LISTING_SESSION_SECRET,
+    process.env.DATABASE_ENCRYPTION_KEY,
+    process.env.ICON_LISTING_DB_ENCRYPTION_KEY,
+    process.env.GITHUB_TOKEN,
+    SESSION_SECRET
+  ].filter(Boolean);
+  return [...new Set(secrets)];
 }
 
 function requireLogin(user) {

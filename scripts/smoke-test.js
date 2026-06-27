@@ -33,12 +33,23 @@ function response() {
 }
 
 async function call(action, body = {}, token = "", method = "POST", headers = {}) {
+  const query = { action };
+  if (method === "GET") {
+    Object.entries(body || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") query[key] = value;
+    });
+  }
+  const params = new URLSearchParams(query);
   const req = {
     method,
-    url: `/api?action=${encodeURIComponent(action)}`,
-    query: { action },
+    url: `/api?${params.toString()}`,
+    query,
     body,
-    headers: { authorization: token ? `Bearer ${token}` : "", ...headers }
+    headers: {
+      authorization: token ? `Bearer ${token}` : "",
+      ...(token ? { "x-iconlisting-token": token } : {}),
+      ...headers
+    }
   };
   const res = response();
   await handler(req, res);
@@ -119,6 +130,34 @@ async function main() {
       password: "secret123"
     });
     assert(register.code === 200 && register.json.token, "register should return a session token");
+
+    const registeredDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const registeredUser = registeredDb.users.find((item) => item.id === register.json.user.id);
+    assert(registeredUser, "registered user should be stored");
+    const staleRegisteredDb = { ...registeredDb, users: registeredDb.users.filter((item) => item.id !== registeredUser.id) };
+    await fs.writeFile(dbPath, JSON.stringify(staleRegisteredDb));
+    await fs.writeFile(backupPath, JSON.stringify(staleRegisteredDb));
+    const staleSessionState = await call("state", {}, register.json.token, "GET");
+    assert(staleSessionState.code === 200 && staleSessionState.json.user?.id === registeredUser.id, "fresh signup session should survive a stale user read");
+    const staleSessionSave = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Fresh Session SMP",
+          edition: "java",
+          javaHost: "fresh-session.example.org",
+          javaPort: 25565,
+          country: "United States",
+          description: "A fresh signup listing created while the stored user record is temporarily stale, proving new accounts can still save a server before GitHub read-after-write catches up. This protects the real dashboard flow where a user signs up, immediately submits a server, and expects the saved listing to appear without waiting for remote JSON propagation.",
+          tags: ["SMP"]
+        }
+      },
+      register.json.token
+    );
+    assert(staleSessionSave.code === 200 && staleSessionSave.json.server.ownerId === registeredUser.id, "fresh signup session should create listings during a stale user read");
+    const afterStaleSessionSave = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    if (!afterStaleSessionSave.users.some((item) => item.id === registeredUser.id)) afterStaleSessionSave.users.push(registeredUser);
+    await fs.writeFile(dbPath, JSON.stringify(afterStaleSessionSave));
 
     const login = await call("login", {
       login: `smoke${suffix}@example.com`,
@@ -388,6 +427,17 @@ async function main() {
     });
     assert(admin.code === 200 && admin.json.user.admin, "configured admin should register as admin");
 
+    const adminDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const adminUser = adminDb.users.find((item) => item.id === admin.json.user.id);
+    const staleAdminDb = { ...adminDb, users: adminDb.users.filter((item) => item.id !== adminUser.id) };
+    await fs.writeFile(dbPath, JSON.stringify(staleAdminDb));
+    await fs.writeFile(backupPath, JSON.stringify(staleAdminDb));
+    const staleAdmin = await call("admin", { command: "saveHost", value: { name: "Blocked Stale Admin", url: "https://example.com", description: "A stale snapshot admin attempt should not be able to save paid host listings because admin power must come from the stored account record." } }, admin.json.token);
+    assert(staleAdmin.code === 403, "token snapshot fallback should not grant admin access");
+    const restoredAdminDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    if (!restoredAdminDb.users.some((item) => item.id === adminUser.id)) restoredAdminDb.users.push(adminUser);
+    await fs.writeFile(dbPath, JSON.stringify(restoredAdminDb));
+
     const clientDescription =
       "A sponsored client listing created by the smoke test to verify admins can save Minecraft client advertisements with a website download link, YouTube video, long description, two showcase images, version targeting, and paid/free metadata. This sentence keeps the description beyond the minimum length.";
     const clientSave = await call(
@@ -446,9 +496,25 @@ async function main() {
     assert(realmSaved && realmSaved.edition === "bedrock" && realmSaved.bedrockType === "realm" && realmSaved.realmCode === "abc123Realm", "bedrock realm fields should be stored");
     assert(server.description.includes("\nLine two") && server.description.includes("\n\nLine four"), "server description should preserve line breaks");
     assert(server.analytics.ipCopiesLast30 === 1, "server should expose public IP copy analytics");
+    assert(!server.analytics.ipCopyDaily && !server.analytics.playerHistory, "list state should not include full analytics arrays");
     assert(client && client.images.length === 2 && client.version === "both" && client.pricing === "paid", "sponsored client fields should be stored");
     assert(host && host.images.length === 3 && host.pricing === "paid", "sponsored host fields should be stored");
-    assert(finalState.json.votes.length === 3, "monthly vote records should be stored");
+    assert(finalState.json.votes.length === 0, "list state should not include raw vote records");
+
+    const detailState = await call("state", { serverId: saved.json.server.id }, "", "GET");
+    const detailServer = detailState.json.servers.find((item) => item.id === saved.json.server.id);
+    assert(Array.isArray(detailServer.analytics.ipCopyDaily) && Array.isArray(detailServer.analytics.playerHistory), "detail state should include full analytics for the requested server");
+    assert(detailState.json.votes.length === 2, "detail state should include current-month votes for only the requested server");
+
+    const preCounterDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const preCounterServer = preCounterDb.servers.find((item) => item.id === saved.json.server.id);
+    preCounterServer.votes = 7;
+    preCounterDb.votes = preCounterDb.votes.filter((item) => item.serverId !== saved.json.server.id).slice(0, 1);
+    await fs.writeFile(dbPath, JSON.stringify(preCounterDb));
+    const counterState = await call("state", {}, "", "GET");
+    const counterStateServer = counterState.json.servers.find((item) => item.id === saved.json.server.id);
+    assert(counterStateServer.votes === 7, "state should not undercount when the stored vote counter is higher than vote records");
+
     const backup = JSON.parse(await fs.readFile(backupPath, "utf8"));
     assert(Array.isArray(backup.servers) && backup.servers.length >= 5, "backup JSON should preserve server listings");
     await fs.writeFile(recoveryPath, JSON.stringify({ version: 2, users: [], servers: [{ ...saved.json.server, id: "recovery-server", name: "Recovery SMP", javaHost: "recovery.example.org", description: "Recovery server listing used to verify bundled JSON recovery merges into an incomplete API state without replacing existing listings." }], clients: [], votes: [], voteIps: {} }));

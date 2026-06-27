@@ -2,6 +2,9 @@ const CONFIG = window.ICON_LISTING_CONFIG;
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
+const ANALYTICS_DAYS = 30;
+const PLAYER_HISTORY_LIMIT = 48;
+const COPY_HASHES_PER_DAY_LIMIT = 120;
 
 function copy(path, fallback = "") {
   return path.split(".").reduce((value, key) => value?.[key], CONFIG.copy) ?? fallback;
@@ -61,10 +64,7 @@ function normalizeServer(server) {
     iconListingPluginEnabled: !!server.iconListingPluginEnabled,
     iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey || ""),
     iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
-    analytics: {
-      ipCopies: Array.isArray(server.analytics?.ipCopies) ? server.analytics.ipCopies : [],
-      playerHistory: Array.isArray(server.analytics?.playerHistory) ? server.analytics.playerHistory : []
-    }
+    analytics: normalizeAnalytics(server.analytics)
   };
 }
 
@@ -160,7 +160,7 @@ function isAdmin(user) {
 }
 
 function authHeaders() {
-  return store.session?.token ? { Authorization: `Bearer ${store.session.token}` } : {};
+  return store.session?.token ? { Authorization: `Bearer ${store.session.token}`, "X-IconListing-Token": store.session.token } : {};
 }
 
 function isLocalFallbackAllowed() {
@@ -217,7 +217,13 @@ async function request(action, payload = {}, method = "POST") {
       let lastError = null;
       for (const basePath of apiBasePaths()) {
         try {
-          const url = `${basePath}?action=${encodeURIComponent(action)}`;
+          const params = new URLSearchParams({ action });
+          if (method === "GET") {
+            Object.entries(payload || {}).forEach(([key, value]) => {
+              if (value !== undefined && value !== null && value !== "") params.set(key, value);
+            });
+          }
+          const url = `${basePath}${basePath.includes("?") ? "&" : "?"}${params.toString()}`;
           const response = await fetch(url, options);
           let json = null;
           try {
@@ -278,7 +284,17 @@ function fallbackRequest(action, payload) {
   };
 
   if (action === "state") {
-    return Promise.resolve({ servers: rankServers(db.servers, db.votes), clients: db.clients, hosts: db.hosts, user: publicUser(user), votes: db.votes });
+    const detailServerId = clean(payload.serverId || "");
+    return Promise.resolve({
+      servers: rankServers(db.servers, db.votes).map((server) => ({
+        ...server,
+        analytics: publicAnalytics(server, { full: server.id === detailServerId })
+      })),
+      clients: db.clients,
+      hosts: db.hosts,
+      user: publicUser(user),
+      votes: detailServerId ? db.votes.filter((vote) => vote.serverId === detailServerId && String(vote.createdAt || "").startsWith(new Date().toISOString().slice(0, 7))) : []
+    });
   }
   if (action === "register") {
     if (!payload.username || !payload.email || !payload.password) return Promise.reject(new Error("Fill out every signup field."));
@@ -358,21 +374,14 @@ function fallbackRequest(action, payload) {
     recordVoteCooldown(db, server.id, username);
     server.votes = db.votes.filter((item) => item.serverId === server.id).length;
     save();
-    return Promise.resolve({ ok: true, vote, server: { ...server, analytics: publicAnalytics(server) } });
+    return Promise.resolve({ ok: true, vote, server: { ...server, analytics: publicAnalytics(server, { full: true }) } });
   }
   if (action === "trackCopy") {
     const server = db.servers.find((item) => item.id === payload.serverId);
     if (!server) return Promise.reject(new Error("Listing not found."));
-    if (!server.analytics) server.analytics = { ipCopies: [], playerHistory: [] };
-    if (!server.analytics.ipCopies) server.analytics.ipCopies = [];
-    const visitorHash = store.session?.user?.id || "local";
-    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
-    server.analytics.ipCopies = server.analytics.ipCopies.filter((copy) => new Date(copy.createdAt).getTime() >= cutoff);
-    if (!server.analytics.ipCopies.some((copy) => copy.visitorHash === visitorHash)) {
-      server.analytics.ipCopies.push({ visitorHash, createdAt: new Date().toISOString() });
-    }
+    recordLocalIpCopy(server);
     save();
-    return Promise.resolve({ ok: true, analytics: publicAnalytics(server) });
+    return Promise.resolve({ ok: true, analytics: publicAnalytics(server, { full: true }) });
   }
   if (action === "accountUpdate") {
     if (!user) return Promise.reject(new Error("Log in before editing your account."));
@@ -726,19 +735,25 @@ function voteLeaderboard(votes, serverId) {
 }
 
 function scoreServer(server, votes = []) {
-  const voteCount = votesForServer(votes, server.id).length || server.votes || 0;
+  const voteCount = displayedVoteCount(server, votes);
   return (server.playersOnline || 0) * CONFIG.ranking.playerWeight + voteCount * CONFIG.ranking.voteWeight + (server.sponsored ? CONFIG.ranking.sponsoredBoost : 0);
 }
 
 function rankServers(servers, votes = []) {
   return [...servers]
-    .map((server) => ({ ...server, votes: votesForServer(votes, server.id).length || server.votes || 0, analytics: publicAnalytics(server) }))
+    .map((server) => ({ ...server, votes: displayedVoteCount(server, votes), analytics: publicAnalytics(server, { full: !!server.analytics?.playerHistory || !!server.analytics?.ipCopyDaily }) }))
     .sort((a, b) => scoreServer(b, votes) - scoreServer(a, votes))
     .map((server, index) => ({ ...server, rank: index + 1 }));
 }
 
+function displayedVoteCount(server, votes = []) {
+  return Math.max(votesForServer(votes, server.id).length, Number(server.votes || 0));
+}
+
 async function getState() {
-  const state = await request("state", {}, "GET");
+  const page = document.body.dataset.page || "home";
+  const detailServerId = ["server", "vote"].includes(page) ? new URLSearchParams(location.search).get("id") : "";
+  const state = await request("state", detailServerId ? { serverId: detailServerId } : {}, "GET");
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
   return { ...state, votes: state.votes || [] };
@@ -919,28 +934,126 @@ function emptyNotice(title = copy("empty.title", "No servers listed yet"), body 
   </div>`;
 }
 
-function publicAnalytics(server) {
-  const analytics = server.analytics || {};
+function publicAnalytics(server, options = {}) {
+  const analytics = normalizeAnalytics(server.analytics || {});
+  const result = {
+    ipCopiesLast7: countDailyCopies(analytics.ipCopyDaily, 7),
+    ipCopiesLast30: countDailyCopies(analytics.ipCopyDaily, ANALYTICS_DAYS)
+  };
+  if (options.full) {
+    result.ipCopyDaily = denseDailyCopies(analytics.ipCopyDaily, ANALYTICS_DAYS);
+    result.playerHistory = compactPlayerHistory(analytics.playerHistory);
+  }
+  return result;
+}
+
+function normalizeAnalytics(analytics = {}) {
+  const daily = new Map();
+  const visitorDays = normalizeIpCopyVisitorDays(analytics.ipCopyVisitorDays);
+  for (const item of Array.isArray(analytics.ipCopyDaily) ? analytics.ipCopyDaily : []) {
+    const date = dateKey(item.date);
+    if (date) daily.set(date, Math.max(Number(daily.get(date) || 0), Number(item.count || 0)));
+  }
+  for (const copyItem of Array.isArray(analytics.ipCopies) ? analytics.ipCopies : []) {
+    const date = dateKey(copyItem.createdAt);
+    if (!date || !isRecentDateKey(date, ANALYTICS_DAYS)) continue;
+    const hash = shortVisitorHash(copyItem.visitorHash || "");
+    const visitors = visitorDays[date] || [];
+    if (hash && !visitors.includes(hash)) {
+      if (visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(hash);
+      visitorDays[date] = visitors;
+      daily.set(date, Number(daily.get(date) || 0) + 1);
+    }
+  }
+  pruneVisitorDays(visitorDays);
   return {
-    ipCopiesLast7: uniqueIpCopies(analytics.ipCopies, 7),
-    ipCopiesLast30: uniqueIpCopies(analytics.ipCopies, 30),
-    ipCopyDaily: dailyIpCopies(analytics.ipCopies, 30),
-    playerHistory: Array.isArray(analytics.playerHistory) ? analytics.playerHistory.slice(-120) : []
+    ipCopyDaily: sparseDailyCopies(daily, ANALYTICS_DAYS),
+    ipCopyVisitorDays: visitorDays,
+    playerHistory: compactPlayerHistory(analytics.playerHistory)
   };
 }
 
-function uniqueIpCopies(copies = [], days) {
-  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
-  return new Set(copies.filter((copy) => new Date(copy.createdAt).getTime() >= cutoff).map((copy) => copy.visitorHash)).size;
+function normalizeIpCopyVisitorDays(value = {}) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const next = {};
+  for (const [date, hashes] of Object.entries(value)) {
+    const key = dateKey(date);
+    if (!key || !isRecentDateKey(key, ANALYTICS_DAYS) || !Array.isArray(hashes)) continue;
+    const unique = [...new Set(hashes.map(shortVisitorHash).filter(Boolean))].slice(0, COPY_HASHES_PER_DAY_LIMIT);
+    if (unique.length) next[key] = unique;
+  }
+  return next;
 }
 
-function dailyIpCopies(copies = [], days) {
+function recordLocalIpCopy(server) {
+  const analytics = normalizeAnalytics(server.analytics || {});
+  const date = new Date().toISOString().slice(0, 10);
+  const visitorHash = shortVisitorHash(store.session?.user?.id || "local");
+  const visitors = analytics.ipCopyVisitorDays[date] || [];
+  if (!visitors.includes(visitorHash)) {
+    if (visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(visitorHash);
+    analytics.ipCopyVisitorDays[date] = visitors;
+    const daily = new Map(analytics.ipCopyDaily.map((item) => [item.date, Number(item.count || 0)]));
+    daily.set(date, Number(daily.get(date) || 0) + 1);
+    analytics.ipCopyDaily = sparseDailyCopies(daily, ANALYTICS_DAYS);
+  }
+  pruneVisitorDays(analytics.ipCopyVisitorDays);
+  server.analytics = analytics;
+}
+
+function countDailyCopies(entries = [], days = ANALYTICS_DAYS) {
+  return denseDailyCopies(entries, days).reduce((sum, item) => sum + Number(item.count || 0), 0);
+}
+
+function denseDailyCopies(entries = [], days = ANALYTICS_DAYS) {
+  const counts = new Map((Array.isArray(entries) ? entries : []).map((item) => [dateKey(item.date), Number(item.count || 0)]).filter(([date]) => date));
   return Array.from({ length: days }, (_, index) => {
-    const date = new Date(Date.now() - (days - index - 1) * 24 * 60 * 60 * 1000);
-    const key = date.toISOString().slice(0, 10);
-    const visitors = new Set(copies.filter((copy) => String(copy.createdAt || "").startsWith(key)).map((copy) => copy.visitorHash));
-    return { date: key, count: visitors.size };
+    const date = new Date(Date.now() - (days - index - 1) * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    return { date, count: Number(counts.get(date) || 0) };
   });
+}
+
+function sparseDailyCopies(counts, days = ANALYTICS_DAYS) {
+  const map = counts instanceof Map ? counts : new Map((Array.isArray(counts) ? counts : []).map((item) => [dateKey(item.date), Number(item.count || 0)]).filter(([date]) => date));
+  return [...map.entries()]
+    .filter(([date, count]) => isRecentDateKey(date, days) && Number(count || 0) > 0)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, count]) => ({ date, count: Number(count || 0) }));
+}
+
+function compactPlayerHistory(history = []) {
+  return (Array.isArray(history) ? history : [])
+    .filter((item) => Number.isFinite(new Date(item.createdAt).getTime()))
+    .map((item) => ({
+      createdAt: new Date(item.createdAt).toISOString(),
+      playersOnline: Number(item.playersOnline || 0),
+      playersMax: Number(item.playersMax || 0),
+      online: !!item.online
+    }))
+    .filter((item) => isRecentDateKey(item.createdAt.slice(0, 10), ANALYTICS_DAYS + 1))
+    .slice(-PLAYER_HISTORY_LIMIT);
+}
+
+function pruneVisitorDays(visitorDays = {}) {
+  for (const date of Object.keys(visitorDays)) {
+    if (!isRecentDateKey(date, ANALYTICS_DAYS) || !visitorDays[date]?.length) delete visitorDays[date];
+  }
+}
+
+function dateKey(value = "") {
+  const date = String(value || "").slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "";
+}
+
+function isRecentDateKey(date, days) {
+  const time = new Date(`${date}T00:00:00.000Z`).getTime();
+  if (!Number.isFinite(time)) return false;
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  return time >= cutoff;
+}
+
+function shortVisitorHash(hash = "") {
+  return String(hash || "").replace(/[^a-z0-9]/gi, "").slice(0, 16);
 }
 
 function descriptionSnippet(value = "", max = 150) {
