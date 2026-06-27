@@ -12,6 +12,7 @@ const PING_TTL_MS = 5 * 60 * 1000;
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const LOGIN_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const LOGIN_LIMIT_MAX_FAILURES = 8;
+const VOTIFIER_TIMEOUT_MS = 3000;
 const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "pluginPoll", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap"]);
 const loginFailures = new Map();
@@ -117,14 +118,14 @@ module.exports = async function handler(req, res) {
       const minecraftUsername = cleanText(body.minecraftUsername || "");
       if (!/^[A-Za-z0-9_]{3,16}$/.test(minecraftUsername)) throw httpError(400, "Enter a valid Minecraft username.");
       enforceVoteCooldown(db, server.id, minecraftUsername, req);
-      if (server.votifierEnabled) await sendVotifierVote(server, minecraftUsername);
       const vote = { id: createId(), serverId: server.id, minecraftUsername, createdAt: new Date().toISOString() };
       db.votes.push(vote);
       queueIconListingPluginVote(server, vote);
       recordVoteCooldown(db, server.id, minecraftUsername, req);
       server.votes = votesForServer(db.votes, server.id).length;
       await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id], touchedVotes: [vote.id] });
-      return json(res, 200, { ok: true, vote, server: publicServer(server, user) });
+      const deliveries = await deliverVoteRewards(server, minecraftUsername);
+      return json(res, 200, { ok: true, vote, deliveries, server: publicServer(server, user) });
     }
 
     if (action === "pluginPoll") {
@@ -1041,18 +1042,42 @@ async function sendVotifierVote(server, minecraftUsername) {
   });
 }
 
+async function deliverVoteRewards(server, minecraftUsername) {
+  const deliveries = { votifier: "skipped", iconListingPlugin: server.iconListingPluginEnabled && server.iconListingVoteKey ? "queued" : "skipped" };
+  if (!server.votifierEnabled) return deliveries;
+  try {
+    await sendVotifierVote(server, minecraftUsername);
+    deliveries.votifier = "sent";
+  } catch (error) {
+    deliveries.votifier = "failed";
+    console.error("Icon Listing Votifier delivery failed", {
+      serverId: server.id,
+      serverName: server.name,
+      message: error.message
+    });
+  }
+  return deliveries;
+}
+
 async function sendVotifierPayload(payload) {
   if (!CONFIG.votifier.providerEndpoint) {
     throw httpError(400, "Set votifier.providerEndpoint in config.js before sending Votifier votes.");
   }
   requireFields(payload, ["host", "port", "token", "minecraftUsername"]);
-  const response = await fetch(CONFIG.votifier.providerEndpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  if (!response.ok) throw httpError(502, "The Votifier provider rejected the vote.");
-  return { ok: true, message: "Votifier vote sent." };
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), VOTIFIER_TIMEOUT_MS);
+  try {
+    const response = await fetch(CONFIG.votifier.providerEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+    if (!response.ok) throw httpError(502, "The Votifier provider rejected the vote.");
+    return { ok: true, message: "Votifier vote sent." };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function validateServer(server) {

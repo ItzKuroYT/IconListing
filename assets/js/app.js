@@ -187,7 +187,8 @@ function isNetworkAbort(error) {
 }
 
 function publicApiMessage(action, status) {
-  if (action === "vote") return "You can only vote once every 24 hours.";
+  if (action === "vote" && status === 429) return "You can only vote once every 24 hours.";
+  if (action === "vote") return "Vote could not be counted. Error: 67.";
   if (status === 401) return "Log in again before doing that.";
   if (status === 403) return "You do not have permission to do that.";
   if (status === 404 && ["deleteServer", "trackCopy"].includes(action)) return "That listing could not be found.";
@@ -196,7 +197,8 @@ function publicApiMessage(action, status) {
 }
 
 function publicRequestError(action, error) {
-  if (action === "vote") return "You can only vote once every 24 hours.";
+  if (action === "vote" && error?.status === 429) return "You can only vote once every 24 hours.";
+  if (action === "vote") return error?.publicMessage || "Vote could not be counted. Error: 67.";
   if (isNetworkAbort(error) || isNetworkAbort(error?.originalError)) return networkApiMessage();
   return error?.publicMessage || error?.message || productionApiMessage();
 }

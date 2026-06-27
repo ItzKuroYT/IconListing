@@ -77,6 +77,7 @@ function assert(condition, message) {
 
 async function main() {
   const received = [];
+  let providerStatus = 200;
   const provider = http.createServer((req, res) => {
     let body = "";
     req.on("data", (chunk) => {
@@ -84,8 +85,8 @@ async function main() {
     });
     req.on("end", () => {
       received.push(JSON.parse(body || "{}"));
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify({ ok: true }));
+      res.writeHead(providerStatus, { "content-type": "application/json" });
+      res.end(JSON.stringify({ ok: providerStatus >= 200 && providerStatus < 300 }));
     });
   });
 
@@ -333,6 +334,47 @@ async function main() {
     assert(repeatVote.code === 429, "repeat vote should be blocked for 24 hours");
     assert(received.length === 2, "blocked repeat vote should not call the Votifier provider");
 
+    const cooldownDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const oldVoteAt = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
+    for (const key of Object.keys(cooldownDb.voteIps?.[saved.json.server.id] || {})) {
+      cooldownDb.voteIps[saved.json.server.id][key] = oldVoteAt;
+    }
+    await fs.writeFile(dbPath, JSON.stringify(cooldownDb));
+    const nextDayVote = await call("vote", {
+      serverId: saved.json.server.id,
+      minecraftUsername: `Alex_${String(suffix).slice(-4)}`
+    });
+    assert(nextDayVote.code === 200, "same player should be able to vote again after 24 hours");
+    assert(received.length === 3, "next-day vote should call the Votifier provider");
+
+    const failingDeliveryServer = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Smoke Failing Votifier",
+          javaHost: "failing-votifier.example.org",
+          javaPort: 25565,
+          country: "United States",
+          description: "This smoke listing verifies the website still counts a vote even when a Votifier delivery provider rejects the reward delivery. The vote should be stored, cooldown should be recorded, and the API should return success.",
+          tags: ["SMP", "Survival"],
+          votifierEnabled: true,
+          votifierHost: "127.0.0.1",
+          votifierPort: 8192,
+          votifierToken: "token"
+        }
+      },
+      login.json.token
+    );
+    assert(failingDeliveryServer.code === 200, "failing delivery fixture should save");
+    providerStatus = 500;
+    const deliveryFailureVote = await call("vote", {
+      serverId: failingDeliveryServer.json.server.id,
+      minecraftUsername: `Fail_${String(suffix).slice(-4)}`
+    });
+    providerStatus = 200;
+    assert(deliveryFailureVote.code === 200, "Votifier delivery failure should not block vote counting");
+    assert(deliveryFailureVote.json.deliveries.votifier === "failed", "delivery status should report failed Votifier delivery");
+
     const copy = await call("trackCopy", { serverId: saved.json.server.id }, "", "POST", {
       "x-forwarded-for": "203.0.113.10",
       "user-agent": "IconListingSmoke"
@@ -397,7 +439,7 @@ async function main() {
     const realmSaved = finalState.json.servers.find((item) => item.id === bedrockRealm.json.server.id);
     const client = finalState.json.clients.find((item) => item.name === "Smoke Client");
     const host = finalState.json.hosts.find((item) => item.name === "Smoke Hosting");
-    assert(server && server.votes === 1, "server should have one counted vote");
+    assert(server && server.votes === 2, "server should have two counted votes after the next-day vote");
     assert(!server.iconListingVoteKey && !server.iconListingVoteQueue && !server.votifierToken, "public state should not expose private vote delivery keys or queues");
     assert(otherServer && otherServer.ownerId === server.ownerId, "same account should keep multiple unique listings");
     assert(bedrockSaved && bedrockSaved.edition === "bedrock" && bedrockSaved.bedrockHost === "bedrock.example.org", "bedrock server fields should be stored");
@@ -406,9 +448,9 @@ async function main() {
     assert(server.analytics.ipCopiesLast30 === 1, "server should expose public IP copy analytics");
     assert(client && client.images.length === 2 && client.version === "both" && client.pricing === "paid", "sponsored client fields should be stored");
     assert(host && host.images.length === 3 && host.pricing === "paid", "sponsored host fields should be stored");
-    assert(finalState.json.votes.length === 1, "monthly vote records should be stored");
+    assert(finalState.json.votes.length === 3, "monthly vote records should be stored");
     const backup = JSON.parse(await fs.readFile(backupPath, "utf8"));
-    assert(Array.isArray(backup.servers) && backup.servers.length >= 4, "backup JSON should preserve server listings");
+    assert(Array.isArray(backup.servers) && backup.servers.length >= 5, "backup JSON should preserve server listings");
     await fs.writeFile(recoveryPath, JSON.stringify({ version: 2, users: [], servers: [{ ...saved.json.server, id: "recovery-server", name: "Recovery SMP", javaHost: "recovery.example.org", description: "Recovery server listing used to verify bundled JSON recovery merges into an incomplete API state without replacing existing listings." }], clients: [], votes: [], voteIps: {} }));
     const recoveredState = await call("state", {}, "", "GET");
     assert(recoveredState.json.servers.some((item) => item.id === "recovery-server"), "state should merge bundled recovery servers");
@@ -427,7 +469,7 @@ async function main() {
     const backupAfterDelete = JSON.parse(await fs.readFile(backupPath, "utf8"));
     assert(backupAfterDelete.deleted?.servers?.[secondServer.json.server.id], "backup JSON should preserve server deletion tombstones");
 
-    console.log("Smoke test passed: auth, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, IconListing vote plugin polling, voting cooldown, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });
