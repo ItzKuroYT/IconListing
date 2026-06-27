@@ -165,7 +165,9 @@ function isLocalFallbackAllowed() {
 }
 
 function apiBasePaths() {
-  return [...new Set([CONFIG.api.productionBasePath, CONFIG.api.basePath].filter(Boolean))];
+  const sameOriginBase = CONFIG.api.basePath || "/api";
+  const productionBase = CONFIG.api.productionBasePath || "";
+  return [...new Set([sameOriginBase, productionBase].filter(Boolean))];
 }
 
 function productionApiMessage() {
@@ -1903,24 +1905,36 @@ function renderLogin(state) {
   </div>`;
   $("#loginForm").addEventListener("submit", async (event) => {
     event.preventDefault();
+    const button = $("#loginForm button[type='submit']");
+    setButtonLoading(button, "Logging in...");
     try {
       const result = await request("login", { login: $("#loginName").value, password: $("#loginPassword").value });
       store.session = { token: result.token, user: result.user };
       location.href = route("/dashboard/");
     } catch (error) {
       toast(error.message);
+      setButtonLoading(button, "Login", false);
     }
   });
   $("#signup").addEventListener("submit", async (event) => {
     event.preventDefault();
+    const button = $("#signup button[type='submit']");
+    setButtonLoading(button, "Creating account...");
     try {
       const result = await request("register", { username: $("#signupUser").value, email: $("#signupEmail").value, password: $("#signupPassword").value });
       store.session = { token: result.token, user: result.user };
       location.href = route("/dashboard/");
     } catch (error) {
       toast(error.message);
+      setButtonLoading(button, "Create Account", false);
     }
   });
+}
+
+function setButtonLoading(button, text, loading = true) {
+  if (!button) return;
+  button.disabled = loading;
+  button.textContent = text;
 }
 
 function renderDashboard(state) {
