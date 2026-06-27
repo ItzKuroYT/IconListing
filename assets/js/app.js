@@ -165,9 +165,9 @@ function isLocalFallbackAllowed() {
 }
 
 function apiBasePaths() {
-  const sameOriginBase = CONFIG.api.basePath || "/api";
   const productionBase = CONFIG.api.productionBasePath || "";
-  return [...new Set([sameOriginBase, productionBase].filter(Boolean))];
+  const sameOriginBase = CONFIG.api.basePath || "/api";
+  return [...new Set([productionBase, sameOriginBase].filter(Boolean))];
 }
 
 function productionApiMessage() {
@@ -187,7 +187,7 @@ function publicApiMessage(action, status) {
   if (action === "vote") return "You can only vote once every 24 hours.";
   if (status === 401) return "Log in again before doing that.";
   if (status === 403) return "You do not have permission to do that.";
-  if (status === 404) return "That listing could not be found.";
+  if (status === 404 && ["deleteServer", "trackCopy"].includes(action)) return "That listing could not be found.";
   if (status === 409) return "That listing already exists.";
   return productionApiMessage();
 }
@@ -220,7 +220,8 @@ async function request(action, payload = {}, method = "POST") {
           } catch {
             const error = new Error(response.ok ? "The site service returned an unreadable response. Error: 67." : publicApiMessage(action, response.status));
             error.status = response.status;
-            error.stopRetry = response.status >= 400 && response.status < 500;
+            const contentType = response.headers.get("content-type") || "";
+            error.stopRetry = response.status >= 400 && response.status < 500 && contentType.includes("application/json");
             throw error;
           }
           if (!response.ok || json.error) {
