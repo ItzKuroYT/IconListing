@@ -80,7 +80,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-28T07:13:43.919Z",
+      "lastPingAt": "2026-06-28T07:13:57.927Z",
       "analytics": {
         "ipCopyDaily": [
           {
@@ -215,14 +215,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-28T07:13:43.919Z",
+            "createdAt": "2026-06-28T07:13:57.927Z",
             "playersOnline": 26,
             "playersMax": 27,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-28T07:13:43.919Z",
+      "lastSuccessfulPingAt": "2026-06-28T07:13:57.927Z",
       "uptimeChecks": 58,
       "uptimeSuccesses": 58,
       "edition": "java",
@@ -267,7 +267,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-      "lastPingAt": "2026-06-28T07:13:43.990Z",
+      "lastPingAt": "2026-06-28T07:13:57.998Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -381,7 +381,7 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T07:13:43.990Z",
+            "createdAt": "2026-06-28T07:13:57.998Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -433,7 +433,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
       "updatedAt": "2026-06-24T22:20:23.472Z",
-      "lastPingAt": "2026-06-28T07:13:44.356Z",
+      "lastPingAt": "2026-06-28T07:13:58.008Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -541,7 +541,7 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T07:13:44.356Z",
+            "createdAt": "2026-06-28T07:13:58.008Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -594,7 +594,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
       "updatedAt": "2026-06-28T05:53:12.589Z",
-      "lastPingAt": "2026-06-28T07:13:45.569Z",
+      "lastPingAt": "2026-06-28T07:13:58.016Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -702,7 +702,7 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-28T07:13:45.569Z",
+            "createdAt": "2026-06-28T07:13:58.016Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
