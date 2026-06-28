@@ -40,6 +40,14 @@
       "passwordHash": "1ca5b14ab548b27cad5915ae531e3ce0:30eda2e629ae82227c5a2517011ae5256f79312dc76e79a8e8e84dc24093bbb7",
       "banned": false,
       "createdAt": "2026-06-27T21:25:17.544Z"
+    },
+    {
+      "id": "73096038-5e65-41ed-88c7-acd26290e9ea",
+      "username": "kadika333",
+      "email": "rwd1998@protonmail.com",
+      "passwordHash": "cb19b504b342c234a114cb1cf5f050e8:d86a43dfaed3fecb82a5fc3da63729f790a3c7116749ba683f0c94c878abd82a",
+      "banned": false,
+      "createdAt": "2026-06-28T05:55:14.295Z"
     }
   ],
   "servers": [
@@ -585,7 +593,7 @@
       ],
       "ownerId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
       "ownerName": "ItzKuroYT",
-      "votes": 2,
+      "votes": 1,
       "playersOnline": 6,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
@@ -717,17 +725,7 @@
       "realmCode": "",
       "iconListingPluginEnabled": true,
       "iconListingVoteKey": "ilv_c9bdda017999eb29bb8e971a477e47b2d7a9",
-      "iconListingVoteQueue": [
-        {
-          "id": "88497ce1-715f-44b0-99f5-dd29718cf28d",
-          "voteId": "9b03919f-4602-4a75-9f81-1b5c4854be9e",
-          "serverId": "e05bb489-241c-420c-8243-6427106b4476",
-          "serverName": "IconGens",
-          "minecraftUsername": "ItzKuro_",
-          "createdAt": "2026-06-28T05:55:07.536Z",
-          "deliveredAt": ""
-        }
-      ]
+      "iconListingVoteQueue": []
     }
   ],
   "clients": [
@@ -766,20 +764,9 @@
       "serverId": "e05bb489-241c-420c-8243-6427106b4476",
       "minecraftUsername": "ItzKuro_",
       "createdAt": "2026-06-26T00:11:27.395Z"
-    },
-    {
-      "id": "9b03919f-4602-4a75-9f81-1b5c4854be9e",
-      "serverId": "e05bb489-241c-420c-8243-6427106b4476",
-      "minecraftUsername": "ItzKuro_",
-      "createdAt": "2026-06-28T05:55:07.536Z"
     }
   ],
-  "voteIps": {
-    "e05bb489-241c-420c-8243-6427106b4476": {
-      "visitor:4dd38b9eebb971a7f67ee5262bc8093b3877e482497305ca87686491d63fe583": "2026-06-28T05:55:07.536Z",
-      "name:itzkuro_": "2026-06-28T05:55:07.536Z"
-    }
-  },
+  "voteIps": {},
   "deleted": {
     "users": {},
     "servers": {
