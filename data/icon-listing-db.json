@@ -80,7 +80,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-28T05:54:39.933Z",
+      "lastPingAt": "2026-06-28T05:54:30.973Z",
       "analytics": {
         "ipCopyDaily": [
           {
@@ -215,14 +215,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-28T05:54:39.933Z",
+            "createdAt": "2026-06-28T05:54:30.973Z",
             "playersOnline": 34,
             "playersMax": 35,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-28T05:54:39.933Z",
+      "lastSuccessfulPingAt": "2026-06-28T05:54:30.973Z",
       "uptimeChecks": 55,
       "uptimeSuccesses": 55,
       "edition": "java",
@@ -267,7 +267,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-      "lastPingAt": "2026-06-28T05:54:39.965Z",
+      "lastPingAt": "2026-06-28T05:54:31.005Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -381,7 +381,7 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T05:54:39.965Z",
+            "createdAt": "2026-06-28T05:54:31.005Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -433,7 +433,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
       "updatedAt": "2026-06-24T22:20:23.472Z",
-      "lastPingAt": "2026-06-28T05:54:39.973Z",
+      "lastPingAt": "2026-06-28T05:54:31.013Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -541,7 +541,7 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T05:54:39.973Z",
+            "createdAt": "2026-06-28T05:54:31.013Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -585,7 +585,7 @@
       ],
       "ownerId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
       "ownerName": "ItzKuroYT",
-      "votes": 1,
+      "votes": 2,
       "playersOnline": 6,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
@@ -717,7 +717,17 @@
       "realmCode": "",
       "iconListingPluginEnabled": true,
       "iconListingVoteKey": "ilv_c9bdda017999eb29bb8e971a477e47b2d7a9",
-      "iconListingVoteQueue": []
+      "iconListingVoteQueue": [
+        {
+          "id": "88497ce1-715f-44b0-99f5-dd29718cf28d",
+          "voteId": "9b03919f-4602-4a75-9f81-1b5c4854be9e",
+          "serverId": "e05bb489-241c-420c-8243-6427106b4476",
+          "serverName": "IconGens",
+          "minecraftUsername": "ItzKuro_",
+          "createdAt": "2026-06-28T05:55:07.536Z",
+          "deliveredAt": ""
+        }
+      ]
     }
   ],
   "clients": [
@@ -756,9 +766,20 @@
       "serverId": "e05bb489-241c-420c-8243-6427106b4476",
       "minecraftUsername": "ItzKuro_",
       "createdAt": "2026-06-26T00:11:27.395Z"
+    },
+    {
+      "id": "9b03919f-4602-4a75-9f81-1b5c4854be9e",
+      "serverId": "e05bb489-241c-420c-8243-6427106b4476",
+      "minecraftUsername": "ItzKuro_",
+      "createdAt": "2026-06-28T05:55:07.536Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "e05bb489-241c-420c-8243-6427106b4476": {
+      "visitor:4dd38b9eebb971a7f67ee5262bc8093b3877e482497305ca87686491d63fe583": "2026-06-28T05:55:07.536Z",
+      "name:itzkuro_": "2026-06-28T05:55:07.536Z"
+    }
+  },
   "deleted": {
     "users": {},
     "servers": {
