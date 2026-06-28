@@ -586,15 +586,15 @@
       "ownerId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
       "ownerName": "ItzKuroYT",
       "votes": 1,
-      "playersOnline": 5,
+      "playersOnline": 6,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 88.09523809523809,
+      "uptimePercent": 88.37209302325581,
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
-      "updatedAt": "2026-06-24T23:07:18.215Z",
-      "lastPingAt": "2026-06-28T05:49:10.941Z",
+      "updatedAt": "2026-06-28T05:53:12.589Z",
+      "lastPingAt": "2026-06-28T05:53:13.907Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -702,21 +702,21 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-28T05:49:10.941Z",
-            "playersOnline": 5,
+            "createdAt": "2026-06-28T05:53:13.907Z",
+            "playersOnline": 6,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-28T05:49:10.941Z",
-      "uptimeChecks": 42,
-      "uptimeSuccesses": 37,
+      "lastSuccessfulPingAt": "2026-06-28T05:53:13.907Z",
+      "uptimeChecks": 43,
+      "uptimeSuccesses": 38,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
-      "iconListingPluginEnabled": false,
-      "iconListingVoteKey": "",
+      "iconListingPluginEnabled": true,
+      "iconListingVoteKey": "ilv_c9bdda017999eb29bb8e971a477e47b2d7a9",
       "iconListingVoteQueue": []
     }
   ],
