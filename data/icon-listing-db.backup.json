@@ -72,15 +72,15 @@
       "ownerId": "bd813e43-bf7a-45fd-869e-f092d2dde82e",
       "ownerName": "MaxFullCalypse",
       "votes": 0,
-      "playersOnline": 40,
-      "playersMax": 41,
+      "playersOnline": 38,
+      "playersMax": 39,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-28T10:57:47.185Z",
+      "lastPingAt": "2026-06-28T11:07:19.729Z",
       "analytics": {
         "ipCopyDaily": [
           {
@@ -221,16 +221,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-28T10:57:47.185Z",
-            "playersOnline": 40,
-            "playersMax": 41,
+            "createdAt": "2026-06-28T11:07:19.729Z",
+            "playersOnline": 38,
+            "playersMax": 39,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-28T10:57:47.185Z",
-      "uptimeChecks": 60,
-      "uptimeSuccesses": 60,
+      "lastSuccessfulPingAt": "2026-06-28T11:07:19.729Z",
+      "uptimeChecks": 61,
+      "uptimeSuccesses": 61,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -273,7 +273,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-      "lastPingAt": "2026-06-28T10:57:47.222Z",
+      "lastPingAt": "2026-06-28T11:07:19.774Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -393,14 +393,14 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T10:57:47.222Z",
+            "createdAt": "2026-06-28T11:07:19.774Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
           }
         ]
       },
-      "uptimeChecks": 55,
+      "uptimeChecks": 56,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -445,7 +445,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
       "updatedAt": "2026-06-24T22:20:23.472Z",
-      "lastPingAt": "2026-06-28T10:57:47.230Z",
+      "lastPingAt": "2026-06-28T11:07:19.786Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -559,14 +559,14 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T10:57:47.230Z",
+            "createdAt": "2026-06-28T11:07:19.786Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
           }
         ]
       },
-      "uptimeChecks": 54,
+      "uptimeChecks": 55,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -604,15 +604,15 @@
       "ownerId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
       "ownerName": "ItzKuroYT",
       "votes": 1,
-      "playersOnline": 5,
+      "playersOnline": 6,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 87.5,
+      "uptimePercent": 87.75510204081633,
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
       "updatedAt": "2026-06-28T05:53:12.589Z",
-      "lastPingAt": "2026-06-28T10:57:47.243Z",
+      "lastPingAt": "2026-06-28T11:07:20.876Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -726,16 +726,16 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T10:57:47.243Z",
-            "playersOnline": 5,
+            "createdAt": "2026-06-28T11:07:20.876Z",
+            "playersOnline": 6,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-28T10:57:47.243Z",
-      "uptimeChecks": 48,
-      "uptimeSuccesses": 42,
+      "lastSuccessfulPingAt": "2026-06-28T11:07:20.876Z",
+      "uptimeChecks": 49,
+      "uptimeSuccesses": 43,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
