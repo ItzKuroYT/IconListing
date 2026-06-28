@@ -516,6 +516,11 @@ async function main() {
     const counterState = await call("state", {}, "", "GET");
     const counterStateServer = counterState.json.servers.find((item) => item.id === saved.json.server.id);
     assert(counterStateServer.votes === 7, "state should not undercount when the stored vote counter is higher than vote records");
+    const counterVote = await call("vote", { serverId: saved.json.server.id, minecraftUsername: `Cnt_${String(suffix).slice(-8)}` }, "", "POST", {
+      "x-forwarded-for": "203.0.113.77",
+      "user-agent": "IconListingCounterSmoke"
+    });
+    assert(counterVote.code === 200 && counterVote.json.server.votes === 8, "vote should increment from the stored counter when raw vote rows are incomplete");
 
     const backup = JSON.parse(await fs.readFile(backupPath, "utf8"));
     assert(Array.isArray(backup.servers) && backup.servers.length >= 5, "backup JSON should preserve server listings");

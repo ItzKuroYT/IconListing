@@ -5,6 +5,7 @@ const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
+const CONFIRMED_WRITE_TTL_MS = 30 * 60 * 1000;
 
 function copy(path, fallback = "") {
   return path.split(".").reduce((value, key) => value?.[key], CONFIG.copy) ?? fallback;
@@ -31,6 +32,75 @@ const store = {
     localStorage.setItem("iconListingDb", JSON.stringify(value));
   }
 };
+
+function confirmedWrites() {
+  try {
+    return pruneConfirmedWrites(JSON.parse(localStorage.getItem("iconListingConfirmedWrites") || "{}"));
+  } catch {
+    return pruneConfirmedWrites({});
+  }
+}
+
+function saveConfirmedWrites(value) {
+  localStorage.setItem("iconListingConfirmedWrites", JSON.stringify(pruneConfirmedWrites(value)));
+}
+
+function pruneConfirmedWrites(value = {}) {
+  const cutoff = Date.now() - CONFIRMED_WRITE_TTL_MS;
+  const freshEntries = (items = {}) => Object.fromEntries(Object.entries(items || {}).filter(([, item]) => Number(item?.updatedAt || item || 0) >= cutoff));
+  return {
+    pendingServers: freshEntries(value.pendingServers),
+    deletedServers: freshEntries(value.deletedServers),
+    serverVotes: freshEntries(value.serverVotes),
+    votes: (Array.isArray(value.votes) ? value.votes : []).filter((vote) => Number(vote.updatedAt || 0) >= cutoff)
+  };
+}
+
+function rememberSavedServer(server) {
+  if (!server?.id) return;
+  const writes = confirmedWrites();
+  delete writes.deletedServers[server.id];
+  writes.pendingServers[server.id] = { server, updatedAt: Date.now() };
+  saveConfirmedWrites(writes);
+}
+
+function rememberDeletedServer(serverId) {
+  if (!serverId) return;
+  const writes = confirmedWrites();
+  delete writes.pendingServers[serverId];
+  delete writes.serverVotes[serverId];
+  writes.votes = writes.votes.filter((vote) => vote.serverId !== serverId);
+  writes.deletedServers[serverId] = { updatedAt: Date.now() };
+  saveConfirmedWrites(writes);
+}
+
+function rememberVoteResult(vote, server) {
+  if (!server?.id) return;
+  const writes = confirmedWrites();
+  if (vote?.serverId) {
+    writes.votes = [...writes.votes.filter((item) => item.id !== vote.id), { ...vote, updatedAt: Date.now() }];
+  }
+  writes.serverVotes[server.id] = { votes: Number(server.votes || 0), updatedAt: Date.now() };
+  saveConfirmedWrites(writes);
+}
+
+function applyConfirmedWrites(state) {
+  const writes = confirmedWrites();
+  const deleted = new Set(Object.keys(writes.deletedServers));
+  const byId = new Map((state.servers || []).filter((server) => !deleted.has(server.id)).map((server) => [server.id, server]));
+  Object.values(writes.pendingServers).forEach((entry) => {
+    if (entry?.server?.id && !deleted.has(entry.server.id)) byId.set(entry.server.id, { ...(byId.get(entry.server.id) || {}), ...entry.server });
+  });
+  Object.entries(writes.serverVotes).forEach(([serverId, entry]) => {
+    const server = byId.get(serverId);
+    if (server) byId.set(serverId, { ...server, votes: Math.max(Number(server.votes || 0), Number(entry.votes || 0)) });
+  });
+  const votes = [...(state.votes || [])];
+  writes.votes.forEach((vote) => {
+    if (!deleted.has(vote.serverId) && !votes.some((item) => item.id === vote.id)) votes.push(vote);
+  });
+  return { ...state, servers: [...byId.values()], votes };
+}
 
 function freshDb() {
   return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {} };
@@ -368,11 +438,12 @@ function fallbackRequest(action, payload) {
     } catch (error) {
       return Promise.reject(error);
     }
+    const previousVoteCount = displayedVoteCount(server, db.votes);
     const vote = { id: createId(), serverId: server.id, minecraftUsername: username, createdAt: new Date().toISOString() };
     db.votes.push(vote);
     queueIconListingPluginVote(server, vote);
     recordVoteCooldown(db, server.id, username);
-    server.votes = db.votes.filter((item) => item.serverId === server.id).length;
+    server.votes = Math.max(previousVoteCount + 1, db.votes.filter((item) => item.serverId === server.id).length);
     save();
     return Promise.resolve({ ok: true, vote, server: { ...server, analytics: publicAnalytics(server, { full: true }) } });
   }
@@ -757,7 +828,7 @@ async function getState() {
   const state = await request("state", detailServerId ? { serverId: detailServerId } : {}, "GET");
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
-  return { ...state, votes: state.votes || [] };
+  return applyConfirmedWrites({ ...state, votes: state.votes || [] });
 }
 
 function scheduleNetworkRefresh(error) {
@@ -1801,6 +1872,7 @@ function renderVotePage(state) {
     event.preventDefault();
     try {
       const result = await request("vote", { serverId: server.id, minecraftUsername: $("#minecraftUsername").value });
+      rememberVoteResult(result.vote, result.server || { ...server, votes: Number(server.votes || 0) + 1 });
       state.votes = [...(state.votes || []), result.vote].filter(Boolean);
       const updatedServer = result.server || { ...server, votes: Number(server.votes || 0) + 1 };
       state.servers = state.servers.map((item) => (item.id === server.id ? { ...item, ...updatedServer } : item));
@@ -2248,6 +2320,7 @@ function bindDashboard(state) {
       setButtonLoading(button, "Deleting...");
       try {
         await request("deleteServer", { id: button.dataset.delete });
+        rememberDeletedServer(button.dataset.delete);
         state.servers = state.servers.filter((server) => server.id !== button.dataset.delete);
         toast("Listing deleted.");
         renderDashboard(state);
@@ -2345,7 +2418,7 @@ async function submitServerForm(event) {
   if (selectedTags.length < CONFIG.limits.tagsMin || selectedTags.length > CONFIG.limits.tagsMax) return toast(`Select ${CONFIG.limits.tagsMin} to ${CONFIG.limits.tagsMax} tags.`);
   if (["#serverName", "#description"].some((selector) => hasBlockedText($(selector).value))) return toast("Please remove blocked words from the listing.");
   try {
-    await request("saveServer", {
+    const result = await request("saveServer", {
       server: {
         id: $("#serverId").value,
         name: $("#serverName").value,
@@ -2372,6 +2445,7 @@ async function submitServerForm(event) {
         tags: selectedTags
       }
     });
+    rememberSavedServer(result.server);
     toast("Listing saved.");
     boot();
   } catch (error) {
@@ -2459,10 +2533,15 @@ function renderAdmin(state) {
   }));
   $$("[data-delete]").forEach((button) => button.addEventListener("click", async () => {
     try {
+      setButtonLoading(button, "Deleting...");
       await request("deleteServer", { id: button.dataset.delete });
-      boot();
+      rememberDeletedServer(button.dataset.delete);
+      state.servers = state.servers.filter((server) => server.id !== button.dataset.delete);
+      toast("Listing deleted.");
+      renderAdmin(state);
     } catch (error) {
       toast(error.message);
+      setButtonLoading(button, "Delete", false);
     }
   }));
   bindAdminClientForms(state);

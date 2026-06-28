@@ -124,11 +124,12 @@ module.exports = async function handler(req, res) {
       const minecraftUsername = cleanText(body.minecraftUsername || "");
       if (!/^[A-Za-z0-9_]{3,16}$/.test(minecraftUsername)) throw httpError(400, "Enter a valid Minecraft username.");
       enforceVoteCooldown(db, server.id, minecraftUsername, req);
+      const previousVoteCount = displayedVoteCount(server, db.votes);
       const vote = { id: createId(), serverId: server.id, minecraftUsername, createdAt: new Date().toISOString() };
       db.votes.push(vote);
       queueIconListingPluginVote(server, vote);
       recordVoteCooldown(db, server.id, minecraftUsername, req);
-      server.votes = votesForServer(db.votes, server.id).length;
+      server.votes = Math.max(previousVoteCount + 1, votesForServer(db.votes, server.id).length);
       await saveDb(db, { touchedServers: [server.id], touchedVotes: [vote.id] });
       const deliveries = await deliverVoteRewards(server, minecraftUsername);
       return json(res, 200, { ok: true, vote, deliveries, server: publicServer(server, user, { fullAnalytics: true }) });
