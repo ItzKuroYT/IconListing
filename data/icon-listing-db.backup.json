@@ -72,15 +72,15 @@
       "ownerId": "bd813e43-bf7a-45fd-869e-f092d2dde82e",
       "ownerName": "MaxFullCalypse",
       "votes": 0,
-      "playersOnline": 22,
-      "playersMax": 23,
+      "playersOnline": 26,
+      "playersMax": 27,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-28T06:37:51.497Z",
+      "lastPingAt": "2026-06-28T07:13:43.919Z",
       "analytics": {
         "ipCopyDaily": [
           {
@@ -215,16 +215,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-28T06:37:51.497Z",
-            "playersOnline": 22,
-            "playersMax": 23,
+            "createdAt": "2026-06-28T07:13:43.919Z",
+            "playersOnline": 26,
+            "playersMax": 27,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-28T06:37:51.497Z",
-      "uptimeChecks": 57,
-      "uptimeSuccesses": 57,
+      "lastSuccessfulPingAt": "2026-06-28T07:13:43.919Z",
+      "uptimeChecks": 58,
+      "uptimeSuccesses": 58,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -267,7 +267,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-      "lastPingAt": "2026-06-28T06:37:51.567Z",
+      "lastPingAt": "2026-06-28T07:13:43.990Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -381,14 +381,14 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T06:37:51.567Z",
+            "createdAt": "2026-06-28T07:13:43.990Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
           }
         ]
       },
-      "uptimeChecks": 52,
+      "uptimeChecks": 53,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -433,7 +433,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
       "updatedAt": "2026-06-24T22:20:23.472Z",
-      "lastPingAt": "2026-06-28T06:37:51.577Z",
+      "lastPingAt": "2026-06-28T07:13:44.356Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -541,14 +541,14 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T06:37:51.577Z",
+            "createdAt": "2026-06-28T07:13:44.356Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
           }
         ]
       },
-      "uptimeChecks": 51,
+      "uptimeChecks": 52,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -586,15 +586,15 @@
       "ownerId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
       "ownerName": "ItzKuroYT",
       "votes": 1,
-      "playersOnline": 6,
-      "playersMax": 500,
-      "version": "Velocity 1.7.2-26.2",
-      "online": true,
-      "uptimePercent": 88.88888888888889,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 86.95652173913044,
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
       "updatedAt": "2026-06-28T05:53:12.589Z",
-      "lastPingAt": "2026-06-28T06:37:51.588Z",
+      "lastPingAt": "2026-06-28T07:13:45.569Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -702,15 +702,15 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-28T06:37:51.588Z",
-            "playersOnline": 6,
-            "playersMax": 500,
-            "online": true
+            "createdAt": "2026-06-28T07:13:45.569Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
           }
         ]
       },
       "lastSuccessfulPingAt": "2026-06-28T06:37:51.588Z",
-      "uptimeChecks": 45,
+      "uptimeChecks": 46,
       "uptimeSuccesses": 40,
       "edition": "java",
       "bedrockType": "server",
