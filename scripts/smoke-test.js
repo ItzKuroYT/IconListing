@@ -536,6 +536,8 @@ async function main() {
 
     const deleteSecond = await call("deleteServer", { id: secondServer.json.server.id }, login.json.token);
     assert(deleteSecond.code === 200, "intentional server delete should succeed");
+    assert(!deleteSecond.json.servers.some((item) => item.id === secondServer.json.server.id), "delete response should omit the deleted server");
+    assert(deleteSecond.json.servers.every((item, index) => item.rank === index + 1), "delete response should rerank remaining servers");
     await fs.writeFile(recoveryPath, JSON.stringify({ version: 2, users: [], servers: [{ ...secondServer.json.server, description: "Deleted server recovery fixture that must not return after an intentional delete because deletion tombstones should block old recovery data from restoring it." }], clients: [], votes: [], voteIps: {} }));
     const afterDeleteRecovery = await call("state", {}, "", "GET");
     assert(!afterDeleteRecovery.json.servers.some((item) => item.id === secondServer.json.server.id), "deleted servers should not be restored from recovery JSON");

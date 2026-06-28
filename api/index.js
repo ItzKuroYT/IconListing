@@ -115,7 +115,7 @@ module.exports = async function handler(req, res) {
       if (db.voteIps) delete db.voteIps[body.id];
       markDeleted(db, "servers", [body.id]);
       await saveDb(db, { deletedServers: [body.id] });
-      return json(res, 200, { ok: true });
+      return json(res, 200, { ok: true, deletedServerId: body.id, ...statePayload(db, user) });
     }
 
     if (action === "vote") {

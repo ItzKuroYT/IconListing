@@ -99,7 +99,11 @@ function applyConfirmedWrites(state) {
   writes.votes.forEach((vote) => {
     if (!deleted.has(vote.serverId) && !votes.some((item) => item.id === vote.id)) votes.push(vote);
   });
-  return { ...state, servers: [...byId.values()], votes };
+  return { ...state, servers: rankServers([...byId.values()], votes), votes };
+}
+
+function removeServerFromState(state, serverId) {
+  return { ...state, servers: rankServers((state.servers || []).filter((server) => server.id !== serverId), state.votes || []) };
 }
 
 function freshDb() {
@@ -1875,7 +1879,7 @@ function renderVotePage(state) {
       rememberVoteResult(result.vote, result.server || { ...server, votes: Number(server.votes || 0) + 1 });
       state.votes = [...(state.votes || []), result.vote].filter(Boolean);
       const updatedServer = result.server || { ...server, votes: Number(server.votes || 0) + 1 };
-      state.servers = state.servers.map((item) => (item.id === server.id ? { ...item, ...updatedServer } : item));
+      state.servers = rankServers(state.servers.map((item) => (item.id === server.id ? { ...item, ...updatedServer } : item)), state.votes);
       toast("Vote counted. Thanks for supporting this server.");
       renderVotePage(state);
     } catch (error) {
@@ -2319,9 +2323,9 @@ function bindDashboard(state) {
       if (!confirm("Delete this listing permanently?")) return;
       setButtonLoading(button, "Deleting...");
       try {
-        await request("deleteServer", { id: button.dataset.delete });
+        const result = await request("deleteServer", { id: button.dataset.delete });
         rememberDeletedServer(button.dataset.delete);
-        state.servers = state.servers.filter((server) => server.id !== button.dataset.delete);
+        state = applyConfirmedWrites(result.servers ? { ...state, ...result } : removeServerFromState(state, button.dataset.delete));
         toast("Listing deleted.");
         renderDashboard(state);
       } catch (error) {
@@ -2534,9 +2538,9 @@ function renderAdmin(state) {
   $$("[data-delete]").forEach((button) => button.addEventListener("click", async () => {
     try {
       setButtonLoading(button, "Deleting...");
-      await request("deleteServer", { id: button.dataset.delete });
+      const result = await request("deleteServer", { id: button.dataset.delete });
       rememberDeletedServer(button.dataset.delete);
-      state.servers = state.servers.filter((server) => server.id !== button.dataset.delete);
+      state = applyConfirmedWrites(result.servers ? { ...state, ...result } : removeServerFromState(state, button.dataset.delete));
       toast("Listing deleted.");
       renderAdmin(state);
     } catch (error) {
