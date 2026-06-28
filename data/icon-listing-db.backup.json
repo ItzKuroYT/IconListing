@@ -80,7 +80,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-28T11:07:19.729Z",
+      "lastPingAt": "2026-06-28T11:07:21.949Z",
       "analytics": {
         "ipCopyDaily": [
           {
@@ -221,14 +221,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-28T11:07:19.729Z",
+            "createdAt": "2026-06-28T11:07:21.949Z",
             "playersOnline": 38,
             "playersMax": 39,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-28T11:07:19.729Z",
+      "lastSuccessfulPingAt": "2026-06-28T11:07:21.949Z",
       "uptimeChecks": 61,
       "uptimeSuccesses": 61,
       "edition": "java",
@@ -273,7 +273,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-      "lastPingAt": "2026-06-28T11:07:19.774Z",
+      "lastPingAt": "2026-06-28T11:07:21.983Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -393,7 +393,7 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T11:07:19.774Z",
+            "createdAt": "2026-06-28T11:07:21.983Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -445,7 +445,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
       "updatedAt": "2026-06-24T22:20:23.472Z",
-      "lastPingAt": "2026-06-28T11:07:19.786Z",
+      "lastPingAt": "2026-06-28T11:07:21.995Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -559,7 +559,7 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T11:07:19.786Z",
+            "createdAt": "2026-06-28T11:07:21.995Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -612,7 +612,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
       "updatedAt": "2026-06-28T05:53:12.589Z",
-      "lastPingAt": "2026-06-28T11:07:20.876Z",
+      "lastPingAt": "2026-06-28T11:07:22.004Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -726,14 +726,14 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-28T11:07:20.876Z",
+            "createdAt": "2026-06-28T11:07:22.004Z",
             "playersOnline": 6,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-28T11:07:20.876Z",
+      "lastSuccessfulPingAt": "2026-06-28T11:07:22.004Z",
       "uptimeChecks": 49,
       "uptimeSuccesses": 43,
       "edition": "java",
