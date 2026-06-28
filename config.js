@@ -8,7 +8,7 @@ const IconListingConfig = {
     discordUrl: "https://discord.gg/HFyUfk458c",
     contactEmail: "officialfnaffanstudios@gmail.com",
     footerNotice:
-      "This site is not an official Minecraft service and is not approved by or associated with Mojang or Microsoft."
+      "This site is not an official Minecraft service and is not approved by or associated with Mojang or Microsoft.."
   },
   theme: {
     colors: {
