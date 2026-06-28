@@ -5,7 +5,6 @@ const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const CONFIRMED_WRITE_TTL_MS = 30 * 60 * 1000;
 const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "admin"]);
 
 function copy(path, fallback = "") {
@@ -34,77 +33,12 @@ const store = {
   }
 };
 
-function confirmedWrites() {
+function clearLegacyLocalOverlays() {
   try {
-    return pruneConfirmedWrites(JSON.parse(localStorage.getItem("iconListingConfirmedWrites") || "{}"));
+    localStorage.removeItem("iconListingConfirmedWrites");
   } catch {
-    return pruneConfirmedWrites({});
+    // Some browsers block storage. Shared API state still works without it.
   }
-}
-
-function saveConfirmedWrites(value) {
-  localStorage.setItem("iconListingConfirmedWrites", JSON.stringify(pruneConfirmedWrites(value)));
-}
-
-function pruneConfirmedWrites(value = {}) {
-  const cutoff = Date.now() - CONFIRMED_WRITE_TTL_MS;
-  const freshEntries = (items = {}) => Object.fromEntries(Object.entries(items || {}).filter(([, item]) => Number(item?.updatedAt || item || 0) >= cutoff));
-  return {
-    pendingServers: freshEntries(value.pendingServers),
-    deletedServers: freshEntries(value.deletedServers),
-    serverVotes: freshEntries(value.serverVotes),
-    votes: (Array.isArray(value.votes) ? value.votes : []).filter((vote) => Number(vote.updatedAt || 0) >= cutoff)
-  };
-}
-
-function rememberSavedServer(server) {
-  if (!server?.id) return;
-  const writes = confirmedWrites();
-  delete writes.deletedServers[server.id];
-  writes.pendingServers[server.id] = { server, updatedAt: Date.now() };
-  saveConfirmedWrites(writes);
-}
-
-function rememberDeletedServer(serverId) {
-  if (!serverId) return;
-  const writes = confirmedWrites();
-  delete writes.pendingServers[serverId];
-  delete writes.serverVotes[serverId];
-  writes.votes = writes.votes.filter((vote) => vote.serverId !== serverId);
-  writes.deletedServers[serverId] = { updatedAt: Date.now() };
-  saveConfirmedWrites(writes);
-}
-
-function rememberVoteResult(vote, server) {
-  if (!server?.id) return;
-  const writes = confirmedWrites();
-  if (vote?.serverId) {
-    writes.votes = [...writes.votes.filter((item) => item.id !== vote.id), { ...vote, updatedAt: Date.now() }];
-  }
-  writes.serverVotes[server.id] = { votes: Number(server.votes || 0), updatedAt: Date.now() };
-  saveConfirmedWrites(writes);
-}
-
-function applyConfirmedWrites(state) {
-  const writes = confirmedWrites();
-  const deleted = new Set(Object.keys(writes.deletedServers));
-  const byId = new Map((state.servers || []).filter((server) => !deleted.has(server.id)).map((server) => [server.id, server]));
-  Object.values(writes.pendingServers).forEach((entry) => {
-    if (entry?.server?.id && !deleted.has(entry.server.id)) byId.set(entry.server.id, { ...(byId.get(entry.server.id) || {}), ...entry.server });
-  });
-  Object.entries(writes.serverVotes).forEach(([serverId, entry]) => {
-    const server = byId.get(serverId);
-    if (server) byId.set(serverId, { ...server, votes: Math.max(Number(server.votes || 0), Number(entry.votes || 0)) });
-  });
-  const votes = [...(state.votes || [])];
-  writes.votes.forEach((vote) => {
-    if (!deleted.has(vote.serverId) && !votes.some((item) => item.id === vote.id)) votes.push(vote);
-  });
-  return { ...state, servers: rankServers([...byId.values()], votes), votes };
-}
-
-function removeServerFromState(state, serverId) {
-  return { ...state, servers: rankServers((state.servers || []).filter((server) => server.id !== serverId), state.votes || []) };
 }
 
 function freshDb() {
@@ -294,7 +228,8 @@ async function request(action, payload = {}, method = "POST") {
       const options = {
         method,
         headers: { "Content-Type": "application/json", ...authHeaders() },
-        signal: controller.signal
+        signal: controller.signal,
+        cache: "no-store"
       };
       if (method !== "GET") options.body = JSON.stringify(payload);
       let lastError = null;
@@ -842,7 +777,15 @@ async function getState() {
   const state = await request("state", detailServerId ? { serverId: detailServerId } : {}, "GET");
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
-  return applyConfirmedWrites({ ...state, votes: state.votes || [] });
+  return { ...state, votes: state.votes || [] };
+}
+
+async function requireSharedServer(serverId) {
+  if (!serverId) throw new Error("The API did not return a listing id. Error: 67.");
+  const shared = await request("state", { serverId }, "GET");
+  const exists = (shared.servers || []).some((server) => server.id === serverId);
+  if (!exists) throw new Error("The listing was not found in shared storage after saving. Error: 67.");
+  return shared;
 }
 
 function scheduleNetworkRefresh(error) {
@@ -1886,7 +1829,6 @@ function renderVotePage(state) {
     event.preventDefault();
     try {
       const result = await request("vote", { serverId: server.id, minecraftUsername: $("#minecraftUsername").value });
-      rememberVoteResult(result.vote, result.server || { ...server, votes: Number(server.votes || 0) + 1 });
       state.votes = [...(state.votes || []), result.vote].filter(Boolean);
       const updatedServer = result.server || { ...server, votes: Number(server.votes || 0) + 1 };
       state.servers = rankServers(state.servers.map((item) => (item.id === server.id ? { ...item, ...updatedServer } : item)), state.votes);
@@ -2334,8 +2276,7 @@ function bindDashboard(state) {
       setButtonLoading(button, "Deleting...");
       try {
         const result = await request("deleteServer", { id: button.dataset.delete });
-        rememberDeletedServer(button.dataset.delete);
-        state = applyConfirmedWrites(result.servers ? { ...state, ...result } : removeServerFromState(state, button.dataset.delete));
+        state = result.servers ? { ...state, ...result, votes: result.votes || state.votes || [] } : await getState();
         toast("Listing deleted.");
         renderDashboard(state);
       } catch (error) {
@@ -2459,7 +2400,7 @@ async function submitServerForm(event) {
         tags: selectedTags
       }
     });
-    rememberSavedServer(result.server);
+    await requireSharedServer(result.server?.id);
     toast("Listing saved.");
     boot();
   } catch (error) {
@@ -2549,8 +2490,7 @@ function renderAdmin(state) {
     try {
       setButtonLoading(button, "Deleting...");
       const result = await request("deleteServer", { id: button.dataset.delete });
-      rememberDeletedServer(button.dataset.delete);
-      state = applyConfirmedWrites(result.servers ? { ...state, ...result } : removeServerFromState(state, button.dataset.delete));
+      state = result.servers ? { ...state, ...result, votes: result.votes || state.votes || [] } : await getState();
       toast("Listing deleted.");
       renderAdmin(state);
     } catch (error) {
@@ -2737,6 +2677,7 @@ function renderStatic(page) {
 }
 
 async function boot() {
+  clearLegacyLocalOverlays();
   if (!$("#app")) renderLayout();
   try {
     const state = await getState();

@@ -107,7 +107,10 @@ module.exports = async function handler(req, res) {
       await updatePing(next);
       db.servers = existing ? db.servers.map((item) => (item.id === existing.id ? next : item)) : [...db.servers, next];
       await saveDb(db, { touchedServers: [next.id], uniqueServerId: next.id });
-      return json(res, 200, writePayload({ server: publicServer(next, user, { fullAnalytics: true }) }));
+      const persistedDb = await persistedDbAfterWrite();
+      const persistedServer = persistedDb.servers.find((item) => item.id === next.id);
+      if (!persistedServer) throw httpError(500, "Listing was not saved to shared storage. Error: 67.");
+      return json(res, 200, writePayload({ server: publicServer(persistedServer, user, { fullAnalytics: true }) }));
     }
 
     if (action === "deleteServer") {
@@ -120,7 +123,9 @@ module.exports = async function handler(req, res) {
       if (db.voteIps) delete db.voteIps[body.id];
       markDeleted(db, "servers", [body.id]);
       await saveDb(db, { deletedServers: [body.id] });
-      return json(res, 200, writePayload({ ok: true, deletedServerId: body.id, ...statePayload(db, user) }));
+      const persistedDb = await persistedDbAfterWrite();
+      if (persistedDb.servers.some((item) => item.id === body.id)) throw httpError(500, "Listing was not deleted from shared storage. Error: 67.");
+      return json(res, 200, writePayload({ ok: true, deletedServerId: body.id, ...statePayload(persistedDb, user) }));
     }
 
     if (action === "vote") {
@@ -136,8 +141,12 @@ module.exports = async function handler(req, res) {
       recordVoteCooldown(db, server.id, minecraftUsername, req);
       server.votes = Math.max(previousVoteCount + 1, votesForServer(db.votes, server.id).length);
       await saveDb(db, { touchedServers: [server.id], touchedVotes: [vote.id] });
-      const deliveries = await deliverVoteRewards(server, minecraftUsername);
-      return json(res, 200, writePayload({ ok: true, vote, deliveries, server: publicServer(server, user, { fullAnalytics: true }) }));
+      const persistedDb = await persistedDbAfterWrite();
+      const persistedServer = persistedDb.servers.find((item) => item.id === server.id);
+      const persistedVote = persistedDb.votes.find((item) => item.id === vote.id);
+      if (!persistedServer || !persistedVote) throw httpError(500, "Vote was not saved to shared storage. Error: 67.");
+      const deliveries = await deliverVoteRewards(persistedServer, minecraftUsername);
+      return json(res, 200, writePayload({ ok: true, vote: persistedVote, deliveries, server: publicServer(persistedServer, user, { fullAnalytics: true }) }));
     }
 
     if (action === "pluginPoll") {
@@ -478,6 +487,10 @@ async function saveDb(db, options = {}) {
   const serialized = serializeDbForStorage(db);
   await fs.writeFile(TMP_DB, serialized);
   await fs.writeFile(TMP_DB_BACKUP, serialized);
+}
+
+async function persistedDbAfterWrite() {
+  return migrateDb(await loadDb({ forceFresh: true }));
 }
 
 async function readLocalBackupDb() {
