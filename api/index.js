@@ -129,7 +129,7 @@ module.exports = async function handler(req, res) {
       queueIconListingPluginVote(server, vote);
       recordVoteCooldown(db, server.id, minecraftUsername, req);
       server.votes = votesForServer(db.votes, server.id).length;
-      await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id], touchedVotes: [vote.id] });
+      await saveDb(db, { touchedServers: [server.id], touchedVotes: [vote.id] });
       const deliveries = await deliverVoteRewards(server, minecraftUsername);
       return json(res, 200, { ok: true, vote, deliveries, server: publicServer(server, user, { fullAnalytics: true }) });
     }
@@ -919,7 +919,7 @@ function statePayload(db, user, options = {}) {
 
 function stateDetailServerId(req) {
   const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
-  return clean(req.query?.serverId || url.searchParams.get("serverId") || url.searchParams.get("id") || "");
+  return clean(req.query?.serverId || req.query?.server || url.searchParams.get("serverId") || url.searchParams.get("id") || url.searchParams.get("server") || "");
 }
 
 function siteUrl(pathname = "/") {

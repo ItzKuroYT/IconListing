@@ -505,6 +505,8 @@ async function main() {
     const detailServer = detailState.json.servers.find((item) => item.id === saved.json.server.id);
     assert(Array.isArray(detailServer.analytics.ipCopyDaily) && Array.isArray(detailServer.analytics.playerHistory), "detail state should include full analytics for the requested server");
     assert(detailState.json.votes.length === 2, "detail state should include current-month votes for only the requested server");
+    const votePageState = await call("state", { server: saved.json.server.id }, "", "GET");
+    assert(votePageState.json.votes.length === 2, "vote page state should accept the server query parameter used by vote links");
 
     const preCounterDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
     const preCounterServer = preCounterDb.servers.find((item) => item.id === saved.json.server.id);

@@ -284,7 +284,7 @@ function fallbackRequest(action, payload) {
   };
 
   if (action === "state") {
-    const detailServerId = clean(payload.serverId || "");
+    const detailServerId = clean(payload.serverId || payload.server || "");
     return Promise.resolve({
       servers: rankServers(db.servers, db.votes).map((server) => ({
         ...server,
@@ -752,7 +752,8 @@ function displayedVoteCount(server, votes = []) {
 
 async function getState() {
   const page = document.body.dataset.page || "home";
-  const detailServerId = ["server", "vote"].includes(page) ? new URLSearchParams(location.search).get("id") : "";
+  const params = new URLSearchParams(location.search);
+  const detailServerId = ["server", "vote"].includes(page) ? (params.get("id") || params.get("server")) : "";
   const state = await request("state", detailServerId ? { serverId: detailServerId } : {}, "GET");
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
@@ -1681,7 +1682,7 @@ function playerChart(history, currentPlayers = 0) {
 }
 
 function copyChart(days) {
-  const points = days.length ? days : dailyIpCopies([], 30);
+  const points = days.length ? days : denseDailyCopies([], ANALYTICS_DAYS);
   return barChart(points.map((point) => Number(point.count || 0)), points.map((point) => shortDate(point.date)), "IP copies");
 }
 
@@ -1763,7 +1764,8 @@ function timeAgo(value) {
 }
 
 function renderVotePage(state) {
-  const id = new URLSearchParams(location.search).get("server");
+  const params = new URLSearchParams(location.search);
+  const id = params.get("server") || params.get("id");
   const server = state.servers.find((item) => item.id === id);
   if (!server) {
     setSeoMeta({
@@ -1798,9 +1800,12 @@ function renderVotePage(state) {
   $("#voteForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
-      await request("vote", { serverId: server.id, minecraftUsername: $("#minecraftUsername").value });
+      const result = await request("vote", { serverId: server.id, minecraftUsername: $("#minecraftUsername").value });
+      state.votes = [...(state.votes || []), result.vote].filter(Boolean);
+      const updatedServer = result.server || { ...server, votes: Number(server.votes || 0) + 1 };
+      state.servers = state.servers.map((item) => (item.id === server.id ? { ...item, ...updatedServer } : item));
       toast("Vote counted. Thanks for supporting this server.");
-      location.reload();
+      renderVotePage(state);
     } catch (error) {
       toast(publicRequestError("vote", error));
     }
@@ -2240,11 +2245,15 @@ function bindDashboard(state) {
   $$("[data-delete]").forEach((button) => {
     button.addEventListener("click", async () => {
       if (!confirm("Delete this listing permanently?")) return;
+      setButtonLoading(button, "Deleting...");
       try {
         await request("deleteServer", { id: button.dataset.delete });
-        boot();
+        state.servers = state.servers.filter((server) => server.id !== button.dataset.delete);
+        toast("Listing deleted.");
+        renderDashboard(state);
       } catch (error) {
         toast(error.message);
+        setButtonLoading(button, "Delete", false);
       }
     });
   });
