@@ -6,6 +6,7 @@ const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
 const CONFIRMED_WRITE_TTL_MS = 30 * 60 * 1000;
+const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "admin"]);
 
 function copy(path, fallback = "") {
   return path.split(".").reduce((value, key) => value?.[key], CONFIG.copy) ?? fallback;
@@ -277,6 +278,14 @@ function publicRequestError(action, error) {
   return error?.publicMessage || error?.message || productionApiMessage();
 }
 
+function requireDurableResult(action, result) {
+  if (!DURABLE_CLIENT_ACTIONS.has(action) || isLocalFallbackAllowed()) return;
+  if (result?.durable) return;
+  const error = new Error("Permanent storage is not connected. Error: 67.");
+  error.publicMessage = productionApiMessage();
+  throw error;
+}
+
 async function request(action, payload = {}, method = "POST") {
   if (location.protocol !== "file:") {
     const controller = new AbortController();
@@ -316,6 +325,7 @@ async function request(action, payload = {}, method = "POST") {
             error.stopRetry = response.status >= 400 && response.status < 500;
             throw error;
           }
+          requireDurableResult(action, json);
           return json;
         } catch (error) {
           lastError = error;

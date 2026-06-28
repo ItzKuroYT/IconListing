@@ -17,7 +17,8 @@ const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
 const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "pluginPoll", "admin"]);
-const READ_ACTIONS = new Set(["state", "sitemap"]);
+const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "admin"]);
+const READ_ACTIONS = new Set(["state", "sitemap", "health"]);
 const loginFailures = new Map();
 
 module.exports = async function handler(req, res) {
@@ -28,9 +29,13 @@ module.exports = async function handler(req, res) {
     const action = actionFromRequest(req);
     requireAllowedMethod(action, req.method);
     enforceBrowserOrigin(req, action);
+    requireDurableStorageForWrite(req, action);
     const body = req.method === "GET" ? {} : await readBody(req);
+    if (action === "health") {
+      return json(res, 200, healthPayload(req));
+    }
     const db = migrateDb(await loadDb({
-      allowRecoveryOnly: ["state", "sitemap", "login"].includes(action),
+      allowRecoveryOnly: ["state", "sitemap", "login", "health"].includes(action),
       forceFresh: WRITE_ACTIONS.has(action) || action === "state"
     }));
     const user = await userFromRequest(req, db);
@@ -60,7 +65,7 @@ module.exports = async function handler(req, res) {
       };
       db.users.push(next);
       await saveDb(db, { touchedUsers: [next.id], uniqueUserId: next.id });
-      return json(res, 200, { user: publicUser(next), token: signToken(next) });
+      return json(res, 200, writePayload({ user: publicUser(next), token: signToken(next) }));
     }
 
     if (action === "login") {
@@ -102,7 +107,7 @@ module.exports = async function handler(req, res) {
       await updatePing(next);
       db.servers = existing ? db.servers.map((item) => (item.id === existing.id ? next : item)) : [...db.servers, next];
       await saveDb(db, { touchedServers: [next.id], uniqueServerId: next.id });
-      return json(res, 200, { server: publicServer(next, user, { fullAnalytics: true }) });
+      return json(res, 200, writePayload({ server: publicServer(next, user, { fullAnalytics: true }) }));
     }
 
     if (action === "deleteServer") {
@@ -115,7 +120,7 @@ module.exports = async function handler(req, res) {
       if (db.voteIps) delete db.voteIps[body.id];
       markDeleted(db, "servers", [body.id]);
       await saveDb(db, { deletedServers: [body.id] });
-      return json(res, 200, { ok: true, deletedServerId: body.id, ...statePayload(db, user) });
+      return json(res, 200, writePayload({ ok: true, deletedServerId: body.id, ...statePayload(db, user) }));
     }
 
     if (action === "vote") {
@@ -132,7 +137,7 @@ module.exports = async function handler(req, res) {
       server.votes = Math.max(previousVoteCount + 1, votesForServer(db.votes, server.id).length);
       await saveDb(db, { touchedServers: [server.id], touchedVotes: [vote.id] });
       const deliveries = await deliverVoteRewards(server, minecraftUsername);
-      return json(res, 200, { ok: true, vote, deliveries, server: publicServer(server, user, { fullAnalytics: true }) });
+      return json(res, 200, writePayload({ ok: true, vote, deliveries, server: publicServer(server, user, { fullAnalytics: true }) }));
     }
 
     if (action === "pluginPoll") {
@@ -145,11 +150,11 @@ module.exports = async function handler(req, res) {
       const limit = Math.max(1, Math.min(50, Number(body.limit || 20)));
       const pending = iconListingPluginPendingVotes(server).slice(0, limit);
       if (changed) await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
-      return json(res, 200, {
+      return json(res, 200, writePayload({
         ok: true,
         server: { id: server.id, name: server.name },
         votes: pending.map(publicIconListingPluginVote)
-      });
+      }));
     }
 
     if (action === "trackCopy") {
@@ -157,7 +162,7 @@ module.exports = async function handler(req, res) {
       if (!server) throw httpError(404, "Listing not found.");
       recordIpCopy(server, req);
       await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
-      return json(res, 200, { ok: true, analytics: publicAnalytics(server, { full: true }) });
+      return json(res, 200, writePayload({ ok: true, analytics: publicAnalytics(server, { full: true }) }));
     }
 
     if (action === "accountUpdate") {
@@ -168,7 +173,7 @@ module.exports = async function handler(req, res) {
       if (body.password) user.passwordHash = hashPassword(body.password);
       ensureUniqueUser(db, user, user.id);
       await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
-      return json(res, 200, { user: publicUser(user) });
+      return json(res, 200, writePayload({ user: publicUser(user) }));
     }
 
     if (action === "deleteAccount") {
@@ -185,7 +190,7 @@ module.exports = async function handler(req, res) {
       markDeleted(db, "users", [user.id]);
       markDeleted(db, "servers", deletedServerIds);
       await saveDb(db, { deletedUsers: [user.id], deletedServers: deletedServerIds });
-      return json(res, 200, { ok: true });
+      return json(res, 200, writePayload({ ok: true }));
     }
 
     if (action === "testVote") {
@@ -254,7 +259,7 @@ module.exports = async function handler(req, res) {
         saveOptions.deletedHosts = [id];
       }
       await saveDb(db, saveOptions);
-      return json(res, 200, { ...statePayload(db, user), users: db.users.map(publicUser) });
+      return json(res, 200, writePayload({ ...statePayload(db, user), users: db.users.map(publicUser) }));
     }
 
     throw httpError(404, "Unknown action.");
@@ -314,6 +319,36 @@ function requireAllowedMethod(action, method = "GET") {
   if (!READ_ACTIONS.has(action) && !WRITE_ACTIONS.has(action)) throw httpError(404, "Unknown action.");
   if (READ_ACTIONS.has(action) && next !== "GET") throw httpError(405, "Method not allowed.");
   if (WRITE_ACTIONS.has(action) && next !== "POST") throw httpError(405, "Method not allowed.");
+}
+
+function requireDurableStorageForWrite(req, action) {
+  if (!DURABLE_WRITE_ACTIONS.has(action)) return;
+  if (hasGithubStorage()) return;
+  if (!isProductionRequest(req)) return;
+  throw httpError(500, "Permanent storage is not connected. Error: 67.");
+}
+
+function isProductionRequest(req) {
+  const host = String(req.headers?.host || req.headers?.Host || "").toLowerCase();
+  return !!(process.env.VERCEL || process.env.VERCEL_URL || process.env.NOW_REGION || host.endsWith(".vercel.app") || host.includes("iconrealms.net"));
+}
+
+function writePayload(payload = {}) {
+  return { ...payload, durable: hasGithubStorage(), storage: hasGithubStorage() ? "github" : "local" };
+}
+
+function healthPayload(req) {
+  return {
+    ok: true,
+    durable: hasGithubStorage(),
+    storage: hasGithubStorage() ? "github" : "local",
+    productionRequest: isProductionRequest(req),
+    githubTokenConfigured: !!process.env.GITHUB_TOKEN,
+    githubRepoConfigured: !!process.env.GITHUB_REPO,
+    githubBranch: githubBranch(),
+    githubDbPath: githubDbPath(),
+    encryptedWrites: shouldEncryptStorage()
+  };
 }
 
 function enforceBrowserOrigin(req, action) {
@@ -575,7 +610,7 @@ function hasGithubStorage() {
 }
 
 function requireConfiguredProductionDb() {
-  if (process.env.VERCEL && !hasGithubStorage()) {
+  if ((process.env.VERCEL || process.env.VERCEL_URL || process.env.NOW_REGION) && !hasGithubStorage()) {
     throw httpError(500, "This action is temporarily unavailable. Error: 67.");
   }
 }
@@ -888,7 +923,7 @@ function serializeDbForStorage(db) {
   const normalized = migrateDb(db);
   const jsonBody = JSON.stringify(normalized, null, 2);
   const secret = storageEncryptionSecret();
-  if (!secret) return jsonBody;
+  if (!secret || !shouldEncryptStorage()) return jsonBody;
   const key = crypto.createHash("sha256").update(secret).digest();
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
@@ -905,6 +940,10 @@ function serializeDbForStorage(db) {
 
 function storageEncryptionSecret() {
   return process.env.DATABASE_ENCRYPTION_KEY || process.env.ICON_LISTING_DB_ENCRYPTION_KEY || "";
+}
+
+function shouldEncryptStorage() {
+  return String(process.env.ICON_LISTING_ENCRYPT_DB || "").toLowerCase() === "true";
 }
 
 function statePayload(db, user, options = {}) {

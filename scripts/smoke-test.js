@@ -165,6 +165,11 @@ async function main() {
     });
     assert(login.code === 200 && login.json.user.username.startsWith("Smoke"), "login should return the user");
 
+    const storageHealth = await call("health", {}, "", "GET", { host: "icon-listing.vercel.app" });
+    assert(storageHealth.code === 200 && storageHealth.json.durable === false, "health should report missing durable storage in local smoke");
+    const fakeProductionWrite = await call("saveServer", { server: { name: "Should Not Save", javaHost: "no-storage.example.org", country: "United States", description: "This listing should be rejected in a production-like request when GitHub storage is not configured, preventing Vercel temporary storage from pretending the listing was saved across browsers.", tags: ["SMP"] } }, login.json.token, "POST", { host: "icon-listing.vercel.app" });
+    assert(fakeProductionWrite.code === 500, "production-like writes without GitHub storage should fail instead of saving locally");
+
     let throttledLogin = null;
     for (let index = 0; index < 9; index += 1) {
       throttledLogin = await call("login", {
