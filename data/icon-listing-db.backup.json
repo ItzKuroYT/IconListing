@@ -72,15 +72,15 @@
       "ownerId": "bd813e43-bf7a-45fd-869e-f092d2dde82e",
       "ownerName": "MaxFullCalypse",
       "votes": 0,
-      "playersOnline": 54,
-      "playersMax": 55,
+      "playersOnline": 59,
+      "playersMax": 60,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-28T12:55:14.618Z",
+      "lastPingAt": "2026-06-28T14:08:19.426Z",
       "analytics": {
         "ipCopyDaily": [
           {
@@ -231,12 +231,18 @@
             "playersOnline": 54,
             "playersMax": 55,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-28T14:08:19.426Z",
+            "playersOnline": 59,
+            "playersMax": 60,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-28T12:55:14.618Z",
-      "uptimeChecks": 62,
-      "uptimeSuccesses": 62,
+      "lastSuccessfulPingAt": "2026-06-28T14:08:19.426Z",
+      "uptimeChecks": 63,
+      "uptimeSuccesses": 63,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -279,7 +285,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-      "lastPingAt": "2026-06-28T12:55:14.691Z",
+      "lastPingAt": "2026-06-28T14:08:19.501Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -409,10 +415,16 @@
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
+          },
+          {
+            "createdAt": "2026-06-28T14:08:19.501Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
           }
         ]
       },
-      "uptimeChecks": 57,
+      "uptimeChecks": 58,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -457,7 +469,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
       "updatedAt": "2026-06-24T22:20:23.472Z",
-      "lastPingAt": "2026-06-28T12:55:14.707Z",
+      "lastPingAt": "2026-06-28T14:08:20.052Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -581,10 +593,16 @@
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
+          },
+          {
+            "createdAt": "2026-06-28T14:08:20.052Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
           }
         ]
       },
-      "uptimeChecks": 56,
+      "uptimeChecks": 57,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -622,15 +640,15 @@
       "ownerId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
       "ownerName": "ItzKuroYT",
       "votes": 1,
-      "playersOnline": 4,
+      "playersOnline": 5,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 88,
+      "uptimePercent": 88.23529411764706,
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
       "updatedAt": "2026-06-28T05:53:12.589Z",
-      "lastPingAt": "2026-06-28T12:55:14.716Z",
+      "lastPingAt": "2026-06-28T14:08:21.310Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -754,12 +772,18 @@
             "playersOnline": 4,
             "playersMax": 500,
             "online": true
+          },
+          {
+            "createdAt": "2026-06-28T14:08:21.310Z",
+            "playersOnline": 5,
+            "playersMax": 500,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-28T12:55:14.716Z",
-      "uptimeChecks": 50,
-      "uptimeSuccesses": 44,
+      "lastSuccessfulPingAt": "2026-06-28T14:08:21.310Z",
+      "uptimeChecks": 51,
+      "uptimeSuccesses": 45,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
