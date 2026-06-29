@@ -34,14 +34,6 @@
       "createdAt": "2026-06-25T23:56:22.113Z"
     },
     {
-      "id": "e7f69622-09e1-4b86-af3c-b90fff23b3ca",
-      "username": "Auth95495227",
-      "email": "codex-auth-1782595495227@example.com",
-      "passwordHash": "1ca5b14ab548b27cad5915ae531e3ce0:30eda2e629ae82227c5a2517011ae5256f79312dc76e79a8e8e84dc24093bbb7",
-      "banned": false,
-      "createdAt": "2026-06-27T21:25:17.544Z"
-    },
-    {
       "id": "e52c8b0f-e4f9-48f1-9b9e-afc5a2f0e281",
       "username": "rubenkootstra640@gmail.com",
       "email": "rubenkootstra640@gmail.com",
@@ -1121,7 +1113,9 @@
   ],
   "voteIps": {},
   "deleted": {
-    "users": {},
+    "users": {
+      "e7f69622-09e1-4b86-af3c-b90fff23b3ca": "2026-06-29T22:53:42.842Z"
+    },
     "servers": {
       "83b6d5fa-2cfb-4318-8517-fb09543ef3e0": "2026-06-28T05:48:47.738Z",
       "7bf4e7b7-a605-4897-87fb-1eb541315811": "2026-06-28T16:39:55.737Z"
