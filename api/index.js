@@ -1055,12 +1055,18 @@ async function cleanupStaleServers(db) {
 async function refreshPings(db) {
   let changed = false;
   for (const server of db.servers) {
-    if (!server.lastPingAt || Date.now() - new Date(server.lastPingAt).getTime() > PING_TTL_MS) {
+    if (shouldRefreshPing(server)) {
       await updatePing(server);
       changed = true;
     }
   }
   return changed;
+}
+
+function shouldRefreshPing(server) {
+  if (!server.lastPingAt) return true;
+  if (server.edition === "java" && !server.javaStatusTarget) return true;
+  return Date.now() - new Date(server.lastPingAt).getTime() > PING_TTL_MS;
 }
 
 async function updatePing(server) {
@@ -1071,6 +1077,10 @@ async function updatePing(server) {
   server.playersOnline = ping.playersOnline;
   server.playersMax = ping.playersMax;
   server.version = ping.version || server.version || "Unknown";
+  if (server.edition === "java") {
+    server.javaStatusTarget = ping.statusTarget || javaStatusTargets(server)[0] || "";
+    server.javaSrvResolved = !!ping.srvResolved;
+  }
   recordPlayerSnapshot(server, now);
   if (ping.online) {
     server.lastSuccessfulPingAt = now;
@@ -1104,8 +1114,17 @@ function recordPlayerSnapshot(server, createdAt) {
 }
 
 async function pingJava(server) {
+  const targets = javaStatusTargets(server);
+  let last = null;
+  for (const target of targets) {
+    last = await pingJavaTarget(target);
+    if (last.online) return last;
+  }
+  return last || { online: false, playersOnline: 0, playersMax: 0, version: "Unknown", statusTarget: targets[0] || "" };
+}
+
+async function pingJavaTarget(target) {
   try {
-    const target = javaStatusTarget(server);
     const response = await fetch(`https://api.mcstatus.io/v2/status/java/${encodeURIComponent(target)}`);
     if (!response.ok) throw new Error("mcstatus request failed");
     const data = await response.json();
@@ -1113,17 +1132,21 @@ async function pingJava(server) {
       online: !!data.online,
       playersOnline: Number(data.players?.online || 0),
       playersMax: Number(data.players?.max || 0),
-      version: data.version?.name_clean || data.version?.name_raw || "Unknown"
+      version: data.version?.name_clean || data.version?.name_raw || "Unknown",
+      statusTarget: target,
+      srvResolved: !!data.srv_record?.host
     };
   } catch {
-    return { online: false, playersOnline: 0, playersMax: 0, version: "Unknown" };
+    return { online: false, playersOnline: 0, playersMax: 0, version: "Unknown", statusTarget: target, srvResolved: false };
   }
 }
 
-function javaStatusTarget(server) {
+function javaStatusTargets(server) {
   const host = cleanHost(server.javaHost);
   const port = javaPort(server);
-  return !port || port === CONFIG.defaults.javaPort ? host : `${host}:${port}`;
+  const exact = !port || port === CONFIG.defaults.javaPort ? host : `${host}:${port}`;
+  if (!host || exact === host || isIpAddress(host)) return [exact].filter(Boolean);
+  return [...new Set([exact, host])];
 }
 
 function javaPort(server) {
@@ -1136,6 +1159,10 @@ function cleanHost(host = "") {
   value = value.replace(/^https?:\/\//i, "").split("/")[0].replace(/\.$/, "");
   const match = value.match(/^(.+):(\d+)$/);
   return match ? match[1] : value;
+}
+
+function isIpAddress(host = "") {
+  return /^(\d{1,3}\.){3}\d{1,3}$/.test(host) || /^[0-9a-f:]+$/i.test(host);
 }
 
 async function pingBedrock(server) {

@@ -1642,6 +1642,7 @@ function serverAddress(server) {
 
 function javaAddress(server) {
   const host = cleanHost(server.javaHost);
+  if (server.javaSrvResolved || server.javaStatusTarget === host) return host;
   const port = javaPort(server);
   return !port || port === CONFIG.defaults.javaPort ? host : `${host}:${port}`;
 }
