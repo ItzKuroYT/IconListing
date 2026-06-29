@@ -40,6 +40,14 @@
       "passwordHash": "1ca5b14ab548b27cad5915ae531e3ce0:30eda2e629ae82227c5a2517011ae5256f79312dc76e79a8e8e84dc24093bbb7",
       "banned": false,
       "createdAt": "2026-06-27T21:25:17.544Z"
+    },
+    {
+      "id": "e52c8b0f-e4f9-48f1-9b9e-afc5a2f0e281",
+      "username": "rubenkootstra640@gmail.com",
+      "email": "rubenkootstra640@gmail.com",
+      "passwordHash": "da619f725ec426936ee659edd4435e6d:4d20b69e5d1c0521ee2e10dd0978e7de3359eb496df11edbbdcd8ea451c454c1",
+      "banned": false,
+      "createdAt": "2026-06-29T08:59:20.680Z"
     }
   ],
   "servers": [
