@@ -31,7 +31,7 @@ const IconListingConfig = {
     productionBasePath: "https://icon-listing.vercel.app/api",
     useLocalFallback: true,
     localFallbackHosts: ["", "localhost", "127.0.0.1"],
-    requestTimeoutMs: 8000
+    requestTimeoutMs: 25000
   },
   seo: {
     defaultTitle: "Best Minecraft Servers 2026 | Icon Listing",

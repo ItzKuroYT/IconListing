@@ -16,8 +16,8 @@ const VOTIFIER_TIMEOUT_MS = 3000;
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "pluginPoll", "admin"]);
-const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "admin"]);
+const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "testPluginVote", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap", "health"]);
 const loginFailures = new Map();
 
@@ -106,7 +106,11 @@ module.exports = async function handler(req, res) {
       ensureUniqueVoteKey(db, next, existing?.id || next.id);
       await updatePing(next);
       db.servers = existing ? db.servers.map((item) => (item.id === existing.id ? next : item)) : [...db.servers, next];
-      await saveDb(db, { touchedServers: [next.id], uniqueServerId: next.id });
+      await saveDb(db, {
+        touchedServers: [next.id],
+        uniqueServerId: next.id,
+        requireExistingServers: existing ? [existing.id] : []
+      });
       const persistedDb = await persistedDbAfterWrite();
       const persistedServer = persistedDb.servers.find((item) => item.id === next.id);
       if (!persistedServer) throw httpError(500, "Listing was not saved to shared storage. Error: 67.");
@@ -140,7 +144,7 @@ module.exports = async function handler(req, res) {
       queueIconListingPluginVote(server, vote);
       recordVoteCooldown(db, server.id, minecraftUsername, req);
       server.votes = Math.max(previousVoteCount + 1, votesForServer(db.votes, server.id).length);
-      await saveDb(db, { touchedServers: [server.id], touchedVotes: [vote.id] });
+      await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id], touchedVotes: [vote.id] });
       const persistedDb = await persistedDbAfterWrite();
       const persistedServer = persistedDb.servers.find((item) => item.id === server.id);
       const persistedVote = persistedDb.votes.find((item) => item.id === vote.id);
@@ -212,6 +216,26 @@ module.exports = async function handler(req, res) {
         serviceName: CONFIG.site.name
       });
       return json(res, 200, result);
+    }
+
+    if (action === "testPluginVote") {
+      requireLogin(user);
+      requireFields(body, ["serverId", "minecraftUsername"]);
+      const server = db.servers.find((item) => item.id === body.serverId);
+      if (!server) throw httpError(404, "Listing not found.");
+      if (server.ownerId !== user.id && !isAdmin(user)) throw httpError(403, "You cannot test that listing.");
+      if (!server.iconListingPluginEnabled || !server.iconListingVoteKey) throw httpError(400, "Enable the IconListing vote plugin and save this listing first.");
+      const minecraftUsername = cleanText(body.minecraftUsername || "");
+      if (!/^[A-Za-z0-9_]{3,16}$/.test(minecraftUsername)) throw httpError(400, "Enter a valid Minecraft username.");
+      const vote = { id: createId(), serverId: server.id, minecraftUsername, createdAt: new Date().toISOString() };
+      const delivery = queueIconListingPluginVote(server, vote, { test: true });
+      if (!delivery) throw httpError(400, "IconListing plugin delivery could not be queued.");
+      await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
+      const persistedDb = await persistedDbAfterWrite();
+      const persistedServer = persistedDb.servers.find((item) => item.id === server.id);
+      const queued = normalizeIconListingVoteQueue(persistedServer?.iconListingVoteQueue).some((item) => item.id === delivery.id && !item.deliveredAt);
+      if (!queued) throw httpError(500, "Plugin test vote was not saved to shared storage. Error: 67.");
+      return json(res, 200, writePayload({ ok: true, message: "Plugin test vote queued. Run /iconlistingvote poll or wait for the next poll." }));
     }
 
     if (action === "admin") {
@@ -728,19 +752,28 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
   const remote = migrateDb(remoteDb);
   const next = migrateDb(nextDb);
   const ids = writeIdSets(options);
+  const deleted = mergeDeleted(remote.deleted, next.deleted, deletedFromIdSets(ids));
+  const deletedUsers = combinedDeletedIds(ids.deletedUsers, deleted.users);
+  const deletedServers = combinedDeletedIds(ids.deletedServers, deleted.servers);
+  const deletedClients = combinedDeletedIds(ids.deletedClients, deleted.clients);
+  const deletedHosts = combinedDeletedIds(ids.deletedHosts, deleted.hosts);
   const merged = {
     ...next,
-    deleted: mergeDeleted(remote.deleted, next.deleted, deletedFromIdSets(ids)),
-    users: mergeById(remote.users, next.users, ids.deletedUsers, ids.touchedUsers),
-    servers: mergeById(remote.servers, next.servers, ids.deletedServers, ids.touchedServers),
-    clients: mergeById(remote.clients, next.clients, ids.deletedClients, ids.touchedClients),
-    hosts: mergeById(remote.hosts, next.hosts, ids.deletedHosts, ids.touchedHosts),
-    votes: mergeVotes(remote.votes, next.votes, ids.deletedServers, ids.touchedVotes, ids.touchedServers),
-    voteIps: mergeVoteIps(remote.voteIps, next.voteIps, ids.deletedServers)
+    deleted,
+    users: mergeById(remote.users, next.users, deletedUsers, ids.touchedUsers),
+    servers: mergeById(remote.servers, next.servers, deletedServers, ids.touchedServers),
+    clients: mergeById(remote.clients, next.clients, deletedClients, ids.touchedClients),
+    hosts: mergeById(remote.hosts, next.hosts, deletedHosts, ids.touchedHosts),
+    votes: mergeVotes(remote.votes, next.votes, deletedServers, ids.touchedVotes, ids.touchedServers),
+    voteIps: mergeVoteIps(remote.voteIps, next.voteIps, deletedServers)
   };
   pruneVoteCooldowns(merged);
   ensureMergedWriteIsValid(merged, options);
   return migrateDb(merged);
+}
+
+function combinedDeletedIds(explicitDeletedIds = new Set(), deletedMap = {}) {
+  return new Set([...explicitDeletedIds, ...Object.keys(deletedMap || {})]);
 }
 
 function ensureRequiredRecordsExist(remoteDb, options = {}) {
@@ -1031,7 +1064,7 @@ async function refreshPings(db) {
 }
 
 async function updatePing(server) {
-  const ping = server.edition === "bedrock" ? await pingBedrock(server) : await pingJava(server.javaHost, server.javaPort);
+  const ping = server.edition === "bedrock" ? await pingBedrock(server) : await pingJava(server);
   const now = new Date().toISOString();
   server.lastPingAt = now;
   server.online = ping.online;
@@ -1070,9 +1103,9 @@ function recordPlayerSnapshot(server, createdAt) {
   server.analytics.playerHistory = compactPlayerHistory(server.analytics.playerHistory);
 }
 
-async function pingJava(host, port) {
+async function pingJava(server) {
   try {
-    const target = `${host}:${Number(port || CONFIG.defaults.javaPort)}`;
+    const target = javaStatusTarget(server);
     const response = await fetch(`https://api.mcstatus.io/v2/status/java/${encodeURIComponent(target)}`);
     if (!response.ok) throw new Error("mcstatus request failed");
     const data = await response.json();
@@ -1085,6 +1118,24 @@ async function pingJava(host, port) {
   } catch {
     return { online: false, playersOnline: 0, playersMax: 0, version: "Unknown" };
   }
+}
+
+function javaStatusTarget(server) {
+  const host = cleanHost(server.javaHost);
+  const port = javaPort(server);
+  return !port || port === CONFIG.defaults.javaPort ? host : `${host}:${port}`;
+}
+
+function javaPort(server) {
+  const hostPort = String(server.javaHost || "").trim().match(/^.+:(\d+)$/);
+  return Number(hostPort?.[1] || server.javaPort || CONFIG.defaults.javaPort);
+}
+
+function cleanHost(host = "") {
+  let value = String(host || "").trim();
+  value = value.replace(/^https?:\/\//i, "").split("/")[0].replace(/\.$/, "");
+  const match = value.match(/^(.+):(\d+)$/);
+  return match ? match[1] : value;
 }
 
 async function pingBedrock(server) {
@@ -1424,19 +1475,22 @@ function normalizeIconListingVoteQueue(queue = []) {
     .slice(-500);
 }
 
-function queueIconListingPluginVote(server, vote) {
-  if (!server.iconListingPluginEnabled || !server.iconListingVoteKey) return;
+function queueIconListingPluginVote(server, vote, options = {}) {
+  if (!server.iconListingPluginEnabled || !server.iconListingVoteKey) return null;
   server.iconListingVoteQueue = normalizeIconListingVoteQueue(server.iconListingVoteQueue);
-  server.iconListingVoteQueue.push({
+  const delivery = {
     id: createId(),
     voteId: vote.id,
     serverId: server.id,
     serverName: server.name,
     minecraftUsername: vote.minecraftUsername,
     createdAt: vote.createdAt,
-    deliveredAt: ""
-  });
+    deliveredAt: "",
+    test: !!options.test
+  };
+  server.iconListingVoteQueue.push(delivery);
   server.iconListingVoteQueue = server.iconListingVoteQueue.slice(-500);
+  return delivery;
 }
 
 function iconListingPluginPendingVotes(server) {

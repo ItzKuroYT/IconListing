@@ -5,7 +5,7 @@ const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "admin"]);
+const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "testPluginVote", "admin"]);
 
 function copy(path, fallback = "") {
   return path.split(".").reduce((value, key) => value?.[key], CONFIG.copy) ?? fallback;
@@ -124,7 +124,8 @@ function toast(message) {
   node.className = "toast";
   node.textContent = message;
   document.body.append(node);
-  window.setTimeout(() => node.remove(), 3600);
+  const duration = /error|unavailable|failed|not|cannot|could not|refresh/i.test(String(message || "")) ? 8500 : 4200;
+  window.setTimeout(() => node.remove(), duration);
 }
 
 function blockedRegexes() {
@@ -778,14 +779,6 @@ async function getState() {
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
   return { ...state, votes: state.votes || [] };
-}
-
-async function requireSharedServer(serverId) {
-  if (!serverId) throw new Error("The API did not return a listing id. Error: 67.");
-  const shared = await request("state", { serverId }, "GET");
-  const exists = (shared.servers || []).some((server) => server.id === serverId);
-  if (!exists) throw new Error("The listing was not found in shared storage after saving. Error: 67.");
-  return shared;
 }
 
 function scheduleNetworkRefresh(error) {
@@ -1644,11 +1637,29 @@ function serverAddress(server) {
   if (server.edition === "bedrock") {
     return server.bedrockType === "realm" ? server.realmCode : bedrockAddress(server);
   }
-  return `${server.javaHost}:${Number(server.javaPort || CONFIG.defaults.javaPort)}`;
+  return javaAddress(server);
+}
+
+function javaAddress(server) {
+  const host = cleanHost(server.javaHost);
+  const port = javaPort(server);
+  return !port || port === CONFIG.defaults.javaPort ? host : `${host}:${port}`;
 }
 
 function bedrockAddress(server) {
   return `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}`;
+}
+
+function javaPort(server) {
+  const hostPort = String(server.javaHost || "").trim().match(/^.+:(\d+)$/);
+  return Number(hostPort?.[1] || server.javaPort || CONFIG.defaults.javaPort);
+}
+
+function cleanHost(host = "") {
+  let value = String(host || "").trim();
+  value = value.replace(/^https?:\/\//i, "").split("/")[0].replace(/\.$/, "");
+  const match = value.match(/^(.+):(\d+)$/);
+  return match ? match[1] : value;
 }
 
 function serverEditionLabel(server) {
@@ -2205,7 +2216,7 @@ function serverFormMarkup(server = {}) {
     </div>
     <div id="javaFields" class="form-grid">
       <div class="field"><label>Java IP / Host</label><input id="javaHost" class="input" value="${escapeHtml(server.javaHost || "")}" required></div>
-      <div class="field"><label>Java Port</label><input id="javaPort" class="input" type="number" value="${Number(server.javaPort || CONFIG.defaults.javaPort)}" required></div>
+      <div class="field"><label>Java Port</label><input id="javaPort" class="input" type="number" value="${Number(server.javaPort || CONFIG.defaults.javaPort)}" placeholder="${CONFIG.defaults.javaPort}"></div>
     </div>
     <label id="crossPlayRow" class="check-row"><input id="crossPlay" type="checkbox" ${server.crossPlay ? "checked" : ""}> Also supports Bedrock / cross-play</label>
     <div id="bedrockModeFields" class="form-grid hidden">
@@ -2235,6 +2246,7 @@ function serverFormMarkup(server = {}) {
     <div id="iconListingPluginFields" class="form-grid hidden">
       <div class="field"><label>Server Vote Key</label><input id="iconListingVoteKey" class="input" value="${escapeHtml(server.iconListingVoteKey || createVoteKey())}" maxlength="96"></div>
       <div class="field"><label>&nbsp;</label><button id="generateIconListingVoteKey" class="button blue" type="button">Generate Key</button></div>
+      <div class="field"><label>&nbsp;</label><button id="testIconListingPluginVote" class="button blue" type="button" ${server.id ? "" : "disabled"}>Test Plugin Vote</button></div>
       <div class="field"><label>&nbsp;</label><a class="button secondary" href="${route(CONFIG.iconListingVotePlugin?.downloadPath || "/download/IconListingVotePlugin.jar")}" download>${escapeHtml(CONFIG.iconListingVotePlugin?.downloadLabel || "Download Plugin")}</a></div>
     </div>
     <div class="form-grid">
@@ -2304,7 +2316,6 @@ function bindServerForm() {
     $("#realmCodeField")?.classList.toggle("hidden", !isBedrock || !isRealm);
     $("#bedrockFields")?.classList.toggle("hidden", isBedrock ? isRealm : !crossPlay?.checked);
     $("#javaHost")?.toggleAttribute("required", !isBedrock);
-    $("#javaPort")?.toggleAttribute("required", !isBedrock);
     $("#bedrockHost")?.toggleAttribute("required", isBedrock ? !isRealm : !!crossPlay?.checked);
     $("#realmCode")?.toggleAttribute("required", isBedrock && isRealm);
     $("#votifierFields")?.classList.toggle("hidden", !votifier?.checked);
@@ -2326,6 +2337,9 @@ function bindServerForm() {
   $("#bannerUpload")?.addEventListener("change", validateBannerUpload);
   $("#testVote")?.addEventListener("click", async () => {
     try {
+      if (!CONFIG.votifier.providerEndpoint) {
+        return toast("Votifier testing needs a provider endpoint. Use Test Plugin Vote for the IconListing plugin.");
+      }
       const result = await request("testVote", { host: $("#votifierHost").value, port: $("#votifierPort").value, token: $("#votifierToken").value });
       toast(result.message || "Test vote sent.");
     } catch (error) {
@@ -2334,6 +2348,18 @@ function bindServerForm() {
   });
   $("#generateIconListingVoteKey")?.addEventListener("click", () => {
     $("#iconListingVoteKey").value = createVoteKey();
+  });
+  $("#testIconListingPluginVote")?.addEventListener("click", async () => {
+    const serverId = $("#serverId").value;
+    if (!serverId) return toast("Save the listing before testing the plugin vote.");
+    const minecraftUsername = prompt("Minecraft username for the test reward:");
+    if (!minecraftUsername) return;
+    try {
+      const result = await request("testPluginVote", { serverId, minecraftUsername });
+      toast(result.message || "Plugin test vote queued.");
+    } catch (error) {
+      toast(error.message);
+    }
   });
   $("#serverForm")?.addEventListener("submit", submitServerForm);
 }
@@ -2400,7 +2426,6 @@ async function submitServerForm(event) {
         tags: selectedTags
       }
     });
-    await requireSharedServer(result.server?.id);
     toast("Listing saved.");
     boot();
   } catch (error) {

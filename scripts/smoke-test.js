@@ -371,6 +371,17 @@ async function main() {
     const pluginAck = await call("pluginPoll", { key: `smoke-key-${suffix}`, ackIds: [pluginPoll.json.votes[0].id] });
     assert(pluginAck.code === 200 && pluginAck.json.votes.length === 0, "IconListing vote plugin should acknowledge delivered votes");
 
+    const pluginTest = await call(
+      "testPluginVote",
+      { serverId: saved.json.server.id, minecraftUsername: `Test_${String(suffix).slice(-4)}` },
+      login.json.token
+    );
+    assert(pluginTest.code === 200, "server owner should be able to queue an IconListing plugin test vote");
+    const pluginTestPoll = await call("pluginPoll", { key: `smoke-key-${suffix}` });
+    assert(pluginTestPoll.code === 200 && pluginTestPoll.json.votes.length === 1, "IconListing plugin should receive queued test votes");
+    assert(pluginTestPoll.json.votes[0].minecraftUsername === `Test_${String(suffix).slice(-4)}`, "IconListing plugin test vote should include the Minecraft username");
+    await call("pluginPoll", { key: `smoke-key-${suffix}`, ackIds: [pluginTestPoll.json.votes[0].id] });
+
     const repeatVote = await call("vote", {
       serverId: saved.json.server.id,
       minecraftUsername: `Alex_${String(suffix).slice(-4)}`
@@ -546,10 +557,14 @@ async function main() {
     await fs.writeFile(recoveryPath, JSON.stringify({ version: 2, users: [], servers: [{ ...secondServer.json.server, description: "Deleted server recovery fixture that must not return after an intentional delete because deletion tombstones should block old recovery data from restoring it." }], clients: [], votes: [], voteIps: {} }));
     const afterDeleteRecovery = await call("state", {}, "", "GET");
     assert(!afterDeleteRecovery.json.servers.some((item) => item.id === secondServer.json.server.id), "deleted servers should not be restored from recovery JSON");
+    const voteDeletedServer = await call("vote", { serverId: secondServer.json.server.id, minecraftUsername: `Gone_${String(suffix).slice(-4)}` });
+    assert(voteDeletedServer.code === 404 || voteDeletedServer.code === 409, "stale votes must not resurrect deleted listings");
+    const afterDeletedVote = await call("state", {}, "", "GET");
+    assert(!afterDeletedVote.json.servers.some((item) => item.id === secondServer.json.server.id), "deleted server should stay deleted after a stale vote attempt");
     const backupAfterDelete = JSON.parse(await fs.readFile(backupPath, "utf8"));
     assert(backupAfterDelete.deleted?.servers?.[secondServer.json.server.id], "backup JSON should preserve server deletion tombstones");
 
-    console.log("Smoke test passed: auth, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     await fs.rm(dbPath, { force: true });
