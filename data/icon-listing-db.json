@@ -80,15 +80,15 @@
       "ownerId": "bd813e43-bf7a-45fd-869e-f092d2dde82e",
       "ownerName": "MaxFullCalypse",
       "votes": 0,
-      "playersOnline": 51,
-      "playersMax": 52,
+      "playersOnline": 41,
+      "playersMax": 42,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-29T13:56:39.035Z",
+      "lastPingAt": "2026-06-29T14:26:28.947Z",
       "analytics": {
         "ipCopyDaily": [
           {
@@ -277,16 +277,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-29T13:56:39.035Z",
-            "playersOnline": 51,
-            "playersMax": 52,
+            "createdAt": "2026-06-29T14:26:28.947Z",
+            "playersOnline": 41,
+            "playersMax": 42,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-29T13:56:39.035Z",
-      "uptimeChecks": 79,
-      "uptimeSuccesses": 79,
+      "lastSuccessfulPingAt": "2026-06-29T14:26:28.947Z",
+      "uptimeChecks": 80,
+      "uptimeSuccesses": 80,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -331,7 +331,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-      "lastPingAt": "2026-06-29T13:56:39.168Z",
+      "lastPingAt": "2026-06-29T14:26:29.099Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -499,14 +499,14 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-29T13:56:39.168Z",
+            "createdAt": "2026-06-29T14:26:29.099Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
           }
         ]
       },
-      "uptimeChecks": 74,
+      "uptimeChecks": 75,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -549,11 +549,11 @@
       "playersMax": 200,
       "version": "Paper 26.1.2",
       "online": true,
-      "uptimePercent": 9.58904109589041,
+      "uptimePercent": 10.81081081081081,
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
       "updatedAt": "2026-06-24T22:20:23.472Z",
-      "lastPingAt": "2026-06-29T13:56:39.820Z",
+      "lastPingAt": "2026-06-29T14:26:29.725Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -715,14 +715,14 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-29T13:56:39.820Z",
+            "createdAt": "2026-06-29T14:26:29.725Z",
             "playersOnline": 0,
             "playersMax": 200,
             "online": true
           }
         ]
       },
-      "uptimeChecks": 73,
+      "uptimeChecks": 74,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -731,8 +731,8 @@
       "iconListingVoteQueue": [],
       "javaStatusTarget": "enchantedmc.minecra.fr",
       "javaSrvResolved": true,
-      "lastSuccessfulPingAt": "2026-06-29T13:56:39.820Z",
-      "uptimeSuccesses": 7
+      "lastSuccessfulPingAt": "2026-06-29T14:26:29.725Z",
+      "uptimeSuccesses": 8
     },
     {
       "id": "e05bb489-241c-420c-8243-6427106b4476",
@@ -764,15 +764,15 @@
       "ownerId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
       "ownerName": "ItzKuroYT",
       "votes": 1,
-      "playersOnline": 4,
+      "playersOnline": 5,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 88.05970149253731,
+      "uptimePercent": 88.23529411764706,
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
       "updatedAt": "2026-06-28T05:53:12.589Z",
-      "lastPingAt": "2026-06-29T13:56:41.109Z",
+      "lastPingAt": "2026-06-29T14:26:31.030Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -934,16 +934,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-29T13:56:41.109Z",
-            "playersOnline": 4,
+            "createdAt": "2026-06-29T14:26:31.030Z",
+            "playersOnline": 5,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-29T13:56:41.109Z",
-      "uptimeChecks": 67,
-      "uptimeSuccesses": 59,
+      "lastSuccessfulPingAt": "2026-06-29T14:26:31.030Z",
+      "uptimeChecks": 68,
+      "uptimeSuccesses": 60,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -992,11 +992,11 @@
       "playersMax": 333,
       "version": "Purpur 1.21.11",
       "online": true,
-      "uptimePercent": 50,
+      "uptimePercent": 53.333333333333336,
       "sponsored": true,
       "createdAt": "2026-06-28T19:12:07.623Z",
       "updatedAt": "2026-06-28T19:12:07.623Z",
-      "lastPingAt": "2026-06-29T13:56:41.572Z",
+      "lastPingAt": "2026-06-29T14:26:31.487Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -1026,19 +1026,19 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-29T13:56:41.572Z",
+            "createdAt": "2026-06-29T14:26:31.487Z",
             "playersOnline": 0,
             "playersMax": 333,
             "online": true
           }
         ]
       },
-      "uptimeChecks": 14,
+      "uptimeChecks": 15,
       "iconListingVoteQueue": [],
       "javaStatusTarget": "unbent.mnt.li",
       "javaSrvResolved": true,
-      "lastSuccessfulPingAt": "2026-06-29T13:56:41.572Z",
-      "uptimeSuccesses": 7
+      "lastSuccessfulPingAt": "2026-06-29T14:26:31.487Z",
+      "uptimeSuccesses": 8
     }
   ],
   "clients": [
