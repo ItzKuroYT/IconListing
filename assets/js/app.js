@@ -70,6 +70,8 @@ function normalizeServer(server) {
     bedrockType,
     crossPlay: edition === "java" && !!server.crossPlay,
     realmCode: server.realmCode || "",
+    iconUrl: normalizeMinecraftIcon(server.iconUrl || ""),
+    votifierType: cleanVotifierType(server.votifierType),
     iconListingPluginEnabled: !!server.iconListingPluginEnabled,
     iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey || ""),
     iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
@@ -333,6 +335,9 @@ function fallbackRequest(action, payload) {
     store.session = { token: `local-${next.id}`, user: publicUser(next) };
     return Promise.resolve({ user: publicUser(next), token: store.session.token });
   }
+  if (action === "votifierToolTest" || action === "testVote") {
+    return Promise.reject(new Error("Votifier testing needs the production API provider endpoint."));
+  }
   if (action === "saveServer") {
     if (!user) return Promise.reject(new Error("Log in before adding a server."));
     const server = sanitizeServer(payload.server || {});
@@ -493,6 +498,7 @@ function sanitizeServer(server) {
     bedrockPort: Number(server.bedrockPort || CONFIG.defaults.bedrockPort),
     realmCode: cleanText(server.realmCode),
     votifierEnabled: !!server.votifierEnabled,
+    votifierType: cleanVotifierType(server.votifierType),
     votifierHost: cleanText(server.votifierHost),
     votifierPort: Number(server.votifierPort || 8192),
     votifierToken: cleanText(server.votifierToken),
@@ -564,6 +570,18 @@ function createVoteKey() {
 
 function cleanVoteKey(value = "") {
   return cleanText(value).replace(/\s+/g, "");
+}
+
+function cleanVotifierType(value = "") {
+  return String(value || "").toLowerCase() === "votifier" ? "votifier" : "nuvotifier";
+}
+
+function normalizeMinecraftIcon(value = "") {
+  const icon = String(value || "").trim();
+  if (!icon || icon.length > 30000) return "";
+  if (/^data:image\/png;base64,[a-z0-9+/=]+$/i.test(icon)) return icon;
+  if (/^https?:\/\//i.test(icon)) return icon;
+  return "";
 }
 
 function sameVoteKey(a = "", b = "") {
@@ -775,7 +793,8 @@ async function getState() {
   const page = document.body.dataset.page || "home";
   const params = new URLSearchParams(location.search);
   const detailServerId = ["server", "vote"].includes(page) ? (params.get("id") || params.get("server")) : "";
-  const state = await request("state", detailServerId ? { serverId: detailServerId } : {}, "GET");
+  const detailServerSlug = page === "server" ? serverSlugFromPath() : "";
+  const state = await request("state", detailServerId ? { serverId: detailServerId } : detailServerSlug ? { serverSlug: detailServerSlug } : {}, "GET");
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
   return { ...state, votes: state.votes || [] };
@@ -893,6 +912,70 @@ function defaultPageSeo(page) {
   };
 }
 
+function navMenuLink(href, title, body = "", extra = "") {
+  return `<a class="menu-link ${extra}" href="${route(href)}">
+    <strong>${escapeHtml(title)}</strong>
+    ${body ? `<span>${escapeHtml(body)}</span>` : ""}
+  </a>`;
+}
+
+function serversDropdownMarkup() {
+  const gamemodes = CONFIG.gamemodes.slice(0, 12).map((tag) => navMenuLink(`/servers/?tag=${encodeURIComponent(tag)}`, tag, "Browse ranked servers")).join("");
+  return `<div class="dropdown mega-dropdown">
+    <button class="drop-button" type="button" data-route-group="servers">Servers <span class="chevron" aria-hidden="true">v</span></button>
+    <div class="dropdown-menu mega-menu">
+      <div class="mega-column">
+        <div class="dropdown-section-title">Java edition</div>
+        ${navMenuLink("/servers/?tag=Java", "Java Servers", "Servers for Minecraft Java Edition")}
+        ${navMenuLink("/servers/?sort=players", "Popular Java Servers", "Sort by active players")}
+        ${navMenuLink("/servers/?sort=new", "Newest Java Servers", "Recently submitted listings")}
+        ${navMenuLink("/servers/?tag=Modded", "Modded Servers", "Modded and custom gameplay")}
+      </div>
+      <div class="mega-column">
+        <div class="dropdown-section-title">Bedrock edition</div>
+        ${navMenuLink("/servers/?tag=Bedrock", "Bedrock Servers", "Servers for Bedrock players")}
+        ${navMenuLink("/servers/?tag=Cross-Play", "Crossplay Servers", "Java and Bedrock together")}
+        ${navMenuLink("/servers/?tag=New", "Newest Bedrock Servers", "Fresh Bedrock listings")}
+        ${navMenuLink("/servers/?tag=Vote%20Rewards", "Vote Reward Servers", "Communities with vote rewards")}
+      </div>
+      <div class="mega-column wide">
+        <div class="dropdown-section-title">Server game modes</div>
+        <div class="compact-link-grid">${gamemodes}</div>
+        <a class="menu-link view-all" href="${route("/servers/")}"><strong>View all servers</strong><span>Search every listing</span></a>
+      </div>
+      <div class="mega-column search-column">
+        <div class="dropdown-section-title">Search</div>
+        <form class="menu-search" action="${route("/servers/")}" method="get">
+          <input name="q" class="input" type="search" placeholder="Find a specific server">
+        </form>
+        <div class="dropdown-section-title">Quick filters</div>
+        ${["Survival", "SMP", "Skyblock", "Prison", "PvP", "Factions"].map((tag) => `<a class="quick-filter" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)}</a>`).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+function sponsoredDropdownMarkup() {
+  return `<div class="dropdown">
+    <button class="drop-button" type="button" data-route-group="sponsored sponsored-clients sponsored-hosts">${escapeHtml(copy("nav.sponsoredServers", "Sponsored"))} <span class="chevron" aria-hidden="true">v</span></button>
+    <div class="dropdown-menu sponsor-menu">
+      ${navMenuLink("/sponsored/", copy("sponsoredServers.title", "Sponsored Servers"), "Paid Minecraft server placements", "accent-purple")}
+      ${navMenuLink("/sponsored-clients/", copy("nav.sponsoredClients", "Sponsored Clients"), "Client promotions and downloads", "accent-pink")}
+      ${navMenuLink("/sponsored-hosts/", copy("nav.sponsoredHosts", "Sponsored Hosts"), "Minecraft hosting sponsors", "accent-blue")}
+    </div>
+  </div>`;
+}
+
+function toolsDropdownMarkup() {
+  return `<div class="dropdown">
+    <button class="drop-button" type="button" data-route-group="motd-builder votifier-tester">${escapeHtml(copy("nav.tools", "Tools"))} <span class="chevron" aria-hidden="true">v</span></button>
+    <div class="dropdown-menu tools-menu">
+      ${navMenuLink("/tools/votifier-tester/", copy("tools.votifierTitle", "Votifier Tester"), "Check Votifier or NuVotifier settings", "accent-blue")}
+      ${navMenuLink("/tools/motd-builder/", copy("tools.motdTitle", "MOTD Builder"), "Build a two-line Minecraft MOTD", "accent-purple")}
+    </div>
+  </div>`;
+}
+
 function renderLayout() {
   const page = document.body.dataset.page || "home";
   setSeoMeta(defaultPageSeo(page));
@@ -906,18 +989,9 @@ function renderLayout() {
         <button class="mobile-toggle" type="button" aria-label="Toggle menu">Menu</button>
         <div class="nav-links">
           <a class="nav-link" data-route="home" href="${route("/")}">${escapeHtml(copy("nav.home", "Home"))}</a>
-          <div class="dropdown">
-            <button class="drop-button" type="button">${escapeHtml(copy("nav.servers", "Servers"))} <span aria-hidden="true">v</span></button>
-            <div class="dropdown-menu">
-              <div class="dropdown-section-title">Gamemodes</div>
-              <div class="tag-grid">${CONFIG.gamemodes.map((tag) => `<a class="tag-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${tag}</a>`).join("")}</div>
-              <div class="dropdown-section-title" style="margin-top:14px">General Tags</div>
-              <div class="tag-grid">${CONFIG.generalTags.map((tag) => `<a class="tag-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${tag}</a>`).join("")}</div>
-            </div>
-          </div>
-          <a class="nav-link" data-route="sponsored" href="${route("/sponsored/")}">${escapeHtml(copy("nav.sponsoredServers", "Sponsored"))}</a>
-          <a class="nav-link" data-route="sponsored-clients" href="${route("/sponsored-clients/")}">${escapeHtml(copy("nav.sponsoredClients", "Sponsored Clients"))}</a>
-          <a class="nav-link" data-route="sponsored-hosts" href="${route("/sponsored-hosts/")}">${escapeHtml(copy("nav.sponsoredHosts", "Sponsored Hosts"))}</a>
+          ${serversDropdownMarkup()}
+          ${sponsoredDropdownMarkup()}
+          ${toolsDropdownMarkup()}
           <a class="nav-link hidden" data-auth="dashboard" data-route="dashboard" href="${route("/dashboard/")}">${escapeHtml(copy("nav.dashboard", "Dashboard"))}</a>
           <a class="nav-link hidden" data-auth="admin" data-route="admin" href="${route("/admin/")}">${escapeHtml(copy("nav.admin", "Admin"))}</a>
           <a class="nav-link" data-auth="login" data-route="login" href="${route("/login/")}">${escapeHtml(copy("nav.login", "Login"))}</a>
@@ -939,6 +1013,10 @@ function renderLayout() {
   </div>`;
   $(".mobile-toggle").addEventListener("click", () => $(".nav").classList.toggle("open"));
   $$(`[data-route="${page}"]`).forEach((link) => link.classList.add("active"));
+  $$("[data-route-group]").forEach((node) => {
+    const routes = String(node.dataset.routeGroup || "").split(/\s+/);
+    node.classList.toggle("active", routes.includes(page));
+  });
 }
 
 function syncAuthUi(user) {
@@ -1082,10 +1160,93 @@ function descriptionSnippet(value = "", max = 150) {
   return trimSeo(value, max);
 }
 
+function serverSlug(value = "", fallback = "") {
+  const slug = String(value || "")
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+  return slug || String(fallback || "server").replace(/[^a-z0-9-]/gi, "").slice(0, 80) || "server";
+}
+
+function serverPath(server) {
+  return `/server/${encodeURIComponent(serverSlug(server.name, server.id))}`;
+}
+
+function serverRoute(server) {
+  return route(serverPath(server));
+}
+
+function serverSlugFromPath() {
+  const match = location.pathname.match(/\/server\/([^/?#]+)/i);
+  return match ? decodeURIComponent(match[1] || "") : "";
+}
+
+function sameServerSlug(server, slug = "") {
+  return serverSlug(server.name, server.id).toLowerCase() === serverSlug(slug).toLowerCase();
+}
+
+function findServerFromLocation(servers = []) {
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id") || params.get("server");
+  if (id) return servers.find((item) => item.id === id);
+  const slug = serverSlugFromPath();
+  return slug ? servers.find((item) => sameServerSlug(item, slug)) : null;
+}
+
 function popularTagLinks(limit = 12) {
   return [...CONFIG.gamemodes.slice(0, limit - 3), "Bedrock", "Cross-Play", "New"].slice(0, limit).map((tag) => (
     `<a class="pill" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)} servers</a>`
   )).join("");
+}
+
+function popularGamemodeStats(servers = [], limit = 8) {
+  const stats = new Map();
+  for (const server of servers) {
+    const tags = [...new Set(server.tags || [])].filter((tag) => CONFIG.gamemodes.includes(tag));
+    for (const tag of tags) {
+      const item = stats.get(tag) || { tag, players: 0, listings: 0 };
+      item.players += Number(server.playersOnline || 0);
+      item.listings += 1;
+      stats.set(tag, item);
+    }
+  }
+  const ranked = [...stats.values()].sort((a, b) => b.players - a.players || b.listings - a.listings || a.tag.localeCompare(b.tag));
+  return ranked.length ? ranked.slice(0, limit) : CONFIG.gamemodes.slice(0, limit).map((tag) => ({ tag, players: 0, listings: 0 }));
+}
+
+function popularGamemodesCard(servers = []) {
+  const rows = popularGamemodeStats(servers);
+  return `<article class="side-card popular-card">
+    <h2><span class="side-icon">G</span> Popular Gamemodes</h2>
+    <div class="popular-rows">${rows.map((item, index) => `<a class="popular-row" href="${route(`/servers/?tag=${encodeURIComponent(item.tag)}`)}">
+      <span class="popular-rank">#${index + 1}</span>
+      <strong>${escapeHtml(item.tag)}</strong>
+      <span class="player-badge">${Number(item.players || 0).toLocaleString()} players</span>
+    </a>`).join("")}</div>
+  </article>`;
+}
+
+function directorySidebar(servers = []) {
+  const online = onlineServerCount(servers);
+  const totalPlayers = servers.reduce((sum, server) => sum + Number(server.playersOnline || 0), 0);
+  return `<aside class="directory-sidebar">
+    ${popularGamemodesCard(servers)}
+    <article class="side-card stat-side-card">
+      <h2>Live Directory</h2>
+      <div class="side-stat"><strong>${Number(online).toLocaleString()}</strong><span>servers online</span></div>
+      <div class="side-stat"><strong>${Number(totalPlayers).toLocaleString()}</strong><span>players online</span></div>
+      <a class="button primary side-button" href="${route("/login/")}">Submit a server</a>
+    </article>
+    <article class="side-card browse-card">
+      <h2>Browse Faster</h2>
+      <div class="server-tags">
+        ${["Java", "Bedrock", "Cross-Play", "SMP", "PvP", "Survival"].map((tag) => `<a class="pill" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)}</a>`).join("")}
+      </div>
+    </article>
+  </aside>`;
 }
 
 const HOME_FAQS = [
@@ -1138,9 +1299,13 @@ function faqMarkup(items) {
 function serverCard(server) {
   const banner = server.bannerUrl ? `background-image:url('${escapeHtml(asset(server.bannerUrl))}')` : "";
   const editionLabel = serverEditionLabel(server);
+  const icon = serverIconUrl(server);
   return `<article class="server-card ${server.sponsored ? "sponsored" : ""}" data-server-id="${escapeHtml(server.id)}">
-    <a class="server-card-link" href="${route(`/server/?id=${encodeURIComponent(server.id)}`)}" aria-label="Open ${escapeHtml(server.name)} listing"></a>
-    <div class="rank">${server.sponsored ? `<span class="star">*</span>` : ""}#${server.rank || "-"}</div>
+    <a class="server-card-link" href="${serverRoute(server)}" aria-label="Open ${escapeHtml(server.name)} listing"></a>
+    <div class="rank-stack">
+      <div class="rank">${server.sponsored ? `<span class="star">*</span>` : ""}#${server.rank || "-"}</div>
+      <img class="server-favicon" src="${escapeHtml(icon)}" alt="${escapeHtml(server.name)} icon" loading="lazy">
+    </div>
     <div class="banner" style="${banner}" role="img" aria-label="${escapeHtml(server.name)} banner"></div>
     <div class="server-main">
       <h3 class="server-title">${escapeHtml(server.name)} ${server.sponsored ? `<span class="pill">Sponsored</span>` : ""}</h3>
@@ -1322,7 +1487,7 @@ function serverJsonLd(server) {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: server.name,
-    url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
+    url: absoluteUrl(serverPath(server)),
     description: trimSeo(server.description || serverSeoDescription(server), 300),
     keywords: [...(server.tags || []), "Minecraft server", "Minecraft server list"].join(", "),
     image: absoluteUrl(asset(server.bannerUrl || CONFIG.site.iconPath)),
@@ -1334,7 +1499,7 @@ function serverJsonLd(server) {
       "@type": "Thing",
       name: server.name,
       description: trimSeo(server.description || serverSeoDescription(server), 300),
-      url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`)
+      url: absoluteUrl(serverPath(server))
     }
   };
 }
@@ -1397,8 +1562,13 @@ function renderHome(state) {
         </div>
       </div>
       ${toolbarMarkup()}
-      <div id="serverList" class="server-list"></div>
-      <div id="serverPager"></div>
+      <div class="directory-layout">
+        <div>
+          <div id="serverList" class="server-list"></div>
+          <div id="serverPager"></div>
+        </div>
+        ${directorySidebar(state.servers)}
+      </div>
     </section>
     <section class="section seo-section">
       <h2 class="section-title">Browse Minecraft Servers by Gamemode</h2>
@@ -1454,7 +1624,7 @@ function renderServers(state) {
           itemListElement: state.servers.slice(0, 20).map((server, index) => ({
             "@type": "ListItem",
             position: index + 1,
-            url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
+            url: absoluteUrl(serverPath(server)),
             name: server.name
           }))
         },
@@ -1481,16 +1651,20 @@ function renderServers(state) {
         <p class="section-copy">A useful Minecraft server list should show more than a name. Icon Listing lets players compare server IPs, online status, player counts, votes, tags, formatted descriptions, banners, trailers, and owner links so they can pick a community that matches how they play.</p>
         ${faqMarkup(SERVER_LIST_FAQS)}
       </section>
-      <div id="serverList" class="server-list"></div>
-      <div id="serverPager"></div>
+      <div class="directory-layout">
+        <div>
+          <div id="serverList" class="server-list"></div>
+          <div id="serverPager"></div>
+        </div>
+        ${directorySidebar(state.servers)}
+      </div>
     </section>
   </div>`;
   setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: "/servers/" });
 }
 
 function renderServerDetail(state) {
-  const id = new URLSearchParams(location.search).get("id");
-  const server = state.servers.find((item) => item.id === id);
+  const server = findServerFromLocation(state.servers);
   if (!server) {
     setSeoMeta({
       title: `Server Not Found | ${CONFIG.site.name}`,
@@ -1509,7 +1683,7 @@ function renderServerDetail(state) {
   setSeoMeta({
     title: serverSeoTitle(server),
     description: serverSeoDescription(server),
-    path: `/server/?id=${encodeURIComponent(server.id)}`,
+    path: serverPath(server),
     image: server.bannerUrl || CONFIG.site.iconPath,
     type: "article",
     keywords: [...(server.tags || []), server.name, server.javaHost, server.bedrockHost, server.realmCode].filter(Boolean),
@@ -1640,6 +1814,11 @@ function serverAddress(server) {
   return javaAddress(server);
 }
 
+function serverIconUrl(server) {
+  const icon = normalizeMinecraftIcon(server.iconUrl || "");
+  return icon || asset(CONFIG.site.iconPath);
+}
+
 function javaAddress(server) {
   const host = cleanHost(server.javaHost);
   if (server.javaSrvResolved || server.javaStatusTarget === host) return host;
@@ -1691,7 +1870,7 @@ function bbBannerCode(server) {
 }
 
 function listingUrl(server) {
-  return new URL(route(`/server/?id=${encodeURIComponent(server.id)}`), location.origin).href;
+  return new URL(serverRoute(server), location.origin).href;
 }
 
 function bannerImageUrl(server) {
@@ -1867,7 +2046,7 @@ function renderSponsored(state) {
         itemListElement: sponsoredServers.slice(0, 20).map((server, index) => ({
           "@type": "ListItem",
           position: index + 1,
-          url: absoluteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
+          url: absoluteUrl(serverPath(server)),
           name: server.name
         }))
       }
@@ -2185,7 +2364,7 @@ function renderDashboard(state) {
           <p class="server-ip">${escapeHtml(serverAddress(server))}</p>
         </div>
         <div class="row-actions">
-          <a class="button" href="${route(`/server/?id=${encodeURIComponent(server.id)}`)}">View</a>
+          <a class="button" href="${serverRoute(server)}">View</a>
           <button class="button" data-edit="${escapeHtml(server.id)}">Edit</button>
           <button class="button danger" data-delete="${escapeHtml(server.id)}">Delete</button>
         </div>
@@ -2233,9 +2412,13 @@ function serverFormMarkup(server = {}) {
     </div>
     <label class="check-row"><input id="votifierEnabled" type="checkbox" ${server.votifierEnabled ? "checked" : ""}> Enable Votifier</label>
     <div id="votifierFields" class="form-grid hidden">
+      <div class="field"><label>Vote Listener Type</label><select id="votifierType" class="select">
+        <option value="nuvotifier" ${cleanVotifierType(server.votifierType) === "nuvotifier" ? "selected" : ""}>NuVotifier</option>
+        <option value="votifier" ${cleanVotifierType(server.votifierType) === "votifier" ? "selected" : ""}>Votifier</option>
+      </select></div>
       <div class="field"><label>Votifier IP / Host</label><input id="votifierHost" class="input" value="${escapeHtml(server.votifierHost || "")}"></div>
       <div class="field"><label>Votifier Port</label><input id="votifierPort" class="input" type="number" value="${Number(server.votifierPort || 8192)}"></div>
-      <div class="field"><label>Votifier Token / Public Key</label><input id="votifierToken" class="input" value="${escapeHtml(server.votifierToken || "")}"></div>
+      <div class="field"><label>Votifier/NuVotifier Token / Public Key</label><input id="votifierToken" class="input" value="${escapeHtml(server.votifierToken || "")}"></div>
       <div class="field"><label>&nbsp;</label><button id="testVote" class="button blue" type="button">Send Test Vote</button></div>
     </div>
     <div class="form-grid">
@@ -2341,7 +2524,7 @@ function bindServerForm() {
       if (!CONFIG.votifier.providerEndpoint) {
         return toast("Votifier testing needs a provider endpoint. Use Test Plugin Vote for the IconListing plugin.");
       }
-      const result = await request("testVote", { host: $("#votifierHost").value, port: $("#votifierPort").value, token: $("#votifierToken").value });
+      const result = await request("testVote", { host: $("#votifierHost").value, port: $("#votifierPort").value, token: $("#votifierToken").value, type: $("#votifierType")?.value || "nuvotifier" });
       toast(result.message || "Test vote sent.");
     } catch (error) {
       toast(error.message);
@@ -2413,6 +2596,7 @@ async function submitServerForm(event) {
         bedrockPort: $("#bedrockPort").value,
         realmCode: $("#realmCode").value,
         votifierEnabled: $("#votifierEnabled").checked,
+        votifierType: $("#votifierType")?.value || "nuvotifier",
         votifierHost: $("#votifierHost").value,
         votifierPort: $("#votifierPort").value,
         votifierToken: $("#votifierToken").value,
@@ -2692,6 +2876,274 @@ function bindAdminHostForms(state) {
   }));
 }
 
+const MINECRAFT_COLORS = [
+  ["0", "Black", "#000000"],
+  ["1", "Dark Blue", "#0000aa"],
+  ["2", "Dark Green", "#00aa00"],
+  ["3", "Dark Aqua", "#00aaaa"],
+  ["4", "Dark Red", "#aa0000"],
+  ["5", "Dark Purple", "#aa00aa"],
+  ["6", "Gold", "#ffaa00"],
+  ["7", "Gray", "#aaaaaa"],
+  ["8", "Dark Gray", "#555555"],
+  ["9", "Blue", "#5555ff"],
+  ["a", "Green", "#55ff55"],
+  ["b", "Aqua", "#55ffff"],
+  ["c", "Red", "#ff5555"],
+  ["d", "Light Purple", "#ff55ff"],
+  ["e", "Yellow", "#ffff55"],
+  ["f", "White", "#ffffff"]
+];
+
+const MINECRAFT_COLOR_MAP = Object.fromEntries(MINECRAFT_COLORS.map(([code, , color]) => [code, color]));
+
+function renderMotdBuilder() {
+  setSeoMeta({
+    title: CONFIG.seo?.pages?.motdBuilder?.title || "Minecraft MOTD Builder | Icon Listing",
+    description: CONFIG.seo?.pages?.motdBuilder?.description || "Build a two-line Minecraft server MOTD with colors, formatting, centering, live preview, raw output, and shareable URL.",
+    path: "/tools/motd-builder/"
+  });
+  const params = new URLSearchParams(location.search);
+  const line1 = params.get("line1") || "&6&lAwesome &aMinecraft&f Server";
+  const line2 = params.get("line2") || "&7Join now &8- &bSurvival &7and &dSkyblock";
+  $("#app").innerHTML = `<div class="page tool-page">
+    <section class="tool-hero">
+      <div class="tool-icon">M</div>
+      <div>
+        <h1 class="section-title">${escapeHtml(copy("tools.motdTitle", "MOTD Builder"))}</h1>
+        <p class="section-copy">${escapeHtml(copy("tools.motdBody", "Design a two-line Minecraft server MOTD with a live in-game style preview, centering helper, and shareable URL."))}</p>
+      </div>
+    </section>
+    <section class="tool-card motd-builder">
+      <div class="field">
+        <div class="field-head"><label for="motdLine1">Line 1</label><button class="button small" type="button" data-center-line="motdLine1">Center</button></div>
+        <input id="motdLine1" class="input motd-input" maxlength="80" value="${escapeHtml(line1)}">
+        <div class="meter"><span id="motdMeter1"></span></div>
+        <p class="field-hint"><span id="motdCount1">0</span>/60 visible characters</p>
+      </div>
+      <div class="field">
+        <div class="field-head"><label for="motdLine2">Line 2</label><button class="button small" type="button" data-center-line="motdLine2">Center</button></div>
+        <input id="motdLine2" class="input motd-input" maxlength="80" value="${escapeHtml(line2)}">
+        <div class="meter"><span id="motdMeter2"></span></div>
+        <p class="field-hint"><span id="motdCount2">0</span>/60 visible characters</p>
+      </div>
+      <div class="tool-block">
+        <h2>Colors</h2>
+        <div class="swatch-row">${MINECRAFT_COLORS.map(([code, name, color]) => `<button class="swatch" type="button" style="--swatch:${color}" data-insert-code="&${code}" title="${escapeHtml(name)}"></button>`).join("")}</div>
+      </div>
+      <div class="tool-block">
+        <h2>Formatting</h2>
+        <div class="row-actions compact">
+          <button class="button small" type="button" data-insert-code="&l">B Bold</button>
+          <button class="button small" type="button" data-insert-code="&o">I Italic</button>
+          <button class="button small" type="button" data-insert-code="&n">U Underline</button>
+          <button class="button small" type="button" data-insert-code="&m">S Strike</button>
+          <button class="button small" type="button" data-insert-code="&k">Obfuscated</button>
+          <button class="button small" type="button" data-insert-code="&r">Reset</button>
+        </div>
+      </div>
+      <div class="tool-block">
+        <h2>Server list preview</h2>
+        <div class="motd-preview">
+          <div class="motd-preview-icon"></div>
+          <div class="motd-preview-copy">
+            <strong>Minecraft Server</strong>
+            <p id="motdPreview1"></p>
+            <p id="motdPreview2"></p>
+          </div>
+          <span class="motd-preview-count">12/100</span>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-head"><label for="rawMotd">Raw MOTD</label><div class="row-actions compact"><button class="button small" id="shareMotd" type="button">Get URL</button><button class="button small" id="copyMotd" type="button">Copy</button></div></div>
+        <textarea id="rawMotd" class="textarea code-input" readonly></textarea>
+      </div>
+    </section>
+  </div>`;
+  bindMotdBuilder();
+}
+
+function bindMotdBuilder() {
+  let activeInput = $("#motdLine1");
+  $$(".motd-input").forEach((input) => {
+    input.addEventListener("focus", () => {
+      activeInput = input;
+    });
+    input.addEventListener("input", updateMotdBuilder);
+  });
+  $$("[data-insert-code]").forEach((button) => button.addEventListener("click", () => {
+    insertAtCursor(activeInput || $("#motdLine1"), button.dataset.insertCode);
+    updateMotdBuilder();
+  }));
+  $$("[data-center-line]").forEach((button) => button.addEventListener("click", () => {
+    const input = $(`#${button.dataset.centerLine}`);
+    input.value = centerMotdLine(input.value);
+    input.focus();
+    updateMotdBuilder();
+  }));
+  $("#copyMotd")?.addEventListener("click", async () => {
+    await copyText($("#rawMotd").value);
+    toast("MOTD copied.");
+  });
+  $("#shareMotd")?.addEventListener("click", async () => {
+    const params = new URLSearchParams({ line1: $("#motdLine1").value, line2: $("#motdLine2").value });
+    const url = `${location.origin}${route("/tools/motd-builder/")}?${params.toString()}`;
+    history.replaceState(null, "", url);
+    await copyText(url);
+    toast("MOTD link copied.");
+  });
+  updateMotdBuilder();
+}
+
+function updateMotdBuilder() {
+  const line1 = $("#motdLine1")?.value || "";
+  const line2 = $("#motdLine2")?.value || "";
+  $("#motdPreview1").innerHTML = minecraftMotdHtml(line1);
+  $("#motdPreview2").innerHTML = minecraftMotdHtml(line2);
+  $("#rawMotd").value = `${line1}\n${line2}`;
+  updateMotdCount("1", line1);
+  updateMotdCount("2", line2);
+}
+
+function updateMotdCount(index, value) {
+  const count = stripMinecraftCodes(value).length;
+  $(`#motdCount${index}`).textContent = count;
+  $(`#motdMeter${index}`).style.width = `${Math.min(100, (count / 60) * 100)}%`;
+}
+
+function centerMotdLine(value = "") {
+  const visible = stripMinecraftCodes(value).trim();
+  const padding = Math.max(0, Math.floor((44 - visible.length) / 2));
+  return `${" ".repeat(padding)}${value.trim()}`;
+}
+
+function stripMinecraftCodes(value = "") {
+  return String(value || "").replace(/&[0-9a-fk-or]/gi, "");
+}
+
+function minecraftMotdHtml(value = "") {
+  let state = resetMinecraftStyle();
+  let buffer = "";
+  const parts = [];
+  const flush = () => {
+    if (!buffer) return;
+    parts.push(`<span style="${minecraftStyleAttr(state)}">${escapeHtml(buffer)}</span>`);
+    buffer = "";
+  };
+  for (let index = 0; index < value.length; index += 1) {
+    const char = value[index];
+    const code = char === "&" ? String(value[index + 1] || "").toLowerCase() : "";
+    if (code && /[0-9a-fk-or]/.test(code)) {
+      flush();
+      index += 1;
+      if (MINECRAFT_COLOR_MAP[code]) state = { ...resetMinecraftStyle(), color: MINECRAFT_COLOR_MAP[code] };
+      else if (code === "l") state.bold = true;
+      else if (code === "o") state.italic = true;
+      else if (code === "n") state.underline = true;
+      else if (code === "m") state.strike = true;
+      else if (code === "k") state.obfuscated = true;
+      else if (code === "r") state = resetMinecraftStyle();
+    } else {
+      buffer += state.obfuscated && char !== " " ? "#" : char;
+    }
+  }
+  flush();
+  return parts.join("") || "&nbsp;";
+}
+
+function resetMinecraftStyle() {
+  return { color: "#ffffff", bold: false, italic: false, underline: false, strike: false, obfuscated: false };
+}
+
+function minecraftStyleAttr(state) {
+  const decorations = [state.underline ? "underline" : "", state.strike ? "line-through" : ""].filter(Boolean).join(" ");
+  return [
+    `color:${state.color}`,
+    state.bold ? "font-weight:800" : "",
+    state.italic ? "font-style:italic" : "",
+    decorations ? `text-decoration:${decorations}` : ""
+  ].filter(Boolean).join(";");
+}
+
+function insertAtCursor(input, text) {
+  if (!input) return;
+  const start = input.selectionStart ?? input.value.length;
+  const end = input.selectionEnd ?? input.value.length;
+  input.value = `${input.value.slice(0, start)}${text}${input.value.slice(end)}`;
+  input.focus();
+  input.selectionStart = input.selectionEnd = start + text.length;
+}
+
+async function copyText(value) {
+  try {
+    await navigator.clipboard.writeText(value);
+  } catch {
+    window.prompt("Copy", value);
+  }
+}
+
+function renderVotifierTester() {
+  setSeoMeta({
+    title: CONFIG.seo?.pages?.votifierTester?.title || "Votifier Tester | NuVotifier Tool",
+    description: CONFIG.seo?.pages?.votifierTester?.description || "Test Votifier and NuVotifier settings with host, port, token or public key, and a Minecraft username.",
+    path: "/tools/votifier-tester/"
+  });
+  $("#app").innerHTML = `<div class="page tool-page">
+    <section class="tool-hero">
+      <div class="tool-icon">V</div>
+      <div>
+        <h1 class="section-title">${escapeHtml(copy("tools.votifierTitle", "Votifier Tester"))}</h1>
+        <p class="section-copy">${escapeHtml(copy("tools.votifierBody", "Check Votifier or NuVotifier settings before connecting voting to a Minecraft server listing."))}</p>
+      </div>
+    </section>
+    <section class="tool-card votifier-tool-card">
+      <form id="votifierToolForm" class="form">
+        <div class="form-grid">
+          <div class="field"><label>Listener type</label><select id="toolVotifierType" class="select">
+            <option value="nuvotifier">NuVotifier</option>
+            <option value="votifier">Votifier</option>
+          </select></div>
+          <div class="field"><label>Test username</label><input id="toolVotifierUsername" class="input" value="${escapeHtml(CONFIG.votifier.testUsername || "IconListingTest")}" maxlength="16"></div>
+          <div class="field"><label>Votifier host</label><input id="toolVotifierHost" class="input" placeholder="play.example.com" required></div>
+          <div class="field"><label>Port</label><input id="toolVotifierPort" class="input" type="number" value="8192" required></div>
+        </div>
+        <div class="field"><label>Token / public key</label><textarea id="toolVotifierToken" class="textarea code-input" placeholder="NuVotifier token or Votifier public key" required></textarea></div>
+        <div class="row-actions">
+          <button class="button primary" type="submit">Test connection</button>
+          <a class="button" href="${escapeHtml(CONFIG.votifier.documentationUrl || "https://github.com/NuVotifier/NuVotifier")}">Docs</a>
+        </div>
+        <div id="votifierToolResult" class="notice hidden"></div>
+      </form>
+    </section>
+  </div>`;
+  bindVotifierTester();
+}
+
+function bindVotifierTester() {
+  $("#votifierToolForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const result = $("#votifierToolResult");
+    result.classList.remove("hidden");
+    if (!CONFIG.votifier.providerEndpoint) {
+      result.textContent = "Votifier testing needs CONFIG.votifier.providerEndpoint to be connected before this public tool can send a test.";
+      return;
+    }
+    result.textContent = "Testing...";
+    try {
+      const response = await request("votifierToolTest", {
+        type: $("#toolVotifierType").value,
+        host: $("#toolVotifierHost").value,
+        port: $("#toolVotifierPort").value,
+        token: $("#toolVotifierToken").value,
+        minecraftUsername: $("#toolVotifierUsername").value
+      });
+      result.textContent = response.message || "Votifier test sent.";
+    } catch (error) {
+      result.textContent = publicRequestError("votifierToolTest", error);
+    }
+  });
+}
+
 function renderStatic(page) {
   const staticCopy = CONFIG.copy?.staticPages?.[page] || ["Page", "This page is ready to configure."];
   setSeoMeta({
@@ -2716,6 +3168,8 @@ async function boot() {
     else if (page === "sponsored") renderSponsored(state);
     else if (page === "sponsored-clients") renderClients(state);
     else if (page === "sponsored-hosts") renderHosts(state);
+    else if (page === "motd-builder") renderMotdBuilder(state);
+    else if (page === "votifier-tester") renderVotifierTester(state);
     else if (page === "login") renderLogin(state);
     else if (page === "dashboard") renderDashboard(state);
     else if (page === "admin") renderAdmin(state);

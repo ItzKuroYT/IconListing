@@ -24,6 +24,7 @@ http.createServer((req, res) => {
     return;
   }
   if (url.pathname === "/") filePath = path.join(root, "index.html");
+  if (/^\/server\/[^/]+\/?$/.test(url.pathname)) filePath = path.join(root, "server", "index.html");
   if (!path.extname(filePath)) filePath = path.join(filePath, "index.html");
   fs.readFile(filePath, (error, body) => {
     if (error) {

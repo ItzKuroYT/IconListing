@@ -16,9 +16,9 @@ const VOTIFIER_TIMEOUT_MS = 3000;
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "pluginPoll", "testPluginVote", "admin"]);
+const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
 const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "testPluginVote", "admin"]);
-const READ_ACTIONS = new Set(["state", "sitemap", "health"]);
+const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage"]);
 const loginFailures = new Map();
 
 module.exports = async function handler(req, res) {
@@ -35,13 +35,21 @@ module.exports = async function handler(req, res) {
       return json(res, 200, healthPayload(req));
     }
     const db = migrateDb(await loadDb({
-      allowRecoveryOnly: ["state", "sitemap", "login", "health"].includes(action),
+      allowRecoveryOnly: ["state", "sitemap", "login", "health", "serverPage", "serverImage"].includes(action),
       forceFresh: WRITE_ACTIONS.has(action) || action === "state"
     }));
     const user = await userFromRequest(req, db);
 
     if (action === "sitemap") {
       return xml(res, 200, sitemapXml(db));
+    }
+
+    if (action === "serverPage") {
+      return html(res, 200, serverPageHtml(db, req));
+    }
+
+    if (action === "serverImage") {
+      return serverImage(res, db, req);
     }
 
     if (action === "state") {
@@ -212,7 +220,20 @@ module.exports = async function handler(req, res) {
         host: clean(body.host),
         port: Number(body.port || 8192),
         token: clean(body.token),
+        type: cleanVotifierType(body.type),
         minecraftUsername: CONFIG.votifier.testUsername,
+        serviceName: CONFIG.site.name
+      });
+      return json(res, 200, result);
+    }
+
+    if (action === "votifierToolTest") {
+      const result = await sendVotifierPayload({
+        host: clean(body.host),
+        port: Number(body.port || 8192),
+        token: clean(body.token),
+        type: cleanVotifierType(body.type),
+        minecraftUsername: cleanText(body.minecraftUsername || CONFIG.votifier.testUsername),
         serviceName: CONFIG.site.name
       });
       return json(res, 200, result);
@@ -330,6 +351,7 @@ async function readBody(req) {
 function actionFromRequest(req) {
   const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
   if (url.pathname.endsWith("/sitemap.xml")) return "sitemap";
+  if (/^\/server\/[^/]+\/?$/i.test(url.pathname)) return "serverPage";
   return req.query?.action || url.searchParams.get("action") || "state";
 }
 
@@ -444,6 +466,8 @@ function normalizeServer(server) {
     bedrockType,
     crossPlay: edition === "java" && !!server.crossPlay,
     realmCode: server.realmCode || "",
+    iconUrl: normalizeMinecraftIcon(server.iconUrl || ""),
+    votifierType: cleanVotifierType(server.votifierType),
     iconListingPluginEnabled: !!server.iconListingPluginEnabled,
     iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey || ""),
     iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
@@ -993,7 +1017,9 @@ function shouldEncryptStorage() {
 }
 
 function statePayload(db, user, options = {}) {
-  const detailServerId = clean(options.detailServerId || "");
+  const detailServerKey = clean(options.detailServerId || options.detailServerKey || "");
+  const detailServer = detailServerKey ? findServerByKey(db.servers, detailServerKey) : null;
+  const detailServerId = detailServer?.id || detailServerKey;
   return {
     servers: rankServers(db.servers, db.votes).map((server) => publicServer(server, user, { fullAnalytics: server.id === detailServerId })),
     clients: db.clients,
@@ -1005,13 +1031,49 @@ function statePayload(db, user, options = {}) {
 
 function stateDetailServerId(req) {
   const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
-  return clean(req.query?.serverId || req.query?.server || url.searchParams.get("serverId") || url.searchParams.get("id") || url.searchParams.get("server") || "");
+  return clean(req.query?.serverId || req.query?.server || req.query?.serverSlug || req.query?.slug || url.searchParams.get("serverId") || url.searchParams.get("id") || url.searchParams.get("server") || url.searchParams.get("serverSlug") || url.searchParams.get("slug") || "");
 }
 
 function siteUrl(pathname = "/") {
   const base = String(CONFIG.site.url || "https://minecraft-listing.iconrealms.net").replace(/\/$/, "");
   const path = String(pathname || "/");
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+function serverSlug(value = "", fallback = "") {
+  const slug = String(value || "")
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+  return slug || String(fallback || "server").replace(/[^a-z0-9-]/gi, "").slice(0, 80) || "server";
+}
+
+function serverPath(server) {
+  return `/server/${encodeURIComponent(serverSlug(server.name, server.id))}`;
+}
+
+function findServerByKey(servers = [], key = "") {
+  const value = clean(key);
+  if (!value) return null;
+  const decoded = decodeUriPart(value);
+  return (servers || []).find((server) => server.id === decoded || server.id === value || serverSlug(server.name, server.id).toLowerCase() === serverSlug(decoded).toLowerCase()) || null;
+}
+
+function serverKeyFromRequest(req) {
+  const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
+  const pathMatch = url.pathname.match(/^\/server\/([^/]+)\/?$/i);
+  return clean(req.query?.slug || req.query?.serverSlug || req.query?.id || url.searchParams.get("slug") || url.searchParams.get("serverSlug") || url.searchParams.get("id") || (pathMatch ? pathMatch[1] : ""));
+}
+
+function decodeUriPart(value = "") {
+  try {
+    return decodeURIComponent(String(value || ""));
+  } catch {
+    return String(value || "");
+  }
 }
 
 function sitemapXml(db) {
@@ -1022,11 +1084,13 @@ function sitemapXml(db) {
     { loc: siteUrl("/sponsored/"), priority: "0.7", changefreq: "weekly" },
     { loc: siteUrl("/sponsored-clients/"), priority: "0.7", changefreq: "weekly" },
     { loc: siteUrl("/sponsored-hosts/"), priority: "0.7", changefreq: "weekly" },
+    { loc: siteUrl("/tools/motd-builder/"), priority: "0.6", changefreq: "monthly" },
+    { loc: siteUrl("/tools/votifier-tester/"), priority: "0.6", changefreq: "monthly" },
     { loc: siteUrl("/help/"), priority: "0.4", changefreq: "monthly" },
     { loc: siteUrl("/contact/"), priority: "0.4", changefreq: "monthly" }
   ];
   const serverUrls = rankServers(db.servers, db.votes).map((server) => ({
-    loc: siteUrl(`/server/?id=${encodeURIComponent(server.id)}`),
+    loc: siteUrl(serverPath(server)),
     priority: server.sponsored ? "0.8" : "0.6",
     changefreq: "daily",
     lastmod: server.updatedAt || server.createdAt || server.lastPingAt || now
@@ -1037,6 +1101,165 @@ function sitemapXml(db) {
 
 function sitemapUrlEntry(item) {
   return `  <url>\n    <loc>${escapeXml(item.loc)}</loc>\n    <lastmod>${escapeXml(item.lastmod || new Date().toISOString())}</lastmod>\n    <changefreq>${escapeXml(item.changefreq || "weekly")}</changefreq>\n    <priority>${escapeXml(item.priority || "0.5")}</priority>\n  </url>`;
+}
+
+function serverPageHtml(db, req) {
+  const server = findServerByKey(rankServers(db.servers, db.votes), serverKeyFromRequest(req));
+  if (!server) {
+    const title = `Server Not Found | ${CONFIG.site.name}`;
+    const description = "This Minecraft server listing could not be found. Browse active Minecraft servers by players, votes, tags, and status.";
+    return appHtml({
+      title,
+      description,
+      canonical: siteUrl("/server/"),
+      image: siteUrl(CONFIG.site.iconPath),
+      type: "website",
+      bodyTitle: "Minecraft Server Listing",
+      bodyCopy: description
+    });
+  }
+  const title = serverSeoTitle(server);
+  const description = serverSeoDescription(server);
+  const canonical = siteUrl(serverPath(server));
+  const image = serverShareImageUrl(server);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: server.name,
+    url: canonical,
+    description,
+    image,
+    keywords: [...(server.tags || []), "Minecraft server", "Minecraft server list"].join(", "),
+    about: {
+      "@type": "VideoGame",
+      name: "Minecraft"
+    }
+  };
+  return appHtml({
+    title,
+    description,
+    canonical,
+    image,
+    type: "article",
+    jsonLd,
+    bodyTitle: server.name,
+    bodyCopy: description
+  });
+}
+
+function appHtml({ title, description, canonical, image, type = "website", jsonLd = null, bodyTitle = "Icon Listing", bodyCopy = "" }) {
+  const safeTitle = escapeHtmlAttr(trimSeo(title, 59));
+  const safeDescription = escapeHtmlAttr(trimSeo(description, 158));
+  const safeCanonical = escapeHtmlAttr(canonical);
+  const safeImage = escapeHtmlAttr(image);
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${safeTitle}</title>
+    <meta name="description" content="${safeDescription}">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="${safeCanonical}">
+    <meta property="og:site_name" content="${escapeHtmlAttr(CONFIG.site.name)}">
+    <meta property="og:type" content="${escapeHtmlAttr(type)}">
+    <meta property="og:title" content="${safeTitle}">
+    <meta property="og:description" content="${safeDescription}">
+    <meta property="og:url" content="${safeCanonical}">
+    <meta property="og:image" content="${safeImage}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${safeTitle}">
+    <meta name="twitter:description" content="${safeDescription}">
+    <meta name="twitter:image" content="${safeImage}">
+    <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
+    ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
+    <link rel="icon" type="image/png" href="/assets/icon.png">
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260629-slug-pages">
+    <script src="/config.js?v=20260629-slug-pages"></script>
+    <script src="/assets/js/app.js?v=20260629-slug-pages" defer></script>
+  </head>
+  <body data-page="server">
+    <main class="page seo-fallback">
+      <section class="section">
+        <h1 class="section-title">${escapeHtml(bodyTitle)}</h1>
+        <p class="section-copy">${escapeHtml(bodyCopy)}</p>
+      </section>
+    </main>
+  </body>
+</html>`;
+}
+
+function serverSeoTitle(server) {
+  const tags = (server.tags || []).filter(Boolean);
+  const suffix = tags[0] ? ` - ${tags[0]}` : "";
+  return trimSeo(`${server.name} Minecraft Server${suffix} | ${CONFIG.site.name}`, 59);
+}
+
+function serverSeoDescription(server) {
+  const tags = (server.tags || []).slice(0, 3).join(", ");
+  const players = server.online ? `${Number(server.playersOnline || 0).toLocaleString()} players online` : "status, IP, votes";
+  const address = publicServerAddress(server);
+  return trimSeo(`${server.name} is a Minecraft server${tags ? ` for ${tags}` : ""}${address ? ` at ${address}` : ""}. View ${players}, tags, description, trailer, and vote page.`, 158);
+}
+
+function publicServerAddress(server) {
+  if (server.edition === "bedrock") return server.bedrockType === "realm" ? server.realmCode : hostPortDisplay(server.bedrockHost, server.bedrockPort, CONFIG.defaults.bedrockPort);
+  const host = cleanHost(server.javaHost);
+  if (server.javaSrvResolved || server.javaStatusTarget === host) return host;
+  return hostPortDisplay(host, javaPort(server), CONFIG.defaults.javaPort);
+}
+
+function hostPortDisplay(host = "", port, defaultPort) {
+  const clean = cleanHost(host);
+  const nextPort = Number(port || defaultPort);
+  return !clean ? "" : !nextPort || nextPort === defaultPort ? clean : `${clean}:${nextPort}`;
+}
+
+function serverShareImageUrl(server) {
+  const banner = clean(server.bannerUrl || "");
+  if (/^https?:\/\//i.test(banner)) return banner;
+  if (/^data:image\//i.test(banner)) return siteUrl(`/api?action=serverImage&slug=${encodeURIComponent(serverSlug(server.name, server.id))}`);
+  const icon = clean(server.iconUrl || "");
+  if (/^https?:\/\//i.test(icon)) return icon;
+  if (/^data:image\//i.test(icon)) return siteUrl(`/api?action=serverImage&slug=${encodeURIComponent(serverSlug(server.name, server.id))}`);
+  return siteUrl(CONFIG.site.iconPath);
+}
+
+function serverImage(res, db, req) {
+  const server = findServerByKey(db.servers, serverKeyFromRequest(req));
+  const dataUrl = clean(server?.bannerUrl || server?.iconUrl || "");
+  const match = dataUrl.match(/^data:(image\/(?:png|jpeg|jpg|gif|webp));base64,([a-z0-9+/=]+)$/i);
+  if (!match) {
+    res.setHeader("Location", siteUrl(CONFIG.site.iconPath));
+    return res.status(302).end("");
+  }
+  const mime = match[1].replace("image/jpg", "image/jpeg");
+  const body = Buffer.from(match[2], "base64");
+  res.setHeader("Content-Type", mime);
+  res.setHeader("Cache-Control", "public, max-age=3600");
+  return res.status(200).end(body);
+}
+
+function trimSeo(value = "", max = 160) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  return text.length > max ? `${text.slice(0, Math.max(0, max - 1)).trim()}...` : text;
+}
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function escapeHtmlAttr(value = "") {
+  return escapeHtml(value);
+}
+
+function escapeScriptJson(value) {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
 }
 
 function escapeXml(value = "") {
@@ -1077,6 +1300,7 @@ async function updatePing(server) {
   server.playersOnline = ping.playersOnline;
   server.playersMax = ping.playersMax;
   server.version = ping.version || server.version || "Unknown";
+  if (ping.iconUrl) server.iconUrl = normalizeMinecraftIcon(ping.iconUrl) || server.iconUrl || "";
   if (server.edition === "java") {
     server.javaStatusTarget = ping.statusTarget || javaStatusTargets(server)[0] || "";
     server.javaSrvResolved = !!ping.srvResolved;
@@ -1134,7 +1358,8 @@ async function pingJavaTarget(target) {
       playersMax: Number(data.players?.max || 0),
       version: data.version?.name_clean || data.version?.name_raw || "Unknown",
       statusTarget: target,
-      srvResolved: !!data.srv_record?.host
+      srvResolved: !!data.srv_record?.host,
+      iconUrl: normalizeMinecraftIcon(data.icon || data.favicon || "")
     };
   } catch {
     return { online: false, playersOnline: 0, playersMax: 0, version: "Unknown", statusTarget: target, srvResolved: false };
@@ -1178,7 +1403,8 @@ async function pingBedrock(server) {
       online: !!data.online,
       playersOnline: Number(data.players?.online || 0),
       playersMax: Number(data.players?.max || 0),
-      version: data.version?.name_clean || data.version?.name_raw || data.version?.name || "Bedrock"
+      version: data.version?.name_clean || data.version?.name_raw || data.version?.name || "Bedrock",
+      iconUrl: normalizeMinecraftIcon(data.icon || data.favicon || "")
     };
   } catch {
     return { online: false, playersOnline: 0, playersMax: 0, version: "Bedrock" };
@@ -1190,6 +1416,7 @@ async function sendVotifierVote(server, minecraftUsername) {
     host: server.votifierHost || server.javaHost || server.bedrockHost,
     port: Number(server.votifierPort || 8192),
     token: server.votifierToken,
+    type: cleanVotifierType(server.votifierType),
     minecraftUsername,
     serviceName: CONFIG.site.name,
     serverId: server.id
@@ -1218,6 +1445,7 @@ async function sendVotifierPayload(payload) {
     throw httpError(400, "Set votifier.providerEndpoint in config.js before sending Votifier votes.");
   }
   requireFields(payload, ["host", "port", "token", "minecraftUsername"]);
+  payload.type = cleanVotifierType(payload.type);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), VOTIFIER_TIMEOUT_MS);
   try {
@@ -1249,6 +1477,7 @@ function validateServer(server) {
     bedrockPort: Number(server.bedrockPort || CONFIG.defaults.bedrockPort),
     realmCode: cleanText(server.realmCode),
     votifierEnabled: !!server.votifierEnabled,
+    votifierType: cleanVotifierType(server.votifierType),
     votifierHost: cleanText(server.votifierHost),
     votifierPort: Number(server.votifierPort || 8192),
     votifierToken: cleanText(server.votifierToken),
@@ -1324,6 +1553,18 @@ function createUniqueVoteKey(db, currentId = "") {
 
 function cleanVoteKey(value = "") {
   return clean(value).replace(/\s+/g, "");
+}
+
+function cleanVotifierType(value = "") {
+  return String(value || "").toLowerCase() === "votifier" ? "votifier" : "nuvotifier";
+}
+
+function normalizeMinecraftIcon(value = "") {
+  const icon = clean(value);
+  if (!icon || icon.length > 30000) return "";
+  if (/^data:image\/png;base64,[a-z0-9+/=]+$/i.test(icon)) return icon;
+  if (/^https?:\/\//i.test(icon)) return icon;
+  return "";
 }
 
 function sameVoteKey(a = "", b = "") {
@@ -1937,5 +2178,10 @@ function json(res, status, payload) {
 
 function xml(res, status, body) {
   res.setHeader("Content-Type", "application/xml; charset=utf-8");
+  return res.status(status).end(body);
+}
+
+function html(res, status, body) {
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
   return res.status(status).end(body);
 }

@@ -69,6 +69,19 @@ async function callRaw(action, body = {}, method = "GET") {
   return { code: res.code, body: res.body, headers: res.headers };
 }
 
+async function callPath(pathname, method = "GET") {
+  const req = {
+    method,
+    url: pathname,
+    query: {},
+    body: {},
+    headers: {}
+  };
+  const res = response();
+  await handler(req, res);
+  return { code: res.code, body: res.body, headers: res.headers };
+}
+
 async function callText(action, body = "", method = "POST", headers = {}) {
   const req = {
     method,
@@ -84,6 +97,16 @@ async function callText(action, body = "", method = "POST", headers = {}) {
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function serverSlug(value = "") {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "server";
 }
 
 async function main() {
@@ -496,7 +519,14 @@ async function main() {
     assert(sitemap.code === 200 && sitemap.headers["Content-Type"]?.includes("application/xml"), "sitemap should return XML");
     assert(sitemap.body.includes("https://minecraft-listing.iconrealms.net/"), "sitemap should include the canonical homepage");
     assert(sitemap.body.includes("https://minecraft-listing.iconrealms.net/sponsored-hosts/"), "sitemap should include sponsored hosts");
-    assert(sitemap.body.includes(`/server/?id=${saved.json.server.id}`), "sitemap should include saved server listing URLs");
+    const savedSlug = serverSlug(saved.json.server.name);
+    assert(sitemap.body.includes(`/server/${savedSlug}`), "sitemap should include saved server listing slug URLs");
+    assert(!sitemap.body.includes(`/server/?id=${saved.json.server.id}`), "sitemap should not use query-string server URLs");
+
+    const serverPage = await callPath(`/server/${savedSlug}`);
+    assert(serverPage.code === 200 && serverPage.headers["Content-Type"]?.includes("text/html"), "slug server page should return HTML");
+    assert(serverPage.body.includes(`${saved.json.server.name} Minecraft Server`), "slug server page should include a server-specific title");
+    assert(serverPage.body.includes(`<meta property="og:image"`), "slug server page should include share image metadata");
 
     const finalState = await call("state", {}, "", "GET");
     const server = finalState.json.servers.find((item) => item.id === saved.json.server.id);
@@ -523,6 +553,9 @@ async function main() {
     assert(detailState.json.votes.length === 2, "detail state should include current-month votes for only the requested server");
     const votePageState = await call("state", { server: saved.json.server.id }, "", "GET");
     assert(votePageState.json.votes.length === 2, "vote page state should accept the server query parameter used by vote links");
+    const slugDetailState = await call("state", { serverSlug: savedSlug }, "", "GET");
+    const slugDetailServer = slugDetailState.json.servers.find((item) => item.id === saved.json.server.id);
+    assert(Array.isArray(slugDetailServer.analytics.ipCopyDaily), "detail state should accept server slugs for full analytics");
 
     const preCounterDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
     const preCounterServer = preCounterDb.servers.find((item) => item.id === saved.json.server.id);

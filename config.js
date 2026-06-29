@@ -80,6 +80,16 @@ const IconListingConfig = {
         title: "Minecraft Hosting | Sponsored Hosts",
         description:
           "Browse sponsored Minecraft hosting providers with website links, videos, showcase images, paid sponsor details, and hosting descriptions."
+      },
+      motdBuilder: {
+        title: "Minecraft MOTD Builder | Icon Listing",
+        description:
+          "Build a two-line Minecraft server MOTD with color codes, formatting, centering, live preview, copy button, and shareable URL."
+      },
+      votifierTester: {
+        title: "Votifier Tester | NuVotifier Tool",
+        description:
+          "Test Votifier and NuVotifier settings for Minecraft vote listeners using host, port, token or public key, and a test username."
       }
     }
   },
@@ -125,6 +135,7 @@ const IconListingConfig = {
       sponsoredServers: "Sponsored",
       sponsoredClients: "Sponsored Clients",
       sponsoredHosts: "Sponsored Hosts",
+      tools: "Tools",
       dashboard: "Dashboard",
       admin: "Admin",
       login: "Login"
@@ -174,6 +185,12 @@ const IconListingConfig = {
       moreInfoButton: "More info",
       videoButton: "Watch video",
       paidLabel: "Paid sponsor"
+    },
+    tools: {
+      motdTitle: "MOTD Builder",
+      motdBody: "Design a two-line Minecraft server MOTD with a live in-game style preview, centering helper, and shareable URL.",
+      votifierTitle: "Votifier Tester",
+      votifierBody: "Check Votifier or NuVotifier settings before connecting voting to a Minecraft server listing."
     },
     login: {
       title: "Login",
