@@ -1172,7 +1172,7 @@ function serverSlug(value = "", fallback = "") {
 }
 
 function serverPath(server) {
-  return `/server/${encodeURIComponent(serverSlug(server.name, server.id))}`;
+  return `/server/${encodeURIComponent(serverSlug(server.name, server.id))}/`;
 }
 
 function serverRoute(server) {

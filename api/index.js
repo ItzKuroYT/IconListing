@@ -1100,7 +1100,7 @@ function serverSlug(value = "", fallback = "") {
 }
 
 function serverPath(server) {
-  return `/server/${encodeURIComponent(serverSlug(server.name, server.id))}`;
+  return `/server/${encodeURIComponent(serverSlug(server.name, server.id))}/`;
 }
 
 function serverStaticPagePath(server) {
@@ -1248,6 +1248,7 @@ async function syncServerStaticPages(db, options = {}) {
   }
   if (entries.length || deletePagePaths.length) {
     await writeGithubTextFile("404.html", fallback404Html(), "Update Icon Listing route fallback");
+    await writeGithubTextFile("sitemap.xml", sitemapXml(db), "Update Icon Listing sitemap");
   }
 }
 
@@ -2292,6 +2293,7 @@ function html(res, status, body) {
 
 module.exports.__iconListingStatic = {
   fallback404Html,
+  sitemapXml,
   serverSlug,
   staticServerPageEntries
 };

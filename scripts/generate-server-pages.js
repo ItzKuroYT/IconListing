@@ -16,7 +16,8 @@ async function main() {
   }
 
   await fs.writeFile(path.join(outputRoot, "404.html"), __iconListingStatic.fallback404Html());
-  console.log(`Generated ${entries.length} server pages and 404.html.`);
+  await fs.writeFile(path.join(outputRoot, "sitemap.xml"), __iconListingStatic.sitemapXml(db));
+  console.log(`Generated ${entries.length} server pages, 404.html, and sitemap.xml.`);
 }
 
 main().catch((error) => {
