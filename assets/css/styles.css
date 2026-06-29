@@ -25,6 +25,7 @@
 body {
   min-height: 100vh;
   margin: 0;
+  overflow-x: hidden;
   background:
     linear-gradient(180deg, rgba(139, 92, 246, .08), transparent 220px),
     linear-gradient(135deg, rgba(56, 189, 248, .08), transparent 360px),
@@ -189,12 +190,18 @@ img {
 
 .mega-menu {
   right: auto;
-  left: 0;
-  width: min(900px, calc(100vw - 32px));
+  left: 50%;
+  width: min(860px, calc(100vw - 32px));
   display: grid;
-  grid-template-columns: 1fr 1fr 1.28fr 1fr;
+  grid-template-columns: 1fr 1fr 1.18fr minmax(170px, .95fr);
   gap: 0;
   padding: 0;
+  transform: translateX(-50%) translateY(8px);
+}
+
+.dropdown:hover .mega-menu,
+.dropdown:focus-within .mega-menu {
+  transform: translateX(-50%) translateY(0);
 }
 
 .mega-column {
@@ -525,8 +532,7 @@ main {
 }
 
 .directory-sidebar {
-  position: sticky;
-  top: 90px;
+  position: static;
   display: grid;
   gap: 14px;
 }
@@ -1603,6 +1609,12 @@ main {
     position: static;
     width: 100%;
     margin-top: 8px;
+  }
+
+  .mega-menu,
+  .dropdown:hover .mega-menu,
+  .dropdown:focus-within .mega-menu {
+    transform: none;
   }
 
   .mega-menu,
