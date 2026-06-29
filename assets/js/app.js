@@ -2731,8 +2731,9 @@ function adminUserPanel(users) {
 }
 
 function adminUserRow(user) {
-  const reviewBody = `Hey ${user.username || "there"},\n\nIf you have a minute, could you leave Icon Listing a review?\n\n${TRUSTPILOT_REVIEW_URL}\n\nThank you!`;
-  const mailto = `mailto:${encodeURIComponent(user.email || "")}?subject=${encodeURIComponent("Review Icon Listing")}&body=${encodeURIComponent(reviewBody)}`;
+  const email = String(user.email || "").trim();
+  const subject = reviewEmailSubject();
+  const body = reviewEmailBody(user.username);
   return `<details class="admin-user-row">
     <summary>
       <span><strong>${escapeHtml(user.username || "Unnamed user")}</strong>${user.banned ? ` <span class="status-badge danger">Banned</span>` : ""}</span>
@@ -2742,12 +2743,53 @@ function adminUserRow(user) {
       <p><span>Email</span><a class="text-link" href="mailto:${escapeHtml(user.email || "")}">${escapeHtml(user.email || "No email saved")}</a></p>
       <p><span>User ID</span><code>${escapeHtml(user.id || "")}</code></p>
       <div class="row-actions compact">
-        <a class="button" href="${escapeHtml(mailto)}">Email review link</a>
+        <button class="button" data-email-review data-review-email="${escapeHtml(encodeURIComponent(email))}" data-review-subject="${escapeHtml(encodeURIComponent(subject))}" data-review-body="${escapeHtml(encodeURIComponent(body))}" type="button" ${email ? "" : "disabled"}>Email review link</button>
+        <button class="button" data-copy-review-template data-review-email="${escapeHtml(encodeURIComponent(email))}" data-review-subject="${escapeHtml(encodeURIComponent(subject))}" data-review-body="${escapeHtml(encodeURIComponent(body))}" type="button">Copy template</button>
         <button class="button" data-admin="banUser" data-id="${escapeHtml(user.id || "")}" type="button">${user.banned ? "Unban" : "Ban"}</button>
         <button class="button danger" data-admin="deleteUser" data-id="${escapeHtml(user.id || "")}" type="button">Delete user</button>
       </div>
     </div>
   </details>`;
+}
+
+function reviewEmailSubject() {
+  return "Review Icon Listing";
+}
+
+function reviewEmailBody(username = "") {
+  return `Hey ${username || "there"},
+
+If you have a minute, could you leave Icon Listing a review?
+
+${TRUSTPILOT_REVIEW_URL}
+
+Thank you!`;
+}
+
+function decodeReviewEmailButton(button) {
+  return {
+    email: decodeURIComponent(button.dataset.reviewEmail || ""),
+    subject: decodeURIComponent(button.dataset.reviewSubject || reviewEmailSubject()),
+    body: decodeURIComponent(button.dataset.reviewBody || reviewEmailBody())
+  };
+}
+
+function gmailComposeUrl(email, subject, body) {
+  const params = new URLSearchParams({
+    view: "cm",
+    fs: "1",
+    to: email,
+    su: subject,
+    body
+  });
+  return `https://mail.google.com/mail/?${params.toString()}`;
+}
+
+function reviewEmailTemplate(email, subject, body) {
+  return `To: ${email}
+Subject: ${subject}
+
+${body}`;
 }
 
 function bindAdminUserPanel(state) {
@@ -2759,6 +2801,19 @@ function bindAdminUserPanel(state) {
       toast(error.message);
     }
   });
+  $$("[data-email-review]").forEach((button) => button.addEventListener("click", async () => {
+    const { email, subject, body } = decodeReviewEmailButton(button);
+    const opened = window.open(gmailComposeUrl(email, subject, body), "_blank");
+    if (opened) opened.opener = null;
+    await copyText(reviewEmailTemplate(email, subject, body));
+    if (opened) toast("Gmail compose opened. Template copied too.");
+    else toast("Template copied. Allow popups or paste it into your email manually.");
+  }));
+  $$("[data-copy-review-template]").forEach((button) => button.addEventListener("click", async () => {
+    const { email, subject, body } = decodeReviewEmailButton(button);
+    await copyText(reviewEmailTemplate(email, subject, body));
+    toast("Review email template copied.");
+  }));
 }
 
 function adminClientPanel(clients) {
