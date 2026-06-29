@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vercel dev",
     "static": "node dev-server.js",
-    "check": "node -c api/index.js && node -c assets/js/app.js && node -c dev-server.js",
+    "check": "node -c api/index.js && node -c assets/js/app.js && node -c dev-server.js && node -c scripts/generate-server-pages.js",
+    "generate:server-pages": "node scripts/generate-server-pages.js",
     "smoke": "node scripts/smoke-test.js"
   },
   "dependencies": {},

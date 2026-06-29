@@ -94,6 +94,7 @@ module.exports = async function handler(req, res) {
       const existing = db.servers.find((item) => item.id === server.id);
       if (existing && existing.ownerId !== user.id && !isAdmin(user)) throw httpError(403, "You cannot edit that listing.");
       ensureUniqueServerListing(db, server, existing?.id || server.id);
+      const previousServerPagePath = existing ? serverStaticPagePath(existing) : "";
       const next = {
         ...existing,
         ...server,
@@ -122,6 +123,10 @@ module.exports = async function handler(req, res) {
       const persistedDb = await persistedDbAfterWrite();
       const persistedServer = persistedDb.servers.find((item) => item.id === next.id);
       if (!persistedServer) throw httpError(500, "Listing was not saved to shared storage. Error: 67.");
+      await safeSyncServerStaticPages(persistedDb, {
+        writeServerIds: [persistedServer.id],
+        deletePagePaths: previousServerPagePath && previousServerPagePath !== serverStaticPagePath(persistedServer) ? [previousServerPagePath] : []
+      });
       return json(res, 200, writePayload({ server: publicServer(persistedServer, user, { fullAnalytics: true }) }));
     }
 
@@ -137,6 +142,7 @@ module.exports = async function handler(req, res) {
       await saveDb(db, { deletedServers: [body.id] });
       const persistedDb = await persistedDbAfterWrite();
       if (persistedDb.servers.some((item) => item.id === body.id)) throw httpError(500, "Listing was not deleted from shared storage. Error: 67.");
+      await safeSyncServerStaticPages(persistedDb, { deletePagePaths: [serverStaticPagePath(server)] });
       return json(res, 200, writePayload({ ok: true, deletedServerId: body.id, ...statePayload(persistedDb, user) }));
     }
 
@@ -203,7 +209,8 @@ module.exports = async function handler(req, res) {
       if (body.username !== user.username || body.email !== user.email || !verifyPassword(body.password, user)) {
         throw httpError(400, "Those details do not match your account.");
       }
-      const deletedServerIds = db.servers.filter((item) => item.ownerId === user.id).map((item) => item.id);
+      const deletedServers = db.servers.filter((item) => item.ownerId === user.id);
+      const deletedServerIds = deletedServers.map((item) => item.id);
       db.users = db.users.filter((item) => item.id !== user.id);
       db.servers = db.servers.filter((item) => item.ownerId !== user.id);
       db.votes = db.votes.filter((vote) => db.servers.some((server) => server.id === vote.serverId));
@@ -211,6 +218,7 @@ module.exports = async function handler(req, res) {
       markDeleted(db, "users", [user.id]);
       markDeleted(db, "servers", deletedServerIds);
       await saveDb(db, { deletedUsers: [user.id], deletedServers: deletedServerIds });
+      await safeSyncServerStaticPages(db, { deletePagePaths: deletedServers.map(serverStaticPagePath) });
       return json(res, 200, writePayload({ ok: true }));
     }
 
@@ -263,6 +271,7 @@ module.exports = async function handler(req, res) {
       requireAdmin(user);
       const id = body.value?.id;
       const saveOptions = {};
+      let deletedServerPagePaths = [];
       if (body.command === "toggleSponsor") {
         const server = db.servers.find((item) => item.id === id);
         if (server) {
@@ -278,7 +287,9 @@ module.exports = async function handler(req, res) {
         }
       }
       if (body.command === "deleteUser") {
-        const deletedServerIds = db.servers.filter((item) => item.ownerId === id).map((item) => item.id);
+        const deletedServers = db.servers.filter((item) => item.ownerId === id);
+        const deletedServerIds = deletedServers.map((item) => item.id);
+        deletedServerPagePaths = deletedServers.map(serverStaticPagePath);
         db.users = db.users.filter((item) => item.id !== id);
         db.servers = db.servers.filter((item) => item.ownerId !== id);
         db.votes = db.votes.filter((vote) => db.servers.some((server) => server.id === vote.serverId));
@@ -313,6 +324,10 @@ module.exports = async function handler(req, res) {
         saveOptions.deletedHosts = [id];
       }
       await saveDb(db, saveOptions);
+      await safeSyncServerStaticPages(db, {
+        writeServerIds: saveOptions.touchedServers || [],
+        deletePagePaths: deletedServerPagePaths
+      });
       return json(res, 200, writePayload({ ...statePayload(db, user), users: db.users.map(publicUser) }));
     }
 
@@ -768,6 +783,39 @@ async function readGithubFile(filePath, options = {}) {
   return response.json();
 }
 
+async function writeGithubTextFile(filePath, content, message) {
+  const existing = await readGithubFile(filePath, { bypassCache: true });
+  const body = {
+    message,
+    content: Buffer.from(String(content || "")).toString("base64"),
+    branch: githubBranch()
+  };
+  if (existing.sha) body.sha = existing.sha;
+  const response = await fetch(githubFileUrl(filePath, false), {
+    method: "PUT",
+    headers: githubHeaders(),
+    body: JSON.stringify(body)
+  });
+  if (!response.ok) throw new Error(`GitHub file write failed (${response.status}) for ${filePath}.`);
+  return response.json();
+}
+
+async function deleteGithubFile(filePath, message) {
+  const existing = await readGithubFile(filePath, { bypassCache: true });
+  if (!existing.sha) return;
+  const response = await fetch(githubFileUrl(filePath, false), {
+    method: "DELETE",
+    headers: githubHeaders(),
+    body: JSON.stringify({
+      message,
+      sha: existing.sha,
+      branch: githubBranch()
+    })
+  });
+  if (response.status === 404) return;
+  if (!response.ok) throw new Error(`GitHub file delete failed (${response.status}) for ${filePath}.`);
+}
+
 function githubBackupPath() {
   return process.env.GITHUB_DB_BACKUP_PATH || backupPathFor(githubDbPath());
 }
@@ -1055,6 +1103,10 @@ function serverPath(server) {
   return `/server/${encodeURIComponent(serverSlug(server.name, server.id))}`;
 }
 
+function serverStaticPagePath(server) {
+  return path.posix.join("server", serverSlug(server.name, server.id), "index.html");
+}
+
 function findServerByKey(servers = [], key = "") {
   const value = clean(key);
   if (!value) return null;
@@ -1105,19 +1157,11 @@ function sitemapUrlEntry(item) {
 
 function serverPageHtml(db, req) {
   const server = findServerByKey(rankServers(db.servers, db.votes), serverKeyFromRequest(req));
-  if (!server) {
-    const title = `Server Not Found | ${CONFIG.site.name}`;
-    const description = "This Minecraft server listing could not be found. Browse active Minecraft servers by players, votes, tags, and status.";
-    return appHtml({
-      title,
-      description,
-      canonical: siteUrl("/server/"),
-      image: siteUrl(CONFIG.site.iconPath),
-      type: "website",
-      bodyTitle: "Minecraft Server Listing",
-      bodyCopy: description
-    });
-  }
+  if (!server) return serverNotFoundHtml();
+  return serverPageHtmlForServer(server);
+}
+
+function serverPageHtmlForServer(server) {
   const title = serverSeoTitle(server);
   const description = serverSeoDescription(server);
   const canonical = siteUrl(serverPath(server));
@@ -1145,6 +1189,66 @@ function serverPageHtml(db, req) {
     bodyTitle: server.name,
     bodyCopy: description
   });
+}
+
+function serverNotFoundHtml() {
+  const title = `Server Not Found | ${CONFIG.site.name}`;
+  const description = "This Minecraft server listing could not be found. Browse active Minecraft servers by players, votes, tags, and status.";
+  return appHtml({
+    title,
+    description,
+    canonical: siteUrl("/server/"),
+    image: siteUrl(CONFIG.site.iconPath),
+    type: "website",
+    bodyTitle: "Minecraft Server Listing",
+    bodyCopy: description
+  });
+}
+
+function staticServerPageEntries(db) {
+  const next = migrateDb(db);
+  return rankServers(next.servers, next.votes).map((server) => ({
+    server,
+    filePath: serverStaticPagePath(server),
+    html: serverPageHtmlForServer(server)
+  }));
+}
+
+function fallback404Html() {
+  const description = "Icon Listing is loading this Minecraft server page. If the listing exists, it will appear after the shared server data loads.";
+  return appHtml({
+    title: `Minecraft Server Listing | ${CONFIG.site.name}`,
+    description,
+    canonical: siteUrl("/server/"),
+    image: siteUrl(CONFIG.site.iconPath),
+    type: "website",
+    bodyTitle: "Minecraft Server Listing",
+    bodyCopy: description
+  });
+}
+
+async function safeSyncServerStaticPages(db, options = {}) {
+  try {
+    await syncServerStaticPages(db, options);
+  } catch (error) {
+    console.error("Icon Listing server page sync failed", error.message);
+  }
+}
+
+async function syncServerStaticPages(db, options = {}) {
+  if (!hasGithubStorage()) return;
+  const writeIds = new Set(options.writeServerIds || []);
+  const deletePagePaths = [...new Set(options.deletePagePaths || [])].filter(Boolean);
+  const entries = staticServerPageEntries(db).filter((entry) => writeIds.has(entry.server.id));
+  for (const entry of entries) {
+    await writeGithubTextFile(entry.filePath, entry.html, `Update server page for ${entry.server.name}`);
+  }
+  for (const filePath of deletePagePaths) {
+    await deleteGithubFile(filePath, `Delete server page ${filePath}`);
+  }
+  if (entries.length || deletePagePaths.length) {
+    await writeGithubTextFile("404.html", fallback404Html(), "Update Icon Listing route fallback");
+  }
 }
 
 function appHtml({ title, description, canonical, image, type = "website", jsonLd = null, bodyTitle = "Icon Listing", bodyCopy = "" }) {
@@ -2185,3 +2289,9 @@ function html(res, status, body) {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   return res.status(status).end(body);
 }
+
+module.exports.__iconListingStatic = {
+  fallback404Html,
+  serverSlug,
+  staticServerPageEntries
+};
