@@ -6,6 +6,7 @@ const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
 const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "testPluginVote", "admin"]);
+const TRUSTPILOT_REVIEW_URL = "https://www.trustpilot.com/review/minecraft-listing.iconrealms.net";
 
 function copy(path, fallback = "") {
   return path.split(".").reduce((value, key) => value?.[key], CONFIG.copy) ?? fallback;
@@ -445,6 +446,9 @@ function fallbackRequest(action, payload) {
   if (action === "admin") {
     if (!isAdmin(user)) return Promise.reject(new Error("Admin access required."));
     const id = payload.value?.id;
+    if (payload.command === "listUsers") {
+      return Promise.resolve({ users: db.users.map(publicUser) });
+    }
     if (payload.command === "toggleSponsor") {
       const server = db.servers.find((item) => item.id === id);
       if (server) server.sponsored = !server.sponsored;
@@ -1003,6 +1007,7 @@ function renderLayout() {
       <div class="footer-inner">
         <div><strong>${CONFIG.site.owner}</strong> | ${CONFIG.site.footerNotice}</div>
         <div class="footer-links">
+          <a class="footer-review-link" href="${TRUSTPILOT_REVIEW_URL}" target="_blank" rel="noopener">Review</a>
           <a href="${route("/terms/")}">Terms</a>
           <a href="${route("/privacy/")}">Privacy</a>
           <a href="${route("/help/")}">Help</a>
@@ -2676,6 +2681,11 @@ function renderAdmin(state) {
           <div class="row-actions"><button class="button" data-admin="toggleSponsor" data-id="${server.id}">${server.sponsored ? "Unsponsor" : "Sponsor"}</button><button class="button danger" data-delete="${server.id}">Delete</button></div>
         </div>`).join("") : emptyNotice()}</div></div>
         <div class="card admin-client-panel">
+          <h2>User Accounts</h2>
+          <p class="section-copy">Load account emails from the admin API when you need to contact users.</p>
+          ${adminUserPanel(state.users)}
+        </div>
+        <div class="card admin-client-panel">
           <h2>${escapeHtml(copy("admin.sponsoredClientsTitle", "Sponsored Clients"))}</h2>
           <p class="section-copy">${escapeHtml(copy("admin.sponsoredClientsBody", "Create and edit sponsored Minecraft client listings."))}</p>
           ${adminClientPanel(state.clients)}
@@ -2710,6 +2720,45 @@ function renderAdmin(state) {
   }));
   bindAdminClientForms(state);
   bindAdminHostForms(state);
+  bindAdminUserPanel(state);
+}
+
+function adminUserPanel(users) {
+  if (!Array.isArray(users)) {
+    return `<div class="row-actions"><button id="loadAdminUsers" class="button primary" type="button">Load user emails</button></div>`;
+  }
+  return `<div class="dashboard-list admin-user-list">${users.length ? users.map((user) => adminUserRow(user)).join("") : `<p class="section-copy">No users have signed up yet.</p>`}</div>`;
+}
+
+function adminUserRow(user) {
+  const reviewBody = `Hey ${user.username || "there"},\n\nIf you have a minute, could you leave Icon Listing a review?\n\n${TRUSTPILOT_REVIEW_URL}\n\nThank you!`;
+  const mailto = `mailto:${encodeURIComponent(user.email || "")}?subject=${encodeURIComponent("Review Icon Listing")}&body=${encodeURIComponent(reviewBody)}`;
+  return `<details class="admin-user-row">
+    <summary>
+      <span><strong>${escapeHtml(user.username || "Unnamed user")}</strong>${user.banned ? ` <span class="status-badge danger">Banned</span>` : ""}</span>
+      <span class="muted">View email</span>
+    </summary>
+    <div class="admin-user-details">
+      <p><span>Email</span><a class="text-link" href="mailto:${escapeHtml(user.email || "")}">${escapeHtml(user.email || "No email saved")}</a></p>
+      <p><span>User ID</span><code>${escapeHtml(user.id || "")}</code></p>
+      <div class="row-actions compact">
+        <a class="button" href="${escapeHtml(mailto)}">Email review link</a>
+        <button class="button" data-admin="banUser" data-id="${escapeHtml(user.id || "")}" type="button">${user.banned ? "Unban" : "Ban"}</button>
+        <button class="button danger" data-admin="deleteUser" data-id="${escapeHtml(user.id || "")}" type="button">Delete user</button>
+      </div>
+    </div>
+  </details>`;
+}
+
+function bindAdminUserPanel(state) {
+  $("#loadAdminUsers")?.addEventListener("click", async () => {
+    try {
+      const result = await request("admin", { command: "listUsers" });
+      renderAdmin({ ...state, users: result.users || [] });
+    } catch (error) {
+      toast(error.message);
+    }
+  });
 }
 
 function adminClientPanel(clients) {

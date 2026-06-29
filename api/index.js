@@ -270,6 +270,9 @@ module.exports = async function handler(req, res) {
     if (action === "admin") {
       requireAdmin(user);
       const id = body.value?.id;
+      if (body.command === "listUsers") {
+        return json(res, 200, writePayload({ users: db.users.map(publicUser) }));
+      }
       const saveOptions = {};
       let deletedServerPagePaths = [];
       if (body.command === "toggleSponsor") {

@@ -956,6 +956,73 @@ main {
   grid-template-columns: 44px minmax(0, 1fr) auto;
 }
 
+.admin-user-list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-user-row {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #121217;
+  overflow: hidden;
+}
+
+.admin-user-row summary {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.admin-user-row summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-user-row[open] summary {
+  border-bottom: 1px solid var(--border);
+  background: rgba(56, 189, 248, .06);
+}
+
+.admin-user-details {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px 14px;
+}
+
+.admin-user-details p {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.admin-user-details span {
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  margin-left: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  color: #ddf7ff;
+  background: rgba(56, 189, 248, .18);
+  font-size: .74rem;
+  font-weight: 800;
+}
+
+.status-badge.danger {
+  color: #ffd0d8;
+  background: rgba(251, 113, 133, .18);
+}
+
 .client-logo {
   width: 92px;
   height: 92px;
@@ -1559,12 +1626,25 @@ main {
 
 .footer-links {
   display: flex;
+  align-items: center;
   gap: 14px;
   white-space: nowrap;
 }
 
 .footer-links a:hover {
   color: var(--text);
+}
+
+.footer-review-link {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 11px;
+  border: 1px solid rgba(236, 72, 153, .44);
+  border-radius: 5px;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(139, 92, 246, .75), rgba(219, 39, 119, .72));
+  font-weight: 800;
 }
 
 .toast {

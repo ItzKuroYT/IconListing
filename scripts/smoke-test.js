@@ -477,6 +477,12 @@ async function main() {
     if (!restoredAdminDb.users.some((item) => item.id === adminUser.id)) restoredAdminDb.users.push(adminUser);
     await fs.writeFile(dbPath, JSON.stringify(restoredAdminDb));
 
+    const beforeUserListRead = await fs.readFile(dbPath, "utf8");
+    const adminUsers = await call("admin", { command: "listUsers" }, admin.json.token);
+    const afterUserListRead = await fs.readFile(dbPath, "utf8");
+    assert(adminUsers.code === 200 && adminUsers.json.users.some((item) => item.email === `smoke${suffix}@example.com`), "admin should be able to view created user emails through the API");
+    assert(beforeUserListRead === afterUserListRead, "admin user email lookup should not write to shared storage");
+
     const clientDescription =
       "A sponsored client listing created by the smoke test to verify admins can save Minecraft client advertisements with a website download link, YouTube video, long description, two showcase images, version targeting, and paid/free metadata. This sentence keeps the description beyond the minimum length.";
     const clientSave = await call(
