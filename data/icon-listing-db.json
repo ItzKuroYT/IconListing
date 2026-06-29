@@ -72,15 +72,15 @@
       "ownerId": "bd813e43-bf7a-45fd-869e-f092d2dde82e",
       "ownerName": "MaxFullCalypse",
       "votes": 0,
-      "playersOnline": 23,
-      "playersMax": 24,
+      "playersOnline": 21,
+      "playersMax": 22,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-06-29T06:47:03.549Z",
+      "lastPingAt": "2026-06-29T06:52:39.114Z",
       "analytics": {
         "ipCopyDaily": [
           {
@@ -257,16 +257,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-29T06:47:03.549Z",
-            "playersOnline": 23,
-            "playersMax": 24,
+            "createdAt": "2026-06-29T06:52:39.114Z",
+            "playersOnline": 21,
+            "playersMax": 22,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-29T06:47:03.549Z",
-      "uptimeChecks": 71,
-      "uptimeSuccesses": 71,
+      "lastSuccessfulPingAt": "2026-06-29T06:52:39.114Z",
+      "uptimeChecks": 72,
+      "uptimeSuccesses": 72,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -309,7 +309,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-      "lastPingAt": "2026-06-29T06:47:03.628Z",
+      "lastPingAt": "2026-06-29T06:52:39.191Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -465,14 +465,14 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-29T06:47:03.628Z",
+            "createdAt": "2026-06-29T06:52:39.191Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
           }
         ]
       },
-      "uptimeChecks": 66,
+      "uptimeChecks": 67,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -517,7 +517,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
       "updatedAt": "2026-06-24T22:20:23.472Z",
-      "lastPingAt": "2026-06-29T06:47:03.951Z",
+      "lastPingAt": "2026-06-29T06:52:39.435Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -667,14 +667,14 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-29T06:47:03.951Z",
+            "createdAt": "2026-06-29T06:52:39.435Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
           }
         ]
       },
-      "uptimeChecks": 65,
+      "uptimeChecks": 66,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -716,11 +716,11 @@
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 86.4406779661017,
+      "uptimePercent": 86.66666666666667,
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
       "updatedAt": "2026-06-28T05:53:12.589Z",
-      "lastPingAt": "2026-06-29T06:47:05.224Z",
+      "lastPingAt": "2026-06-29T06:52:40.687Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -870,16 +870,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-06-29T06:47:05.224Z",
+            "createdAt": "2026-06-29T06:52:40.687Z",
             "playersOnline": 6,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-06-29T06:47:05.224Z",
-      "uptimeChecks": 59,
-      "uptimeSuccesses": 51,
+      "lastSuccessfulPingAt": "2026-06-29T06:52:40.687Z",
+      "uptimeChecks": 60,
+      "uptimeSuccesses": 52,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -930,7 +930,7 @@
       "sponsored": false,
       "createdAt": "2026-06-28T19:12:07.623Z",
       "updatedAt": "2026-06-28T19:12:07.623Z",
-      "lastPingAt": "2026-06-29T06:47:05.380Z",
+      "lastPingAt": "2026-06-29T06:52:40.833Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -948,14 +948,14 @@
             "online": false
           },
           {
-            "createdAt": "2026-06-29T06:47:05.380Z",
+            "createdAt": "2026-06-29T06:52:40.833Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
           }
         ]
       },
-      "uptimeChecks": 6,
+      "uptimeChecks": 7,
       "iconListingVoteQueue": []
     }
   ],
