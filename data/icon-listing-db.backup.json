@@ -48,6 +48,14 @@
       "passwordHash": "a6f8c237fbc60ef554fa49557ace4a82:57add3f375ce3da9f66fcc11b367dac60564f6a1f42df18b53f7f532c20a273d",
       "banned": false,
       "createdAt": "2026-06-30T06:06:59.035Z"
+    },
+    {
+      "id": "641d818d-74c9-4141-84d9-b8ac9cb5dc87",
+      "username": "Calamitas Infernal",
+      "email": "tydhartman@gmail.com",
+      "passwordHash": "984191547364e7e1b1fe50b1be307a60:d86bf1a9429f4be0a284f51be0cf21c1c97392afd932e48b79b834a9be5640c8",
+      "banned": false,
+      "createdAt": "2026-06-30T15:48:21.163Z"
     }
   ],
   "servers": [
