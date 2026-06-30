@@ -50,21 +50,21 @@
       "createdAt": "2026-06-30T06:06:59.035Z"
     },
     {
-      "id": "ee217337-fc2f-477a-ae30-de1f4a46079f",
+      "id": "770e2fc2-d805-4ca5-a78f-93aef7e935b7",
       "username": "sunrise",
       "email": "sunrise543290@gmail.com",
       "passwordHash": "",
       "emailOptIn": false,
       "emailVerified": true,
-      "emailVerifiedAt": "2026-06-30T22:52:31.846Z",
-      "termsAcceptedAt": "2026-06-30T22:52:31.846Z",
-      "googleLinkedAt": "2026-06-30T22:52:31.846Z",
-      "createdAt": "2026-06-30T22:52:31.846Z",
+      "emailVerifiedAt": "2026-06-30T22:52:45.831Z",
+      "termsAcceptedAt": "2026-06-30T22:52:45.831Z",
+      "googleLinkedAt": "2026-06-30T22:52:45.831Z",
+      "createdAt": "2026-06-30T22:52:45.831Z",
       "banned": false,
       "googleSub": "116606334083790252482",
       "googleName": "sun rise",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKk9Fcwi7ReG-7VmBe0o8C4vz_oa2XtM6W3wNBho70LrdS9eEE=s96-c",
-      "updatedAt": "2026-06-30T22:52:31.846Z"
+      "updatedAt": "2026-06-30T22:52:45.831Z"
     }
   ],
   "servers": [
