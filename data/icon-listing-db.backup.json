@@ -50,21 +50,23 @@
       "createdAt": "2026-06-30T06:06:59.035Z"
     },
     {
-      "id": "bef623b2-d577-4ed5-9775-1adb82362172",
-      "username": "IsaacCooperFnafFan",
+      "id": "303d71a7-268a-4d86-aa71-bdb540a05f06",
+      "username": "TestAccount2",
       "email": "luciferthedevil926@gmail.com",
-      "passwordHash": "",
-      "emailOptIn": false,
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-06-30T23:51:48.592Z",
-      "termsAcceptedAt": "2026-06-30T23:51:48.592Z",
-      "googleLinkedAt": "2026-06-30T23:51:48.592Z",
-      "createdAt": "2026-06-30T23:51:48.592Z",
+      "passwordHash": "6794a401096c45ba62ac7dd433842b84:96bac3ce917a89198ee24577e02a6fc7ee58ce2633adc08a075660203bdf7c96",
+      "emailOptIn": true,
+      "emailOptInAt": "2026-06-30T23:52:21.734Z",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-06-30T23:52:21.734Z",
       "banned": false,
-      "googleSub": "117469034604833102670",
-      "googleName": "Isaac Cooper (FnafFanStudios)",
-      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJYPQwmEIwbO2b413qUgsIsRji9uUe283lB-eqhHkUUiS2P8kc=s96-c",
-      "updatedAt": "2026-06-30T23:51:48.592Z"
+      "createdAt": "2026-06-30T23:52:21.734Z",
+      "emailVerification": {
+        "codeHash": "54128ad7dd6c3df2dd136546992cbd87ba012dc426181447ff1247d1ad47f8f2",
+        "createdAt": "2026-06-30T23:52:21.734Z",
+        "expiresAt": "2026-07-01T00:07:21.734Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
