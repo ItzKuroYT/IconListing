@@ -5,8 +5,10 @@ const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const TRUSTPILOT_REVIEW_URL = "https://www.trustpilot.com/review/minecraft-listing.iconrealms.net";
+let turnstileLoadPromise = null;
+const renderedTurnstileWidgets = new Map();
 
 function copy(path, fallback = "") {
   return path.split(".").reduce((value, key) => value?.[key], CONFIG.copy) ?? fallback;
@@ -72,7 +74,7 @@ function normalizeServer(server) {
     crossPlay: edition === "java" && !!server.crossPlay,
     realmCode: server.realmCode || "",
     iconUrl: normalizeMinecraftIcon(server.iconUrl || ""),
-    votifierType: cleanVotifierType(server.votifierType),
+    votifierType: cleanVotifierType(server.votifierType || "auto"),
     iconListingPluginEnabled: !!server.iconListingPluginEnabled,
     iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey || ""),
     iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
@@ -141,8 +143,12 @@ function blockedRegexes() {
   ];
 }
 
+function clean(value = "") {
+  return String(value || "").trim();
+}
+
 function cleanText(value = "") {
-  let next = String(value || "").trim();
+  let next = clean(value);
   for (const regex of blockedRegexes()) {
     next = next.replace(regex, CONFIG.moderation?.replacement || "***");
   }
@@ -184,6 +190,16 @@ function apiBasePaths() {
   const productionBase = CONFIG.api.productionBasePath || "";
   const sameOriginBase = CONFIG.api.basePath || "/api";
   return [...new Set([productionBase, sameOriginBase].filter(Boolean))];
+}
+
+function apiActionUrl(action, params = {}) {
+  const basePath = apiBasePaths()[0] || "/api";
+  const search = new URLSearchParams({ action, ...params });
+  return `${basePath}${basePath.includes("?") ? "&" : "?"}${search.toString()}`;
+}
+
+function googleStartUrl() {
+  return apiActionUrl("googleStart", { next: "/dashboard/" });
 }
 
 function productionApiMessage() {
@@ -290,7 +306,16 @@ async function request(action, payload = {}, method = "POST") {
 
 function publicUser(user) {
   if (!user) return null;
-  return { id: user.id, username: user.username, email: user.email, admin: isAdmin(user), banned: !!user.banned };
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    emailOptIn: user.emailOptIn === true,
+    emailVerified: user.emailVerified === true,
+    emailVerificationPending: user.emailVerified !== true && (!!user.emailVerification?.codeHash || !!user.emailVerificationCode),
+    admin: isAdmin(user),
+    banned: !!user.banned
+  };
 }
 
 function fallbackUserFromSession() {
@@ -321,10 +346,24 @@ function fallbackRequest(action, payload) {
   }
   if (action === "register") {
     if (!payload.username || !payload.email || !payload.password) return Promise.reject(new Error("Fill out every signup field."));
+    if (payload.termsAccepted !== true) return Promise.reject(new Error("You must accept the terms and conditions."));
     if (hasBlockedText(payload.username)) return Promise.reject(new Error("That username is not allowed here."));
     const exists = db.users.some((item) => same(item.email, payload.email) || same(item.username, payload.username));
     if (exists) return Promise.reject(new Error("That username or email is already taken."));
-    const next = { id: createId(), username: cleanText(payload.username), email: cleanText(payload.email), password: payload.password, banned: false };
+    const emailOptIn = payload.emailOptIn === true;
+    const next = {
+      id: createId(),
+      username: cleanText(payload.username),
+      email: cleanText(payload.email),
+      password: payload.password,
+      emailOptIn,
+      emailOptInAt: emailOptIn ? new Date().toISOString() : "",
+      emailVerified: false,
+      emailVerifiedAt: "",
+      emailVerificationCode: "000000",
+      termsAcceptedAt: new Date().toISOString(),
+      banned: false
+    };
     db.users.push(next);
     save();
     store.session = { token: `local-${next.id}`, user: publicUser(next) };
@@ -337,7 +376,7 @@ function fallbackRequest(action, payload) {
     return Promise.resolve({ user: publicUser(next), token: store.session.token });
   }
   if (action === "votifierToolTest" || action === "testVote") {
-    return Promise.reject(new Error("Votifier testing needs the production API provider endpoint."));
+    return Promise.reject(new Error("Votifier testing needs the production API."));
   }
   if (action === "saveServer") {
     if (!user) return Promise.reject(new Error("Log in before adding a server."));
@@ -414,7 +453,12 @@ function fallbackRequest(action, payload) {
     if (!user) return Promise.reject(new Error("Log in before editing your account."));
     if (hasBlockedText(payload.username)) return Promise.reject(new Error("That username is not allowed here."));
     if (payload.username) user.username = cleanText(payload.username);
-    if (payload.email) user.email = cleanText(payload.email);
+    if (payload.email && !same(payload.email, user.email)) {
+      user.email = cleanText(payload.email);
+      user.emailVerified = false;
+      user.emailVerifiedAt = "";
+      user.emailVerificationCode = "000000";
+    }
     if (payload.password) user.password = payload.password;
     try {
       ensureUniqueUser(db, user, user.id);
@@ -423,7 +467,27 @@ function fallbackRequest(action, payload) {
     }
     save();
     store.session = { ...store.session, user: publicUser(user) };
-    return Promise.resolve({ user: publicUser(user) });
+    return Promise.resolve({ user: publicUser(user), token: store.session.token });
+  }
+  if (action === "verifyEmail") {
+    if (!user) return Promise.reject(new Error("Log in before verifying your email."));
+    if (user.emailVerified) return Promise.resolve({ ok: true, user: publicUser(user), token: store.session.token, message: "Email is already verified." });
+    if (clean(payload.code).replace(/\s+/g, "") !== clean(user.emailVerificationCode || "000000")) {
+      return Promise.reject(new Error("That verification code did not match."));
+    }
+    user.emailVerified = true;
+    user.emailVerifiedAt = new Date().toISOString();
+    delete user.emailVerificationCode;
+    save();
+    store.session = { ...store.session, user: publicUser(user) };
+    return Promise.resolve({ ok: true, user: publicUser(user), token: store.session.token, message: "Email verified." });
+  }
+  if (action === "resendEmailVerification") {
+    if (!user) return Promise.reject(new Error("Log in before verifying your email."));
+    if (user.emailVerified) return Promise.resolve({ ok: true, user: publicUser(user), token: store.session.token, message: "Email is already verified." });
+    user.emailVerificationCode = "000000";
+    save();
+    return Promise.resolve({ ok: true, sent: false, user: publicUser(user), token: store.session.token, message: "Local preview code is 000000. Production sends this with Resend." });
   }
   if (action === "deleteAccount") {
     if (!user) return Promise.reject(new Error("Log in before deleting your account."));
@@ -436,12 +500,6 @@ function fallbackRequest(action, payload) {
     save();
     store.session = null;
     return Promise.resolve({ ok: true });
-  }
-  if (action === "testVote") {
-    if (!CONFIG.votifier.providerEndpoint) {
-      return Promise.reject(new Error("Set votifier.providerEndpoint in config.js before sending real test votes."));
-    }
-    return Promise.resolve({ ok: true, message: "Votifier is configured. The production API will send this test vote." });
   }
   if (action === "admin") {
     if (!isAdmin(user)) return Promise.reject(new Error("Admin access required."));
@@ -502,7 +560,7 @@ function sanitizeServer(server) {
     bedrockPort: Number(server.bedrockPort || CONFIG.defaults.bedrockPort),
     realmCode: cleanText(server.realmCode),
     votifierEnabled: !!server.votifierEnabled,
-    votifierType: cleanVotifierType(server.votifierType),
+    votifierType: cleanVotifierType(server.votifierType || "auto"),
     votifierHost: cleanText(server.votifierHost),
     votifierPort: Number(server.votifierPort || 8192),
     votifierToken: cleanText(server.votifierToken),
@@ -577,7 +635,10 @@ function cleanVoteKey(value = "") {
 }
 
 function cleanVotifierType(value = "") {
-  return String(value || "").toLowerCase() === "votifier" ? "votifier" : "nuvotifier";
+  const next = String(value || "").toLowerCase();
+  if (next === "votifier") return "votifier";
+  if (next === "auto") return "auto";
+  return "nuvotifier";
 }
 
 function normalizeMinecraftIcon(value = "") {
@@ -802,6 +863,21 @@ async function getState() {
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
   return { ...state, votes: state.votes || [] };
+}
+
+function consumeGoogleAuthHash() {
+  const raw = String(location.hash || "").replace(/^#/, "");
+  if (!raw) return null;
+  const params = new URLSearchParams(raw);
+  const token = params.get("googleToken");
+  const error = params.get("googleError");
+  if (!token && !error) return null;
+  history.replaceState(null, document.title, `${location.pathname}${location.search}`);
+  if (token) {
+    store.session = { token, user: null };
+    return { ok: true, message: "Signed in with Google." };
+  }
+  return { ok: false, message: error || "Google sign-in failed. Error: 67." };
 }
 
 function scheduleNetworkRefresh(error) {
@@ -2280,6 +2356,85 @@ function hostCard(host) {
   </article>`;
 }
 
+function turnstileEnabled() {
+  return !!(CONFIG.security?.turnstile?.enabled && CONFIG.security?.turnstile?.siteKey);
+}
+
+function turnstileMarkup(widgetId, tokenId) {
+  if (!turnstileEnabled()) return "";
+  return `<div class="field turnstile-field">
+    <label>Security check</label>
+    <div id="${escapeHtml(widgetId)}" class="turnstile-box"></div>
+    <input id="${escapeHtml(tokenId)}" type="hidden" required>
+  </div>`;
+}
+
+function loadTurnstile() {
+  if (!turnstileEnabled()) return Promise.resolve(null);
+  if (window.turnstile) return Promise.resolve(window.turnstile);
+  if (turnstileLoadPromise) return turnstileLoadPromise;
+  turnstileLoadPromise = new Promise((resolve, reject) => {
+    const existing = document.querySelector("script[data-turnstile]");
+    if (existing) {
+      existing.addEventListener("load", () => resolve(window.turnstile));
+      existing.addEventListener("error", reject);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.defer = true;
+    script.dataset.turnstile = "true";
+    script.onload = () => resolve(window.turnstile);
+    script.onerror = () => reject(new Error("Captcha could not load."));
+    document.head.appendChild(script);
+  });
+  return turnstileLoadPromise;
+}
+
+function renderTurnstileWidget(widgetId, tokenId, action) {
+  if (!turnstileEnabled()) return;
+  renderedTurnstileWidgets.delete(widgetId);
+  loadTurnstile().then((turnstile) => {
+    const container = $(`#${widgetId}`);
+    const input = $(`#${tokenId}`);
+    if (!turnstile || !container || !input || renderedTurnstileWidgets.has(widgetId)) return;
+    const widget = turnstile.render(container, {
+      sitekey: CONFIG.security.turnstile.siteKey,
+      theme: "dark",
+      action,
+      callback(token) {
+        input.value = token || "";
+      },
+      "expired-callback"() {
+        input.value = "";
+      },
+      "error-callback"() {
+        input.value = "";
+      }
+    });
+    renderedTurnstileWidgets.set(widgetId, widget);
+  }).catch(() => {
+    const container = $(`#${widgetId}`);
+    if (container) container.innerHTML = `<p class="notice compact">Captcha could not load. Refresh and try again.</p>`;
+  });
+}
+
+function turnstileToken(tokenId) {
+  if (!turnstileEnabled()) return "";
+  const token = $(`#${tokenId}`)?.value || "";
+  if (!token) throw new Error("Complete the captcha.");
+  return token;
+}
+
+function resetTurnstileWidget(widgetId, tokenId) {
+  if (!turnstileEnabled()) return;
+  const input = $(`#${tokenId}`);
+  if (input) input.value = "";
+  const widget = renderedTurnstileWidgets.get(widgetId);
+  if (window.turnstile && widget !== undefined) window.turnstile.reset(widget);
+}
+
 function renderLogin(state) {
   setSeoMeta({
     title: `Login | ${CONFIG.site.name}`,
@@ -2299,31 +2454,43 @@ function renderLogin(state) {
       <form id="loginForm" class="card form">
         <h1 class="section-title">${escapeHtml(copy("login.title", "Login"))}</h1>
         <p class="section-copy">${escapeHtml(copy("login.body", "Log in to manage your server listings."))}</p>
+        <a class="button google-button" href="${escapeHtml(googleStartUrl())}">Continue with Google</a>
+        <div class="auth-divider"><span>or</span></div>
         <div class="field"><label>Username or email</label><input id="loginName" class="input" required></div>
         <div class="field"><label>Password</label><input id="loginPassword" class="input" type="password" required></div>
+        ${turnstileMarkup("loginTurnstile", "loginTurnstileToken")}
         <button class="button primary" type="submit">Login</button>
         <p class="section-copy">${escapeHtml(copy("login.signupPrompt", "Need an account?"))} <a class="text-link" href="#signup">${escapeHtml(copy("login.signupLink", "Sign up below"))}</a>.</p>
       </form>
       <form id="signup" class="card form">
         <h2 class="section-title">${escapeHtml(copy("login.signupTitle", "Sign Up"))}</h2>
         <p class="section-copy">${escapeHtml(copy("login.signupBody", "Create an account to submit a server."))}</p>
+        <a class="button google-button" href="${escapeHtml(googleStartUrl())}">Sign up with Google</a>
+        <p class="fine-print">By continuing with Google, you accept the <a class="text-link" href="${route("/terms/")}">terms and conditions</a> of IconListing.</p>
+        <div class="auth-divider"><span>or</span></div>
         <div class="field"><label>Username</label><input id="signupUser" class="input" minlength="3" required></div>
         <div class="field"><label>Email</label><input id="signupEmail" class="input" type="email" required></div>
         <div class="field"><label>Password</label><input id="signupPassword" class="input" type="password" minlength="6" required></div>
+        <label class="check-row"><input id="signupEmailOptIn" type="checkbox"> Allow IconListing to send me news and updates.</label>
+        <label class="check-row"><input id="signupTerms" type="checkbox" required> I accept the <a class="text-link" href="${route("/terms/")}">terms and conditions</a> of IconListing.</label>
+        ${turnstileMarkup("signupTurnstile", "signupTurnstileToken")}
         <button class="button blue" type="submit">Create Account</button>
       </form>
     </section>
   </div>`;
+  renderTurnstileWidget("loginTurnstile", "loginTurnstileToken", "login");
+  renderTurnstileWidget("signupTurnstile", "signupTurnstileToken", "register");
   $("#loginForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const button = $("#loginForm button[type='submit']");
     setButtonLoading(button, "Logging in...");
     try {
-      const result = await request("login", { login: $("#loginName").value, password: $("#loginPassword").value });
+      const result = await request("login", { login: $("#loginName").value, password: $("#loginPassword").value, turnstileToken: turnstileToken("loginTurnstileToken") });
       store.session = { token: result.token, user: result.user };
       location.href = route("/dashboard/");
     } catch (error) {
       toast(error.message);
+      resetTurnstileWidget("loginTurnstile", "loginTurnstileToken");
       setButtonLoading(button, "Login", false);
     }
   });
@@ -2332,11 +2499,19 @@ function renderLogin(state) {
     const button = $("#signup button[type='submit']");
     setButtonLoading(button, "Creating account...");
     try {
-      const result = await request("register", { username: $("#signupUser").value, email: $("#signupEmail").value, password: $("#signupPassword").value });
+      const result = await request("register", {
+        username: $("#signupUser").value,
+        email: $("#signupEmail").value,
+        password: $("#signupPassword").value,
+        emailOptIn: $("#signupEmailOptIn").checked,
+        termsAccepted: $("#signupTerms").checked,
+        turnstileToken: turnstileToken("signupTurnstileToken")
+      });
       store.session = { token: result.token, user: result.user };
       location.href = route("/dashboard/");
     } catch (error) {
       toast(error.message);
+      resetTurnstileWidget("signupTurnstile", "signupTurnstileToken");
       setButtonLoading(button, "Create Account", false);
     }
   });
@@ -2362,6 +2537,7 @@ function renderDashboard(state) {
           <p class="section-copy">${escapeHtml(copy("dashboard.body", "Edit listings, check rank, or add another server."))}</p>
         </div>
       </div>
+      ${emailVerificationPanel(state.user)}
       <div class="dashboard-list">${mine.length ? mine.map((server) => `<article class="card dash-item">
         <div class="rank">#${server.rank}</div>
         <div>
@@ -2385,9 +2561,25 @@ function renderDashboard(state) {
   bindDashboard(state);
 }
 
+function emailVerificationPanel(user) {
+  if (!user || user.emailVerified) return "";
+  return `<form id="emailVerificationForm" class="card email-verification-card">
+    <div>
+      <h2>Email verification</h2>
+      <p class="section-copy">Enter the 6-digit code sent to <strong>${escapeHtml(user.email || "your email")}</strong>.</p>
+    </div>
+    <div class="email-verification-controls">
+      <input id="emailVerificationCode" class="input code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required>
+      <button id="verifyEmailButton" class="button primary" type="submit">Verify email</button>
+      <button id="resendVerificationButton" class="button" type="button">Resend code</button>
+    </div>
+  </form>`;
+}
+
 function serverFormMarkup(server = {}) {
   const edition = server.edition === "bedrock" ? "bedrock" : "java";
   const bedrockType = server.bedrockType === "realm" ? "realm" : "server";
+  const listenerType = server.votifierType ? cleanVotifierType(server.votifierType) : "auto";
   return `<form id="serverForm" class="card form">
     <input type="hidden" id="serverId" value="${escapeHtml(server.id || "")}">
     <h2 class="section-title">${server.id ? "Edit Server" : "Add Server"}</h2>
@@ -2418,8 +2610,9 @@ function serverFormMarkup(server = {}) {
     <label class="check-row"><input id="votifierEnabled" type="checkbox" ${server.votifierEnabled ? "checked" : ""}> Enable Votifier</label>
     <div id="votifierFields" class="form-grid hidden">
       <div class="field"><label>Vote Listener Type</label><select id="votifierType" class="select">
-        <option value="nuvotifier" ${cleanVotifierType(server.votifierType) === "nuvotifier" ? "selected" : ""}>NuVotifier</option>
-        <option value="votifier" ${cleanVotifierType(server.votifierType) === "votifier" ? "selected" : ""}>Votifier</option>
+        <option value="auto" ${listenerType === "auto" ? "selected" : ""}>Auto detect</option>
+        <option value="nuvotifier" ${listenerType === "nuvotifier" ? "selected" : ""}>NuVotifier</option>
+        <option value="votifier" ${listenerType === "votifier" ? "selected" : ""}>Votifier</option>
       </select></div>
       <div class="field"><label>Votifier IP / Host</label><input id="votifierHost" class="input" value="${escapeHtml(server.votifierHost || "")}"></div>
       <div class="field"><label>Votifier Port</label><input id="votifierPort" class="input" type="number" value="${Number(server.votifierPort || 8192)}"></div>
@@ -2487,7 +2680,38 @@ function bindDashboard(state) {
     });
   });
   bindServerForm();
+  bindEmailVerificationPanel();
   bindSettingsForms();
+}
+
+function bindEmailVerificationPanel() {
+  $("#emailVerificationForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = $("#verifyEmailButton");
+    setButtonLoading(button, "Verifying...");
+    try {
+      const result = await request("verifyEmail", { code: $("#emailVerificationCode").value });
+      store.session = { token: result.token || store.session?.token, user: result.user };
+      toast(result.message || "Email verified.");
+      boot();
+    } catch (error) {
+      toast(error.message);
+      setButtonLoading(button, "Verify email", false);
+    }
+  });
+  $("#resendVerificationButton")?.addEventListener("click", async () => {
+    const button = $("#resendVerificationButton");
+    setButtonLoading(button, "Sending...");
+    try {
+      const result = await request("resendEmailVerification", {});
+      if (result.user) store.session = { token: result.token || store.session?.token, user: result.user };
+      toast(result.message || "Verification code sent.");
+    } catch (error) {
+      toast(error.message);
+    } finally {
+      setButtonLoading(button, "Resend code", false);
+    }
+  });
 }
 
 function bindServerForm() {
@@ -2525,11 +2749,10 @@ function bindServerForm() {
   });
   $("#bannerUpload")?.addEventListener("change", validateBannerUpload);
   $("#testVote")?.addEventListener("click", async () => {
+    const minecraftUsername = prompt("Minecraft username for the test vote:", CONFIG.votifier.testUsername || "IconListingTest");
+    if (!minecraftUsername) return;
     try {
-      if (!CONFIG.votifier.providerEndpoint) {
-        return toast("Votifier testing needs a provider endpoint. Use Test Plugin Vote for the IconListing plugin.");
-      }
-      const result = await request("testVote", { host: $("#votifierHost").value, port: $("#votifierPort").value, token: $("#votifierToken").value, type: $("#votifierType")?.value || "nuvotifier" });
+      const result = await request("testVote", { host: $("#votifierHost").value, port: $("#votifierPort").value, token: $("#votifierToken").value, type: $("#votifierType")?.value || "auto", minecraftUsername });
       toast(result.message || "Test vote sent.");
     } catch (error) {
       toast(error.message);
@@ -2627,6 +2850,7 @@ function settingsMarkup(user) {
   return `<div class="grid two">
     <form id="settingsForm" class="card form">
       <h2 class="section-title">Account Settings</h2>
+      <p class="section-copy">Email status: <strong>${user.emailVerified ? "Verified" : "Not verified"}</strong></p>
       <div class="field"><label>Username</label><input id="settingsUsername" class="input" value="${escapeHtml(user.username)}" required></div>
       <div class="field"><label>Email</label><input id="settingsEmail" class="input" type="email" value="${escapeHtml(user.email)}" required></div>
       <div class="field"><label>New Password</label><input id="settingsPassword" class="input" type="password" minlength="6"></div>
@@ -2648,8 +2872,8 @@ function bindSettingsForms() {
     event.preventDefault();
     try {
       const result = await request("accountUpdate", { username: $("#settingsUsername").value, email: $("#settingsEmail").value, password: $("#settingsPassword").value });
-      store.session = { ...store.session, user: result.user };
-      toast("Account updated.");
+      store.session = { token: result.token || store.session?.token, user: result.user };
+      toast(result.emailVerificationMessage || "Account updated.");
       boot();
     } catch (error) {
       toast(error.message);
@@ -2732,19 +2956,22 @@ function adminUserPanel(users) {
 
 function adminUserRow(user) {
   const email = String(user.email || "").trim();
+  const optedIn = user.emailOptIn === true;
+  const canSendReview = !!email && optedIn;
   const subject = reviewEmailSubject();
   const body = reviewEmailBody(user.username);
   return `<details class="admin-user-row">
     <summary>
-      <span><strong>${escapeHtml(user.username || "Unnamed user")}</strong>${user.banned ? ` <span class="status-badge danger">Banned</span>` : ""}</span>
+      <span><strong>${escapeHtml(user.username || "Unnamed user")}</strong>${user.banned ? ` <span class="status-badge danger">Banned</span>` : ""}${user.emailVerified ? ` <span class="status-badge">Verified email</span>` : ""}${optedIn ? ` <span class="status-badge">Email opt-in</span>` : ` <span class="status-badge danger">Email opt-out</span>`}</span>
       <span class="muted">View email</span>
     </summary>
     <div class="admin-user-details">
       <p><span>Email</span><a class="text-link" href="mailto:${escapeHtml(user.email || "")}">${escapeHtml(user.email || "No email saved")}</a></p>
+      ${optedIn ? "" : `<p class="admin-email-warning">! this user opted out of emails</p>`}
       <p><span>User ID</span><code>${escapeHtml(user.id || "")}</code></p>
       <div class="row-actions compact">
-        <button class="button" data-email-review data-review-email="${escapeHtml(encodeURIComponent(email))}" data-review-subject="${escapeHtml(encodeURIComponent(subject))}" data-review-body="${escapeHtml(encodeURIComponent(body))}" type="button" ${email ? "" : "disabled"}>Email review link</button>
-        <button class="button" data-copy-review-template data-review-email="${escapeHtml(encodeURIComponent(email))}" data-review-subject="${escapeHtml(encodeURIComponent(subject))}" data-review-body="${escapeHtml(encodeURIComponent(body))}" type="button">Copy template</button>
+        <button class="button" data-email-review data-review-email="${escapeHtml(encodeURIComponent(email))}" data-review-subject="${escapeHtml(encodeURIComponent(subject))}" data-review-body="${escapeHtml(encodeURIComponent(body))}" type="button" ${canSendReview ? "" : "disabled"}>Email review link</button>
+        <button class="button" data-copy-review-template data-review-email="${escapeHtml(encodeURIComponent(email))}" data-review-subject="${escapeHtml(encodeURIComponent(subject))}" data-review-body="${escapeHtml(encodeURIComponent(body))}" type="button" ${canSendReview ? "" : "disabled"}>Copy template</button>
         <button class="button" data-admin="banUser" data-id="${escapeHtml(user.id || "")}" type="button">${user.banned ? "Unban" : "Ban"}</button>
         <button class="button danger" data-admin="deleteUser" data-id="${escapeHtml(user.id || "")}" type="button">Delete user</button>
       </div>
@@ -3204,6 +3431,7 @@ function renderVotifierTester() {
       <form id="votifierToolForm" class="form">
         <div class="form-grid">
           <div class="field"><label>Listener type</label><select id="toolVotifierType" class="select">
+            <option value="auto">Auto detect</option>
             <option value="nuvotifier">NuVotifier</option>
             <option value="votifier">Votifier</option>
           </select></div>
@@ -3228,10 +3456,6 @@ function bindVotifierTester() {
     event.preventDefault();
     const result = $("#votifierToolResult");
     result.classList.remove("hidden");
-    if (!CONFIG.votifier.providerEndpoint) {
-      result.textContent = "Votifier testing needs CONFIG.votifier.providerEndpoint to be connected before this public tool can send a test.";
-      return;
-    }
     result.textContent = "Testing...";
     try {
       const response = await request("votifierToolTest", {
@@ -3249,17 +3473,52 @@ function bindVotifierTester() {
 }
 
 function renderStatic(page) {
-  const staticCopy = CONFIG.copy?.staticPages?.[page] || ["Page", "This page is ready to configure."];
+  const staticCopy = normalizeStaticPage(CONFIG.copy?.staticPages?.[page]);
   setSeoMeta({
-    title: `${staticCopy[0]} | ${CONFIG.site.name}`,
-    description: staticCopy[1],
+    title: `${staticCopy.title} | ${CONFIG.site.name}`,
+    description: staticCopy.description,
     path: `/${page}/`
   });
-  $("#app").innerHTML = `<div class="page"><section class="section card"><h1 class="section-title">${escapeHtml(staticCopy[0])}</h1><p class="section-copy">${escapeHtml(staticCopy[1])}</p></section></div>`;
+  $("#app").innerHTML = `<div class="page"><section class="section card policy-card">
+    <h1 class="section-title">${escapeHtml(staticCopy.title)}</h1>
+    <p class="section-copy">${escapeHtml(staticCopy.description)}</p>
+    ${staticCopy.updated ? `<p class="policy-updated">Last updated: ${escapeHtml(staticCopy.updated)}</p>` : ""}
+    <div class="policy-content">${staticCopy.sections.map(policySectionMarkup).join("")}</div>
+  </section></div>`;
+}
+
+function normalizeStaticPage(value) {
+  if (Array.isArray(value)) {
+    return {
+      title: value[0] || "Page",
+      description: value[1] || "This page is ready to configure.",
+      updated: "",
+      sections: [{ body: value[1] || "This page is ready to configure." }]
+    };
+  }
+  if (value && typeof value === "object") {
+    return {
+      title: value.title || "Page",
+      description: value.description || "",
+      updated: value.updated || "",
+      sections: Array.isArray(value.sections) ? value.sections : []
+    };
+  }
+  return normalizeStaticPage(["Page", "This page is ready to configure."]);
+}
+
+function policySectionMarkup(section = {}) {
+  const bullets = Array.isArray(section.bullets) ? section.bullets : [];
+  return `<section class="policy-section">
+    ${section.heading ? `<h2>${escapeHtml(section.heading)}</h2>` : ""}
+    ${section.body ? `<p>${escapeHtml(section.body)}</p>` : ""}
+    ${bullets.length ? `<ul>${bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
+  </section>`;
 }
 
 async function boot() {
   clearLegacyLocalOverlays();
+  const googleAuthResult = consumeGoogleAuthHash();
   if (!$("#app")) renderLayout();
   try {
     const state = await getState();
@@ -3278,6 +3537,7 @@ async function boot() {
     else if (page === "dashboard") renderDashboard(state);
     else if (page === "admin") renderAdmin(state);
     else renderStatic(page);
+    if (googleAuthResult?.message) toast(googleAuthResult.message);
   } catch (error) {
     const refreshing = scheduleNetworkRefresh(error);
     const message = refreshing ? networkApiMessage() : publicRequestError("state", error);

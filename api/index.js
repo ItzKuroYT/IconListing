@@ -1,5 +1,7 @@
 const crypto = require("crypto");
+const dns = require("dns/promises");
 const fs = require("fs/promises");
+const net = require("net");
 const os = require("os");
 const path = require("path");
 const CONFIG = require("../config.js");
@@ -13,12 +15,21 @@ const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const LOGIN_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const LOGIN_LIMIT_MAX_FAILURES = 8;
 const VOTIFIER_TIMEOUT_MS = 3000;
+const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
+const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
+const GOOGLE_STATE_TTL_MS = 10 * 60 * 1000;
+const RESEND_EMAIL_URL = "https://api.resend.com/emails";
+const EMAIL_VERIFICATION_TTL_MS = 15 * 60 * 1000;
+const EMAIL_VERIFICATION_RESEND_COOLDOWN_MS = 60 * 1000;
+const EMAIL_VERIFICATION_MAX_ATTEMPTS = 8;
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
-const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "pluginPoll", "testPluginVote", "admin"]);
-const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage"]);
+const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage", "googleStart", "googleCallback"]);
 const loginFailures = new Map();
 
 module.exports = async function handler(req, res) {
@@ -34,9 +45,12 @@ module.exports = async function handler(req, res) {
     if (action === "health") {
       return json(res, 200, healthPayload(req));
     }
+    if (action === "googleStart") {
+      return startGoogleOAuth(req, res);
+    }
     const db = migrateDb(await loadDb({
       allowRecoveryOnly: ["state", "sitemap", "login", "health", "serverPage", "serverImage"].includes(action),
-      forceFresh: WRITE_ACTIONS.has(action) || action === "state"
+      forceFresh: WRITE_ACTIONS.has(action) || action === "state" || action === "googleCallback"
     }));
     const user = await userFromRequest(req, db);
 
@@ -58,26 +72,46 @@ module.exports = async function handler(req, res) {
       return json(res, 200, statePayload(db, user, { detailServerId: stateDetailServerId(req) }));
     }
 
+    if (action === "googleCallback") {
+      return finishGoogleOAuth(req, res, db);
+    }
+
     if (action === "register") {
       requireFields(body, ["username", "email", "password"]);
+      await requireTurnstile(req, body.turnstileToken);
+      if (body.termsAccepted !== true) throw httpError(400, "You must accept the terms and conditions.");
       if (hasBlockedText(body.username)) throw httpError(400, "That username is not allowed here.");
       const exists = db.users.some((item) => same(item.email, body.email) || same(item.username, body.username));
       if (exists) throw httpError(409, "That username or email is already taken.");
+      const emailOptIn = body.emailOptIn === true;
       const next = {
         id: createId(),
         username: cleanText(body.username),
         email: cleanText(body.email),
         passwordHash: hashPassword(body.password),
+        emailOptIn,
+        emailOptInAt: emailOptIn ? new Date().toISOString() : "",
+        emailVerified: false,
+        emailVerifiedAt: "",
+        termsAcceptedAt: new Date().toISOString(),
         banned: false,
         createdAt: new Date().toISOString()
       };
+      const emailVerificationCode = createEmailVerificationChallenge(next);
       db.users.push(next);
       await saveDb(db, { touchedUsers: [next.id], uniqueUserId: next.id });
-      return json(res, 200, writePayload({ user: publicUser(next), token: signToken(next) }));
+      const emailDelivery = await sendEmailVerification(next, emailVerificationCode);
+      return json(res, 200, writePayload({
+        user: publicUser(next),
+        token: signToken(next),
+        emailVerificationSent: emailDelivery.sent,
+        emailVerificationMessage: emailDelivery.message
+      }));
     }
 
     if (action === "login") {
       requireFields(body, ["login", "password"]);
+      await requireTurnstile(req, body.turnstileToken);
       enforceLoginRateLimit(req, body.login);
       const next = db.users.find((item) => same(item.email, body.login) || same(item.username, body.login));
       if (!next || next.banned || !verifyPassword(body.password, next)) {
@@ -163,7 +197,7 @@ module.exports = async function handler(req, res) {
       const persistedServer = persistedDb.servers.find((item) => item.id === server.id);
       const persistedVote = persistedDb.votes.find((item) => item.id === vote.id);
       if (!persistedServer || !persistedVote) throw httpError(500, "Vote was not saved to shared storage. Error: 67.");
-      const deliveries = await deliverVoteRewards(persistedServer, minecraftUsername);
+      const deliveries = await deliverVoteRewards(persistedServer, minecraftUsername, req);
       return json(res, 200, writePayload({ ok: true, vote: persistedVote, deliveries, server: publicServer(persistedServer, user, { fullAnalytics: true }) }));
     }
 
@@ -195,12 +229,61 @@ module.exports = async function handler(req, res) {
     if (action === "accountUpdate") {
       requireLogin(user);
       if (body.username && hasBlockedText(body.username)) throw httpError(400, "That username is not allowed here.");
+      let emailVerificationCode = "";
       if (body.username) user.username = cleanText(body.username);
-      if (body.email) user.email = cleanText(body.email);
+      if (body.email && !same(body.email, user.email)) {
+        user.email = cleanText(body.email);
+        emailVerificationCode = createEmailVerificationChallenge(user);
+      }
       if (body.password) user.passwordHash = hashPassword(body.password);
       ensureUniqueUser(db, user, user.id);
       await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
-      return json(res, 200, writePayload({ user: publicUser(user) }));
+      const emailDelivery = emailVerificationCode ? await sendEmailVerification(user, emailVerificationCode) : null;
+      return json(res, 200, writePayload({
+        user: publicUser(user),
+        token: signToken(user),
+        emailVerificationSent: emailDelivery?.sent,
+        emailVerificationMessage: emailDelivery?.message
+      }));
+    }
+
+    if (action === "verifyEmail") {
+      requireLogin(user);
+      requireFields(body, ["code"]);
+      try {
+        verifyEmailCode(user, body.code);
+      } catch (error) {
+        if (user.emailVerification?.attempts) {
+          await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
+        }
+        throw error;
+      }
+      await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
+      const persistedDb = await persistedDbAfterWrite();
+      const persistedUser = persistedDb.users.find((item) => item.id === user.id);
+      if (!persistedUser?.emailVerified) throw httpError(500, "Email verification was not saved. Error: 67.");
+      return json(res, 200, writePayload({ ok: true, user: publicUser(persistedUser), token: signToken(persistedUser), message: "Email verified." }));
+    }
+
+    if (action === "resendEmailVerification") {
+      requireLogin(user);
+      if (user.emailVerified) {
+        return json(res, 200, writePayload({ ok: true, user: publicUser(user), token: signToken(user), message: "Email is already verified." }));
+      }
+      enforceEmailVerificationCooldown(user);
+      const emailVerificationCode = createEmailVerificationChallenge(user);
+      await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
+      const persistedDb = await persistedDbAfterWrite();
+      const persistedUser = persistedDb.users.find((item) => item.id === user.id);
+      if (!persistedUser?.emailVerification?.codeHash) throw httpError(500, "Verification code was not saved. Error: 67.");
+      const emailDelivery = await sendEmailVerification(persistedUser, emailVerificationCode);
+      return json(res, 200, writePayload({
+        ok: true,
+        user: publicUser(persistedUser),
+        token: signToken(persistedUser),
+        sent: emailDelivery.sent,
+        message: emailDelivery.message
+      }));
     }
 
     if (action === "deleteAccount") {
@@ -229,8 +312,9 @@ module.exports = async function handler(req, res) {
         port: Number(body.port || 8192),
         token: clean(body.token),
         type: cleanVotifierType(body.type),
-        minecraftUsername: CONFIG.votifier.testUsername,
-        serviceName: CONFIG.site.name
+        minecraftUsername: cleanText(body.minecraftUsername || CONFIG.votifier.testUsername),
+        serviceName: CONFIG.site.name,
+        address: requestIp(req)
       });
       return json(res, 200, result);
     }
@@ -242,7 +326,8 @@ module.exports = async function handler(req, res) {
         token: clean(body.token),
         type: cleanVotifierType(body.type),
         minecraftUsername: cleanText(body.minecraftUsername || CONFIG.votifier.testUsername),
-        serviceName: CONFIG.site.name
+        serviceName: CONFIG.site.name,
+        address: requestIp(req)
       });
       return json(res, 200, result);
     }
@@ -431,6 +516,328 @@ function enforceBrowserOrigin(req, action) {
   if (!allowedOrigins().has(origin)) throw httpError(403, "Request origin is not allowed.");
 }
 
+async function requireTurnstile(req, token) {
+  if (!CONFIG.security?.turnstile?.enabled) return;
+  const secret = turnstileSecret();
+  if (!secret) {
+    if (isProductionRequest(req)) throw httpError(500, "Captcha is not configured. Error: 67.");
+    return;
+  }
+  const responseToken = clean(token);
+  if (!responseToken) throw httpError(400, "Complete the captcha.");
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 6000);
+  try {
+    const body = new URLSearchParams({
+      secret,
+      response: responseToken
+    });
+    const ip = requestIp(req);
+    if (ip && ip !== "0.0.0.0") body.set("remoteip", ip);
+    const response = await fetch(TURNSTILE_VERIFY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body,
+      signal: controller.signal
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.success) throw httpError(400, "Captcha check failed. Try again.");
+  } catch (error) {
+    if (error.status) throw error;
+    throw httpError(400, "Captcha check failed. Try again.");
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function turnstileSecret() {
+  return clean(process.env.TURNSTILE_SECRET_KEY || process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY);
+}
+
+function startGoogleOAuth(req, res) {
+  if (!googleClientId() || !googleClientSecret()) return redirect(res, googleAuthReturnUrl({ error: "Google sign-in is not configured. Error: 67." }));
+  const nextPath = safeReturnPath(queryValue(req, "next") || "/dashboard/");
+  const params = new URLSearchParams({
+    client_id: googleClientId(),
+    redirect_uri: googleRedirectUri(req),
+    response_type: "code",
+    scope: "openid email profile",
+    prompt: "select_account",
+    state: signGoogleState({ next: nextPath, createdAt: Date.now() })
+  });
+  return redirect(res, `${GOOGLE_AUTH_URL}?${params.toString()}`);
+}
+
+async function finishGoogleOAuth(req, res, db) {
+  try {
+    if (!googleClientId() || !googleClientSecret()) throw httpError(500, "Google sign-in is not configured. Error: 67.");
+    if (isProductionRequest(req) && !hasGithubStorage()) throw httpError(500, "Permanent storage is not connected. Error: 67.");
+    const error = queryValue(req, "error");
+    if (error) throw httpError(400, "Google sign-in was cancelled.");
+    const state = verifyGoogleState(queryValue(req, "state"));
+    const code = clean(queryValue(req, "code"));
+    if (!code) throw httpError(400, "Google did not return a sign-in code.");
+    const tokens = await exchangeGoogleCode(req, code);
+    const profile = await fetchGoogleProfile(tokens.access_token);
+    if (!profile.email || profile.email_verified !== true) throw httpError(400, "Google did not verify this email address.");
+    const next = upsertGoogleUser(db, profile);
+    await saveDb(db, { touchedUsers: [next.id], uniqueUserId: next.id });
+    const persistedDb = await persistedDbAfterWrite();
+    const persistedUser = persistedDb.users.find((item) => item.id === next.id);
+    if (!persistedUser) throw httpError(500, "Google account was not saved. Error: 67.");
+    return redirect(res, googleAuthReturnUrl({ token: signToken(persistedUser), next: state.next || "/dashboard/" }));
+  } catch (error) {
+    return redirect(res, googleAuthReturnUrl({ error: error.message || "Google sign-in failed. Error: 67." }));
+  }
+}
+
+async function exchangeGoogleCode(req, code) {
+  const response = await fetch(GOOGLE_TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      code,
+      client_id: googleClientId(),
+      client_secret: googleClientSecret(),
+      redirect_uri: googleRedirectUri(req),
+      grant_type: "authorization_code"
+    })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.access_token) throw httpError(400, "Google sign-in could not be verified.");
+  return data;
+}
+
+async function fetchGoogleProfile(accessToken) {
+  const response = await fetch(GOOGLE_USERINFO_URL, {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.sub) throw httpError(400, "Google profile could not be loaded.");
+  return data;
+}
+
+function upsertGoogleUser(db, profile) {
+  const email = clean(profile.email).toLowerCase();
+  const googleSub = clean(profile.sub);
+  const now = new Date().toISOString();
+  let user = db.users.find((item) => clean(item.googleSub) === googleSub) || db.users.find((item) => same(item.email, email));
+  if (user?.banned) throw httpError(403, "This account cannot sign in.");
+  if (!user) {
+    user = {
+      id: createId(),
+      username: uniqueGoogleUsername(db, profile),
+      email,
+      passwordHash: "",
+      emailOptIn: false,
+      emailVerified: true,
+      emailVerifiedAt: now,
+      termsAcceptedAt: now,
+      googleLinkedAt: now,
+      createdAt: now,
+      banned: false
+    };
+    db.users.push(user);
+  }
+  user.email = email;
+  user.googleSub = googleSub;
+  user.googleName = cleanText(profile.name || "");
+  user.googlePicture = clean(profile.picture || "");
+  user.emailVerified = true;
+  user.emailVerifiedAt = user.emailVerifiedAt || now;
+  delete user.emailVerification;
+  user.googleLinkedAt = user.googleLinkedAt || now;
+  user.updatedAt = now;
+  return user;
+}
+
+function uniqueGoogleUsername(db, profile) {
+  const source = clean(profile.name || "").replace(/\s+/g, "") || clean(profile.email || "").split("@")[0] || "GoogleUser";
+  const base = cleanText(source).replace(/[^A-Za-z0-9_]/g, "").slice(0, 18) || "GoogleUser";
+  const start = base.length >= 3 ? base : `${base}User`;
+  let next = start;
+  let index = 2;
+  while (db.users.some((user) => same(user.username, next))) {
+    next = `${start}${index}`.slice(0, 24);
+    index += 1;
+  }
+  return next;
+}
+
+function signGoogleState(payload) {
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const sig = crypto.createHmac("sha256", tokenSecrets()[0]).update(body).digest("hex");
+  return `${body}.${sig}`;
+}
+
+function verifyGoogleState(state) {
+  const [body, sig] = clean(state).split(".");
+  if (!body || !sig || !verifySignedBody(body, sig)) throw httpError(400, "Google sign-in state was invalid.");
+  const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8"));
+  if (!payload.createdAt || Date.now() - Number(payload.createdAt) > GOOGLE_STATE_TTL_MS) throw httpError(400, "Google sign-in expired. Try again.");
+  return { next: safeReturnPath(payload.next || "/dashboard/") };
+}
+
+function createEmailVerificationChallenge(user) {
+  const code = String(crypto.randomInt(0, 1000000)).padStart(6, "0");
+  const now = Date.now();
+  user.emailVerification = {
+    codeHash: emailVerificationHash(user, code),
+    createdAt: new Date(now).toISOString(),
+    expiresAt: new Date(now + EMAIL_VERIFICATION_TTL_MS).toISOString(),
+    attempts: 0
+  };
+  user.emailVerified = false;
+  user.emailVerifiedAt = "";
+  return code;
+}
+
+function verifyEmailCode(user, code) {
+  if (user.emailVerified) return;
+  const verification = user.emailVerification || {};
+  if (!verification.codeHash || !verification.expiresAt) throw httpError(400, "Request a verification code first.");
+  if (new Date(verification.expiresAt).getTime() < Date.now()) throw httpError(400, "Verification code expired. Request a new one.");
+  if (Number(verification.attempts || 0) >= EMAIL_VERIFICATION_MAX_ATTEMPTS) throw httpError(429, "Too many verification attempts. Request a new code.");
+  const actualHash = emailVerificationHash(user, clean(code).replace(/\s+/g, ""));
+  if (!safeEqualHex(verification.codeHash, actualHash)) {
+    verification.attempts = Number(verification.attempts || 0) + 1;
+    user.emailVerification = verification;
+    throw httpError(400, "That verification code did not match.");
+  }
+  user.emailVerified = true;
+  user.emailVerifiedAt = new Date().toISOString();
+  delete user.emailVerification;
+}
+
+function enforceEmailVerificationCooldown(user) {
+  const createdAt = new Date(user.emailVerification?.createdAt || 0).getTime();
+  if (createdAt && Date.now() - createdAt < EMAIL_VERIFICATION_RESEND_COOLDOWN_MS) {
+    throw httpError(429, "Wait a minute before requesting another code.");
+  }
+}
+
+function emailVerificationHash(user, code) {
+  return crypto
+    .createHmac("sha256", tokenSecrets()[0])
+    .update(`${clean(user.id)}|${clean(user.email).toLowerCase()}|${clean(code)}`)
+    .digest("hex");
+}
+
+async function sendEmailVerification(user, code) {
+  if (!resendApiKey() || !resendFromEmail()) {
+    return { sent: false, message: "Email verification is not configured yet. Add Resend settings in Vercel." };
+  }
+  const subject = "Your Icon Listing verification code";
+  const text = [
+    `Your Icon Listing verification code is ${code}.`,
+    "It expires in 15 minutes.",
+    "If you did not request this, you can ignore this email."
+  ].join("\n");
+  const html = `<div style="font-family:Arial,sans-serif;line-height:1.5;color:#111827">
+    <h1 style="font-size:22px;margin:0 0 12px">Verify your Icon Listing email</h1>
+    <p>Your verification code is:</p>
+    <p style="font-size:30px;font-weight:800;letter-spacing:6px;margin:16px 0">${escapeHtmlForEmail(code)}</p>
+    <p>This code expires in 15 minutes.</p>
+    <p style="color:#6b7280">If you did not request this, you can ignore this email.</p>
+  </div>`;
+  try {
+    const payload = {
+      from: resendFromEmail(),
+      to: [user.email],
+      subject,
+      text,
+      html
+    };
+    const replyTo = resendReplyTo();
+    if (replyTo) payload.reply_to = replyTo;
+    const response = await fetch(RESEND_EMAIL_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendApiKey()}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const responseText = await response.text().catch(() => "");
+      console.error("Icon Listing email verification failed", { status: response.status, body: responseText.slice(0, 300) });
+      return { sent: false, message: "Verification email could not be sent. Try again soon." };
+    }
+    return { sent: true, message: "Verification code sent. Check your email." };
+  } catch (error) {
+    console.error("Icon Listing email verification failed", { message: error.message });
+    return { sent: false, message: "Verification email could not be sent. Try again soon." };
+  }
+}
+
+function resendApiKey() {
+  return clean(process.env.RESEND_API_KEY);
+}
+
+function resendFromEmail() {
+  return clean(process.env.RESEND_FROM_EMAIL);
+}
+
+function resendReplyTo() {
+  return clean(process.env.RESEND_REPLY_TO);
+}
+
+function escapeHtmlForEmail(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function googleAuthReturnUrl({ token = "", error = "", next = "/dashboard/" } = {}) {
+  const path = token ? safeReturnPath(next) : "/login/";
+  const url = new URL(siteUrl(path));
+  const hash = new URLSearchParams();
+  if (token) hash.set("googleToken", token);
+  if (error) hash.set("googleError", error);
+  url.hash = hash.toString();
+  return url.toString();
+}
+
+function googleRedirectUri(req) {
+  const url = new URL("/api", requestBaseUrl(req));
+  url.searchParams.set("action", "googleCallback");
+  return url.toString();
+}
+
+function requestBaseUrl(req) {
+  const host = clean(req.headers?.["x-forwarded-host"] || req.headers?.host || req.headers?.Host);
+  const proto = clean(req.headers?.["x-forwarded-proto"] || "https").split(",")[0] || "https";
+  if (host) return `${proto}://${host}`;
+  return apiOrigin(CONFIG.api?.productionBasePath) || CONFIG.site.url;
+}
+
+function googleClientId() {
+  return clean(process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_OAUTH_CLIENT_ID);
+}
+
+function googleClientSecret() {
+  return clean(process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_OAUTH_CLIENT_SECRET);
+}
+
+function safeReturnPath(value = "/dashboard/") {
+  const path = clean(value) || "/dashboard/";
+  if (!path.startsWith("/") || path.startsWith("//") || path.includes("\\") || /[\r\n]/.test(path)) return "/dashboard/";
+  return path;
+}
+
+function queryValue(req, key) {
+  const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
+  return req.query?.[key] || url.searchParams.get(key) || "";
+}
+
+function redirect(res, location) {
+  res.setHeader("Location", location);
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  return res.status(302).end("");
+}
+
 function requestOrigin(req) {
   return String(req.headers?.origin || req.headers?.Origin || "").replace(/\/$/, "");
 }
@@ -485,7 +892,7 @@ function normalizeServer(server) {
     crossPlay: edition === "java" && !!server.crossPlay,
     realmCode: server.realmCode || "",
     iconUrl: normalizeMinecraftIcon(server.iconUrl || ""),
-    votifierType: cleanVotifierType(server.votifierType),
+    votifierType: cleanVotifierType(server.votifierType || "auto"),
     iconListingPluginEnabled: !!server.iconListingPluginEnabled,
     iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey || ""),
     iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
@@ -1282,9 +1689,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260629-slug-pages">
-    <script src="/config.js?v=20260629-slug-pages"></script>
-    <script src="/assets/js/app.js?v=20260629-slug-pages" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260630-votifier-direct">
+    <script src="/config.js?v=20260630-votifier-direct"></script>
+    <script src="/assets/js/app.js?v=20260630-votifier-direct" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">
@@ -1519,23 +1926,24 @@ async function pingBedrock(server) {
   }
 }
 
-async function sendVotifierVote(server, minecraftUsername) {
+async function sendVotifierVote(server, minecraftUsername, req = null) {
   return sendVotifierPayload({
     host: server.votifierHost || server.javaHost || server.bedrockHost,
     port: Number(server.votifierPort || 8192),
     token: server.votifierToken,
-    type: cleanVotifierType(server.votifierType),
+    type: cleanVotifierType(server.votifierType || "auto"),
     minecraftUsername,
     serviceName: CONFIG.site.name,
+    address: req ? requestIp(req) : "0.0.0.0",
     serverId: server.id
   });
 }
 
-async function deliverVoteRewards(server, minecraftUsername) {
+async function deliverVoteRewards(server, minecraftUsername, req = null) {
   const deliveries = { votifier: "skipped", iconListingPlugin: server.iconListingPluginEnabled && server.iconListingVoteKey ? "queued" : "skipped" };
   if (!server.votifierEnabled) return deliveries;
   try {
-    await sendVotifierVote(server, minecraftUsername);
+    await sendVotifierVote(server, minecraftUsername, req);
     deliveries.votifier = "sent";
   } catch (error) {
     deliveries.votifier = "failed";
@@ -1549,25 +1957,225 @@ async function deliverVoteRewards(server, minecraftUsername) {
 }
 
 async function sendVotifierPayload(payload) {
-  if (!CONFIG.votifier.providerEndpoint) {
-    throw httpError(400, "Set votifier.providerEndpoint in config.js before sending Votifier votes.");
-  }
   requireFields(payload, ["host", "port", "token", "minecraftUsername"]);
   payload.type = cleanVotifierType(payload.type);
+  if (!/^[A-Za-z0-9_]{3,16}$/.test(cleanText(payload.minecraftUsername))) throw httpError(400, "Enter a valid Minecraft username.");
+  const providerEndpoint = votifierProviderEndpoint();
+  if (providerEndpoint) return sendVotifierViaProvider(payload, providerEndpoint);
+  return sendDirectVotifierPayload(payload);
+}
+
+async function sendVotifierViaProvider(payload, providerEndpoint) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), VOTIFIER_TIMEOUT_MS);
   try {
-    const response = await fetch(CONFIG.votifier.providerEndpoint, {
+    const headers = { "Content-Type": "application/json" };
+    const providerToken = clean(process.env.VOTIFIER_PROVIDER_TOKEN);
+    if (providerToken) headers.Authorization = `Bearer ${providerToken}`;
+    const response = await fetch(providerEndpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(payload),
       signal: controller.signal
     });
-    if (!response.ok) throw httpError(502, "The Votifier provider rejected the vote.");
-    return { ok: true, message: "Votifier vote sent." };
+    if (!response.ok) throw httpError(400, "The Votifier relay rejected the vote.");
+    return { ok: true, message: "Votifier vote sent through the configured provider." };
   } finally {
     clearTimeout(timeout);
   }
+}
+
+async function sendDirectVotifierPayload(payload) {
+  const host = await publicVotifierHost(payload.host);
+  const port = validVotifierPort(payload.port);
+  const next = {
+    ...payload,
+    host,
+    port,
+    token: clean(payload.token),
+    serviceName: cleanText(payload.serviceName || CONFIG.site.name),
+    minecraftUsername: cleanText(payload.minecraftUsername),
+    address: clean(payload.address || "0.0.0.0"),
+    timestamp: new Date().toISOString()
+  };
+  const result = next.type === "auto" ? await sendAutoVotifierPayload(next) : next.type === "votifier" ? await sendLegacyVotifierPayload(next) : await sendNuVotifierPayload(next);
+  const protocolName = result.protocol === "votifier" ? "Votifier" : "NuVotifier";
+  return {
+    ok: true,
+    message: `${protocolName} test vote sent to ${host}:${port}.`,
+    ...result
+  };
+}
+
+async function sendAutoVotifierPayload(payload) {
+  return votifierSocketExchange(payload, (handshake) => {
+    if (/^VOTIFIER\s+2\b/i.test(clean(handshake))) return buildNuVotifierPacket(payload, handshake);
+    return buildLegacyVotifierPacket(payload, handshake);
+  });
+}
+
+async function sendNuVotifierPayload(payload) {
+  return votifierSocketExchange(payload, (handshake) => buildNuVotifierPacket(payload, handshake));
+}
+
+async function sendLegacyVotifierPayload(payload) {
+  return votifierSocketExchange(payload, (handshake) => buildLegacyVotifierPacket(payload, handshake));
+}
+
+function buildNuVotifierPacket(payload, handshake) {
+  const challenge = nuVotifierChallenge(handshake);
+  const vote = {
+    serviceName: payload.serviceName,
+    username: payload.minecraftUsername,
+    address: payload.address,
+    timestamp: payload.timestamp,
+    challenge
+  };
+  const encodedPayload = Buffer.from(JSON.stringify(vote), "utf8").toString("base64");
+  const signature = crypto.createHmac("sha256", payload.token).update(encodedPayload).digest("base64");
+  return {
+    body: Buffer.from(`${JSON.stringify({ payload: encodedPayload, signature })}\n`, "utf8"),
+    handshake,
+    protocol: "nuvotifier"
+  };
+}
+
+function buildLegacyVotifierPacket(payload, handshake) {
+  const body = [
+    "VOTE",
+    payload.serviceName,
+    payload.minecraftUsername,
+    payload.address,
+    payload.timestamp
+  ].join("\n") + "\n";
+  return {
+    body: crypto.publicEncrypt(
+      {
+        key: normalizeVotifierPublicKey(payload.token),
+        padding: crypto.constants.RSA_PKCS1_PADDING
+      },
+      Buffer.from(body, "utf8")
+    ),
+    handshake,
+    protocol: "votifier"
+  };
+}
+
+function votifierSocketExchange(payload, buildPacket) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let gotHandshake = false;
+    let wrotePacket = false;
+    let exchangeResult = null;
+    const socket = net.createConnection({ host: payload.host, port: payload.port });
+    const settle = (callback, value) => {
+      if (settled) return;
+      settled = true;
+      try {
+        socket.destroy();
+      } catch {
+        // The socket may already be closed.
+      }
+      callback(value);
+    };
+    socket.setTimeout(VOTIFIER_TIMEOUT_MS);
+    socket.setNoDelay(true);
+    socket.once("data", (chunk) => {
+      if (gotHandshake) return;
+      gotHandshake = true;
+      let packet;
+      try {
+        packet = buildPacket(chunk.toString("utf8"));
+      } catch (error) {
+        settle(reject, httpError(400, error.message || "Could not build the Votifier vote packet."));
+        return;
+      }
+      exchangeResult = {
+        handshake: clean(packet.handshake).slice(0, 80),
+        protocol: packet.protocol || cleanVotifierType(payload.type),
+        packetBytes: packet.body.length
+      };
+      socket.write(packet.body, (error) => {
+        if (error) {
+          settle(reject, httpError(400, "The Votifier listener rejected the vote."));
+          return;
+        }
+        wrotePacket = true;
+        socket.end();
+      });
+    });
+    socket.once("finish", () => {
+      if (wrotePacket && exchangeResult) settle(resolve, exchangeResult);
+    });
+    socket.once("timeout", () => settle(reject, httpError(408, "The Votifier listener timed out. Check the port and firewall.")));
+    socket.once("error", () => settle(reject, httpError(400, "Could not connect to the Votifier listener. Check the host, port, and firewall.")));
+    socket.once("close", () => {
+      if (settled) return;
+      if (wrotePacket && exchangeResult) settle(resolve, exchangeResult);
+      else if (!gotHandshake) settle(reject, httpError(400, "The Votifier listener closed before sending a handshake."));
+      else settle(reject, httpError(400, "The Votifier listener closed before the vote packet was sent."));
+    });
+  });
+}
+
+function nuVotifierChallenge(handshake = "") {
+  const match = clean(handshake).match(/^VOTIFIER\s+2\s+(.+)$/i);
+  if (!match) throw new Error("NuVotifier did not send a v2 challenge. Check the listener type.");
+  return match[1].trim();
+}
+
+function normalizeVotifierPublicKey(value = "") {
+  const key = clean(value);
+  const explicitLabel = key.match(/-----BEGIN (RSA )?PUBLIC KEY-----/i)?.[1] ? "RSA PUBLIC KEY" : "PUBLIC KEY";
+  const body = key
+    .replace(/-----BEGIN (RSA )?PUBLIC KEY-----/gi, "")
+    .replace(/-----END (RSA )?PUBLIC KEY-----/gi, "")
+    .replace(/\s+/g, "");
+  if (!/^[A-Za-z0-9+/=]+$/.test(body) || body.length < 64) throw new Error("Enter a valid Votifier public key.");
+  const lines = body.match(/.{1,64}/g) || [];
+  return `-----BEGIN ${explicitLabel}-----\n${lines.join("\n")}\n-----END ${explicitLabel}-----`;
+}
+
+function votifierProviderEndpoint() {
+  return clean(process.env.VOTIFIER_PROVIDER_ENDPOINT || CONFIG.votifier.providerEndpoint || "");
+}
+
+async function publicVotifierHost(host = "") {
+  const value = cleanHost(host);
+  if (!value || /[^A-Za-z0-9.:-]/.test(value)) throw httpError(400, "Enter a valid public Votifier host.");
+  const addresses = await dns.lookup(value, { all: true, verbatim: true });
+  if (!addresses.length) throw httpError(400, "Votifier host could not be resolved.");
+  if (isProductionRuntime() && addresses.some((entry) => isPrivateAddress(entry.address))) {
+    throw httpError(400, "Votifier host must resolve to a public address.");
+  }
+  return value;
+}
+
+function validVotifierPort(value) {
+  const port = Number(value || 8192);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) throw httpError(400, "Enter a valid Votifier port.");
+  return port;
+}
+
+function isProductionRuntime() {
+  return !!(process.env.VERCEL || process.env.VERCEL_URL || process.env.NOW_REGION);
+}
+
+function isPrivateAddress(address = "") {
+  const value = String(address || "").trim().toLowerCase();
+  if (!value || value === "localhost") return true;
+  if (value === "::1" || value.startsWith("fc") || value.startsWith("fd") || value.startsWith("fe80:")) return true;
+  const parts = value.split(".").map(Number);
+  if (parts.length !== 4 || parts.some((item) => !Number.isInteger(item))) return false;
+  const [a, b] = parts;
+  return (
+    a === 10 ||
+    a === 127 ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) ||
+    (a === 169 && b === 254) ||
+    a === 0
+  );
 }
 
 function validateServer(server) {
@@ -1585,7 +2193,7 @@ function validateServer(server) {
     bedrockPort: Number(server.bedrockPort || CONFIG.defaults.bedrockPort),
     realmCode: cleanText(server.realmCode),
     votifierEnabled: !!server.votifierEnabled,
-    votifierType: cleanVotifierType(server.votifierType),
+    votifierType: cleanVotifierType(server.votifierType || "auto"),
     votifierHost: cleanText(server.votifierHost),
     votifierPort: Number(server.votifierPort || 8192),
     votifierToken: cleanText(server.votifierToken),
@@ -1664,7 +2272,10 @@ function cleanVoteKey(value = "") {
 }
 
 function cleanVotifierType(value = "") {
-  return String(value || "").toLowerCase() === "votifier" ? "votifier" : "nuvotifier";
+  const next = String(value || "").toLowerCase();
+  if (next === "votifier") return "votifier";
+  if (next === "auto") return "auto";
+  return "nuvotifier";
 }
 
 function normalizeMinecraftIcon(value = "") {
@@ -2034,9 +2645,13 @@ function shortVisitorHash(hash = "") {
   return String(hash || "").replace(/[^a-f0-9]/gi, "").slice(0, 16);
 }
 
-function clientHash(req) {
+function requestIp(req) {
   const forwarded = req.headers["x-forwarded-for"] || req.headers["X-Forwarded-For"] || "";
-  const ip = String(forwarded).split(",")[0].trim() || req.socket?.remoteAddress || "unknown";
+  return String(forwarded).split(",")[0].trim() || req.socket?.remoteAddress || "0.0.0.0";
+}
+
+function clientHash(req) {
+  const ip = requestIp(req);
   const agent = req.headers["user-agent"] || req.headers["User-Agent"] || "";
   return crypto.createHmac("sha256", SESSION_SECRET).update(`${ip}|${agent}`).digest("hex");
 }
@@ -2126,6 +2741,8 @@ function signToken(user) {
     id: snapshot.id,
     username: snapshot.username || "",
     email: snapshot.email || "",
+    emailOptIn: snapshot.emailOptIn === true,
+    emailVerified: snapshot.emailVerified === true,
     expires
   };
   const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
@@ -2145,6 +2762,8 @@ async function userFromRequest(req, db) {
     id: session.id,
     username: session.username,
     email: session.email,
+    emailOptIn: session.emailOptIn === true,
+    emailVerified: session.emailVerified === true,
     banned: false,
     fromTokenSnapshot: true
   };
@@ -2152,7 +2771,16 @@ async function userFromRequest(req, db) {
 
 function publicUser(user) {
   if (!user) return null;
-  return { id: user.id, username: user.username, email: user.email, admin: isAdmin(user), banned: !!user.banned };
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    emailOptIn: user.emailOptIn === true,
+    emailVerified: user.emailVerified === true,
+    emailVerificationPending: user.emailVerified !== true && !!user.emailVerification?.codeHash,
+    admin: isAdmin(user),
+    banned: !!user.banned
+  };
 }
 
 function isAdmin(user) {
@@ -2180,6 +2808,8 @@ function verifySnapshotToken(token) {
       id: String(payload.id),
       username: clean(payload.username || ""),
       email: clean(payload.email || ""),
+      emailOptIn: payload.emailOptIn === true,
+      emailVerified: payload.emailVerified === true,
       expires: Number(payload.expires)
     };
   } catch {

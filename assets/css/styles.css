@@ -428,6 +428,15 @@ main {
   background: #24242c;
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: .48;
+}
+
+.button:disabled:hover {
+  background: #1b1b21;
+}
+
 .button.primary {
   border-color: rgba(236, 72, 153, .58);
   background: linear-gradient(135deg, #7c3aed, #db2777);
@@ -447,6 +456,16 @@ main {
   border-color: rgba(251, 113, 133, .45);
   background: rgba(251, 113, 133, .12);
   color: #ffd0d8;
+}
+
+.google-button {
+  border-color: rgba(255, 255, 255, .22);
+  color: #111318;
+  background: #f7f7fb;
+}
+
+.google-button:hover {
+  background: #e6e8f0;
 }
 
 .button.icon {
@@ -1005,6 +1024,15 @@ main {
   font-size: .82rem;
 }
 
+.admin-email-warning {
+  padding: 10px 12px;
+  border: 1px solid rgba(251, 113, 133, .28);
+  border-radius: 6px;
+  color: #ffd0d8;
+  background: rgba(251, 113, 133, .08);
+  font-weight: 800;
+}
+
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -1037,6 +1065,67 @@ main {
   gap: 14px;
 }
 
+.email-verification-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+  border-color: rgba(139, 92, 246, .38);
+  background:
+    linear-gradient(135deg, rgba(139, 92, 246, .14), rgba(56, 189, 248, .08)),
+    var(--surface);
+}
+
+.email-verification-card h2,
+.email-verification-card p {
+  margin: 0;
+}
+
+.email-verification-card h2 {
+  font-size: 1.05rem;
+}
+
+.email-verification-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.email-verification-card .code-input {
+  width: 118px;
+  text-align: center;
+  font-weight: 900;
+  letter-spacing: 4px;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: .86rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--border);
+}
+
+.fine-print {
+  margin: -4px 0 0;
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.45;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1059,6 +1148,25 @@ main {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.check-row input {
+  flex: 0 0 auto;
+}
+
+.turnstile-field {
+  align-items: start;
+}
+
+.turnstile-box {
+  min-height: 65px;
+  display: grid;
+  align-items: center;
+}
+
+.notice.compact {
+  padding: 10px 12px;
+  font-size: .9rem;
 }
 
 .tag-picker {
@@ -1100,6 +1208,50 @@ main {
   background: #111923;
   color: #d9f5ff;
   padding: 13px 14px;
+}
+
+.policy-card {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.policy-updated {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: .92rem;
+}
+
+.policy-content {
+  display: grid;
+  gap: 22px;
+  margin-top: 28px;
+}
+
+.policy-section {
+  display: grid;
+  gap: 10px;
+}
+
+.policy-section h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.policy-section p {
+  margin: 0;
+  color: #d7d8e5;
+  line-height: 1.65;
+}
+
+.policy-section ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #d7d8e5;
+  line-height: 1.65;
+}
+
+.policy-section li + li {
+  margin-top: 7px;
 }
 
 .empty-state {
@@ -1710,6 +1862,14 @@ main {
 
   .directory-sidebar {
     position: static;
+  }
+
+  .email-verification-card {
+    grid-template-columns: 1fr;
+  }
+
+  .email-verification-controls {
+    justify-content: flex-start;
   }
 
   .toolbar,

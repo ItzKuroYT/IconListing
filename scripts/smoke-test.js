@@ -1,5 +1,7 @@
+const crypto = require("crypto");
 const fs = require("fs/promises");
 const http = require("http");
+const net = require("net");
 const os = require("os");
 const path = require("path");
 
@@ -111,6 +113,7 @@ function serverSlug(value = "") {
 
 async function main() {
   const received = [];
+  const tcpServers = [];
   let providerStatus = 200;
   const provider = http.createServer((req, res) => {
     let body = "";
@@ -142,17 +145,87 @@ async function main() {
     const badOrigin = await call("register", {
       username: "BlockedOrigin",
       email: "blocked-origin@example.com",
-      password: "secret123"
+      password: "secret123",
+      termsAccepted: true
     }, "", "POST", { origin: "https://evil.example" });
     assert(badOrigin.code === 403, "write actions should reject unapproved browser origins");
 
     const suffix = Date.now();
+    const previousGoogleClientId = process.env.GOOGLE_CLIENT_ID;
+    const previousGoogleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const previousFetch = global.fetch;
+    process.env.GOOGLE_CLIENT_ID = "smoke-google-client";
+    process.env.GOOGLE_CLIENT_SECRET = "smoke-google-secret";
+    const googleStart = await callRaw("googleStart", {}, "GET");
+    assert(googleStart.code === 302 && String(googleStart.headers.Location || "").includes("accounts.google.com"), "Google OAuth start should redirect to Google");
+    const googleState = new URL(googleStart.headers.Location).searchParams.get("state");
+    global.fetch = async (url) => {
+      if (String(url).includes("oauth2.googleapis.com/token")) {
+        return { ok: true, json: async () => ({ access_token: "smoke-google-access" }) };
+      }
+      if (String(url).includes("openidconnect.googleapis.com/v1/userinfo")) {
+        return { ok: true, json: async () => ({ sub: `google-${suffix}`, email: `google${suffix}@example.com`, email_verified: true, name: "Google Smoke" }) };
+      }
+      return previousFetch(url);
+    };
+    const googleCallback = await callPath(`/api?action=googleCallback&code=smoke-code&state=${encodeURIComponent(googleState)}`);
+    global.fetch = previousFetch;
+    if (previousGoogleClientId === undefined) delete process.env.GOOGLE_CLIENT_ID;
+    else process.env.GOOGLE_CLIENT_ID = previousGoogleClientId;
+    if (previousGoogleClientSecret === undefined) delete process.env.GOOGLE_CLIENT_SECRET;
+    else process.env.GOOGLE_CLIENT_SECRET = previousGoogleClientSecret;
+    assert(googleCallback.code === 302 && String(googleCallback.headers.Location || "").includes("googleToken="), "Google OAuth callback should create a signed session");
+    const googleToken = new URL(googleCallback.headers.Location).hash.replace(/^#/, "");
+    const googleSession = new URLSearchParams(googleToken).get("googleToken");
+    const googleStateRead = await call("state", {}, googleSession, "GET");
+    assert(googleStateRead.code === 200 && googleStateRead.json.user?.emailVerified === true, "Google OAuth users should have verified email status");
+
+    const missingTerms = await call("register", {
+      username: `NoTerms${suffix}`,
+      email: `noterms${suffix}@example.com`,
+      password: "secret123"
+    });
+    assert(missingTerms.code === 400, "register should require terms acceptance");
+
+    const sentVerificationEmails = [];
+    const previousResendApiKey = process.env.RESEND_API_KEY;
+    const previousResendFromEmail = process.env.RESEND_FROM_EMAIL;
+    const previousResendReplyTo = process.env.RESEND_REPLY_TO;
+    const previousResendFetch = global.fetch;
+    process.env.RESEND_API_KEY = "smoke-resend-key";
+    process.env.RESEND_FROM_EMAIL = "Icon Listing <verify@noreply.iconrealms.net>";
+    process.env.RESEND_REPLY_TO = "support@example.com";
+    global.fetch = async (url, options = {}) => {
+      if (String(url).includes("api.resend.com/emails")) {
+        sentVerificationEmails.push(JSON.parse(options.body || "{}"));
+        return { ok: true, json: async () => ({ id: `email-${suffix}` }), text: async () => "" };
+      }
+      return previousResendFetch(url, options);
+    };
     const register = await call("register", {
       username: `Smoke${suffix}`,
       email: `smoke${suffix}@example.com`,
-      password: "secret123"
+      password: "secret123",
+      emailOptIn: true,
+      termsAccepted: true
     });
     assert(register.code === 200 && register.json.token, "register should return a session token");
+    assert(register.json.user.emailVerified === false && register.json.user.emailVerificationPending === true, "password signups should start with pending email verification");
+    assert(sentVerificationEmails.length === 1, "register should send one verification email through Resend");
+    const verificationCode = JSON.stringify(sentVerificationEmails[0]).match(/\b\d{6}\b/)?.[0];
+    assert(verificationCode, "verification email should include a 6 digit code");
+    const badVerificationCode = verificationCode === "000000" ? "999999" : "000000";
+    const rejectedVerification = await call("verifyEmail", { code: badVerificationCode }, register.json.token);
+    assert(rejectedVerification.code === 400, "wrong email verification codes should be rejected");
+    const acceptedVerification = await call("verifyEmail", { code: verificationCode }, register.json.token);
+    assert(acceptedVerification.code === 200 && acceptedVerification.json.user?.emailVerified === true, "emailed verification code should verify the account");
+    global.fetch = previousResendFetch;
+    if (previousResendApiKey === undefined) delete process.env.RESEND_API_KEY;
+    else process.env.RESEND_API_KEY = previousResendApiKey;
+    if (previousResendFromEmail === undefined) delete process.env.RESEND_FROM_EMAIL;
+    else process.env.RESEND_FROM_EMAIL = previousResendFromEmail;
+    if (previousResendReplyTo === undefined) delete process.env.RESEND_REPLY_TO;
+    else process.env.RESEND_REPLY_TO = previousResendReplyTo;
 
     const registeredDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
     const registeredUser = registeredDb.users.find((item) => item.id === register.json.user.id);
@@ -381,6 +454,91 @@ async function main() {
     );
     assert(testVote.code === 200, "test vote should call the configured Votifier provider");
 
+    const directToken = `direct-token-${suffix}`;
+    const directReceived = [];
+    let resolveDirectReceived;
+    const directReceivedReady = new Promise((resolve) => {
+      resolveDirectReceived = resolve;
+    });
+    const directVotifier = net.createServer((socket) => {
+      socket.write("VOTIFIER 2 smoke-challenge\n");
+      socket.on("data", (chunk) => {
+        const message = JSON.parse(chunk.toString("utf8").trim());
+        const signature = crypto.createHmac("sha256", directToken).update(message.payload).digest("base64");
+        directReceived.push({
+          signatureValid: signature === message.signature,
+          payload: JSON.parse(Buffer.from(message.payload, "base64").toString("utf8"))
+        });
+        resolveDirectReceived();
+        socket.end();
+      });
+    });
+    tcpServers.push(directVotifier);
+    await new Promise((resolve) => directVotifier.listen(0, "127.0.0.1", resolve));
+    const providerEndpoint = CONFIG.votifier.providerEndpoint;
+    CONFIG.votifier.providerEndpoint = "";
+    const directVotifierTest = await call("votifierToolTest", {
+      type: "auto",
+      host: "127.0.0.1",
+      port: directVotifier.address().port,
+      token: directToken,
+      minecraftUsername: "DirectTest"
+    });
+    CONFIG.votifier.providerEndpoint = providerEndpoint;
+    assert(directVotifierTest.code === 200 && directVotifierTest.json.protocol === "nuvotifier", "auto-detected NuVotifier testing should send through the API without a provider endpoint");
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error("direct NuVotifier listener did not receive a packet")), 1000);
+      directReceivedReady.then(() => {
+        clearTimeout(timeout);
+        resolve();
+      }, reject);
+    });
+    assert(directReceived.length === 1 && directReceived[0].signatureValid, "direct NuVotifier payload should be HMAC signed with the token");
+    assert(directReceived[0].payload.challenge === "smoke-challenge" && directReceived[0].payload.username === "DirectTest", "direct NuVotifier payload should include challenge and username");
+
+    const legacyKeys = crypto.generateKeyPairSync("rsa", { modulusLength: 1024 });
+    const legacyReceived = [];
+    let resolveLegacyReceived;
+    const legacyReceivedReady = new Promise((resolve) => {
+      resolveLegacyReceived = resolve;
+    });
+    const legacyVotifier = net.createServer((socket) => {
+      socket.write("VOTIFIER 1\n");
+      socket.on("data", (chunk) => {
+        legacyReceived.push(
+          crypto.privateDecrypt(
+            {
+              key: legacyKeys.privateKey,
+              padding: crypto.constants.RSA_PKCS1_PADDING
+            },
+            chunk
+          ).toString("utf8")
+        );
+        resolveLegacyReceived();
+        socket.end();
+      });
+    });
+    tcpServers.push(legacyVotifier);
+    await new Promise((resolve) => legacyVotifier.listen(0, "127.0.0.1", resolve));
+    CONFIG.votifier.providerEndpoint = "";
+    const legacyVotifierTest = await call("votifierToolTest", {
+      type: "votifier",
+      host: "127.0.0.1",
+      port: legacyVotifier.address().port,
+      token: legacyKeys.publicKey.export({ type: "spki", format: "pem" }),
+      minecraftUsername: "LegacyTest"
+    });
+    CONFIG.votifier.providerEndpoint = providerEndpoint;
+    assert(legacyVotifierTest.code === 200, "direct legacy Votifier testing should send through the API without a provider endpoint");
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error("legacy Votifier listener did not receive a packet")), 1000);
+      legacyReceivedReady.then(() => {
+        clearTimeout(timeout);
+        resolve();
+      }, reject);
+    });
+    assert(legacyReceived.length === 1 && legacyReceived[0].includes("LegacyTest"), "direct legacy Votifier payload should be encrypted with the public key");
+
     const vote = await call("vote", {
       serverId: saved.json.server.id,
       minecraftUsername: `Alex_${String(suffix).slice(-4)}`
@@ -462,7 +620,9 @@ async function main() {
     const admin = await call("register", {
       username: "ItzKuroYT",
       email: `admin${suffix}@example.com`,
-      password: "secret123"
+      password: "secret123",
+      emailOptIn: true,
+      termsAccepted: true
     });
     assert(admin.code === 200 && admin.json.user.admin, "configured admin should register as admin");
 
@@ -603,9 +763,10 @@ async function main() {
     const backupAfterDelete = JSON.parse(await fs.readFile(backupPath, "utf8"));
     assert(backupAfterDelete.deleted?.servers?.[secondServer.json.server.id], "backup JSON should preserve server deletion tombstones");
 
-    console.log("Smoke test passed: auth, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, Google OAuth, email verification, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
+    tcpServers.forEach((server) => server.close());
     await fs.rm(dbPath, { force: true });
     await fs.rm(backupPath, { force: true });
     await fs.rm(recoveryPath, { force: true });

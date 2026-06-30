@@ -97,6 +97,12 @@ const IconListingConfig = {
     users: ["ItzKuroYT"],
     emails: ["isaaccooper926@gmail.com"]
   },
+  security: {
+    turnstile: {
+      enabled: true,
+      siteKey: "0x4AAAAAADtjc0m-E7iHdgVt"
+    }
+  },
   limits: {
     bannerMaxBytes: 1048576,
     bannerMaxWidth: 468,
@@ -224,8 +230,122 @@ const IconListingConfig = {
       emptyLeaderboard: "No monthly votes yet."
     },
     staticPages: {
-      terms: ["Terms", "Use Icon Listing honestly. Do not submit listings you do not control, spam the vote system, or post unsafe content."],
-      privacy: ["Privacy", "Icon Listing stores account details, listings, votes, and moderation data needed to run the site."],
+      terms: {
+        title: "Terms of Service",
+        description: "Use Icon Listing responsibly. These terms explain account rules, listing standards, sponsorship limits, enforcement, and acceptable use.",
+        updated: "June 30, 2026",
+        sections: [
+          {
+            heading: "Agreement",
+            body: "By accessing or using Icon Listing, you agree to use the platform responsibly, honestly, and in compliance with these Terms. If you do not agree, do not create an account, submit listings, vote, or use the service."
+          },
+          {
+            heading: "General Rules",
+            bullets: [
+              "Only submit Minecraft servers, Minecraft launchers, Minecraft clients, or Minecraft hosting services that you own, manage, or have permission to list.",
+              "Do not impersonate another person, community, business, server network, client, host, or brand.",
+              "Do not create duplicate listings to gain an unfair advantage.",
+              "Do not manipulate rankings, votes, reviews, analytics, traffic, or visibility through bots, alternate accounts, paid vote services, scripts, or other fraudulent methods.",
+              "Do not attempt to exploit bugs, bypass limits, scrape private data, overload the API, interfere with normal site operation, or access another account without permission."
+            ]
+          },
+          {
+            heading: "Listing Content",
+            bullets: [
+              "Listings must accurately represent the server, launcher, client, or hosting service being advertised.",
+              "Do not include false information, misleading claims, fake player counts, deceptive screenshots, fake links, or unrelated keywords.",
+              "Do not upload or link to content that is illegal, hateful, discriminatory, sexually explicit, excessively graphic, abusive, or otherwise inappropriate for a general audience.",
+              "Minecraft servers intended for adults are permitted only if the public listing itself remains appropriate for a general audience. Do not include explicit images, explicit descriptions, or links to pornographic or sexually explicit material.",
+              "Listings promoting malware, phishing, scams, credential theft, harmful cheats, forced downloads, or other malicious software are strictly prohibited."
+            ]
+          },
+          {
+            heading: "Sponsored Listings",
+            body: "Icon Listing may offer optional paid sponsorships for sponsored Minecraft servers, sponsored Minecraft launchers or clients, and sponsored Minecraft hosting providers. Sponsored placement increases visibility on the site, but it does not guarantee players, downloads, customers, votes, revenue, search ranking, or any specific result."
+          },
+          {
+            heading: "Accounts",
+            bullets: [
+              "You are responsible for maintaining the security of your account.",
+              "Do not share accounts, sell accounts, or attempt to gain unauthorized access to another user's account.",
+              "You are responsible for all activity performed through your account.",
+              "You must provide accurate account and listing information, including a reachable email address when required by the signup process."
+            ]
+          },
+          {
+            heading: "Votes, Rankings, and Tools",
+            body: "Votes, rankings, status checks, Votifier tools, analytics, and related features are provided to help users discover and manage listings. These systems may be limited, adjusted, corrected, or disabled when abuse, technical problems, inaccurate data, or suspicious activity is detected."
+          },
+          {
+            heading: "Minecraft Affiliation",
+            body: "Icon Listing is not an official Minecraft service and is not approved by or associated with Mojang, Microsoft, or their affiliates. Minecraft names, marks, and related assets belong to their respective owners."
+          },
+          {
+            heading: "Enforcement",
+            body: "We reserve the right to edit, reject, hide, suspend, or remove any listing, vote, account, sponsor placement, or submitted content that violates these Terms or harms the platform. Severe or repeated violations may result in a permanent ban without prior notice."
+          },
+          {
+            heading: "Changes",
+            body: "These Terms may be updated at any time. Continued use of Icon Listing after changes are posted means you accept the updated Terms."
+          }
+        ]
+      },
+      privacy: {
+        title: "Privacy Policy",
+        description: "How Icon Listing collects, stores, and uses account data, listing data, email preferences, votes, moderation records, and technical information.",
+        updated: "June 30, 2026",
+        sections: [
+          {
+            heading: "Overview",
+            body: "Icon Listing collects and stores the information necessary to provide, protect, and maintain the platform. We do not sell your personal information to third parties."
+          },
+          {
+            heading: "Information We Store",
+            bullets: [
+              "Account information, such as username, email address, encrypted password data, account status, and account creation time.",
+              "Email communication preferences, including whether you opted in to news and updates.",
+              "Minecraft server, launcher, client, and hosting listings you create or manage.",
+              "Votes, copied IP events, listing interactions, plugin vote delivery data, and analytics needed to operate ranking and anti-abuse systems.",
+              "Moderation data, reports, bans, deletion records, and administrative actions used to keep the platform safe.",
+              "Technical information, such as IP addresses, browser user agent data, request metadata, and security signals used to prevent spam, fraud, abuse, and unauthorized access."
+            ]
+          },
+          {
+            heading: "Email Addresses and Updates",
+            body: "An email address may be required to create and manage an account. We may use it for account support, security notices, account recovery, important service messages, or listing-related issues. News, updates, and review outreach should only be sent to users who opt in during signup or through a later preference option if available."
+          },
+          {
+            heading: "How We Use Data",
+            bullets: [
+              "Operate, secure, and improve Icon Listing.",
+              "Save and display listings, votes, rankings, sponsorships, and account dashboards.",
+              "Prevent spam, fraud, vote manipulation, API abuse, and duplicate or unsafe listings.",
+              "Enforce the Terms of Service and handle moderation.",
+              "Provide account support, troubleshoot bugs, and maintain backups or recovery records."
+            ]
+          },
+          {
+            heading: "Local Storage and Cookies",
+            body: "Icon Listing may use browser storage or similar technology to keep you logged in, remember interface state, run security checks, and support normal site features. Third-party services such as Cloudflare Turnstile may process technical signals to verify that login or signup requests are legitimate."
+          },
+          {
+            heading: "Sharing",
+            body: "Public listing information is shown publicly on the site and may be indexed by search engines. Private account information is not sold. Data may be shared only when needed to operate infrastructure, comply with law, investigate abuse, protect users, or maintain the service."
+          },
+          {
+            heading: "Your Choices",
+            body: "You may request removal of your account and associated personal information, subject to legal, security, anti-abuse, backup, or moderation requirements that may require certain records to be retained for a limited time. You may also choose not to opt in to news and update emails."
+          },
+          {
+            heading: "Security",
+            body: "We use reasonable technical measures such as password hashing, session signing, origin checks, captcha verification, and abuse limits to protect the platform. No online service can guarantee perfect security."
+          },
+          {
+            heading: "Changes",
+            body: "This Privacy Policy may be updated as Icon Listing changes. Continued use of the platform after changes are posted means the updated policy applies."
+          }
+        ]
+      },
       help: ["Help", "Need help with a listing, vote, sponsorship, or account? Join the Discord or contact the IconRealms team."],
       contact: ["Contact", "Reach IconRealms at officialfnaffanstudios@gmail.com or through Discord."]
     }
