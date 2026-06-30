@@ -26,6 +26,17 @@ const store = {
     if (value) localStorage.setItem("iconListingSession", JSON.stringify(value));
     else localStorage.removeItem("iconListingSession");
   },
+  get pendingVerification() {
+    try {
+      return JSON.parse(sessionStorage.getItem("iconListingPendingVerification") || "null");
+    } catch {
+      return null;
+    }
+  },
+  set pendingVerification(value) {
+    if (value) sessionStorage.setItem("iconListingPendingVerification", JSON.stringify(value));
+    else sessionStorage.removeItem("iconListingPendingVerification");
+  },
   get fallbackDb() {
     const saved = localStorage.getItem("iconListingDb");
     if (saved) return migrateDb(JSON.parse(saved));
@@ -366,12 +377,16 @@ function fallbackRequest(action, payload) {
     };
     db.users.push(next);
     save();
-    store.session = { token: `local-${next.id}`, user: publicUser(next) };
-    return Promise.resolve({ user: publicUser(next), token: store.session.token });
+    return Promise.resolve({ pendingVerification: true, user: publicUser(next), verificationToken: `local-${next.id}`, emailVerificationMessage: "Local preview code is 000000." });
   }
   if (action === "login") {
     const next = db.users.find((item) => (same(item.email, payload.login) || same(item.username, payload.login)) && item.password === payload.password && !item.banned);
     if (!next) return Promise.reject(new Error("That login did not match an account."));
+    if (next.emailVerified !== true) {
+      next.emailVerificationCode = "000000";
+      save();
+      return Promise.resolve({ pendingVerification: true, user: publicUser(next), verificationToken: `local-${next.id}`, emailVerificationMessage: "Local preview code is 000000." });
+    }
     store.session = { token: `local-${next.id}`, user: publicUser(next) };
     return Promise.resolve({ user: publicUser(next), token: store.session.token });
   }
@@ -470,24 +485,26 @@ function fallbackRequest(action, payload) {
     return Promise.resolve({ user: publicUser(user), token: store.session.token });
   }
   if (action === "verifyEmail") {
-    if (!user) return Promise.reject(new Error("Log in before verifying your email."));
-    if (user.emailVerified) return Promise.resolve({ ok: true, user: publicUser(user), token: store.session.token, message: "Email is already verified." });
-    if (clean(payload.code).replace(/\s+/g, "") !== clean(user.emailVerificationCode || "000000")) {
+    const target = user || db.users.find((item) => `local-${item.id}` === payload.verificationToken);
+    if (!target) return Promise.reject(new Error("Verification session expired. Log in or sign up again."));
+    if (target.emailVerified) return Promise.resolve({ ok: true, user: publicUser(target), token: store.session?.token || `local-${target.id}`, message: "Email is already verified." });
+    if (clean(payload.code).replace(/\s+/g, "") !== clean(target.emailVerificationCode || "000000")) {
       return Promise.reject(new Error("That verification code did not match."));
     }
-    user.emailVerified = true;
-    user.emailVerifiedAt = new Date().toISOString();
-    delete user.emailVerificationCode;
+    target.emailVerified = true;
+    target.emailVerifiedAt = new Date().toISOString();
+    delete target.emailVerificationCode;
     save();
-    store.session = { ...store.session, user: publicUser(user) };
-    return Promise.resolve({ ok: true, user: publicUser(user), token: store.session.token, message: "Email verified." });
+    store.session = { token: `local-${target.id}`, user: publicUser(target) };
+    return Promise.resolve({ ok: true, user: publicUser(target), token: store.session.token, message: "Email verified." });
   }
   if (action === "resendEmailVerification") {
-    if (!user) return Promise.reject(new Error("Log in before verifying your email."));
-    if (user.emailVerified) return Promise.resolve({ ok: true, user: publicUser(user), token: store.session.token, message: "Email is already verified." });
-    user.emailVerificationCode = "000000";
+    const target = user || db.users.find((item) => `local-${item.id}` === payload.verificationToken);
+    if (!target) return Promise.reject(new Error("Verification session expired. Log in or sign up again."));
+    if (target.emailVerified) return Promise.resolve({ ok: true, user: publicUser(target), token: store.session?.token || `local-${target.id}`, message: "Email is already verified." });
+    target.emailVerificationCode = "000000";
     save();
-    return Promise.resolve({ ok: true, sent: false, user: publicUser(user), token: store.session.token, message: "Local preview code is 000000. Production sends this with Resend." });
+    return Promise.resolve({ ok: true, sent: false, user: publicUser(target), verificationToken: `local-${target.id}`, message: "Local preview code is 000000. Production sends this with Resend." });
   }
   if (action === "deleteAccount") {
     if (!user) return Promise.reject(new Error("Log in before deleting your account."));
@@ -2449,6 +2466,10 @@ function renderLogin(state) {
     });
     return;
   }
+  if (store.pendingVerification) {
+    renderPendingEmailVerification(store.pendingVerification);
+    return;
+  }
   $("#app").innerHTML = `<div class="page">
     <section class="section grid two">
       <form id="loginForm" class="card form">
@@ -2486,6 +2507,10 @@ function renderLogin(state) {
     setButtonLoading(button, "Logging in...");
     try {
       const result = await request("login", { login: $("#loginName").value, password: $("#loginPassword").value, turnstileToken: turnstileToken("loginTurnstileToken") });
+      if (result.pendingVerification) {
+        showPendingEmailVerification(result);
+        return;
+      }
       store.session = { token: result.token, user: result.user };
       location.href = route("/dashboard/");
     } catch (error) {
@@ -2507,6 +2532,10 @@ function renderLogin(state) {
         termsAccepted: $("#signupTerms").checked,
         turnstileToken: turnstileToken("signupTurnstileToken")
       });
+      if (result.pendingVerification) {
+        showPendingEmailVerification(result);
+        return;
+      }
       store.session = { token: result.token, user: result.user };
       location.href = route("/dashboard/");
     } catch (error) {
@@ -2514,6 +2543,73 @@ function renderLogin(state) {
       resetTurnstileWidget("signupTurnstile", "signupTurnstileToken");
       setButtonLoading(button, "Create Account", false);
     }
+  });
+}
+
+function showPendingEmailVerification(result) {
+  const pending = {
+    verificationToken: result.verificationToken,
+    user: result.user,
+    message: result.emailVerificationMessage || result.message || "Check your email for a verification code."
+  };
+  store.pendingVerification = pending;
+  renderPendingEmailVerification(pending);
+}
+
+function renderPendingEmailVerification(pending = {}) {
+  const user = pending.user || {};
+  $("#app").innerHTML = `<div class="page">
+    <form id="pendingEmailVerificationForm" class="card form auth-verification-card">
+      <h1 class="section-title">Verify your email</h1>
+      <p class="section-copy">Enter the 6-digit code sent to <strong>${escapeHtml(user.email || "your email")}</strong>. Your account will log in after verification.</p>
+      ${pending.message ? `<div class="notice compact">${escapeHtml(pending.message)}</div>` : ""}
+      <div class="field"><label>Verification code</label><input id="pendingEmailVerificationCode" class="input code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required></div>
+      <div class="row-actions">
+        <button id="pendingVerifyEmailButton" class="button primary" type="submit">Verify and continue</button>
+        <button id="pendingResendEmailButton" class="button" type="button">Resend code</button>
+        <button id="cancelPendingVerification" class="button" type="button">Back to login</button>
+      </div>
+    </form>
+  </div>`;
+  $("#pendingEmailVerificationForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = $("#pendingVerifyEmailButton");
+    setButtonLoading(button, "Verifying...");
+    try {
+      const result = await request("verifyEmail", {
+        code: $("#pendingEmailVerificationCode").value,
+        verificationToken: pending.verificationToken
+      });
+      store.pendingVerification = null;
+      store.session = { token: result.token, user: result.user };
+      toast(result.message || "Email verified.");
+      location.href = route("/dashboard/");
+    } catch (error) {
+      toast(error.message);
+      setButtonLoading(button, "Verify and continue", false);
+    }
+  });
+  $("#pendingResendEmailButton")?.addEventListener("click", async () => {
+    const button = $("#pendingResendEmailButton");
+    setButtonLoading(button, "Sending...");
+    try {
+      const result = await request("resendEmailVerification", { verificationToken: pending.verificationToken });
+      const next = {
+        verificationToken: result.verificationToken || pending.verificationToken,
+        user: result.user || pending.user,
+        message: result.message || "Verification code sent."
+      };
+      store.pendingVerification = next;
+      renderPendingEmailVerification(next);
+      toast(next.message);
+    } catch (error) {
+      toast(error.message);
+      setButtonLoading(button, "Resend code", false);
+    }
+  });
+  $("#cancelPendingVerification")?.addEventListener("click", () => {
+    store.pendingVerification = null;
+    boot();
   });
 }
 

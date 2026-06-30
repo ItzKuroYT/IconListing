@@ -1101,6 +1101,24 @@ main {
   letter-spacing: 4px;
 }
 
+.auth-verification-card {
+  width: min(560px, 100%);
+  margin: 0 auto;
+  border-color: rgba(56, 189, 248, .28);
+  background:
+    linear-gradient(135deg, rgba(236, 72, 153, .1), rgba(56, 189, 248, .08)),
+    var(--surface);
+}
+
+.auth-verification-card .code-input {
+  width: 160px;
+  max-width: 100%;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 5px;
+}
+
 .auth-divider {
   display: flex;
   align-items: center;

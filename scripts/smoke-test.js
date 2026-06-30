@@ -168,7 +168,7 @@ async function main() {
       }
       return previousFetch(url);
     };
-    const googleCallback = await callPath(`/api?action=googleCallback&code=smoke-code&state=${encodeURIComponent(googleState)}`);
+    const googleCallback = await callPath(`/api/google-callback?code=smoke-code&state=${encodeURIComponent(googleState)}`);
     global.fetch = previousFetch;
     if (previousGoogleClientId === undefined) delete process.env.GOOGLE_CLIENT_ID;
     else process.env.GOOGLE_CLIENT_ID = previousGoogleClientId;
@@ -209,16 +209,26 @@ async function main() {
       emailOptIn: true,
       termsAccepted: true
     });
-    assert(register.code === 200 && register.json.token, "register should return a session token");
+    assert(register.code === 200 && register.json.pendingVerification && register.json.verificationToken, "register should return a pending email verification token");
     assert(register.json.user.emailVerified === false && register.json.user.emailVerificationPending === true, "password signups should start with pending email verification");
     assert(sentVerificationEmails.length === 1, "register should send one verification email through Resend");
     const verificationCode = JSON.stringify(sentVerificationEmails[0]).match(/\b\d{6}\b/)?.[0];
     assert(verificationCode, "verification email should include a 6 digit code");
     const badVerificationCode = verificationCode === "000000" ? "999999" : "000000";
-    const rejectedVerification = await call("verifyEmail", { code: badVerificationCode }, register.json.token);
+    const rejectedVerification = await call("verifyEmail", { code: badVerificationCode, verificationToken: register.json.verificationToken });
     assert(rejectedVerification.code === 400, "wrong email verification codes should be rejected");
-    const acceptedVerification = await call("verifyEmail", { code: verificationCode }, register.json.token);
-    assert(acceptedVerification.code === 200 && acceptedVerification.json.user?.emailVerified === true, "emailed verification code should verify the account");
+    const resendReadyDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const resendReadyUser = resendReadyDb.users.find((item) => item.id === register.json.user.id);
+    resendReadyUser.emailVerification.createdAt = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+    await fs.writeFile(dbPath, JSON.stringify(resendReadyDb));
+    await fs.writeFile(backupPath, JSON.stringify(resendReadyDb));
+    const resentVerification = await call("resendEmailVerification", { verificationToken: register.json.verificationToken });
+    assert(resentVerification.code === 200 && resentVerification.json.verificationToken && sentVerificationEmails.length === 2, "pending signup should resend verification email without a logged-in session");
+    const resentVerificationCode = JSON.stringify(sentVerificationEmails[1]).match(/\b\d{6}\b/)?.[0];
+    assert(resentVerificationCode, "resent verification email should include a 6 digit code");
+    const acceptedVerification = await call("verifyEmail", { code: resentVerificationCode, verificationToken: resentVerification.json.verificationToken });
+    assert(acceptedVerification.code === 200 && acceptedVerification.json.user?.emailVerified === true && acceptedVerification.json.token, "emailed verification code should verify the account and return a session");
+    const verifiedToken = acceptedVerification.json.token;
     global.fetch = previousResendFetch;
     if (previousResendApiKey === undefined) delete process.env.RESEND_API_KEY;
     else process.env.RESEND_API_KEY = previousResendApiKey;
@@ -233,7 +243,7 @@ async function main() {
     const staleRegisteredDb = { ...registeredDb, users: registeredDb.users.filter((item) => item.id !== registeredUser.id) };
     await fs.writeFile(dbPath, JSON.stringify(staleRegisteredDb));
     await fs.writeFile(backupPath, JSON.stringify(staleRegisteredDb));
-    const staleSessionState = await call("state", {}, register.json.token, "GET");
+    const staleSessionState = await call("state", {}, verifiedToken, "GET");
     assert(staleSessionState.code === 200 && staleSessionState.json.user?.id === registeredUser.id, "fresh signup session should survive a stale user read");
     const staleSessionSave = await call(
       "saveServer",
@@ -248,7 +258,7 @@ async function main() {
           tags: ["SMP"]
         }
       },
-      register.json.token
+      verifiedToken
     );
     assert(staleSessionSave.code === 200 && staleSessionSave.json.server.ownerId === registeredUser.id, "fresh signup session should create listings during a stale user read");
     const afterStaleSessionSave = JSON.parse(await fs.readFile(dbPath, "utf8"));
@@ -617,6 +627,19 @@ async function main() {
     });
     assert(copy.code === 200 && copy.json.analytics.ipCopiesLast30 === 1, "IP copy analytics should count one unique copy");
 
+    const adminSentEmails = [];
+    const adminPreviousFetch = global.fetch;
+    const adminPreviousResendApiKey = process.env.RESEND_API_KEY;
+    const adminPreviousResendFromEmail = process.env.RESEND_FROM_EMAIL;
+    process.env.RESEND_API_KEY = "smoke-resend-key";
+    process.env.RESEND_FROM_EMAIL = "Icon Listing <verify@noreply.iconrealms.net>";
+    global.fetch = async (url, options = {}) => {
+      if (String(url).includes("api.resend.com/emails")) {
+        adminSentEmails.push(JSON.parse(options.body || "{}"));
+        return { ok: true, json: async () => ({ id: `admin-email-${suffix}` }), text: async () => "" };
+      }
+      return adminPreviousFetch(url, options);
+    };
     const admin = await call("register", {
       username: "ItzKuroYT",
       email: `admin${suffix}@example.com`,
@@ -624,21 +647,31 @@ async function main() {
       emailOptIn: true,
       termsAccepted: true
     });
-    assert(admin.code === 200 && admin.json.user.admin, "configured admin should register as admin");
+    assert(admin.code === 200 && admin.json.user.admin && admin.json.pendingVerification, "configured admin should register as pending admin");
+    const adminVerificationCode = JSON.stringify(adminSentEmails[0] || {}).match(/\b\d{6}\b/)?.[0];
+    assert(adminVerificationCode, "admin verification email should include a code");
+    const adminVerify = await call("verifyEmail", { code: adminVerificationCode, verificationToken: admin.json.verificationToken });
+    assert(adminVerify.code === 200 && adminVerify.json.token, "admin email verification should return an admin session");
+    const adminToken = adminVerify.json.token;
+    global.fetch = adminPreviousFetch;
+    if (adminPreviousResendApiKey === undefined) delete process.env.RESEND_API_KEY;
+    else process.env.RESEND_API_KEY = adminPreviousResendApiKey;
+    if (adminPreviousResendFromEmail === undefined) delete process.env.RESEND_FROM_EMAIL;
+    else process.env.RESEND_FROM_EMAIL = adminPreviousResendFromEmail;
 
     const adminDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
     const adminUser = adminDb.users.find((item) => item.id === admin.json.user.id);
     const staleAdminDb = { ...adminDb, users: adminDb.users.filter((item) => item.id !== adminUser.id) };
     await fs.writeFile(dbPath, JSON.stringify(staleAdminDb));
     await fs.writeFile(backupPath, JSON.stringify(staleAdminDb));
-    const staleAdmin = await call("admin", { command: "saveHost", value: { name: "Blocked Stale Admin", url: "https://example.com", description: "A stale snapshot admin attempt should not be able to save paid host listings because admin power must come from the stored account record." } }, admin.json.token);
+    const staleAdmin = await call("admin", { command: "saveHost", value: { name: "Blocked Stale Admin", url: "https://example.com", description: "A stale snapshot admin attempt should not be able to save paid host listings because admin power must come from the stored account record." } }, adminToken);
     assert(staleAdmin.code === 403, "token snapshot fallback should not grant admin access");
     const restoredAdminDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
     if (!restoredAdminDb.users.some((item) => item.id === adminUser.id)) restoredAdminDb.users.push(adminUser);
     await fs.writeFile(dbPath, JSON.stringify(restoredAdminDb));
 
     const beforeUserListRead = await fs.readFile(dbPath, "utf8");
-    const adminUsers = await call("admin", { command: "listUsers" }, admin.json.token);
+    const adminUsers = await call("admin", { command: "listUsers" }, adminToken);
     const afterUserListRead = await fs.readFile(dbPath, "utf8");
     assert(adminUsers.code === 200 && adminUsers.json.users.some((item) => item.email === `smoke${suffix}@example.com`), "admin should be able to view created user emails through the API");
     assert(beforeUserListRead === afterUserListRead, "admin user email lookup should not write to shared storage");
@@ -659,7 +692,7 @@ async function main() {
           pricing: "paid"
         }
       },
-      admin.json.token
+      adminToken
     );
     assert(clientSave.code === 200 && clientSave.json.clients.length === 1, "admin should save a sponsored client");
 
@@ -677,7 +710,7 @@ async function main() {
           images: ["https://example.com/host-one.png", "https://example.com/host-two.png", "https://example.com/host-three.png"]
         }
       },
-      admin.json.token
+      adminToken
     );
     assert(hostSave.code === 200 && hostSave.json.hosts.length === 1, "admin should save a sponsored host");
 

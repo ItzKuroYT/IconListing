@@ -102,8 +102,9 @@ module.exports = async function handler(req, res) {
       await saveDb(db, { touchedUsers: [next.id], uniqueUserId: next.id });
       const emailDelivery = await sendEmailVerification(next, emailVerificationCode);
       return json(res, 200, writePayload({
+        pendingVerification: true,
         user: publicUser(next),
-        token: signToken(next),
+        verificationToken: signEmailVerificationToken(next),
         emailVerificationSent: emailDelivery.sent,
         emailVerificationMessage: emailDelivery.message
       }));
@@ -119,6 +120,18 @@ module.exports = async function handler(req, res) {
         throw httpError(401, "That login did not match an account.");
       }
       clearLoginFailures(req, body.login);
+      if (next.emailVerified !== true) {
+        const emailVerificationCode = createEmailVerificationChallenge(next);
+        await saveDb(db, { touchedUsers: [next.id], uniqueUserId: next.id });
+        const emailDelivery = await sendEmailVerification(next, emailVerificationCode);
+        return json(res, 200, writePayload({
+          pendingVerification: true,
+          user: publicUser(next),
+          verificationToken: signEmailVerificationToken(next),
+          emailVerificationSent: emailDelivery.sent,
+          emailVerificationMessage: emailDelivery.message || "Verify your email before logging in."
+        }));
+      }
       return json(res, 200, { user: publicUser(next), token: signToken(next) });
     }
 
@@ -248,39 +261,33 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === "verifyEmail") {
-      requireLogin(user);
       requireFields(body, ["code"]);
+      const target = emailVerificationTarget(req, db, body, user);
       try {
-        verifyEmailCode(user, body.code);
+        verifyEmailCode(target, body.code);
       } catch (error) {
-        if (user.emailVerification?.attempts) {
-          await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
+        if (target.emailVerification?.attempts) {
+          await saveDb(db, { touchedUsers: [target.id], uniqueUserId: target.id });
         }
         throw error;
       }
-      await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
-      const persistedDb = await persistedDbAfterWrite();
-      const persistedUser = persistedDb.users.find((item) => item.id === user.id);
-      if (!persistedUser?.emailVerified) throw httpError(500, "Email verification was not saved. Error: 67.");
-      return json(res, 200, writePayload({ ok: true, user: publicUser(persistedUser), token: signToken(persistedUser), message: "Email verified." }));
+      await saveDb(db, { touchedUsers: [target.id], uniqueUserId: target.id });
+      return json(res, 200, writePayload({ ok: true, user: publicUser(target), token: signToken(target), message: "Email verified." }));
     }
 
     if (action === "resendEmailVerification") {
-      requireLogin(user);
-      if (user.emailVerified) {
-        return json(res, 200, writePayload({ ok: true, user: publicUser(user), token: signToken(user), message: "Email is already verified." }));
+      const target = emailVerificationTarget(req, db, body, user);
+      if (target.emailVerified) {
+        return json(res, 200, writePayload({ ok: true, user: publicUser(target), token: signToken(target), message: "Email is already verified." }));
       }
-      enforceEmailVerificationCooldown(user);
-      const emailVerificationCode = createEmailVerificationChallenge(user);
-      await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
-      const persistedDb = await persistedDbAfterWrite();
-      const persistedUser = persistedDb.users.find((item) => item.id === user.id);
-      if (!persistedUser?.emailVerification?.codeHash) throw httpError(500, "Verification code was not saved. Error: 67.");
-      const emailDelivery = await sendEmailVerification(persistedUser, emailVerificationCode);
+      enforceEmailVerificationCooldown(target);
+      const emailVerificationCode = createEmailVerificationChallenge(target);
+      await saveDb(db, { touchedUsers: [target.id], uniqueUserId: target.id });
+      const emailDelivery = await sendEmailVerification(target, emailVerificationCode);
       return json(res, 200, writePayload({
         ok: true,
-        user: publicUser(persistedUser),
-        token: signToken(persistedUser),
+        user: publicUser(target),
+        verificationToken: signEmailVerificationToken(target),
         sent: emailDelivery.sent,
         message: emailDelivery.message
       }));
@@ -455,6 +462,7 @@ function actionFromRequest(req) {
   const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
   if (url.pathname.endsWith("/sitemap.xml")) return "sitemap";
   if (/^\/server\/[^/]+\/?$/i.test(url.pathname)) return "serverPage";
+  if (/^\/api\/google-callback\/?$/i.test(url.pathname)) return "googleCallback";
   return req.query?.action || url.searchParams.get("action") || "state";
 }
 
@@ -587,6 +595,7 @@ async function finishGoogleOAuth(req, res, db) {
     if (!persistedUser) throw httpError(500, "Google account was not saved. Error: 67.");
     return redirect(res, googleAuthReturnUrl({ token: signToken(persistedUser), next: state.next || "/dashboard/" }));
   } catch (error) {
+    console.error("Icon Listing Google OAuth failed", { status: error.status || 500, message: error.message });
     return redirect(res, googleAuthReturnUrl({ error: error.message || "Google sign-in failed. Error: 67." }));
   }
 }
@@ -604,7 +613,10 @@ async function exchangeGoogleCode(req, code) {
     })
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok || !data.access_token) throw httpError(400, "Google sign-in could not be verified.");
+  if (!response.ok || !data.access_token) {
+    const reason = clean(data.error_description || data.error || "");
+    throw httpError(400, reason ? `Google sign-in could not be verified: ${reason}` : "Google sign-in could not be verified.");
+  }
   return data;
 }
 
@@ -692,6 +704,31 @@ function createEmailVerificationChallenge(user) {
   return code;
 }
 
+function emailVerificationTarget(req, db, body = {}, sessionUser = null) {
+  const verificationToken = clean(body.verificationToken || "");
+  if (verificationToken) {
+    const payload = verifyEmailVerificationToken(verificationToken);
+    const target = db.users.find((item) => item.id === payload.id || same(item.email, payload.email));
+    if (!target) throw httpError(400, "Verification session expired. Log in or sign up again.");
+    if (target.emailVerified) return target;
+    if (!target.emailVerification?.codeHash) {
+      target.emailVerification = {
+        codeHash: payload.codeHash,
+        createdAt: payload.createdAt,
+        expiresAt: payload.expiresAt,
+        attempts: Number(target.emailVerification?.attempts || 0)
+      };
+      target.emailVerified = false;
+      target.emailVerifiedAt = "";
+    } else if (target.emailVerification.codeHash !== payload.codeHash) {
+      throw httpError(400, "A newer verification code was sent. Use the latest code from your email.");
+    }
+    return target;
+  }
+  requireLogin(sessionUser);
+  return sessionUser;
+}
+
 function verifyEmailCode(user, code) {
   if (user.emailVerified) return;
   const verification = user.emailVerification || {};
@@ -721,6 +758,35 @@ function emailVerificationHash(user, code) {
     .createHmac("sha256", tokenSecrets()[0])
     .update(`${clean(user.id)}|${clean(user.email).toLowerCase()}|${clean(code)}`)
     .digest("hex");
+}
+
+function signEmailVerificationToken(user) {
+  const verification = user.emailVerification || {};
+  const payload = {
+    v: 1,
+    id: clean(user.id),
+    email: clean(user.email).toLowerCase(),
+    codeHash: clean(verification.codeHash),
+    createdAt: clean(verification.createdAt),
+    expiresAt: clean(verification.expiresAt)
+  };
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const sig = crypto.createHmac("sha256", tokenSecrets()[0]).update(body).digest("hex");
+  return `ev1.${body}.${sig}`;
+}
+
+function verifyEmailVerificationToken(token = "") {
+  const [, body, sig] = clean(token).split(".");
+  if (!body || !sig || !verifySignedBody(body, sig)) throw httpError(400, "Verification session expired. Log in or sign up again.");
+  let payload;
+  try {
+    payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8"));
+  } catch {
+    throw httpError(400, "Verification session expired. Log in or sign up again.");
+  }
+  if (!payload?.id || !payload.email || !payload.codeHash || !payload.expiresAt) throw httpError(400, "Verification session expired. Log in or sign up again.");
+  if (new Date(payload.expiresAt).getTime() < Date.now()) throw httpError(400, "Verification code expired. Request a new one.");
+  return payload;
 }
 
 async function sendEmailVerification(user, code) {
@@ -801,9 +867,7 @@ function googleAuthReturnUrl({ token = "", error = "", next = "/dashboard/" } = 
 }
 
 function googleRedirectUri(req) {
-  const url = new URL("/api", requestBaseUrl(req));
-  url.searchParams.set("action", "googleCallback");
-  return url.toString();
+  return new URL("/api/google-callback", requestBaseUrl(req)).toString();
 }
 
 function requestBaseUrl(req) {
@@ -1689,9 +1753,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260630-votifier-direct">
-    <script src="/config.js?v=20260630-votifier-direct"></script>
-    <script src="/assets/js/app.js?v=20260630-votifier-direct" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260630-auth-verify-fix">
+    <script src="/config.js?v=20260630-auth-verify-fix"></script>
+    <script src="/assets/js/app.js?v=20260630-auth-verify-fix" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">
