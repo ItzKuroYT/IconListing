@@ -1351,6 +1351,68 @@
       "uptimeChecks": 13,
       "uptimeSuccesses": 13,
       "iconListingVoteQueue": []
+    },
+    {
+      "id": "eada511e-c7b9-43e8-8f1e-bcffcb21764d",
+      "name": "Calamity SMP",
+      "edition": "java",
+      "javaHost": "162.245.187.170",
+      "javaPort": 25566,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "nuvotifier",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_aa110009b03b6b3a652abd0dedaec3e2bc53",
+      "websiteUrl": "",
+      "discordUrl": "https://www.discord.gg/X9jvEAfBQP",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "Turns out we want the player base to be larger than we originally intended for, so I'm putting ads out here to get more players. I'm also gonna give out some details here:\n\nLifesteal (we made the heart recipe more expensive so you can't craft your way to 20 hearts)\n2 maces (they have to be held by different teams, and those teams can't be allied)\nWorldborder is 10k in each direction\nString dupers and infinite restocks are enabled",
+      "tags": [
+        "Survival",
+        "PvP",
+        "Lifesteal",
+        "SMP"
+      ],
+      "ownerId": "641d818d-74c9-4141-84d9-b8ac9cb5dc87",
+      "ownerName": "Calamitas Infernal",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 20,
+      "version": "Paper 1.21.11",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-06-30T15:54:50.226Z",
+      "updatedAt": "2026-06-30T15:54:50.226Z",
+      "lastPingAt": "2026-06-30T15:54:50.447Z",
+      "javaStatusTarget": "162.245.187.170:25566",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-06-30T15:54:50.447Z",
+            "playersOnline": 0,
+            "playersMax": 20,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-06-30T15:54:50.447Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
     }
   ],
   "clients": [
