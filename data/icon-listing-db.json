@@ -50,21 +50,21 @@
       "createdAt": "2026-06-30T06:06:59.035Z"
     },
     {
-      "id": "c391f070-5092-42e4-8dbe-e17c475929a5",
+      "id": "6f314ef9-88de-4c4d-a6fd-1f4a1ee42abe",
       "username": "WyattAnderson",
       "email": "animaltamer63@gmail.com",
       "passwordHash": "",
       "emailOptIn": false,
       "emailVerified": true,
-      "emailVerifiedAt": "2026-06-30T23:06:38.100Z",
-      "termsAcceptedAt": "2026-06-30T23:06:38.100Z",
-      "googleLinkedAt": "2026-06-30T23:06:38.100Z",
-      "createdAt": "2026-06-30T23:06:38.100Z",
+      "emailVerifiedAt": "2026-06-30T23:06:46.843Z",
+      "termsAcceptedAt": "2026-06-30T23:06:46.843Z",
+      "googleLinkedAt": "2026-06-30T23:06:46.843Z",
+      "createdAt": "2026-06-30T23:06:46.843Z",
       "banned": false,
       "googleSub": "106461275408491075977",
       "googleName": "Wyatt Anderson",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKcfX3dzyU72Vmx4ga6a1vnkGfCQGhM0BcFbgjslIGLxetPug=s96-c",
-      "updatedAt": "2026-06-30T23:06:38.100Z"
+      "updatedAt": "2026-06-30T23:06:46.843Z"
     }
   ],
   "servers": [
