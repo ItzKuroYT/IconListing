@@ -1094,8 +1094,17 @@
       "updatedAt": "2026-06-28T19:12:07.623Z",
       "lastPingAt": "2026-06-30T04:24:13.498Z",
       "analytics": {
-        "ipCopyDaily": [],
-        "ipCopyVisitorDays": {},
+        "ipCopyDaily": [
+          {
+            "date": "2026-06-30",
+            "count": 1
+          }
+        ],
+        "ipCopyVisitorDays": {
+          "2026-06-30": [
+            "6016f8fa71f17318"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-06-28T20:06:52.554Z",
