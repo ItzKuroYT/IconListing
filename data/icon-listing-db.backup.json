@@ -40,6 +40,14 @@
       "passwordHash": "da619f725ec426936ee659edd4435e6d:4d20b69e5d1c0521ee2e10dd0978e7de3359eb496df11edbbdcd8ea451c454c1",
       "banned": false,
       "createdAt": "2026-06-29T08:59:20.680Z"
+    },
+    {
+      "id": "9903281f-98bc-426d-bc27-f61a27015931",
+      "username": "sound",
+      "email": "soundproduction112@gmail.com",
+      "passwordHash": "a6f8c237fbc60ef554fa49557ace4a82:57add3f375ce3da9f66fcc11b367dac60564f6a1f42df18b53f7f532c20a273d",
+      "banned": false,
+      "createdAt": "2026-06-30T06:06:59.035Z"
     }
   ],
   "servers": [
