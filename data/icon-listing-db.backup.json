@@ -48,25 +48,6 @@
       "passwordHash": "a6f8c237fbc60ef554fa49557ace4a82:57add3f375ce3da9f66fcc11b367dac60564f6a1f42df18b53f7f532c20a273d",
       "banned": false,
       "createdAt": "2026-06-30T06:06:59.035Z"
-    },
-    {
-      "id": "10effabf-6412-4be1-9fc7-4968c1adcabd",
-      "username": "TestAccount",
-      "email": "sunrise543290@gmail.com",
-      "passwordHash": "391c4420ca194348144c6f05d3774609:6a4580a65b3ff59486c65aa81f6b058a23050bf86c287e08083938baf0d50ecc",
-      "emailOptIn": true,
-      "emailOptInAt": "2026-06-30T22:54:28.421Z",
-      "emailVerified": false,
-      "emailVerifiedAt": "",
-      "termsAcceptedAt": "2026-06-30T22:54:28.421Z",
-      "banned": false,
-      "createdAt": "2026-06-30T22:54:28.421Z",
-      "emailVerification": {
-        "codeHash": "88086a296947d9704f6f1bc1974fc52b496d43941f41da2b1e98c8b4c10d07ae",
-        "createdAt": "2026-06-30T22:54:28.421Z",
-        "expiresAt": "2026-06-30T23:09:28.421Z",
-        "attempts": 0
-      }
     }
   ],
   "servers": [
@@ -1472,6 +1453,63 @@
       "lastSuccessfulPingAt": "2026-06-30T22:49:51.777Z",
       "uptimeChecks": 12,
       "uptimeSuccesses": 12,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
+    },
+    {
+      "id": "4380d4ec-1ac3-4363-8cbf-47ea54f4cc9c",
+      "name": "eawewewe",
+      "edition": "java",
+      "javaHost": "wewewewe",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "wewewewe",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_f21f4bcd2af172e4cb06ef6ca78bb52611cf",
+      "websiteUrl": "",
+      "discordUrl": "",
+      "youtubeUrl": "",
+      "country": "Afghanistan",
+      "bannerUrl": "",
+      "description": "wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe",
+      "tags": [
+        "New"
+      ],
+      "ownerId": "10effabf-6412-4be1-9fc7-4968c1adcabd",
+      "ownerName": "TestAccount",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 0,
+      "sponsored": false,
+      "createdAt": "2026-06-30T22:55:05.721Z",
+      "updatedAt": "2026-06-30T22:55:05.721Z",
+      "lastPingAt": "2026-06-30T22:55:05.806Z",
+      "javaStatusTarget": "wewewewe",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-06-30T22:55:05.806Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          }
+        ]
+      },
+      "uptimeChecks": 1,
       "iconUrl": "",
       "iconListingVoteQueue": []
     }
