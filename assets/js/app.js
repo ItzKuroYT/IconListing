@@ -1287,7 +1287,8 @@ function serverPath(server) {
   return `/server/${encodeURIComponent(serverSlug(server.name, server.id))}/`;
 }
 
-function serverRoute(server) {
+function serverRoute(server, options = {}) {
+  if (options.byId && server?.id) return route(`/server/?id=${encodeURIComponent(server.id)}`);
   return route(serverPath(server));
 }
 
@@ -2655,7 +2656,7 @@ function renderDashboard(state) {
           <p class="server-ip">${escapeHtml(serverAddress(server))}</p>
         </div>
         <div class="row-actions">
-          <a class="button" href="${serverRoute(server)}">View</a>
+          <a class="button" href="${serverRoute(server, { byId: true })}">View</a>
           <button class="button" data-edit="${escapeHtml(server.id)}">Edit</button>
           <button class="button danger" data-delete="${escapeHtml(server.id)}">Delete</button>
         </div>

@@ -1869,9 +1869,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260701-save-sync-fix">
-    <script src="/config.js?v=20260701-save-sync-fix"></script>
-    <script src="/assets/js/app.js?v=20260701-save-sync-fix" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260701-view-sync-fix">
+    <script src="/config.js?v=20260701-view-sync-fix"></script>
+    <script src="/assets/js/app.js?v=20260701-view-sync-fix" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">
