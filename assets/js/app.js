@@ -243,8 +243,14 @@ function publicRequestError(action, error) {
   return error?.publicMessage || error?.message || productionApiMessage();
 }
 
+function publicDurableFailure(action, error) {
+  const next = new Error(publicRequestError(action, error));
+  next.originalError = error;
+  return next;
+}
+
 function requireDurableResult(action, result) {
-  if (!DURABLE_CLIENT_ACTIONS.has(action) || isLocalFallbackAllowed()) return;
+  if (!DURABLE_CLIENT_ACTIONS.has(action)) return;
   if (result?.durable) return;
   const error = new Error("Permanent storage is not connected. Error: 67.");
   error.publicMessage = productionApiMessage();
@@ -303,6 +309,7 @@ async function request(action, payload = {}, method = "POST") {
       }
       throw lastError || new Error(productionApiMessage());
     } catch (error) {
+      if (DURABLE_CLIENT_ACTIONS.has(action)) throw publicDurableFailure(action, error);
       if (!isLocalFallbackAllowed()) {
         const next = new Error(publicRequestError(action, error));
         next.originalError = error;
@@ -312,6 +319,7 @@ async function request(action, payload = {}, method = "POST") {
       window.clearTimeout(timeout);
     }
   }
+  if (DURABLE_CLIENT_ACTIONS.has(action)) throw new Error(productionApiMessage());
   return fallbackRequest(action, payload);
 }
 
@@ -660,6 +668,7 @@ function cleanVotifierType(value = "") {
   const next = String(value || "").toLowerCase();
   if (next === "votifier") return "votifier";
   if (next === "auto") return "auto";
+  if (next === "azuvotifier") return "azuvotifier";
   return "nuvotifier";
 }
 
@@ -1072,7 +1081,7 @@ function toolsDropdownMarkup() {
   return `<div class="dropdown">
     <button class="drop-button" type="button" data-route-group="motd-builder votifier-tester">${escapeHtml(copy("nav.tools", "Tools"))} <span class="chevron" aria-hidden="true">v</span></button>
     <div class="dropdown-menu tools-menu">
-      ${navMenuLink("/tools/votifier-tester/", copy("tools.votifierTitle", "Votifier Tester"), "Check Votifier or NuVotifier settings", "accent-blue")}
+      ${navMenuLink("/tools/votifier-tester/", copy("tools.votifierTitle", "Votifier Tester"), "Check Votifier, NuVotifier, or AzuVotifier settings", "accent-blue")}
       ${navMenuLink("/tools/motd-builder/", copy("tools.motdTitle", "MOTD Builder"), "Build a two-line Minecraft MOTD", "accent-purple")}
     </div>
   </div>`;
@@ -2713,11 +2722,12 @@ function serverFormMarkup(server = {}) {
       <div class="field"><label>Vote Listener Type</label><select id="votifierType" class="select">
         <option value="auto" ${listenerType === "auto" ? "selected" : ""}>Auto detect</option>
         <option value="nuvotifier" ${listenerType === "nuvotifier" ? "selected" : ""}>NuVotifier</option>
-        <option value="votifier" ${listenerType === "votifier" ? "selected" : ""}>Votifier</option>
+        <option value="azuvotifier" ${listenerType === "azuvotifier" ? "selected" : ""}>AzuVotifier</option>
+        <option value="votifier" ${listenerType === "votifier" ? "selected" : ""}>Votifier / Classic</option>
       </select></div>
       <div class="field"><label>Votifier IP / Host</label><input id="votifierHost" class="input" value="${escapeHtml(server.votifierHost || "")}"></div>
       <div class="field"><label>Votifier Port</label><input id="votifierPort" class="input" type="number" value="${Number(server.votifierPort || 8192)}"></div>
-      <div class="field"><label>Token / Public Key</label><textarea id="votifierToken" class="textarea code-input" rows="3" placeholder="NuVotifier token from config.yml, or classic rsa/public.key">${escapeHtml(server.votifierToken || "")}</textarea><p class="fine-print">Auto detect uses short NuVotifier tokens for v2 and rsa/public.key values for classic Votifier.</p></div>
+      <div class="field"><label>Token / Public Key</label><textarea id="votifierToken" class="textarea code-input" rows="3" placeholder="NuVotifier/AzuVotifier token from config.yml, or classic rsa/public.key">${escapeHtml(server.votifierToken || "")}</textarea><p class="fine-print">Auto detect uses short NuVotifier/AzuVotifier tokens for v2 and rsa/public.key values for classic Votifier.</p></div>
       <div class="field"><label>&nbsp;</label><button id="testVote" class="button blue" type="button">Send Test Vote</button></div>
     </div>
     <div class="form-grid">
@@ -2942,8 +2952,13 @@ async function submitServerForm(event) {
         tags: selectedTags
       }
     });
-    toast("Listing saved.");
-    boot();
+    toast("Listing saved to shared storage.");
+    if (Array.isArray(result.servers) && result.user) {
+      syncAuthUi(result.user);
+      renderDashboard({ ...result, votes: result.votes || [] });
+    } else {
+      boot();
+    }
   } catch (error) {
     toast(error.message);
   }
@@ -3525,8 +3540,8 @@ async function copyText(value) {
 
 function renderVotifierTester() {
   setSeoMeta({
-    title: CONFIG.seo?.pages?.votifierTester?.title || "Votifier Tester | NuVotifier Tool",
-    description: CONFIG.seo?.pages?.votifierTester?.description || "Test Votifier and NuVotifier settings with host, port, token or public key, and a Minecraft username.",
+    title: CONFIG.seo?.pages?.votifierTester?.title || "Votifier Tester | NuVotifier & AzuVotifier Tool",
+    description: CONFIG.seo?.pages?.votifierTester?.description || "Test Votifier, NuVotifier, and AzuVotifier settings with host, port, token or public key, and a Minecraft username.",
     path: "/tools/votifier-tester/"
   });
   $("#app").innerHTML = `<div class="page tool-page">
@@ -3534,7 +3549,7 @@ function renderVotifierTester() {
       <div class="tool-icon">V</div>
       <div>
         <h1 class="section-title">${escapeHtml(copy("tools.votifierTitle", "Votifier Tester"))}</h1>
-        <p class="section-copy">${escapeHtml(copy("tools.votifierBody", "Check Votifier or NuVotifier settings before connecting voting to a Minecraft server listing."))}</p>
+        <p class="section-copy">${escapeHtml(copy("tools.votifierBody", "Check Votifier, NuVotifier, or AzuVotifier settings before connecting voting to a Minecraft server listing."))}</p>
       </div>
     </section>
     <section class="tool-card votifier-tool-card">
@@ -3543,13 +3558,14 @@ function renderVotifierTester() {
           <div class="field"><label>Listener type</label><select id="toolVotifierType" class="select">
             <option value="auto">Auto detect</option>
             <option value="nuvotifier">NuVotifier</option>
-            <option value="votifier">Votifier</option>
+            <option value="azuvotifier">AzuVotifier</option>
+            <option value="votifier">Votifier / Classic</option>
           </select></div>
           <div class="field"><label>Test username</label><input id="toolVotifierUsername" class="input" value="${escapeHtml(CONFIG.votifier.testUsername || "IconListingTest")}" maxlength="16"></div>
           <div class="field"><label>Votifier host</label><input id="toolVotifierHost" class="input" placeholder="play.example.com" required></div>
           <div class="field"><label>Port</label><input id="toolVotifierPort" class="input" type="number" value="8192" required></div>
         </div>
-        <div class="field"><label>Token / public key</label><textarea id="toolVotifierToken" class="textarea code-input" placeholder="NuVotifier token or Votifier public key" required></textarea></div>
+        <div class="field"><label>Token / public key</label><textarea id="toolVotifierToken" class="textarea code-input" placeholder="NuVotifier/AzuVotifier token or Votifier public key" required></textarea></div>
         <div class="row-actions">
           <button class="button primary" type="submit">Test connection</button>
           <a class="button" href="${escapeHtml(CONFIG.votifier.documentationUrl || "https://github.com/NuVotifier/NuVotifier")}">Docs</a>

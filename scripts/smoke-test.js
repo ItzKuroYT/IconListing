@@ -111,6 +111,42 @@ function serverSlug(value = "") {
     .slice(0, 80) || "server";
 }
 
+function parseNuVotifierFrame(chunk) {
+  if (chunk.length < 4) throw new Error("NuVotifier frame is missing its header");
+  const magic = chunk.readUInt16BE(0);
+  const length = chunk.readUInt16BE(2);
+  const rawMessage = chunk.subarray(4, 4 + length).toString("utf8");
+  const message = JSON.parse(rawMessage);
+  return {
+    magic,
+    length,
+    packetBytes: chunk.length,
+    message,
+    payload: JSON.parse(message.payload),
+    payloadIsJson: message.payload.trim().startsWith("{")
+  };
+}
+
+function createNuVotifierFrameServer({ token, challenge, received, resolve }) {
+  return net.createServer((socket) => {
+    socket.write(`VOTIFIER 2 ${challenge}\n`);
+    socket.on("data", (chunk) => {
+      const frame = parseNuVotifierFrame(chunk);
+      const signature = crypto.createHmac("sha256", token).update(frame.message.payload).digest("base64");
+      received.push({
+        packetBytes: frame.packetBytes,
+        frameMagic: frame.magic,
+        frameLength: frame.length,
+        payloadIsJson: frame.payloadIsJson,
+        signatureValid: signature === frame.message.signature,
+        payload: frame.payload
+      });
+      resolve();
+      socket.end();
+    });
+  });
+}
+
 async function main() {
   const received = [];
   const tcpServers = [];
@@ -566,13 +602,15 @@ async function main() {
     const directVotifier = net.createServer((socket) => {
       socket.write("VOTIFIER 2 smoke-challenge\n");
       socket.on("data", (chunk) => {
-        const message = JSON.parse(chunk.toString("utf8").trim());
-        const signature = crypto.createHmac("sha256", directToken).update(message.payload).digest("base64");
+        const frame = parseNuVotifierFrame(chunk);
+        const signature = crypto.createHmac("sha256", directToken).update(frame.message.payload).digest("base64");
         directReceived.push({
-          packetBytes: chunk.length,
-          payloadIsJson: message.payload.trim().startsWith("{"),
-          signatureValid: signature === message.signature,
-          payload: JSON.parse(message.payload)
+          packetBytes: frame.packetBytes,
+          frameMagic: frame.magic,
+          frameLength: frame.length,
+          payloadIsJson: frame.payloadIsJson,
+          signatureValid: signature === frame.message.signature,
+          payload: frame.payload
         });
         resolveDirectReceived();
         socket.end();
@@ -599,8 +637,151 @@ async function main() {
       }, reject);
     });
     assert(directReceived.length === 1 && directReceived[0].signatureValid, "direct NuVotifier payload should be HMAC signed with the token");
-    assert(directReceived[0].payloadIsJson && directReceived[0].packetBytes < 256, "direct NuVotifier payload should be raw JSON and stay under the legacy packet guard");
+    assert(directReceived[0].payloadIsJson && directReceived[0].frameMagic === 0x733A && directReceived[0].packetBytes === directReceived[0].frameLength + 4, "direct NuVotifier payload should use the v2 binary frame header");
     assert(directReceived[0].payload.challenge === "smoke-challenge" && directReceived[0].payload.username === "DirectTest", "direct NuVotifier payload should include challenge and username");
+    assert(typeof directReceived[0].payload.timestamp === "number", "direct NuVotifier payload should send timestamp as a number");
+
+    const azuToken = `azu-token-${suffix}`;
+    const azuReceived = [];
+    let resolveAzuReceived;
+    const azuReceivedReady = new Promise((resolve) => {
+      resolveAzuReceived = resolve;
+    });
+    const azuVotifier = net.createServer((socket) => {
+      socket.write("VOTIFIER 2 azu-challenge\n");
+      socket.on("data", (chunk) => {
+        const frame = parseNuVotifierFrame(chunk);
+        const signature = crypto.createHmac("sha256", azuToken).update(frame.message.payload).digest("base64");
+        azuReceived.push({
+          frameMagic: frame.magic,
+          signatureValid: signature === frame.message.signature,
+          payload: frame.payload
+        });
+        resolveAzuReceived();
+        socket.end();
+      });
+    });
+    tcpServers.push(azuVotifier);
+    await new Promise((resolve) => azuVotifier.listen(0, "127.0.0.1", resolve));
+    CONFIG.votifier.providerEndpoint = "";
+    const azuVotifierTest = await call("votifierToolTest", {
+      type: "azuvotifier",
+      host: "127.0.0.1",
+      port: azuVotifier.address().port,
+      token: azuToken,
+      minecraftUsername: "AzuTest"
+    });
+    CONFIG.votifier.providerEndpoint = providerEndpoint;
+    assert(azuVotifierTest.code === 200 && azuVotifierTest.json.protocol === "nuvotifier", "AzuVotifier testing should route through the NuVotifier v2 token sender");
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error("AzuVotifier listener did not receive a packet")), 1000);
+      azuReceivedReady.then(() => {
+        clearTimeout(timeout);
+        resolve();
+      }, reject);
+    });
+    assert(azuReceived.length === 1 && azuReceived[0].frameMagic === 0x733A && azuReceived[0].signatureValid, "AzuVotifier payload should be a signed NuVotifier v2 frame");
+    assert(azuReceived[0].payload.challenge === "azu-challenge" && azuReceived[0].payload.username === "AzuTest", "AzuVotifier payload should include challenge and username");
+
+    const directVoteNuToken = `direct-vote-nu-${suffix}`;
+    const directVoteNuReceived = [];
+    let resolveDirectVoteNuReceived;
+    const directVoteNuReady = new Promise((resolve) => {
+      resolveDirectVoteNuReceived = resolve;
+    });
+    const directVoteNuVotifier = createNuVotifierFrameServer({
+      token: directVoteNuToken,
+      challenge: "direct-vote-nu-challenge",
+      received: directVoteNuReceived,
+      resolve: resolveDirectVoteNuReceived
+    });
+    tcpServers.push(directVoteNuVotifier);
+    await new Promise((resolve) => directVoteNuVotifier.listen(0, "127.0.0.1", resolve));
+    const directVoteNuServer = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Smoke Direct NuVotifier Vote",
+          javaHost: "direct-nu.example.org",
+          javaPort: 25565,
+          country: "United States",
+          description: "A direct NuVotifier smoke listing that verifies the actual public vote endpoint can deliver a v2 token vote to the configured listener without using the external relay provider. The description is intentionally long enough to pass listing validation while keeping the test focused on reward delivery.",
+          tags: ["SMP", "Survival"],
+          votifierEnabled: true,
+          votifierType: "nuvotifier",
+          votifierHost: "127.0.0.1",
+          votifierPort: directVoteNuVotifier.address().port,
+          votifierToken: directVoteNuToken
+        }
+      },
+      login.json.token
+    );
+    assert(directVoteNuServer.code === 200 && directVoteNuServer.json.server.votifierType === "nuvotifier", "NuVotifier listing should save its listener type");
+    CONFIG.votifier.providerEndpoint = "";
+    const directVoteNu = await call("vote", {
+      serverId: directVoteNuServer.json.server.id,
+      minecraftUsername: `Nu_${String(suffix).slice(-4)}`
+    });
+    CONFIG.votifier.providerEndpoint = providerEndpoint;
+    assert(directVoteNu.code === 200 && directVoteNu.json.deliveries.votifier === "sent", "actual NuVotifier vote should be delivered directly");
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error("actual NuVotifier vote listener did not receive a packet")), 1000);
+      directVoteNuReady.then(() => {
+        clearTimeout(timeout);
+        resolve();
+      }, reject);
+    });
+    assert(directVoteNuReceived.length === 1 && directVoteNuReceived[0].signatureValid && directVoteNuReceived[0].frameMagic === 0x733A, "actual NuVotifier vote should send a signed v2 frame");
+
+    const directVoteAzuToken = `direct-vote-azu-${suffix}`;
+    const directVoteAzuReceived = [];
+    let resolveDirectVoteAzuReceived;
+    const directVoteAzuReady = new Promise((resolve) => {
+      resolveDirectVoteAzuReceived = resolve;
+    });
+    const directVoteAzuVotifier = createNuVotifierFrameServer({
+      token: directVoteAzuToken,
+      challenge: "direct-vote-azu-challenge",
+      received: directVoteAzuReceived,
+      resolve: resolveDirectVoteAzuReceived
+    });
+    tcpServers.push(directVoteAzuVotifier);
+    await new Promise((resolve) => directVoteAzuVotifier.listen(0, "127.0.0.1", resolve));
+    const directVoteAzuServer = await call(
+      "saveServer",
+      {
+        server: {
+          name: "Smoke Direct AzuVotifier Vote",
+          javaHost: "direct-azu.example.org",
+          javaPort: 25565,
+          country: "United States",
+          description: "A direct AzuVotifier smoke listing that verifies the actual public vote endpoint can deliver a v2 token vote to an AzuVotifier-compatible listener without using the relay provider. The description is intentionally long enough to pass listing validation while keeping the test focused on reward delivery.",
+          tags: ["SMP", "Survival"],
+          votifierEnabled: true,
+          votifierType: "azuvotifier",
+          votifierHost: "127.0.0.1",
+          votifierPort: directVoteAzuVotifier.address().port,
+          votifierToken: directVoteAzuToken
+        }
+      },
+      login.json.token
+    );
+    assert(directVoteAzuServer.code === 200 && directVoteAzuServer.json.server.votifierType === "azuvotifier", "AzuVotifier listing should save its listener type");
+    CONFIG.votifier.providerEndpoint = "";
+    const directVoteAzu = await call("vote", {
+      serverId: directVoteAzuServer.json.server.id,
+      minecraftUsername: `Azu_${String(suffix).slice(-4)}`
+    });
+    CONFIG.votifier.providerEndpoint = providerEndpoint;
+    assert(directVoteAzu.code === 200 && directVoteAzu.json.deliveries.votifier === "sent", "actual AzuVotifier vote should be delivered directly");
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error("actual AzuVotifier vote listener did not receive a packet")), 1000);
+      directVoteAzuReady.then(() => {
+        clearTimeout(timeout);
+        resolve();
+      }, reject);
+    });
+    assert(directVoteAzuReceived.length === 1 && directVoteAzuReceived[0].signatureValid && directVoteAzuReceived[0].frameMagic === 0x733A, "actual AzuVotifier vote should send a signed v2 frame");
 
     const legacyKeys = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
     const legacyReceived = [];
@@ -1019,7 +1200,7 @@ async function main() {
     if (deleteAccountPreviousResendFromEmail === undefined) delete process.env.RESEND_FROM_EMAIL;
     else process.env.RESEND_FROM_EMAIL = deleteAccountPreviousResendFromEmail;
 
-    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     tcpServers.forEach((server) => server.close());

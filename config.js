@@ -87,9 +87,9 @@ const IconListingConfig = {
           "Build a two-line Minecraft server MOTD with color codes, formatting, centering, live preview, copy button, and shareable URL."
       },
       votifierTester: {
-        title: "Votifier Tester | NuVotifier Tool",
+        title: "Votifier Tester | NuVotifier & AzuVotifier Tool",
         description:
-          "Test Votifier and NuVotifier settings for Minecraft vote listeners using host, port, token or public key, and a test username."
+          "Test Votifier, NuVotifier, and AzuVotifier settings for Minecraft vote listeners using host, port, token or public key, and a test username."
       }
     }
   },
@@ -196,7 +196,7 @@ const IconListingConfig = {
       motdTitle: "MOTD Builder",
       motdBody: "Design a two-line Minecraft server MOTD with a live in-game style preview, centering helper, and shareable URL.",
       votifierTitle: "Votifier Tester",
-      votifierBody: "Check Votifier or NuVotifier settings before connecting voting to a Minecraft server listing."
+      votifierBody: "Check Votifier, NuVotifier, or AzuVotifier settings before connecting voting to a Minecraft server listing."
     },
     login: {
       title: "Login",

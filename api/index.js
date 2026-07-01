@@ -175,7 +175,10 @@ module.exports = async function handler(req, res) {
         writeServerIds: [persistedServer.id],
         deletePagePaths: previousServerPagePath && previousServerPagePath !== serverStaticPagePath(persistedServer) ? [previousServerPagePath] : []
       });
-      return json(res, 200, writePayload({ server: publicServer(persistedServer, user, { fullAnalytics: true }) }));
+      return json(res, 200, writePayload({
+        ...statePayload(persistedDb, user, { detailServerId: persistedServer.id }),
+        server: publicServer(persistedServer, user, { fullAnalytics: true })
+      }));
     }
 
     if (action === "deleteServer") {
@@ -1866,9 +1869,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260701-votifier-protocol-fix">
-    <script src="/config.js?v=20260701-votifier-protocol-fix"></script>
-    <script src="/assets/js/app.js?v=20260701-votifier-protocol-fix" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260701-save-sync-fix">
+    <script src="/config.js?v=20260701-save-sync-fix"></script>
+    <script src="/assets/js/app.js?v=20260701-save-sync-fix" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">
@@ -2176,7 +2179,7 @@ async function sendDirectVotifierPayload(payload) {
     timestamp: String(Date.now())
   };
   const result = next.type === "auto" ? await sendAutoVotifierPayload(next) : next.type === "votifier" ? await sendLegacyVotifierPayload(next) : await sendNuVotifierPayload(next);
-  const protocolName = result.protocol === "votifier" ? "Votifier" : "NuVotifier";
+  const protocolName = result.protocol === "votifier" ? "Votifier" : "NuVotifier/AzuVotifier";
   return {
     ok: true,
     message: `${protocolName} vote packet sent to ${host}:${port} (${result.packetBytes} bytes).`,
@@ -2188,20 +2191,20 @@ async function sendAutoVotifierPayload(payload) {
   return votifierSocketExchange(payload, (handshake) => {
     if (isLikelyVotifierPublicKey(payload.token)) return buildLegacyVotifierPacket(payload, handshake);
     if (/^VOTIFIER\s+2\b/i.test(clean(handshake))) return buildNuVotifierPacket(payload, handshake);
-    throw new Error("This listener is using classic Votifier. Paste the rsa/public.key value, or set the listener type to NuVotifier with the token from NuVotifier config.yml.");
+    throw new Error("This listener is using classic Votifier. Paste the rsa/public.key value, or set the listener type to NuVotifier/AzuVotifier with the token from config.yml.");
   });
 }
 
 async function sendNuVotifierPayload(payload) {
   if (isLikelyVotifierPublicKey(payload.token)) {
-    throw httpError(400, "NuVotifier v2 needs the short token from NuVotifier config.yml, not the rsa/public.key public key.");
+    throw httpError(400, "NuVotifier/AzuVotifier v2 needs the short token from config.yml, not the rsa/public.key public key.");
   }
   return votifierSocketExchange(payload, (handshake) => buildNuVotifierPacket(payload, handshake));
 }
 
 async function sendLegacyVotifierPayload(payload) {
   if (!isLikelyVotifierPublicKey(payload.token)) {
-    throw httpError(400, "Classic Votifier needs the rsa/public.key public key. For NuVotifier tokens, choose Auto detect or NuVotifier.");
+    throw httpError(400, "Classic Votifier needs the rsa/public.key public key. For NuVotifier/AzuVotifier tokens, choose Auto detect or NuVotifier/AzuVotifier.");
   }
   return votifierSocketExchange(payload, (handshake) => buildLegacyVotifierPacket(payload, handshake));
 }
@@ -2212,13 +2215,17 @@ function buildNuVotifierPacket(payload, handshake) {
     serviceName: payload.serviceName,
     username: payload.minecraftUsername,
     address: payload.address,
-    timestamp: payload.timestamp,
+    timestamp: Number(payload.timestamp) || Date.now(),
     challenge
   };
   const encodedPayload = JSON.stringify(vote);
   const signature = crypto.createHmac("sha256", payload.token).update(encodedPayload, "utf8").digest("base64");
+  const message = Buffer.from(JSON.stringify({ payload: encodedPayload, signature }), "utf8");
+  const header = Buffer.alloc(4);
+  header.writeUInt16BE(0x733A, 0);
+  header.writeUInt16BE(message.length, 2);
   return {
-    body: Buffer.from(`${JSON.stringify({ payload: encodedPayload, signature })}\n`, "utf8"),
+    body: Buffer.concat([header, message]),
     handshake,
     protocol: "nuvotifier"
   };
@@ -2292,9 +2299,6 @@ function votifierSocketExchange(payload, buildPacket) {
         socket.end();
       });
     });
-    socket.once("finish", () => {
-      if (wrotePacket && exchangeResult) settle(resolve, exchangeResult);
-    });
     socket.once("timeout", () => settle(reject, httpError(408, "The Votifier listener timed out. Check the port and firewall.")));
     socket.once("error", () => settle(reject, httpError(400, "Could not connect to the Votifier listener. Check the host, port, and firewall.")));
     socket.once("close", () => {
@@ -2308,7 +2312,7 @@ function votifierSocketExchange(payload, buildPacket) {
 
 function nuVotifierChallenge(handshake = "") {
   const match = clean(handshake).match(/^VOTIFIER\s+2\s+(.+)$/i);
-  if (!match) throw new Error("The listener did not advertise NuVotifier v2. Choose Auto detect with a public key, or enable NuVotifier v2 tokens on the server.");
+  if (!match) throw new Error("The listener did not advertise NuVotifier/AzuVotifier v2. Choose Auto detect with a public key, or enable v2 tokens on the server.");
   return match[1].trim();
 }
 
@@ -2472,6 +2476,7 @@ function cleanVotifierType(value = "") {
   const next = String(value || "").toLowerCase();
   if (next === "votifier") return "votifier";
   if (next === "auto") return "auto";
+  if (next === "azuvotifier") return "azuvotifier";
   return "nuvotifier";
 }
 
