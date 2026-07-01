@@ -51,6 +51,23 @@
       "passwordHash": "a6f8c237fbc60ef554fa49557ace4a82:57add3f375ce3da9f66fcc11b367dac60564f6a1f42df18b53f7f532c20a273d",
       "banned": false,
       "createdAt": "2026-06-30T06:06:59.035Z"
+    },
+    {
+      "id": "3b991bad-a5cc-450b-8de0-f3228aaeac77",
+      "username": "HoneyBee",
+      "email": "honey182bee@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-07-01T22:43:15.336Z",
+      "termsAcceptedAt": "2026-07-01T22:43:15.336Z",
+      "googleLinkedAt": "2026-07-01T22:43:15.336Z",
+      "createdAt": "2026-07-01T22:43:15.336Z",
+      "banned": false,
+      "googleSub": "104334393931667678685",
+      "googleName": "Honey Bee",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJuIEXHrCqUhzRYH2nm1QbYBEWWl7aRHtSFRXDQgo2IwbRNqcc=s96-c",
+      "updatedAt": "2026-07-01T22:43:15.336Z"
     }
   ],
   "servers": [
