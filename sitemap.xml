@@ -2,55 +2,55 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://minecraft-listing.iconrealms.net/</loc>
-    <lastmod>2026-07-01T04:40:50.670Z</lastmod>
+    <lastmod>2026-07-01T05:09:16.589Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://minecraft-listing.iconrealms.net/servers/</loc>
-    <lastmod>2026-07-01T04:40:50.670Z</lastmod>
+    <lastmod>2026-07-01T05:09:16.589Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://minecraft-listing.iconrealms.net/sponsored/</loc>
-    <lastmod>2026-07-01T04:40:50.670Z</lastmod>
+    <lastmod>2026-07-01T05:09:16.589Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraft-listing.iconrealms.net/sponsored-clients/</loc>
-    <lastmod>2026-07-01T04:40:50.670Z</lastmod>
+    <lastmod>2026-07-01T05:09:16.589Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraft-listing.iconrealms.net/sponsored-hosts/</loc>
-    <lastmod>2026-07-01T04:40:50.670Z</lastmod>
+    <lastmod>2026-07-01T05:09:16.589Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraft-listing.iconrealms.net/tools/motd-builder/</loc>
-    <lastmod>2026-07-01T04:40:50.670Z</lastmod>
+    <lastmod>2026-07-01T05:09:16.589Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraft-listing.iconrealms.net/tools/votifier-tester/</loc>
-    <lastmod>2026-07-01T04:40:50.670Z</lastmod>
+    <lastmod>2026-07-01T05:09:16.589Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraft-listing.iconrealms.net/help/</loc>
-    <lastmod>2026-07-01T04:40:50.670Z</lastmod>
+    <lastmod>2026-07-01T05:09:16.589Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://minecraft-listing.iconrealms.net/contact/</loc>
-    <lastmod>2026-07-01T04:40:50.670Z</lastmod>
+    <lastmod>2026-07-01T05:09:16.589Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -79,6 +79,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraft-listing.iconrealms.net/server/Unbent-Flames/</loc>
+    <lastmod>2026-07-01T05:09:11.571Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraft-listing.iconrealms.net/server/VOIDFALL/</loc>
     <lastmod>2026-06-30T07:10:31.396Z</lastmod>
     <changefreq>daily</changefreq>
@@ -87,12 +93,6 @@
   <url>
     <loc>https://minecraft-listing.iconrealms.net/server/Calamity-SMP/</loc>
     <lastmod>2026-06-30T15:54:50.226Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraft-listing.iconrealms.net/server/TestServer/</loc>
-    <lastmod>2026-07-01T04:40:46.411Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
