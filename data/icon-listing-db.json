@@ -24,14 +24,8 @@
       "passwordHash": "157b7a344965baf0056be479b29fb573:63681ef58487ce60714743f756ec276c9e879746b7f02989f812f3646eb2de41",
       "banned": false,
       "createdAt": "2026-06-24T23:05:19.939Z",
-      "emailVerification": {
-        "codeHash": "b1a39d17628ff61adbb02b348a8d20b38d5ef25dd3a9a3f86c0beed1ba5bbdf8",
-        "createdAt": "2026-07-01T01:37:40.181Z",
-        "expiresAt": "2026-07-01T01:52:40.181Z",
-        "attempts": 0
-      },
-      "emailVerified": false,
-      "emailVerifiedAt": ""
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-07-01T01:38:00.609Z"
     },
     {
       "id": "0b4c1c9f-a7ad-4a40-9294-7c75b34731bc",
