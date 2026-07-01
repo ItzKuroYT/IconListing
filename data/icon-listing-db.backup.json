@@ -48,25 +48,6 @@
       "passwordHash": "a6f8c237fbc60ef554fa49557ace4a82:57add3f375ce3da9f66fcc11b367dac60564f6a1f42df18b53f7f532c20a273d",
       "banned": false,
       "createdAt": "2026-06-30T06:06:59.035Z"
-    },
-    {
-      "id": "eb8aa869-70f3-4c81-aa90-3c742e21aa03",
-      "username": "TestAccount2",
-      "email": "luciferthedevil926@gmail.com",
-      "passwordHash": "2b0d17a197672592e087c75c789428a5:83068649099f1f4cd095f709e118dbe703218eb5c5ea16e8a97bedb8449edd0f",
-      "emailOptIn": true,
-      "emailOptInAt": "2026-07-01T01:32:25.245Z",
-      "emailVerified": false,
-      "emailVerifiedAt": "",
-      "termsAcceptedAt": "2026-07-01T01:32:25.245Z",
-      "banned": false,
-      "createdAt": "2026-07-01T01:32:25.245Z",
-      "emailVerification": {
-        "codeHash": "041be26b3e261bcf92438d83dec3e3461cd33bdbc8211f73d96edec65a69a3ce",
-        "createdAt": "2026-07-01T01:32:25.246Z",
-        "expiresAt": "2026-07-01T01:47:25.246Z",
-        "attempts": 0
-      }
     }
   ],
   "servers": [
