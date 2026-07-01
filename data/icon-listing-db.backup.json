@@ -48,19 +48,6 @@
       "passwordHash": "a6f8c237fbc60ef554fa49557ace4a82:57add3f375ce3da9f66fcc11b367dac60564f6a1f42df18b53f7f532c20a273d",
       "banned": false,
       "createdAt": "2026-06-30T06:06:59.035Z"
-    },
-    {
-      "id": "eb8aa869-70f3-4c81-aa90-3c742e21aa03",
-      "username": "TestAccount2",
-      "email": "luciferthedevil926@gmail.com",
-      "passwordHash": "2b0d17a197672592e087c75c789428a5:83068649099f1f4cd095f709e118dbe703218eb5c5ea16e8a97bedb8449edd0f",
-      "emailOptIn": true,
-      "emailOptInAt": "2026-07-01T01:32:25.245Z",
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-07-01T01:32:40.485Z",
-      "termsAcceptedAt": "2026-07-01T01:32:25.245Z",
-      "createdAt": "2026-07-01T01:32:25.245Z",
-      "banned": false
     }
   ],
   "servers": [
@@ -926,7 +913,7 @@
       ],
       "ownerId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
       "ownerName": "ItzKuroYT",
-      "votes": 1,
+      "votes": 2,
       "playersOnline": 7,
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
@@ -1160,7 +1147,17 @@
       "realmCode": "",
       "iconListingPluginEnabled": true,
       "iconListingVoteKey": "ilv_c9bdda017999eb29bb8e971a477e47b2d7a9",
-      "iconListingVoteQueue": [],
+      "iconListingVoteQueue": [
+        {
+          "id": "9f584e72-8cb2-4893-bd89-6a6661e808e6",
+          "voteId": "6dd4965d-a99f-4e54-86c6-29c6ed9ff893",
+          "serverId": "e05bb489-241c-420c-8243-6427106b4476",
+          "serverName": "IconGens",
+          "minecraftUsername": "kadika333",
+          "createdAt": "2026-07-01T01:33:35.883Z",
+          "deliveredAt": ""
+        }
+      ],
       "javaStatusTarget": "icongen.minehut.gg",
       "javaSrvResolved": false,
       "iconUrl": "data:image/png;base64,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",
@@ -1512,12 +1509,22 @@
       "serverId": "48af8ec3-158a-4fca-9523-89eef6a617bd",
       "minecraftUsername": "Random8261",
       "createdAt": "2026-06-30T06:17:50.783Z"
+    },
+    {
+      "id": "6dd4965d-a99f-4e54-86c6-29c6ed9ff893",
+      "serverId": "e05bb489-241c-420c-8243-6427106b4476",
+      "minecraftUsername": "kadika333",
+      "createdAt": "2026-07-01T01:33:35.883Z"
     }
   ],
   "voteIps": {
     "48af8ec3-158a-4fca-9523-89eef6a617bd": {
       "visitor:6016f8fa71f173186bd410448f87c5be899c7c25f2dd32017a0c6fe52dc9d005": "2026-06-30T06:17:50.783Z",
       "name:random8261": "2026-06-30T06:17:50.783Z"
+    },
+    "e05bb489-241c-420c-8243-6427106b4476": {
+      "visitor:74e5d540e0b9f8a9dd4482369bf340182f8cae772be420aa7f3bfe719585a81e": "2026-07-01T01:33:35.883Z",
+      "name:kadika333": "2026-07-01T01:33:35.883Z"
     }
   },
   "deleted": {
