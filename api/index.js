@@ -598,11 +598,9 @@ async function finishGoogleOAuth(req, res, db) {
     const profile = await fetchGoogleProfile(tokens.access_token);
     if (!profile.email || profile.email_verified !== true) throw httpError(400, "Google did not verify this email address.");
     const next = upsertGoogleUser(db, profile);
-    await saveDb(db, { touchedUsers: [next.id], uniqueUserId: next.id });
-    const persistedDb = await persistedDbAfterWrite();
-    const persistedUser = persistedDb.users.find((item) => item.id === next.id);
-    if (!persistedUser) throw httpError(500, "Google account was not saved. Error: 67.");
-    return redirect(res, googleAuthReturnUrl({ token: signToken(persistedUser), next: state.next || "/dashboard/" }));
+    const savedDb = await saveDb(db, { touchedUsers: [next.id], uniqueUserId: next.id });
+    const savedUser = savedDb.users.find((item) => item.id === next.id) || next;
+    return redirect(res, googleAuthReturnUrl({ token: signToken(savedUser), next: state.next || "/dashboard/" }));
   } catch (error) {
     console.error("Icon Listing Google OAuth failed", { status: error.status || 500, message: error.message });
     return redirect(res, googleAuthReturnUrl({ error: error.message || "Google sign-in failed. Error: 67." }));
@@ -717,7 +715,7 @@ function emailVerificationTarget(req, db, body = {}, sessionUser = null) {
   const verificationToken = clean(body.verificationToken || "");
   if (verificationToken) {
     const payload = verifyEmailVerificationToken(verificationToken);
-    const target = db.users.find((item) => item.id === payload.id || same(item.email, payload.email));
+    const target = db.users.find((item) => item.id === payload.id || same(item.email, payload.email)) || restorePendingVerificationUser(db, payload);
     if (!target) throw httpError(400, "Verification session expired. Log in or sign up again.");
     if (target.emailVerified) return target;
     if (!target.emailVerification?.codeHash) {
@@ -736,6 +734,36 @@ function emailVerificationTarget(req, db, body = {}, sessionUser = null) {
   }
   requireLogin(sessionUser);
   return sessionUser;
+}
+
+function restorePendingVerificationUser(db, payload = {}) {
+  const pending = readEmailVerificationPendingUser(payload.pendingUser);
+  const username = cleanText(pending.username || "");
+  const email = clean(pending.email || payload.email).toLowerCase();
+  const passwordHash = clean(pending.passwordHash || "");
+  if (!payload.id || !username || !email || !passwordHash) return null;
+  if (db.users.some((item) => same(item.username, username) || same(item.email, email))) return null;
+  const restored = {
+    id: clean(payload.id),
+    username,
+    email,
+    passwordHash,
+    emailOptIn: pending.emailOptIn === true,
+    emailOptInAt: clean(pending.emailOptInAt || ""),
+    emailVerified: false,
+    emailVerifiedAt: "",
+    termsAcceptedAt: clean(pending.termsAcceptedAt || new Date().toISOString()),
+    createdAt: clean(pending.createdAt || new Date().toISOString()),
+    banned: false,
+    emailVerification: {
+      codeHash: clean(payload.codeHash),
+      createdAt: clean(payload.createdAt),
+      expiresAt: clean(payload.expiresAt),
+      attempts: 0
+    }
+  };
+  db.users.push(restored);
+  return restored;
 }
 
 function verifyEmailCode(user, code) {
@@ -772,16 +800,69 @@ function emailVerificationHash(user, code) {
 function signEmailVerificationToken(user) {
   const verification = user.emailVerification || {};
   const payload = {
-    v: 1,
+    v: 2,
     id: clean(user.id),
     email: clean(user.email).toLowerCase(),
     codeHash: clean(verification.codeHash),
     createdAt: clean(verification.createdAt),
-    expiresAt: clean(verification.expiresAt)
+    expiresAt: clean(verification.expiresAt),
+    pendingUser: emailVerificationPendingUserPayload(user)
   };
   const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
   const sig = crypto.createHmac("sha256", tokenSecrets()[0]).update(body).digest("hex");
-  return `ev1.${body}.${sig}`;
+  return `ev2.${body}.${sig}`;
+}
+
+function emailVerificationPendingUserPayload(user) {
+  const snapshot = emailVerificationPendingUserSnapshot(user);
+  return snapshot ? encryptVerificationSnapshot(snapshot) : undefined;
+}
+
+function emailVerificationPendingUserSnapshot(user) {
+  if (user.emailVerified === true || !user.passwordHash) return undefined;
+  return {
+    username: clean(user.username),
+    email: clean(user.email).toLowerCase(),
+    passwordHash: clean(user.passwordHash),
+    emailOptIn: user.emailOptIn === true,
+    emailOptInAt: clean(user.emailOptInAt || ""),
+    termsAcceptedAt: clean(user.termsAcceptedAt || ""),
+    createdAt: clean(user.createdAt || "")
+  };
+}
+
+function encryptVerificationSnapshot(value) {
+  const iv = crypto.randomBytes(12);
+  const key = verificationSnapshotKey(tokenSecrets()[0]);
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const encrypted = Buffer.concat([cipher.update(JSON.stringify(value), "utf8"), cipher.final()]);
+  return {
+    alg: "aes-256-gcm",
+    iv: iv.toString("base64url"),
+    tag: cipher.getAuthTag().toString("base64url"),
+    data: encrypted.toString("base64url")
+  };
+}
+
+function readEmailVerificationPendingUser(value) {
+  if (!value || typeof value !== "object") return {};
+  if (value.username && value.passwordHash) return value;
+  if (value.alg !== "aes-256-gcm" || !value.iv || !value.tag || !value.data) return {};
+  for (const secret of tokenSecrets()) {
+    try {
+      const decipher = crypto.createDecipheriv("aes-256-gcm", verificationSnapshotKey(secret), Buffer.from(value.iv, "base64url"));
+      decipher.setAuthTag(Buffer.from(value.tag, "base64url"));
+      const decrypted = Buffer.concat([decipher.update(Buffer.from(value.data, "base64url")), decipher.final()]).toString("utf8");
+      return JSON.parse(decrypted || "{}");
+    } catch {
+      // Try the next configured token secret.
+    }
+  }
+  return {};
+}
+
+function verificationSnapshotKey(secret = "") {
+  return crypto.createHash("sha256").update(`${secret}|email-verification-snapshot`).digest();
 }
 
 function verifyEmailVerificationToken(token = "") {

@@ -296,6 +296,20 @@ async function main() {
     const acceptedVerification = await call("verifyEmail", { code: resentVerificationCode, verificationToken: resentVerification.json.verificationToken });
     assert(acceptedVerification.code === 200 && acceptedVerification.json.user?.emailVerified === true && acceptedVerification.json.token, "emailed verification code should verify the account and return a session");
     const verifiedToken = acceptedVerification.json.token;
+    const restoredSignup = await call("register", {
+      username: `Restore${suffix}`,
+      email: `restore${suffix}@example.com`,
+      password: "secret123",
+      termsAccepted: true
+    });
+    const restoredSignupCode = JSON.stringify(sentVerificationEmails[sentVerificationEmails.length - 1] || {}).match(/\b\d{6}\b/)?.[0];
+    assert(restoredSignup.code === 200 && restoredSignupCode, "restore signup fixture should receive a verification code");
+    const hiddenPendingDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    hiddenPendingDb.users = hiddenPendingDb.users.filter((item) => item.id !== restoredSignup.json.user.id);
+    await fs.writeFile(dbPath, JSON.stringify(hiddenPendingDb));
+    await fs.writeFile(backupPath, JSON.stringify(hiddenPendingDb));
+    const restoredVerification = await call("verifyEmail", { code: restoredSignupCode, verificationToken: restoredSignup.json.verificationToken });
+    assert(restoredVerification.code === 200 && restoredVerification.json.user?.emailVerified === true && restoredVerification.json.token, "email verification should restore a pending signup when storage reads stale");
     global.fetch = previousResendFetch;
     if (previousResendApiKey === undefined) delete process.env.RESEND_API_KEY;
     else process.env.RESEND_API_KEY = previousResendApiKey;
