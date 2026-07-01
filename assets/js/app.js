@@ -324,6 +324,8 @@ function publicUser(user) {
     emailOptIn: user.emailOptIn === true,
     emailVerified: user.emailVerified === true,
     emailVerificationPending: user.emailVerified !== true && (!!user.emailVerification?.codeHash || !!user.emailVerificationCode),
+    passwordLogin: !!user.password,
+    googleLinked: !!user.googleSub,
     admin: isAdmin(user),
     banned: !!user.banned
   };
@@ -508,7 +510,10 @@ function fallbackRequest(action, payload) {
   }
   if (action === "deleteAccount") {
     if (!user) return Promise.reject(new Error("Log in before deleting your account."));
-    if (payload.username !== user.username || payload.email !== user.email || payload.password !== user.password) {
+    const passwordRequired = !!user.password;
+    const identityMatches = same(payload.username, user.username) && same(payload.email, user.email);
+    const passwordMatches = passwordRequired ? payload.password === user.password : same(payload.confirmEmail || payload.email, user.email);
+    if (!identityMatches || !passwordMatches) {
       return Promise.reject(new Error("Those details do not match your account."));
     }
     db.users = db.users.filter((item) => item.id !== user.id);
@@ -2943,21 +2948,22 @@ async function submitServerForm(event) {
 }
 
 function settingsMarkup(user) {
+  const passwordLogin = user.passwordLogin !== false;
   return `<div class="grid two">
     <form id="settingsForm" class="card form">
       <h2 class="section-title">Account Settings</h2>
       <p class="section-copy">Email status: <strong>${user.emailVerified ? "Verified" : "Not verified"}</strong></p>
-      <div class="field"><label>Username</label><input id="settingsUsername" class="input" value="${escapeHtml(user.username)}" required></div>
-      <div class="field"><label>Email</label><input id="settingsEmail" class="input" type="email" value="${escapeHtml(user.email)}" required></div>
-      <div class="field"><label>New Password</label><input id="settingsPassword" class="input" type="password" minlength="6"></div>
+      <div class="field"><label>Username</label><input id="settingsUsername" class="input" autocomplete="username" value="${escapeHtml(user.username)}" required></div>
+      <div class="field"><label>Email</label><input id="settingsEmail" class="input" type="email" autocomplete="email" value="${escapeHtml(user.email)}" required></div>
+      <div class="field"><label>${passwordLogin ? "New Password" : "Add Password Login"}</label><input id="settingsPassword" class="input" type="password" autocomplete="new-password" minlength="6"></div>
       <button class="button primary" type="submit">Save Account</button>
     </form>
     <form id="deleteAccountForm" class="card form danger-zone">
       <h2 class="section-title">Delete Account</h2>
       <p class="section-copy">Deleting your account also permanently removes every listing you own.</p>
-      <div class="field"><label>Username</label><input id="deleteUsername" class="input" required></div>
-      <div class="field"><label>Email</label><input id="deleteEmail" class="input" type="email" required></div>
-      <div class="field"><label>Password</label><input id="deletePassword" class="input" type="password" required></div>
+      <div class="field"><label>Username</label><input id="deleteUsername" class="input" autocomplete="off" value="${escapeHtml(user.username)}" required></div>
+      <div class="field"><label>Email</label><input id="deleteEmail" class="input" type="email" autocomplete="off" value="${escapeHtml(user.email)}" required></div>
+      ${passwordLogin ? `<div class="field"><label>Current Password</label><input id="deletePassword" class="input" type="password" autocomplete="current-password" required></div>` : `<div class="field"><label>Confirm Email</label><input id="deleteConfirmEmail" class="input" type="email" autocomplete="off" placeholder="${escapeHtml(user.email)}" required></div>`}
       <button class="button danger" type="submit">Delete Account</button>
     </form>
   </div>`;
@@ -2979,7 +2985,13 @@ function bindSettingsForms() {
     event.preventDefault();
     if (!confirm("Delete your account and every listing you own?")) return;
     try {
-      await request("deleteAccount", { username: $("#deleteUsername").value, email: $("#deleteEmail").value, password: $("#deletePassword").value });
+      await request("deleteAccount", {
+        username: $("#deleteUsername").value,
+        email: $("#deleteEmail").value,
+        password: $("#deletePassword")?.value || "",
+        confirmEmail: $("#deleteConfirmEmail")?.value || ""
+      });
+      store.session = null;
       location.href = route("/");
     } catch (error) {
       toast(error.message);

@@ -180,6 +180,73 @@ async function main() {
     const googleStateRead = await call("state", {}, googleSession, "GET");
     assert(googleStateRead.code === 200 && googleStateRead.json.user?.emailVerified === true, "Google OAuth users should have verified email status");
 
+    const previousGithubToken = process.env.GITHUB_TOKEN;
+    const previousGithubRepo = process.env.GITHUB_REPO;
+    const previousGithubBranch = process.env.GITHUB_BRANCH;
+    const previousGithubDbPath = process.env.GITHUB_DB_PATH;
+    const previousGithubBackupPath = process.env.GITHUB_DB_BACKUP_PATH;
+    process.env.GOOGLE_CLIENT_ID = "smoke-google-client";
+    process.env.GOOGLE_CLIENT_SECRET = "smoke-google-secret";
+    process.env.GITHUB_TOKEN = "smoke-github-token";
+    process.env.GITHUB_REPO = "SmokeOwner/SmokeRepo";
+    process.env.GITHUB_BRANCH = "main";
+    process.env.GITHUB_DB_PATH = `data/smoke-google-${suffix}.json`;
+    process.env.GITHUB_DB_BACKUP_PATH = `data/smoke-google-${suffix}.backup.json`;
+    const githubFiles = new Map();
+    const githubShas = new Map();
+    const staleReads = new Map();
+    const staleContents = new Map();
+    const githubPathFromUrl = (url) => {
+      const pathname = new URL(String(url)).pathname;
+      const marker = "/contents/";
+      return decodeURIComponent(pathname.slice(pathname.indexOf(marker) + marker.length));
+    };
+    global.fetch = async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("oauth2.googleapis.com/token")) {
+        return { ok: true, status: 200, json: async () => ({ access_token: "smoke-google-stale-access" }) };
+      }
+      if (href.includes("openidconnect.googleapis.com/v1/userinfo")) {
+        return { ok: true, status: 200, json: async () => ({ sub: `google-stale-${suffix}`, email: `googlestale${suffix}@example.com`, email_verified: true, name: "Google Stale Smoke" }) };
+      }
+      if (href.includes("api.github.com/repos/SmokeOwner/SmokeRepo/contents/")) {
+        const filePath = githubPathFromUrl(url);
+        if (options.method === "PUT") {
+          const body = JSON.parse(options.body || "{}");
+          staleContents.set(filePath, githubFiles.get(filePath));
+          staleReads.set(filePath, 1);
+          githubFiles.set(filePath, body.content);
+          githubShas.set(filePath, `sha-${githubFiles.size}-${Date.now()}`);
+          return { ok: true, status: 200, json: async () => ({ content: { sha: githubShas.get(filePath) } }) };
+        }
+        const shouldServeStale = Number(staleReads.get(filePath) || 0) > 0;
+        if (shouldServeStale) staleReads.set(filePath, Number(staleReads.get(filePath)) - 1);
+        const content = shouldServeStale ? staleContents.get(filePath) : githubFiles.get(filePath);
+        if (!content) return { ok: false, status: 404, json: async () => ({}) };
+        return { ok: true, status: 200, json: async () => ({ content, sha: githubShas.get(filePath) || "sha-0" }) };
+      }
+      return previousFetch(url, options);
+    };
+    const staleGoogleStart = await callRaw("googleStart", {}, "GET");
+    const staleGoogleState = new URL(staleGoogleStart.headers.Location).searchParams.get("state");
+    const staleGoogleCallback = await callPath(`/api/google-callback?code=smoke-stale-code&state=${encodeURIComponent(staleGoogleState)}`);
+    global.fetch = previousFetch;
+    if (previousGithubToken === undefined) delete process.env.GITHUB_TOKEN;
+    else process.env.GITHUB_TOKEN = previousGithubToken;
+    if (previousGithubRepo === undefined) delete process.env.GITHUB_REPO;
+    else process.env.GITHUB_REPO = previousGithubRepo;
+    if (previousGithubBranch === undefined) delete process.env.GITHUB_BRANCH;
+    else process.env.GITHUB_BRANCH = previousGithubBranch;
+    if (previousGithubDbPath === undefined) delete process.env.GITHUB_DB_PATH;
+    else process.env.GITHUB_DB_PATH = previousGithubDbPath;
+    if (previousGithubBackupPath === undefined) delete process.env.GITHUB_DB_BACKUP_PATH;
+    else process.env.GITHUB_DB_BACKUP_PATH = previousGithubBackupPath;
+    if (previousGoogleClientId === undefined) delete process.env.GOOGLE_CLIENT_ID;
+    else process.env.GOOGLE_CLIENT_ID = previousGoogleClientId;
+    if (previousGoogleClientSecret === undefined) delete process.env.GOOGLE_CLIENT_SECRET;
+    else process.env.GOOGLE_CLIENT_SECRET = previousGoogleClientSecret;
+    assert(staleGoogleCallback.code === 302 && String(staleGoogleCallback.headers.Location || "").includes("googleToken="), "Google OAuth should survive a stale GitHub read after saving the account");
+
     const missingTerms = await call("register", {
       username: `NoTerms${suffix}`,
       email: `noterms${suffix}@example.com`,
@@ -476,8 +543,10 @@ async function main() {
         const message = JSON.parse(chunk.toString("utf8").trim());
         const signature = crypto.createHmac("sha256", directToken).update(message.payload).digest("base64");
         directReceived.push({
+          packetBytes: chunk.length,
+          payloadIsJson: message.payload.trim().startsWith("{"),
           signatureValid: signature === message.signature,
-          payload: JSON.parse(Buffer.from(message.payload, "base64").toString("utf8"))
+          payload: JSON.parse(message.payload)
         });
         resolveDirectReceived();
         socket.end();
@@ -504,6 +573,7 @@ async function main() {
       }, reject);
     });
     assert(directReceived.length === 1 && directReceived[0].signatureValid, "direct NuVotifier payload should be HMAC signed with the token");
+    assert(directReceived[0].payloadIsJson && directReceived[0].packetBytes < 256, "direct NuVotifier payload should be raw JSON and stay under the legacy packet guard");
     assert(directReceived[0].payload.challenge === "smoke-challenge" && directReceived[0].payload.username === "DirectTest", "direct NuVotifier payload should include challenge and username");
 
     const legacyKeys = crypto.generateKeyPairSync("rsa", { modulusLength: 1024 });
@@ -796,7 +866,59 @@ async function main() {
     const backupAfterDelete = JSON.parse(await fs.readFile(backupPath, "utf8"));
     assert(backupAfterDelete.deleted?.servers?.[secondServer.json.server.id], "backup JSON should preserve server deletion tombstones");
 
-    console.log("Smoke test passed: auth, Google OAuth, email verification, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
+    const deleteAccountEmails = [];
+    const deleteAccountPreviousFetch = global.fetch;
+    const deleteAccountPreviousResendApiKey = process.env.RESEND_API_KEY;
+    const deleteAccountPreviousResendFromEmail = process.env.RESEND_FROM_EMAIL;
+    process.env.RESEND_API_KEY = "smoke-resend-key";
+    process.env.RESEND_FROM_EMAIL = "Icon Listing <verify@noreply.iconrealms.net>";
+    global.fetch = async (url, options = {}) => {
+      if (String(url).includes("api.resend.com/emails")) {
+        deleteAccountEmails.push(JSON.parse(options.body || "{}"));
+        return { ok: true, json: async () => ({ id: `delete-email-${suffix}` }), text: async () => "" };
+      }
+      return deleteAccountPreviousFetch(url, options);
+    };
+    const deleteAccountRegister = await call("register", {
+      username: `DeleteMe${String(suffix).slice(-6)}`,
+      email: `deleteme${suffix}@example.com`,
+      password: "secret123",
+      termsAccepted: true
+    });
+    const deleteAccountCode = JSON.stringify(deleteAccountEmails[0] || {}).match(/\b\d{6}\b/)?.[0];
+    assert(deleteAccountRegister.code === 200 && deleteAccountCode, "delete-account fixture should register and receive a verification code");
+    const deleteAccountVerify = await call("verifyEmail", { code: deleteAccountCode, verificationToken: deleteAccountRegister.json.verificationToken });
+    assert(deleteAccountVerify.code === 200 && deleteAccountVerify.json.token, "delete-account fixture should verify email");
+    const deleteAccountServer = await call(
+      "saveServer",
+      {
+        server: {
+          name: `Delete Account SMP ${String(suffix).slice(-5)}`,
+          javaHost: `delete-account-${suffix}.example.org`,
+          country: "United States",
+          description: "A temporary listing owned by the account deletion smoke test. It verifies that deleting an account also removes the user's server listings from shared storage without leaving stale records behind. The extra detail keeps this fixture above the public listing description minimum.",
+          tags: ["SMP"]
+        }
+      },
+      deleteAccountVerify.json.token
+    );
+    assert(deleteAccountServer.code === 200 && deleteAccountServer.json.server.id, "delete-account fixture should save a listing");
+    const deleteAccountResult = await call("deleteAccount", {
+      username: ` ${deleteAccountRegister.json.user.username.toLowerCase()} `,
+      email: ` ${deleteAccountRegister.json.user.email.toUpperCase()} `,
+      password: "secret123"
+    }, deleteAccountVerify.json.token);
+    assert(deleteAccountResult.code === 200, "account deletion should accept matching username/email case-insensitively");
+    const afterAccountDeleteDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    assert(!afterAccountDeleteDb.users.some((item) => item.id === deleteAccountRegister.json.user.id), "deleted account should be removed from storage");
+    assert(!afterAccountDeleteDb.servers.some((item) => item.ownerId === deleteAccountRegister.json.user.id), "deleted account listings should be removed from storage");
+    global.fetch = deleteAccountPreviousFetch;
+    if (deleteAccountPreviousResendApiKey === undefined) delete process.env.RESEND_API_KEY;
+    else process.env.RESEND_API_KEY = deleteAccountPreviousResendApiKey;
+    if (deleteAccountPreviousResendFromEmail === undefined) delete process.env.RESEND_FROM_EMAIL;
+    else process.env.RESEND_FROM_EMAIL = deleteAccountPreviousResendFromEmail;
+
+    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     tcpServers.forEach((server) => server.close());

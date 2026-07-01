@@ -295,8 +295,13 @@ module.exports = async function handler(req, res) {
 
     if (action === "deleteAccount") {
       requireLogin(user);
-      requireFields(body, ["username", "email", "password"]);
-      if (body.username !== user.username || body.email !== user.email || !verifyPassword(body.password, user)) {
+      if (user.fromTokenSnapshot) throw httpError(409, "Refresh and try again before deleting your account.");
+      requireFields(body, ["username", "email"]);
+      const passwordRequired = accountHasPassword(user);
+      if (passwordRequired && !body.password) throw httpError(400, "password is required.");
+      const identityMatches = same(body.username, user.username) && same(body.email, user.email);
+      const passwordMatches = passwordRequired ? verifyPassword(body.password, user) : same(body.confirmEmail || body.email, user.email);
+      if (!identityMatches || !passwordMatches) {
         throw httpError(400, "Those details do not match your account.");
       }
       const deletedServers = db.servers.filter((item) => item.ownerId === user.id);
@@ -308,7 +313,11 @@ module.exports = async function handler(req, res) {
       markDeleted(db, "users", [user.id]);
       markDeleted(db, "servers", deletedServerIds);
       await saveDb(db, { deletedUsers: [user.id], deletedServers: deletedServerIds });
-      await safeSyncServerStaticPages(db, { deletePagePaths: deletedServers.map(serverStaticPagePath) });
+      const persistedDb = await persistedDbAfterWrite();
+      if (persistedDb.users.some((item) => item.id === user.id) || persistedDb.servers.some((item) => item.ownerId === user.id)) {
+        throw httpError(500, "Account was not deleted from shared storage. Error: 67.");
+      }
+      await safeSyncServerStaticPages(persistedDb, { deletePagePaths: deletedServers.map(serverStaticPagePath) });
       return json(res, 200, writePayload({ ok: true }));
     }
 
@@ -1005,7 +1014,18 @@ function normalizeDeletedMap(value = {}) {
 
 async function loadDb(options = {}) {
   if (!options.allowRecoveryOnly) requireConfiguredProductionDb();
-  if (hasGithubStorage()) return mergeDurableDb(await readGithubDb({ bypassCache: !!options.forceFresh }), await readGithubBackupDb({ bypassCache: !!options.forceFresh }), await readRecoveryDb());
+  if (hasGithubStorage()) {
+    const cacheKey = githubStorageKey();
+    const cached = githubDbCache.key === cacheKey && githubDbCache.data ? cloneJson(githubDbCache.data) : freshDb();
+    const merged = mergeDurableDb(
+      await readGithubDb({ bypassCache: !!options.forceFresh }),
+      await readGithubBackupDb({ bypassCache: !!options.forceFresh }),
+      await readRecoveryDb(),
+      cached
+    );
+    githubDbCache = { data: cloneJson(merged), sha: githubDbCache.sha, loadedAt: Date.now(), key: cacheKey };
+    return merged;
+  }
   if (process.env.VERCEL && options.allowRecoveryOnly) return readRecoveryDb();
   try {
     return mergeDurableDb(parseDbFromStorage(await fs.readFile(TMP_DB, "utf8")), await readLocalBackupDb(), await readRecoveryDb());
@@ -1017,13 +1037,13 @@ async function loadDb(options = {}) {
 async function saveDb(db, options = {}) {
   requireConfiguredProductionDb();
   if (hasGithubStorage()) {
-    await writeGithubDb(db, options);
-    return;
+    return writeGithubDb(db, options);
   }
   await writeLocalBackup();
   const serialized = serializeDbForStorage(db);
   await fs.writeFile(TMP_DB, serialized);
   await fs.writeFile(TMP_DB_BACKUP, serialized);
+  return migrateDb(db);
 }
 
 async function persistedDbAfterWrite() {
@@ -1091,7 +1111,7 @@ function markDeleted(db, kind, ids = []) {
 }
 
 function mergeUsersWithRecovery(primaryUsers = [], recoveryUsers = [], deletedUsers = {}) {
-  const merged = [...primaryUsers];
+  const merged = primaryUsers.filter((user) => !user?.id || !deletedUsers[user.id]);
   for (const user of recoveryUsers) {
     if (!user?.id) continue;
     if (deletedUsers[user.id]) continue;
@@ -1102,7 +1122,7 @@ function mergeUsersWithRecovery(primaryUsers = [], recoveryUsers = [], deletedUs
 }
 
 function mergeServersWithRecovery(primaryServers = [], recoveryServers = [], deletedServers = {}) {
-  const merged = [...primaryServers];
+  const merged = primaryServers.filter((server) => !server?.id || !deletedServers[server.id]);
   for (const server of recoveryServers) {
     if (!server?.id) continue;
     if (deletedServers[server.id]) continue;
@@ -1120,7 +1140,7 @@ function mergeServersWithRecovery(primaryServers = [], recoveryServers = [], del
 }
 
 function mergeClientsWithRecovery(primaryClients = [], recoveryClients = [], deletedClients = {}) {
-  const merged = [...primaryClients];
+  const merged = primaryClients.filter((client) => !client?.id || !deletedClients[client.id]);
   for (const client of recoveryClients) {
     if (!client?.id && !client?.name) continue;
     if (client.id && deletedClients[client.id]) continue;
@@ -1131,7 +1151,7 @@ function mergeClientsWithRecovery(primaryClients = [], recoveryClients = [], del
 }
 
 function mergeHostsWithRecovery(primaryHosts = [], recoveryHosts = [], deletedHosts = {}) {
-  const merged = [...primaryHosts];
+  const merged = primaryHosts.filter((host) => !host?.id || !deletedHosts[host.id]);
   for (const host of recoveryHosts) {
     if (!host?.id && !host?.name) continue;
     if (host.id && deletedHosts[host.id]) continue;
@@ -1153,7 +1173,7 @@ function mergeVotesWithRecovery(primaryVotes = [], recoveryVotes = [], servers =
   return [...merged.values()];
 }
 
-let githubDbCache = { data: null, sha: null, loadedAt: 0 };
+let githubDbCache = { data: null, sha: null, loadedAt: 0, key: "" };
 
 function hasGithubStorage() {
   return !!(process.env.GITHUB_TOKEN && process.env.GITHUB_REPO);
@@ -1166,18 +1186,19 @@ function requireConfiguredProductionDb() {
 }
 
 async function readGithubDb(options = {}) {
-  if (!options.bypassCache && githubDbCache.data && Date.now() - githubDbCache.loadedAt < 1500) return cloneJson(githubDbCache.data);
+  const cacheKey = githubStorageKey();
+  if (!options.bypassCache && githubDbCache.key === cacheKey && githubDbCache.data && Date.now() - githubDbCache.loadedAt < 1500) return cloneJson(githubDbCache.data);
   const response = await fetch(githubDbUrl(true, options), { headers: githubReadHeaders() });
   if (response.status === 404) {
     const db = migrateDb(freshDb());
-    githubDbCache = { data: db, sha: null, loadedAt: Date.now() };
+    githubDbCache = { data: db, sha: null, loadedAt: Date.now(), key: cacheKey };
     return cloneJson(db);
   }
   if (!response.ok) throw new Error(`GitHub database read failed (${response.status}).`);
   const payload = await response.json();
   const content = Buffer.from(String(payload.content || "").replace(/\n/g, ""), "base64").toString("utf8");
   const db = parseDbFromStorage(content);
-  githubDbCache = { data: db, sha: payload.sha, loadedAt: Date.now() };
+  githubDbCache = { data: db, sha: payload.sha, loadedAt: Date.now(), key: cacheKey };
   return cloneJson(db);
 }
 
@@ -1199,13 +1220,14 @@ async function writeGithubDb(db, options = {}, retry = true) {
     body: JSON.stringify(body)
   });
   if (response.status === 409 && retry) {
-    githubDbCache = { data: null, sha: null, loadedAt: 0 };
+    githubDbCache = { data: null, sha: null, loadedAt: 0, key: "" };
     return writeGithubDb(normalized, options, false);
   }
   if (!response.ok) throw new Error(`GitHub database write failed (${response.status}).`);
   const payload = await response.json();
-  githubDbCache = { data: cloneJson(normalized), sha: payload.content?.sha || githubDbCache.sha, loadedAt: Date.now() };
+  githubDbCache = { data: cloneJson(normalized), sha: payload.content?.sha || githubDbCache.sha, loadedAt: Date.now(), key: githubStorageKey() };
   await writeGithubBackup(normalized);
+  return normalized;
 }
 
 async function writeLocalBackup() {
@@ -1458,6 +1480,10 @@ function githubDbUrl(includeRef, options = {}) {
 
 function githubDbPath() {
   return process.env.GITHUB_DB_PATH || "data/icon-listing-db.json";
+}
+
+function githubStorageKey() {
+  return `${process.env.GITHUB_REPO || ""}|${githubBranch()}|${githubDbPath()}`;
 }
 
 function backupPathFor(filePath) {
@@ -1753,9 +1779,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260630-auth-verify-fix">
-    <script src="/config.js?v=20260630-auth-verify-fix"></script>
-    <script src="/assets/js/app.js?v=20260630-auth-verify-fix" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260630-account-delete-fix">
+    <script src="/config.js?v=20260630-account-delete-fix"></script>
+    <script src="/assets/js/app.js?v=20260630-account-delete-fix" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">
@@ -2095,8 +2121,8 @@ function buildNuVotifierPacket(payload, handshake) {
     timestamp: payload.timestamp,
     challenge
   };
-  const encodedPayload = Buffer.from(JSON.stringify(vote), "utf8").toString("base64");
-  const signature = crypto.createHmac("sha256", payload.token).update(encodedPayload).digest("base64");
+  const encodedPayload = JSON.stringify(vote);
+  const signature = crypto.createHmac("sha256", payload.token).update(encodedPayload, "utf8").digest("base64");
   return {
     body: Buffer.from(`${JSON.stringify({ payload: encodedPayload, signature })}\n`, "utf8"),
     handshake,
@@ -2797,6 +2823,10 @@ function verifyPassword(password, user) {
   return crypto.timingSafeEqual(Buffer.from(hash, "hex"), Buffer.from(check, "hex"));
 }
 
+function accountHasPassword(user) {
+  return !!(user?.password || user?.passwordHash);
+}
+
 function signToken(user) {
   const expires = Date.now() + 1000 * 60 * 60 * 24 * 14;
   const snapshot = typeof user === "object" && user ? user : { id: user };
@@ -2842,6 +2872,8 @@ function publicUser(user) {
     emailOptIn: user.emailOptIn === true,
     emailVerified: user.emailVerified === true,
     emailVerificationPending: user.emailVerified !== true && !!user.emailVerification?.codeHash,
+    passwordLogin: accountHasPassword(user),
+    googleLinked: !!user.googleSub,
     admin: isAdmin(user),
     banned: !!user.banned
   };
