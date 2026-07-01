@@ -1382,7 +1382,7 @@
       ],
       "ownerId": "db155e7a-81d1-4625-9f60-fb0cb21273f7",
       "ownerName": "kadika333",
-      "votes": 1,
+      "votes": 2,
       "playersOnline": 4,
       "playersMax": 333,
       "version": "Purpur 1.21.11",
@@ -1461,12 +1461,20 @@
       "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
       "minecraftUsername": "kadika333",
       "createdAt": "2026-07-01T05:10:00.201Z"
+    },
+    {
+      "id": "1f19ad43-6bc6-4e5b-956c-f07ef7be072d",
+      "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
+      "minecraftUsername": "tebung",
+      "createdAt": "2026-07-01T06:48:27.154Z"
     }
   ],
   "voteIps": {
     "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
       "visitor:74e5d540e0b9f8a9dd4482369bf340182f8cae772be420aa7f3bfe719585a81e": "2026-07-01T05:10:00.201Z",
-      "name:kadika333": "2026-07-01T05:10:00.201Z"
+      "name:kadika333": "2026-07-01T05:10:00.201Z",
+      "visitor:8b1bd0fb2fe6deffd31853c716f5e10f5f1ee6d98cab8c94fb71f37e4bb7fc68": "2026-07-01T06:48:27.154Z",
+      "name:tebung": "2026-07-01T06:48:27.154Z"
     }
   },
   "deleted": {
