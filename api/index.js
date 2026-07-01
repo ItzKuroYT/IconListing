@@ -1295,7 +1295,14 @@ async function readGithubDb(options = {}) {
 
 async function writeGithubDb(db, options = {}, retry = true) {
   let normalized = migrateDb(db);
-  const latest = mergeDurableDb(await readGithubDb({ bypassCache: true }), await readGithubBackupDb({ bypassCache: true }), await readRecoveryDb());
+  const cacheKey = githubStorageKey();
+  const cachedBeforeFreshRead = githubDbCache.key === cacheKey && githubDbCache.data ? cloneJson(githubDbCache.data) : freshDb();
+  const latest = mergeDurableDb(
+    await readGithubDb({ bypassCache: true }),
+    await readGithubBackupDb({ bypassCache: true }),
+    await readRecoveryDb(),
+    cachedBeforeFreshRead
+  );
   ensureRequiredRecordsExist(latest, options);
   normalized = mergeDbForWrite(latest, normalized, options);
   ensureWriteDoesNotLoseData(latest, normalized, options);
@@ -1411,7 +1418,11 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
   const remote = migrateDb(remoteDb);
   const next = migrateDb(nextDb);
   const ids = writeIdSets(options);
-  const deleted = mergeDeleted(remote.deleted, next.deleted, deletedFromIdSets(ids));
+  const deleted = restoreTouchedRecords(
+    mergeDeleted(remote.deleted, next.deleted, deletedFromIdSets(ids)),
+    next,
+    ids
+  );
   const deletedUsers = combinedDeletedIds(ids.deletedUsers, deleted.users);
   const deletedServers = combinedDeletedIds(ids.deletedServers, deleted.servers);
   const deletedClients = combinedDeletedIds(ids.deletedClients, deleted.clients);
@@ -1433,6 +1444,33 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
 
 function combinedDeletedIds(explicitDeletedIds = new Set(), deletedMap = {}) {
   return new Set([...explicitDeletedIds, ...Object.keys(deletedMap || {})]);
+}
+
+function restoreTouchedRecords(deleted, next, ids) {
+  const restored = normalizeDeleted(deleted);
+  restoreTouchedKind(restored.users, next.users, ids.touchedUsers, ids.deletedUsers);
+  restoreTouchedKind(restored.servers, next.servers, ids.touchedServers, ids.deletedServers);
+  restoreTouchedKind(restored.clients, next.clients, ids.touchedClients, ids.deletedClients);
+  restoreTouchedKind(restored.hosts, next.hosts, ids.touchedHosts, ids.deletedHosts);
+  return restored;
+}
+
+function restoreTouchedKind(deletedMap = {}, nextItems = [], touchedIds = new Set(), explicitDeletedIds = new Set()) {
+  const byId = new Map((nextItems || []).filter((item) => item?.id).map((item) => [item.id, item]));
+  for (const id of touchedIds || []) {
+    if (explicitDeletedIds.has(id)) continue;
+    const item = byId.get(id);
+    if (item && deletedMap[id] && itemIsNewerThanDeletion(item, deletedMap[id])) delete deletedMap[id];
+  }
+}
+
+function itemIsNewerThanDeletion(item, deletedAt) {
+  const deletedTime = new Date(deletedAt || 0).getTime();
+  const itemTime = Math.max(
+    new Date(item?.updatedAt || 0).getTime() || 0,
+    new Date(item?.createdAt || 0).getTime() || 0
+  );
+  return Number.isFinite(itemTime) && itemTime > 0 && (!Number.isFinite(deletedTime) || itemTime > deletedTime);
 }
 
 function ensureRequiredRecordsExist(remoteDb, options = {}) {

@@ -480,6 +480,19 @@ async function main() {
     githubSyncShas.delete(githubSyncBackupPath);
     githubSyncStaleContents.set(githubSyncMainPath, Buffer.from(JSON.stringify(githubSyncInitialDb)).toString("base64"));
     githubSyncStaleReads.set(githubSyncMainPath, 2);
+    const githubStaleVote = await call("vote", {
+      serverId: githubSaved.json.server.id,
+      minecraftUsername: `Gh_${String(suffix).slice(-6)}`
+    }, "", "POST", {
+      "x-forwarded-for": "198.51.100.77",
+      "user-agent": "IconListingGithubStaleVoteSmoke"
+    });
+    assert(githubStaleVote.code === 200, "voting for a newly saved GitHub listing should survive stale GitHub reads");
+    const githubStoredAfterStaleVote = JSON.parse(Buffer.from(githubSyncFiles.get(githubSyncMainPath), "base64").toString("utf8"));
+    assert(githubStoredAfterStaleVote.servers.some((item) => item.id === githubSaved.json.server.id), "stale GitHub vote writes must not erase the voted listing");
+    assert(githubStoredAfterStaleVote.votes.some((item) => item.serverId === githubSaved.json.server.id), "stale GitHub vote writes must keep the vote row");
+    githubSyncStaleContents.set(githubSyncMainPath, Buffer.from(JSON.stringify(githubSyncInitialDb)).toString("base64"));
+    githubSyncStaleReads.set(githubSyncMainPath, 2);
     const githubStaleState = await call("state", {}, "", "GET");
     assert(githubStaleState.code === 200, "state should survive a stale GitHub read after a listing save");
     const githubStoredAfterStaleWrite = JSON.parse(Buffer.from(githubSyncFiles.get(githubSyncMainPath), "base64").toString("utf8"));
