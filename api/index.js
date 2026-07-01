@@ -390,7 +390,9 @@ module.exports = async function handler(req, res) {
         const server = db.servers.find((item) => item.id === id);
         if (server) {
           server.sponsored = !server.sponsored;
+          server.updatedAt = new Date().toISOString();
           saveOptions.touchedServers = [server.id];
+          saveOptions.requireExistingServers = [server.id];
         }
       }
       if (body.command === "banUser") {

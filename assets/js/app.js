@@ -3049,11 +3049,16 @@ function renderAdmin(state) {
     </section>
   </div>`;
   $$("[data-admin]").forEach((button) => button.addEventListener("click", async () => {
+    const label = button.textContent;
     try {
-      await request("admin", { command: button.dataset.admin, value: { id: button.dataset.id } });
-      boot();
+      setButtonLoading(button, "Saving...");
+      const result = await request("admin", { command: button.dataset.admin, value: { id: button.dataset.id } });
+      state = result.servers ? { ...state, ...result, votes: result.votes || state.votes || [] } : { ...state, users: result.users || state.users };
+      toast("Admin change saved.");
+      renderAdmin(state);
     } catch (error) {
       toast(error.message);
+      setButtonLoading(button, label, false);
     }
   }));
   $$("[data-delete]").forEach((button) => button.addEventListener("click", async () => {

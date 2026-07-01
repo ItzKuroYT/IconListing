@@ -1155,6 +1155,12 @@ async function main() {
     );
     assert(hostSave.code === 200 && hostSave.json.hosts.length === 1, "admin should save a sponsored host");
 
+    const adminSponsor = await call("admin", { command: "toggleSponsor", value: { id: saved.json.server.id } }, adminToken);
+    const sponsoredServer = adminSponsor.json.servers.find((item) => item.id === saved.json.server.id);
+    assert(adminSponsor.code === 200 && sponsoredServer?.sponsored === true, "admin should be able to sponsor a server listing");
+    const afterSponsorDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    assert(afterSponsorDb.servers.find((item) => item.id === saved.json.server.id)?.sponsored === true, "sponsored server flag should persist to storage");
+
     const adminDeleteFixture = await call(
       "saveServer",
       {
