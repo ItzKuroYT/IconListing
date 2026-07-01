@@ -2792,8 +2792,10 @@ function bindEmailVerificationPanel() {
     setButtonLoading(button, "Verifying...");
     try {
       const result = await request("verifyEmail", { code: $("#emailVerificationCode").value });
-      store.session = { token: result.token || store.session?.token, user: result.user };
+      const verifiedUser = { ...(result.user || store.session?.user || {}), emailVerified: true, emailVerificationPending: false };
+      store.session = { token: result.token || store.session?.token, user: verifiedUser };
       toast(result.message || "Email verified.");
+      $("#emailVerificationForm")?.remove();
       boot();
     } catch (error) {
       toast(error.message);

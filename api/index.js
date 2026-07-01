@@ -68,7 +68,8 @@ module.exports = async function handler(req, res) {
 
     if (action === "state") {
       const refreshed = await refreshPings(db);
-      if (refreshed) await saveDb(db);
+      if (user?.fromVerifiedSession) await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
+      else if (refreshed) await saveDb(db);
       return json(res, 200, statePayload(db, user, { detailServerId: stateDetailServerId(req) }));
     }
 
@@ -1438,11 +1439,16 @@ function ensureWriteDoesNotLoseData(remoteDb, nextDb, options = {}) {
   const remote = migrateDb(remoteDb);
   const next = migrateDb(nextDb);
   const ids = writeIdSets(options);
-  assertNoUnexpectedLoss("server", remote.servers, next.servers, ids.deletedServers);
-  assertNoUnexpectedLoss("user", remote.users, next.users, ids.deletedUsers);
-  assertNoUnexpectedLoss("client", remote.clients, next.clients, ids.deletedClients);
-  assertNoUnexpectedLoss("host", remote.hosts, next.hosts, ids.deletedHosts);
-  assertNoUnexpectedVoteLoss(remote.votes, next.votes, ids.deletedServers);
+  const deleted = normalizeDeleted(next.deleted);
+  const deletedServers = combinedDeletedIds(ids.deletedServers, deleted.servers);
+  const deletedUsers = combinedDeletedIds(ids.deletedUsers, deleted.users);
+  const deletedClients = combinedDeletedIds(ids.deletedClients, deleted.clients);
+  const deletedHosts = combinedDeletedIds(ids.deletedHosts, deleted.hosts);
+  assertNoUnexpectedLoss("server", remote.servers, next.servers, deletedServers);
+  assertNoUnexpectedLoss("user", remote.users, next.users, deletedUsers);
+  assertNoUnexpectedLoss("client", remote.clients, next.clients, deletedClients);
+  assertNoUnexpectedLoss("host", remote.hosts, next.hosts, deletedHosts);
+  assertNoUnexpectedVoteLoss(remote.votes, next.votes, deletedServers);
 }
 
 function assertNoUnexpectedLoss(label, remoteItems = [], nextItems = [], deletedIds = new Set()) {
@@ -1860,9 +1866,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260630-account-delete-fix">
-    <script src="/config.js?v=20260630-account-delete-fix"></script>
-    <script src="/assets/js/app.js?v=20260630-account-delete-fix" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260701-auth-state-fix">
+    <script src="/config.js?v=20260701-auth-state-fix"></script>
+    <script src="/assets/js/app.js?v=20260701-auth-state-fix" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">
@@ -2931,7 +2937,7 @@ async function userFromRequest(req, db) {
   const session = verifyToken(token);
   if (!session) return null;
   const storedUser = db.users.find((item) => item.id === session.id && !item.banned);
-  if (storedUser) return storedUser;
+  if (storedUser) return userWithSessionClaims(storedUser, session);
   if (!session.username && !session.email) return null;
   return {
     id: session.id,
@@ -2942,6 +2948,19 @@ async function userFromRequest(req, db) {
     banned: false,
     fromTokenSnapshot: true
   };
+}
+
+function userWithSessionClaims(user, session = {}) {
+  if (!user || session.id !== user.id) return user;
+  if (session.email && !same(session.email, user.email)) return user;
+  if (session.emailVerified === true && user.emailVerified !== true) {
+    user.emailVerified = true;
+    user.emailVerifiedAt = user.emailVerifiedAt || new Date().toISOString();
+    delete user.emailVerification;
+    user.fromVerifiedSession = true;
+  }
+  if (session.emailOptIn === true && user.emailOptIn !== true) user.emailOptIn = true;
+  return user;
 }
 
 function publicUser(user) {

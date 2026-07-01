@@ -296,6 +296,18 @@ async function main() {
     const acceptedVerification = await call("verifyEmail", { code: resentVerificationCode, verificationToken: resentVerification.json.verificationToken });
     assert(acceptedVerification.code === 200 && acceptedVerification.json.user?.emailVerified === true && acceptedVerification.json.token, "emailed verification code should verify the account and return a session");
     const verifiedToken = acceptedVerification.json.token;
+    const staleVerificationDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const staleVerificationUser = staleVerificationDb.users.find((item) => item.id === acceptedVerification.json.user.id);
+    staleVerificationUser.emailVerified = false;
+    staleVerificationUser.emailVerifiedAt = "";
+    staleVerificationUser.emailVerification = { codeHash: "stale", createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 60000).toISOString(), attempts: 0 };
+    await fs.writeFile(dbPath, JSON.stringify(staleVerificationDb));
+    await fs.writeFile(backupPath, JSON.stringify(staleVerificationDb));
+    const verifiedSessionState = await call("state", {}, verifiedToken, "GET");
+    assert(verifiedSessionState.code === 200 && verifiedSessionState.json.user?.emailVerified === true, "verified session token should hide stale dashboard verification prompts");
+    const repairedVerificationDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const repairedVerificationUser = repairedVerificationDb.users.find((item) => item.id === acceptedVerification.json.user.id);
+    assert(repairedVerificationUser?.emailVerified === true && !repairedVerificationUser.emailVerification, "verified session state should repair stale stored verification status");
     const restoredSignup = await call("register", {
       username: `Restore${suffix}`,
       email: `restore${suffix}@example.com`,
@@ -797,6 +809,26 @@ async function main() {
       adminToken
     );
     assert(hostSave.code === 200 && hostSave.json.hosts.length === 1, "admin should save a sponsored host");
+
+    const adminDeleteFixture = await call(
+      "saveServer",
+      {
+        server: {
+          name: `Admin Delete SMP ${String(suffix).slice(-5)}`,
+          javaHost: `admin-delete-${suffix}.example.org`,
+          country: "United States",
+          description: "A temporary server listing owned by a normal account so the admin deletion flow can prove cross-owner moderation deletes are marked as intentional storage changes and do not get blocked by protection.",
+          tags: ["SMP"]
+        }
+      },
+      login.json.token
+    );
+    assert(adminDeleteFixture.code === 200 && adminDeleteFixture.json.server.id, "admin delete fixture should save");
+    const adminDelete = await call("deleteServer", { id: adminDeleteFixture.json.server.id }, adminToken);
+    assert(adminDelete.code === 200, "admin should delete a server listing without storage protection blocking it");
+    assert(!adminDelete.json.servers.some((item) => item.id === adminDeleteFixture.json.server.id), "admin delete response should omit the deleted listing");
+    const afterAdminDeleteDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    assert(afterAdminDeleteDb.deleted?.servers?.[adminDeleteFixture.json.server.id], "admin-deleted listings should be tombstoned");
 
     const sitemap = await callRaw("sitemap");
     assert(sitemap.code === 200 && sitemap.headers["Content-Type"]?.includes("application/xml"), "sitemap should return XML");
