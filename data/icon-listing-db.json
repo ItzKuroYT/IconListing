@@ -23,7 +23,15 @@
       "email": "isaaccooper926@gmail.com",
       "passwordHash": "157b7a344965baf0056be479b29fb573:63681ef58487ce60714743f756ec276c9e879746b7f02989f812f3646eb2de41",
       "banned": false,
-      "createdAt": "2026-06-24T23:05:19.939Z"
+      "createdAt": "2026-06-24T23:05:19.939Z",
+      "emailVerification": {
+        "codeHash": "bb42fc2bd962c3f7c62847ce5784165d58980b0defbaa0017464df67417b5d8d",
+        "createdAt": "2026-07-01T01:35:19.366Z",
+        "expiresAt": "2026-07-01T01:50:19.366Z",
+        "attempts": 0
+      },
+      "emailVerified": false,
+      "emailVerifiedAt": ""
     },
     {
       "id": "0b4c1c9f-a7ad-4a40-9294-7c75b34731bc",
@@ -79,7 +87,7 @@
       ],
       "ownerId": "bd813e43-bf7a-45fd-869e-f092d2dde82e",
       "ownerName": "MaxFullCalypse",
-      "votes": 1,
+      "votes": 0,
       "playersOnline": 37,
       "playersMax": 38,
       "version": "Velocity 1.7.2-26.2",
@@ -1499,12 +1507,6 @@
       "serverId": "48af8ec3-158a-4fca-9523-89eef6a617bd",
       "minecraftUsername": "Random8261",
       "createdAt": "2026-06-30T06:17:50.783Z"
-    },
-    {
-      "id": "676bc684-2738-4663-8212-d1f36f7a0cb4",
-      "serverId": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
-      "minecraftUsername": "kadika333",
-      "createdAt": "2026-07-01T01:34:12.962Z"
     }
   ],
   "voteIps": {
