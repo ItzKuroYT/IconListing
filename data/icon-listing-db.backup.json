@@ -48,23 +48,6 @@
       "passwordHash": "a6f8c237fbc60ef554fa49557ace4a82:57add3f375ce3da9f66fcc11b367dac60564f6a1f42df18b53f7f532c20a273d",
       "banned": false,
       "createdAt": "2026-06-30T06:06:59.035Z"
-    },
-    {
-      "id": "82177375-d3f0-452b-ad8e-c1c53c6e79a4",
-      "username": "IsaacCooperFnafFan",
-      "email": "luciferthedevil926@gmail.com",
-      "passwordHash": "",
-      "emailOptIn": false,
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-07-01T01:18:58.021Z",
-      "termsAcceptedAt": "2026-07-01T01:18:58.021Z",
-      "googleLinkedAt": "2026-07-01T01:18:58.021Z",
-      "createdAt": "2026-07-01T01:18:58.021Z",
-      "banned": false,
-      "googleSub": "117469034604833102670",
-      "googleName": "Isaac Cooper (FnafFanStudios)",
-      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJYPQwmEIwbO2b413qUgsIsRji9uUe283lB-eqhHkUUiS2P8kc=s96-c",
-      "updatedAt": "2026-07-01T01:18:58.021Z"
     }
   ],
   "servers": [
@@ -1204,7 +1187,7 @@
       ],
       "ownerId": "73096038-5e65-41ed-88c7-acd26290e9ea",
       "ownerName": "kadika333",
-      "votes": 1,
+      "votes": 2,
       "playersOnline": 0,
       "playersMax": 333,
       "version": "Purpur 1.21.11",
@@ -1516,12 +1499,20 @@
       "serverId": "48af8ec3-158a-4fca-9523-89eef6a617bd",
       "minecraftUsername": "Random8261",
       "createdAt": "2026-06-30T06:17:50.783Z"
+    },
+    {
+      "id": "cdbdf7e3-e694-4e08-a042-a165c6ce0ef9",
+      "serverId": "48af8ec3-158a-4fca-9523-89eef6a617bd",
+      "minecraftUsername": "kadika333",
+      "createdAt": "2026-07-01T01:19:58.700Z"
     }
   ],
   "voteIps": {
     "48af8ec3-158a-4fca-9523-89eef6a617bd": {
       "visitor:6016f8fa71f173186bd410448f87c5be899c7c25f2dd32017a0c6fe52dc9d005": "2026-06-30T06:17:50.783Z",
-      "name:random8261": "2026-06-30T06:17:50.783Z"
+      "name:random8261": "2026-06-30T06:17:50.783Z",
+      "visitor:74e5d540e0b9f8a9dd4482369bf340182f8cae772be420aa7f3bfe719585a81e": "2026-07-01T01:19:58.700Z",
+      "name:kadika333": "2026-07-01T01:19:58.700Z"
     }
   },
   "deleted": {
