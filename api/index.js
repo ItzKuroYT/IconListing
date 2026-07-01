@@ -67,9 +67,15 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === "state") {
-      const refreshed = await refreshPings(db);
-      if (user?.fromVerifiedSession) await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
-      else if (refreshed) await saveDb(db);
+      const refreshedServerIds = await refreshPings(db);
+      const saveOptions = {};
+      if (refreshedServerIds.length) saveOptions.touchedServers = refreshedServerIds;
+      if (user?.fromVerifiedSession) {
+        saveOptions.requireExistingUsers = [user.id];
+        saveOptions.touchedUsers = [user.id];
+        saveOptions.uniqueUserId = user.id;
+      }
+      if (refreshedServerIds.length || user?.fromVerifiedSession) await saveDb(db, saveOptions);
       return json(res, 200, statePayload(db, user, { detailServerId: stateDetailServerId(req) }));
     }
 
@@ -1518,33 +1524,23 @@ function deletedFromIdSets(ids) {
 
 function mergeById(remoteItems = [], nextItems = [], deletedIds = new Set(), touchedIds = new Set()) {
   const merged = new Map();
-  const remoteIds = new Set();
   for (const item of remoteItems) {
-    if (item?.id && !deletedIds.has(item.id)) {
-      remoteIds.add(item.id);
-      merged.set(item.id, item);
-    }
+    if (item?.id && !deletedIds.has(item.id)) merged.set(item.id, item);
   }
   for (const item of nextItems) {
-    if (item?.id && !deletedIds.has(item.id) && (remoteIds.has(item.id) || touchedIds.has(item.id))) merged.set(item.id, item);
+    if (item?.id && !deletedIds.has(item.id)) merged.set(item.id, item);
   }
   return [...merged.values()];
 }
 
 function mergeVotes(remoteVotes = [], nextVotes = [], deletedServerIds = new Set(), touchedVoteIds = new Set(), touchedServerIds = new Set()) {
   const merged = new Map();
-  const remoteIds = new Set();
   const add = (vote) => {
     if (!vote?.id || deletedServerIds.has(vote.serverId)) return;
     merged.set(vote.id, vote);
   };
-  remoteVotes.forEach((vote) => {
-    if (vote?.id && !deletedServerIds.has(vote.serverId)) remoteIds.add(vote.id);
-    add(vote);
-  });
-  nextVotes.forEach((vote) => {
-    if (remoteIds.has(vote?.id) || touchedVoteIds.has(vote?.id) || touchedServerIds.has(vote?.serverId)) add(vote);
-  });
+  remoteVotes.forEach(add);
+  nextVotes.forEach(add);
   return [...merged.values()];
 }
 
@@ -1971,14 +1967,14 @@ async function cleanupStaleServers(db) {
 }
 
 async function refreshPings(db) {
-  let changed = false;
+  const changedServerIds = [];
   for (const server of db.servers) {
     if (shouldRefreshPing(server)) {
       await updatePing(server);
-      changed = true;
+      if (server.id) changedServerIds.push(server.id);
     }
   }
-  return changed;
+  return changedServerIds;
 }
 
 function shouldRefreshPing(server) {

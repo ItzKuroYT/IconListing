@@ -394,6 +394,102 @@ async function main() {
     if (!afterStaleSessionSave.users.some((item) => item.id === registeredUser.id)) afterStaleSessionSave.users.push(registeredUser);
     await fs.writeFile(dbPath, JSON.stringify(afterStaleSessionSave));
 
+    const githubSyncEnv = {
+      GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+      GITHUB_REPO: process.env.GITHUB_REPO,
+      GITHUB_BRANCH: process.env.GITHUB_BRANCH,
+      GITHUB_DB_PATH: process.env.GITHUB_DB_PATH,
+      GITHUB_DB_BACKUP_PATH: process.env.GITHUB_DB_BACKUP_PATH
+    };
+    const githubSyncFetch = global.fetch;
+    const githubSyncMainPath = `data/smoke-sync-${suffix}.json`;
+    const githubSyncBackupPath = `data/smoke-sync-${suffix}.backup.json`;
+    process.env.GITHUB_TOKEN = "smoke-sync-github-token";
+    process.env.GITHUB_REPO = "SmokeOwner/SmokeRepo";
+    process.env.GITHUB_BRANCH = "main";
+    process.env.GITHUB_DB_PATH = githubSyncMainPath;
+    process.env.GITHUB_DB_BACKUP_PATH = githubSyncBackupPath;
+    const githubSyncInitialDb = {
+      version: 2,
+      users: [registeredUser],
+      servers: [
+        {
+          id: `github-refresh-${suffix}`,
+          ownerId: registeredUser.id,
+          ownerName: registeredUser.username,
+          name: `GitHub Refresh Fixture ${suffix}`,
+          javaHost: `github-refresh-${suffix}.example.org`,
+          javaPort: 25565,
+          country: "United States",
+          description: "An older listing that needs a ping refresh so a later state read performs a shared storage write while GitHub is still serving a stale database snapshot.",
+          tags: ["SMP"],
+          lastPingAt: "",
+          votes: 0
+        }
+      ],
+      clients: [],
+      hosts: [],
+      votes: [],
+      voteIps: {},
+      deleted: { users: {}, servers: {}, clients: {}, hosts: {} }
+    };
+    const githubSyncFiles = new Map([[githubSyncMainPath, Buffer.from(JSON.stringify(githubSyncInitialDb)).toString("base64")]]);
+    const githubSyncShas = new Map([[githubSyncMainPath, "sync-sha-0"]]);
+    const githubSyncStaleReads = new Map();
+    const githubSyncStaleContents = new Map();
+    const githubSyncPathFromUrl = (url) => {
+      const pathname = new URL(String(url)).pathname;
+      const marker = "/contents/";
+      return decodeURIComponent(pathname.slice(pathname.indexOf(marker) + marker.length));
+    };
+    global.fetch = async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("api.github.com/repos/SmokeOwner/SmokeRepo/contents/")) {
+        const filePath = githubSyncPathFromUrl(url);
+        if (options.method === "PUT") {
+          const body = JSON.parse(options.body || "{}");
+          githubSyncFiles.set(filePath, body.content);
+          githubSyncShas.set(filePath, `sync-sha-${githubSyncShas.size}-${Date.now()}`);
+          return { ok: true, status: 200, json: async () => ({ content: { sha: githubSyncShas.get(filePath) } }) };
+        }
+        const shouldServeStale = Number(githubSyncStaleReads.get(filePath) || 0) > 0;
+        if (shouldServeStale) githubSyncStaleReads.set(filePath, Number(githubSyncStaleReads.get(filePath)) - 1);
+        const content = shouldServeStale ? githubSyncStaleContents.get(filePath) : githubSyncFiles.get(filePath);
+        if (!content) return { ok: false, status: 404, json: async () => ({}) };
+        return { ok: true, status: 200, json: async () => ({ content, sha: githubSyncShas.get(filePath) || "sync-sha-0" }) };
+      }
+      return githubSyncFetch(url, options);
+    };
+    const githubSaved = await call(
+      "saveServer",
+      {
+        server: {
+          name: `GitHub Sync New SMP ${suffix}`,
+          javaHost: `github-sync-new-${suffix}.example.org`,
+          javaPort: 25565,
+          country: "United States",
+          description: "A listing saved to the fake GitHub database, then protected through a stale read and a later ping-refresh write. This reproduces the production bug where a server appears briefly across browsers and then disappears after the next API save.",
+          tags: ["SMP", "Survival"]
+        }
+      },
+      verifiedToken
+    );
+    assert(githubSaved.code === 200 && githubSaved.json.server.id, "GitHub-backed server save should succeed");
+    assert(githubSyncFiles.has(githubSyncBackupPath), "GitHub-backed save should write a backup snapshot");
+    githubSyncFiles.delete(githubSyncBackupPath);
+    githubSyncShas.delete(githubSyncBackupPath);
+    githubSyncStaleContents.set(githubSyncMainPath, Buffer.from(JSON.stringify(githubSyncInitialDb)).toString("base64"));
+    githubSyncStaleReads.set(githubSyncMainPath, 2);
+    const githubStaleState = await call("state", {}, "", "GET");
+    assert(githubStaleState.code === 200, "state should survive a stale GitHub read after a listing save");
+    const githubStoredAfterStaleWrite = JSON.parse(Buffer.from(githubSyncFiles.get(githubSyncMainPath), "base64").toString("utf8"));
+    assert(githubStoredAfterStaleWrite.servers.some((item) => item.id === githubSaved.json.server.id), "later API writes must not erase cache-only listings when GitHub serves stale JSON");
+    global.fetch = githubSyncFetch;
+    for (const [key, value] of Object.entries(githubSyncEnv)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+
     const login = await call("login", {
       login: `smoke${suffix}@example.com`,
       password: "secret123"
