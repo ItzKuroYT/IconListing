@@ -1501,18 +1501,18 @@
       "createdAt": "2026-06-30T06:17:50.783Z"
     },
     {
-      "id": "d0a6b934-c8d6-4815-a0d9-8fe3972b4097",
+      "id": "2da0c4b5-a19c-479d-bbdb-08a76184da36",
       "serverId": "48af8ec3-158a-4fca-9523-89eef6a617bd",
       "minecraftUsername": "kadika333",
-      "createdAt": "2026-06-30T23:59:41.411Z"
+      "createdAt": "2026-07-01T00:00:12.245Z"
     }
   ],
   "voteIps": {
     "48af8ec3-158a-4fca-9523-89eef6a617bd": {
       "visitor:6016f8fa71f173186bd410448f87c5be899c7c25f2dd32017a0c6fe52dc9d005": "2026-06-30T06:17:50.783Z",
       "name:random8261": "2026-06-30T06:17:50.783Z",
-      "visitor:74e5d540e0b9f8a9dd4482369bf340182f8cae772be420aa7f3bfe719585a81e": "2026-06-30T23:59:41.411Z",
-      "name:kadika333": "2026-06-30T23:59:41.411Z"
+      "visitor:74e5d540e0b9f8a9dd4482369bf340182f8cae772be420aa7f3bfe719585a81e": "2026-07-01T00:00:12.245Z",
+      "name:kadika333": "2026-07-01T00:00:12.245Z"
     }
   },
   "deleted": {
