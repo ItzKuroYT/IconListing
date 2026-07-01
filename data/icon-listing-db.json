@@ -23,7 +23,10 @@
       "email": "isaaccooper926@gmail.com",
       "passwordHash": "157b7a344965baf0056be479b29fb573:63681ef58487ce60714743f756ec276c9e879746b7f02989f812f3646eb2de41",
       "banned": false,
-      "createdAt": "2026-06-24T23:05:19.939Z"
+      "createdAt": "2026-06-24T23:05:19.939Z",
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-07-01T04:40:46.410Z",
+      "fromVerifiedSession": true
     },
     {
       "id": "0b4c1c9f-a7ad-4a40-9294-7c75b34731bc",
@@ -1307,6 +1310,63 @@
       "lastSuccessfulPingAt": "2026-07-01T04:32:25.058Z",
       "uptimeChecks": 27,
       "uptimeSuccesses": 27,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
+    },
+    {
+      "id": "b959bc7d-07a8-4506-bca1-af935c22e276",
+      "name": "TestServer",
+      "edition": "java",
+      "javaHost": "weeeeeeeeee",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_5d85e5412c4e67e4066bf17fee508661c9b6",
+      "websiteUrl": "https://web.iconrealms.net/home/",
+      "discordUrl": "",
+      "youtubeUrl": "https://www.youtube.com/watch?v=HyAGt0ER-ak",
+      "country": "Afghanistan",
+      "bannerUrl": "",
+      "description": "etestetestetestetestetesteteetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetesteteststetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetestetest",
+      "tags": [
+        "Cross-Play"
+      ],
+      "ownerId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
+      "ownerName": "ItzKuroYT",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 0,
+      "sponsored": false,
+      "createdAt": "2026-07-01T04:40:46.411Z",
+      "updatedAt": "2026-07-01T04:40:46.411Z",
+      "lastPingAt": "2026-07-01T04:40:46.490Z",
+      "javaStatusTarget": "weeeeeeeeee",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-07-01T04:40:46.490Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          }
+        ]
+      },
+      "uptimeChecks": 1,
       "iconUrl": "",
       "iconListingVoteQueue": []
     }
