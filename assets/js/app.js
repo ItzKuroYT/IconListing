@@ -2717,7 +2717,7 @@ function serverFormMarkup(server = {}) {
       </select></div>
       <div class="field"><label>Votifier IP / Host</label><input id="votifierHost" class="input" value="${escapeHtml(server.votifierHost || "")}"></div>
       <div class="field"><label>Votifier Port</label><input id="votifierPort" class="input" type="number" value="${Number(server.votifierPort || 8192)}"></div>
-      <div class="field"><label>Votifier/NuVotifier Token / Public Key</label><input id="votifierToken" class="input" value="${escapeHtml(server.votifierToken || "")}"></div>
+      <div class="field"><label>Token / Public Key</label><textarea id="votifierToken" class="textarea code-input" rows="3" placeholder="NuVotifier token from config.yml, or classic rsa/public.key">${escapeHtml(server.votifierToken || "")}</textarea><p class="fine-print">Auto detect uses short NuVotifier tokens for v2 and rsa/public.key values for classic Votifier.</p></div>
       <div class="field"><label>&nbsp;</label><button id="testVote" class="button blue" type="button">Send Test Vote</button></div>
     </div>
     <div class="form-grid">

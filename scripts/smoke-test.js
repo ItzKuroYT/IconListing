@@ -602,7 +602,7 @@ async function main() {
     assert(directReceived[0].payloadIsJson && directReceived[0].packetBytes < 256, "direct NuVotifier payload should be raw JSON and stay under the legacy packet guard");
     assert(directReceived[0].payload.challenge === "smoke-challenge" && directReceived[0].payload.username === "DirectTest", "direct NuVotifier payload should include challenge and username");
 
-    const legacyKeys = crypto.generateKeyPairSync("rsa", { modulusLength: 1024 });
+    const legacyKeys = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
     const legacyReceived = [];
     let resolveLegacyReceived;
     const legacyReceivedReady = new Promise((resolve) => {
@@ -612,13 +612,16 @@ async function main() {
       socket.write("VOTIFIER 1\n");
       socket.on("data", (chunk) => {
         legacyReceived.push(
-          crypto.privateDecrypt(
-            {
-              key: legacyKeys.privateKey,
-              padding: crypto.constants.RSA_PKCS1_PADDING
-            },
-            chunk
-          ).toString("utf8")
+          {
+            packetBytes: chunk.length,
+            body: crypto.privateDecrypt(
+              {
+                key: legacyKeys.privateKey,
+                padding: crypto.constants.RSA_PKCS1_PADDING
+              },
+              chunk
+            ).toString("utf8")
+          }
         );
         resolveLegacyReceived();
         socket.end();
@@ -643,7 +646,59 @@ async function main() {
         resolve();
       }, reject);
     });
-    assert(legacyReceived.length === 1 && legacyReceived[0].includes("LegacyTest"), "direct legacy Votifier payload should be encrypted with the public key");
+    assert(legacyReceived.length === 1 && legacyReceived[0].packetBytes === 256 && legacyReceived[0].body.includes("LegacyTest"), "direct legacy Votifier payload should be a 256-byte encrypted packet with the public key");
+
+    const autoKeyReceived = [];
+    let resolveAutoKeyReceived;
+    const autoKeyReceivedReady = new Promise((resolve) => {
+      resolveAutoKeyReceived = resolve;
+    });
+    const autoKeyVotifier = net.createServer((socket) => {
+      socket.write("VOTIFIER 2 auto-key-challenge\n");
+      socket.on("data", (chunk) => {
+        autoKeyReceived.push({
+          packetBytes: chunk.length,
+          firstByte: chunk[0],
+          body: crypto.privateDecrypt(
+            {
+              key: legacyKeys.privateKey,
+              padding: crypto.constants.RSA_PKCS1_PADDING
+            },
+            chunk
+          ).toString("utf8")
+        });
+        resolveAutoKeyReceived();
+        socket.end();
+      });
+    });
+    tcpServers.push(autoKeyVotifier);
+    await new Promise((resolve) => autoKeyVotifier.listen(0, "127.0.0.1", resolve));
+    CONFIG.votifier.providerEndpoint = "";
+    const autoKeyVotifierTest = await call("votifierToolTest", {
+      type: "auto",
+      host: "127.0.0.1",
+      port: autoKeyVotifier.address().port,
+      token: legacyKeys.publicKey.export({ type: "spki", format: "pem" }),
+      minecraftUsername: "AutoKeyTest"
+    });
+    const forcedNuWithPublicKey = await call("votifierToolTest", {
+      type: "nuvotifier",
+      host: "127.0.0.1",
+      port: autoKeyVotifier.address().port,
+      token: legacyKeys.publicKey.export({ type: "spki", format: "pem" }),
+      minecraftUsername: "BadKeyTest"
+    });
+    CONFIG.votifier.providerEndpoint = providerEndpoint;
+    assert(autoKeyVotifierTest.code === 200 && autoKeyVotifierTest.json.protocol === "votifier", "auto-detect should use classic Votifier when a public key is pasted");
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error("auto public-key Votifier listener did not receive a packet")), 1000);
+      autoKeyReceivedReady.then(() => {
+        clearTimeout(timeout);
+        resolve();
+      }, reject);
+    });
+    assert(autoKeyReceived.length === 1 && autoKeyReceived[0].packetBytes === 256 && autoKeyReceived[0].firstByte !== 123 && autoKeyReceived[0].body.includes("AutoKeyTest"), "auto public-key mode should send a 256-byte RSA packet instead of JSON");
+    assert(forcedNuWithPublicKey.code === 400, "forced NuVotifier mode should reject public keys before sending a JSON packet");
 
     const vote = await call("vote", {
       serverId: saved.json.server.id,

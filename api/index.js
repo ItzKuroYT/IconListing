@@ -1866,9 +1866,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260701-auth-state-fix">
-    <script src="/config.js?v=20260701-auth-state-fix"></script>
-    <script src="/assets/js/app.js?v=20260701-auth-state-fix" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260701-votifier-protocol-fix">
+    <script src="/config.js?v=20260701-votifier-protocol-fix"></script>
+    <script src="/assets/js/app.js?v=20260701-votifier-protocol-fix" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">
@@ -2173,29 +2173,36 @@ async function sendDirectVotifierPayload(payload) {
     serviceName: cleanText(payload.serviceName || CONFIG.site.name),
     minecraftUsername: cleanText(payload.minecraftUsername),
     address: clean(payload.address || "0.0.0.0"),
-    timestamp: new Date().toISOString()
+    timestamp: String(Date.now())
   };
   const result = next.type === "auto" ? await sendAutoVotifierPayload(next) : next.type === "votifier" ? await sendLegacyVotifierPayload(next) : await sendNuVotifierPayload(next);
   const protocolName = result.protocol === "votifier" ? "Votifier" : "NuVotifier";
   return {
     ok: true,
-    message: `${protocolName} test vote sent to ${host}:${port}.`,
+    message: `${protocolName} vote packet sent to ${host}:${port} (${result.packetBytes} bytes).`,
     ...result
   };
 }
 
 async function sendAutoVotifierPayload(payload) {
   return votifierSocketExchange(payload, (handshake) => {
+    if (isLikelyVotifierPublicKey(payload.token)) return buildLegacyVotifierPacket(payload, handshake);
     if (/^VOTIFIER\s+2\b/i.test(clean(handshake))) return buildNuVotifierPacket(payload, handshake);
-    return buildLegacyVotifierPacket(payload, handshake);
+    throw new Error("This listener is using classic Votifier. Paste the rsa/public.key value, or set the listener type to NuVotifier with the token from NuVotifier config.yml.");
   });
 }
 
 async function sendNuVotifierPayload(payload) {
+  if (isLikelyVotifierPublicKey(payload.token)) {
+    throw httpError(400, "NuVotifier v2 needs the short token from NuVotifier config.yml, not the rsa/public.key public key.");
+  }
   return votifierSocketExchange(payload, (handshake) => buildNuVotifierPacket(payload, handshake));
 }
 
 async function sendLegacyVotifierPayload(payload) {
+  if (!isLikelyVotifierPublicKey(payload.token)) {
+    throw httpError(400, "Classic Votifier needs the rsa/public.key public key. For NuVotifier tokens, choose Auto detect or NuVotifier.");
+  }
   return votifierSocketExchange(payload, (handshake) => buildLegacyVotifierPacket(payload, handshake));
 }
 
@@ -2225,14 +2232,18 @@ function buildLegacyVotifierPacket(payload, handshake) {
     payload.address,
     payload.timestamp
   ].join("\n") + "\n";
-  return {
-    body: crypto.publicEncrypt(
+  const encrypted = crypto.publicEncrypt(
       {
         key: normalizeVotifierPublicKey(payload.token),
         padding: crypto.constants.RSA_PKCS1_PADDING
       },
       Buffer.from(body, "utf8")
-    ),
+    );
+  if (encrypted.length > 256) {
+    throw new Error("That public key produced a packet larger than NuVotifier accepts. Use the public key from this listener's rsa/public.key file.");
+  }
+  return {
+    body: encrypted,
     handshake,
     protocol: "votifier"
   };
@@ -2297,8 +2308,17 @@ function votifierSocketExchange(payload, buildPacket) {
 
 function nuVotifierChallenge(handshake = "") {
   const match = clean(handshake).match(/^VOTIFIER\s+2\s+(.+)$/i);
-  if (!match) throw new Error("NuVotifier did not send a v2 challenge. Check the listener type.");
+  if (!match) throw new Error("The listener did not advertise NuVotifier v2. Choose Auto detect with a public key, or enable NuVotifier v2 tokens on the server.");
   return match[1].trim();
+}
+
+function isLikelyVotifierPublicKey(value = "") {
+  const key = clean(value);
+  const body = key
+    .replace(/-----BEGIN (RSA )?PUBLIC KEY-----/gi, "")
+    .replace(/-----END (RSA )?PUBLIC KEY-----/gi, "")
+    .replace(/\s+/g, "");
+  return /-----BEGIN (RSA )?PUBLIC KEY-----/i.test(key) || (/^[A-Za-z0-9+/=]+$/.test(body) && body.length > 180);
 }
 
 function normalizeVotifierPublicKey(value = "") {
