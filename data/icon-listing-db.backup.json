@@ -23,7 +23,10 @@
       "email": "isaaccooper926@gmail.com",
       "passwordHash": "157b7a344965baf0056be479b29fb573:63681ef58487ce60714743f756ec276c9e879746b7f02989f812f3646eb2de41",
       "banned": false,
-      "createdAt": "2026-06-24T23:05:19.939Z"
+      "createdAt": "2026-06-24T23:05:19.939Z",
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-07-01T04:19:15.355Z",
+      "fromVerifiedSession": true
     },
     {
       "id": "0b4c1c9f-a7ad-4a40-9294-7c75b34731bc",
