@@ -1496,7 +1496,7 @@
       ],
       "ownerId": "9903281f-98bc-426d-bc27-f61a27015931",
       "ownerName": "sound",
-      "votes": 0,
+      "votes": 1,
       "playersOnline": 0,
       "playersMax": 100,
       "version": "Purpur 1.21.11",
@@ -2126,9 +2126,20 @@
       "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
       "minecraftUsername": "ItzKuro_",
       "createdAt": "2026-07-01T22:52:05.948Z"
+    },
+    {
+      "id": "05abd2b0-b2c1-4f8a-9f64-32f04caf4df9",
+      "serverId": "35649eb1-0ca0-4cd2-8a3c-c1a41ed2ee0d",
+      "minecraftUsername": "soundgoblin6021",
+      "createdAt": "2026-07-03T21:45:04.204Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "35649eb1-0ca0-4cd2-8a3c-c1a41ed2ee0d": {
+      "visitor:57f756d044dbe5346e955c776398bd9398522c6c8b5fd4c9867e1ac8ef351987": "2026-07-03T21:45:04.204Z",
+      "name:soundgoblin6021": "2026-07-03T21:45:04.204Z"
+    }
+  },
   "deleted": {
     "users": {
       "e7f69622-09e1-4b86-af3c-b90fff23b3ca": "2026-06-29T22:53:42.842Z"
