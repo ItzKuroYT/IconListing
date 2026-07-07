@@ -85,6 +85,25 @@
       "googleName": "ycn",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocLapqv5yDwMhCa2v9CqEQBrZeQcGtOMhSgXV5LncCc76dGVxuwi=s96-c",
       "updatedAt": "2026-07-05T05:09:55.446Z"
+    },
+    {
+      "id": "98db84eb-6f43-4758-b584-08639d8addeb",
+      "username": "AnderEv54",
+      "email": "everett.anderson5454@gmail.com",
+      "passwordHash": "535f8f8cc4ee13b9c55b2e9513c31d73:d9ae19306266b5a64880cfd64fad65bccb4115b990f31c71ed6efa79211c6437",
+      "emailOptIn": false,
+      "emailOptInAt": "",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-07-07T12:16:17.258Z",
+      "banned": false,
+      "createdAt": "2026-07-07T12:16:17.258Z",
+      "emailVerification": {
+        "codeHash": "7b867d433ae808179c9c3b36497f2d31dac1f252e7896535e3c3786a12756021",
+        "createdAt": "2026-07-07T12:16:17.259Z",
+        "expiresAt": "2026-07-07T12:31:17.259Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
