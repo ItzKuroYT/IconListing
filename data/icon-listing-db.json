@@ -2804,10 +2804,10 @@
       "createdAt": "2026-07-08T01:11:51.815Z"
     },
     {
-      "id": "59e0ed58-2ed2-456b-84c6-4de2afb18286",
+      "id": "1624bddc-238f-43e0-9531-1544feb06008",
       "serverId": "48c565ba-791e-4c42-9d79-60a90f5a2440",
       "minecraftUsername": "beatthis101",
-      "createdAt": "2026-07-08T02:52:24.552Z"
+      "createdAt": "2026-07-08T02:52:27.212Z"
     }
   ],
   "voteIps": {
@@ -2822,8 +2822,8 @@
       "name:itzkuro_": "2026-07-08T01:11:51.815Z"
     },
     "48c565ba-791e-4c42-9d79-60a90f5a2440": {
-      "visitor:b987cf40ed44fd57e9666b25e6fa36108551c176e9e6fbc703a8c32e347a37a9": "2026-07-08T02:52:24.552Z",
-      "name:beatthis101": "2026-07-08T02:52:24.552Z"
+      "visitor:b987cf40ed44fd57e9666b25e6fa36108551c176e9e6fbc703a8c32e347a37a9": "2026-07-08T02:52:27.212Z",
+      "name:beatthis101": "2026-07-08T02:52:27.212Z"
     }
   },
   "deleted": {
