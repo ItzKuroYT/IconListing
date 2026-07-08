@@ -116,6 +116,23 @@
       "googleName": "BeatThis101",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocI01Rs-hIjJ2PTsSyZo2qZc4PyLWzSS4UKFpVo9T4n-CQNWFZ6B=s96-c",
       "updatedAt": "2026-07-08T02:49:19.667Z"
+    },
+    {
+      "id": "8d7331fd-edc3-428f-b341-cee5e307ff78",
+      "username": "ChaseCooper",
+      "email": "chasewtcooper@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-07-08T21:26:18.549Z",
+      "termsAcceptedAt": "2026-07-08T21:26:18.549Z",
+      "googleLinkedAt": "2026-07-08T21:26:18.549Z",
+      "createdAt": "2026-07-08T21:26:18.549Z",
+      "banned": false,
+      "googleSub": "116759390642569126003",
+      "googleName": "Chase Cooper",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocIcIIx9W5GL2RMHwSOz0yXJdM90mr2RBQU52BNwRI8kJ3ic6gUS=s96-c",
+      "updatedAt": "2026-07-08T21:26:18.549Z"
     }
   ],
   "servers": [
