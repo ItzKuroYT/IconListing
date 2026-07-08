@@ -838,17 +838,8 @@
       "updatedAt": "2026-06-24T22:20:23.472Z",
       "lastPingAt": "2026-07-08T01:07:27.102Z",
       "analytics": {
-        "ipCopyDaily": [
-          {
-            "date": "2026-07-08",
-            "count": 1
-          }
-        ],
-        "ipCopyVisitorDays": {
-          "2026-07-08": [
-            "b3f1f36fca325bb9"
-          ]
-        },
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-01T16:16:31.898Z",
