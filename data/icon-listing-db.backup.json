@@ -99,6 +99,23 @@
       "banned": false,
       "createdAt": "2026-07-07T12:16:17.258Z",
       "fromVerifiedSession": true
+    },
+    {
+      "id": "ad7511ee-1268-4185-9a12-2193af258a76",
+      "username": "BeatThis101",
+      "email": "beatthis101@proton.me",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-07-08T02:49:19.667Z",
+      "termsAcceptedAt": "2026-07-08T02:49:19.667Z",
+      "googleLinkedAt": "2026-07-08T02:49:19.667Z",
+      "createdAt": "2026-07-08T02:49:19.667Z",
+      "banned": false,
+      "googleSub": "106602164241481498061",
+      "googleName": "BeatThis101",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocI01Rs-hIjJ2PTsSyZo2qZc4PyLWzSS4UKFpVo9T4n-CQNWFZ6B=s96-c",
+      "updatedAt": "2026-07-08T02:49:19.667Z"
     }
   ],
   "servers": [
