@@ -2687,7 +2687,7 @@
       ],
       "ownerId": "ad7511ee-1268-4185-9a12-2193af258a76",
       "ownerName": "BeatThis101",
-      "votes": 0,
+      "votes": 1,
       "playersOnline": 10,
       "playersMax": 100,
       "version": "Velocity 1.7.2-26.2",
@@ -2802,6 +2802,12 @@
       "serverId": "e05bb489-241c-420c-8243-6427106b4476",
       "minecraftUsername": "ItzKuro_",
       "createdAt": "2026-07-08T01:11:51.815Z"
+    },
+    {
+      "id": "59e0ed58-2ed2-456b-84c6-4de2afb18286",
+      "serverId": "48c565ba-791e-4c42-9d79-60a90f5a2440",
+      "minecraftUsername": "beatthis101",
+      "createdAt": "2026-07-08T02:52:24.552Z"
     }
   ],
   "voteIps": {
@@ -2814,6 +2820,10 @@
     "e05bb489-241c-420c-8243-6427106b4476": {
       "visitor:b3f1f36fca325bb9efc1064549e6c59905ff424413ab8a3a36b9740ac4057529": "2026-07-08T01:11:51.815Z",
       "name:itzkuro_": "2026-07-08T01:11:51.815Z"
+    },
+    "48c565ba-791e-4c42-9d79-60a90f5a2440": {
+      "visitor:b987cf40ed44fd57e9666b25e6fa36108551c176e9e6fbc703a8c32e347a37a9": "2026-07-08T02:52:24.552Z",
+      "name:beatthis101": "2026-07-08T02:52:24.552Z"
     }
   },
   "deleted": {
