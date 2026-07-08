@@ -555,6 +555,19 @@ async function main() {
 
     const description =
       "A real listing created by the smoke test to verify account login, listing creation, mcstatus fallback, Votifier forwarding, vote recording, and monthly vote totals without using premade seed content.\nLine two should keep its line break.\n\nLine four should still be separated after saving.";
+    const discordNotifications = [];
+    const previousDiscordWebhook = process.env["discord-webhook"];
+    const previousDiscordWebhookUpper = process.env.DISCORD_WEBHOOK;
+    const previousDiscordWebhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    const previousDiscordFetch = global.fetch;
+    process.env["discord-webhook"] = "https://discord.example/webhook";
+    global.fetch = async (url, options = {}) => {
+      if (String(url) === "https://discord.example/webhook") {
+        discordNotifications.push(JSON.parse(options.body || "{}"));
+        return { ok: true, status: 204, text: async () => "" };
+      }
+      return previousDiscordFetch(url, options);
+    };
     const saved = await call(
       "saveServer",
       {
@@ -575,8 +588,18 @@ async function main() {
       },
       login.json.token
     );
+    global.fetch = previousDiscordFetch;
+    if (previousDiscordWebhook === undefined) delete process.env["discord-webhook"];
+    else process.env["discord-webhook"] = previousDiscordWebhook;
+    if (previousDiscordWebhookUpper === undefined) delete process.env.DISCORD_WEBHOOK;
+    else process.env.DISCORD_WEBHOOK = previousDiscordWebhookUpper;
+    if (previousDiscordWebhookUrl === undefined) delete process.env.DISCORD_WEBHOOK_URL;
+    else process.env.DISCORD_WEBHOOK_URL = previousDiscordWebhookUrl;
     assert(saved.code === 200 && saved.json.server.id, "server save should succeed");
     assert(saved.json.server.iconListingVoteKey === `smoke-key-${suffix}`, "server owner should receive the IconListing vote plugin key");
+    assert(discordNotifications.length === 1, "new server saves should send one Discord webhook notification");
+    assert(discordNotifications[0].content.includes("View Smoke Test SMP on iconlisting"), "Discord webhook should include the server name");
+    assert(discordNotifications[0].content.includes(`/server/${serverSlug(saved.json.server.name)}`), "Discord webhook should include the server slug URL");
 
     const duplicateName = await call(
       "saveServer",

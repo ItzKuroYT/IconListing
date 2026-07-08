@@ -181,6 +181,7 @@ module.exports = async function handler(req, res) {
         writeServerIds: [persistedServer.id],
         deletePagePaths: previousServerPagePath && previousServerPagePath !== serverStaticPagePath(persistedServer) ? [previousServerPagePath] : []
       });
+      if (!existing) await safeNotifyServerCreated(persistedServer);
       return json(res, 200, writePayload({
         ...statePayload(persistedDb, user, { detailServerId: persistedServer.id }),
         server: publicServer(persistedServer, user, { fullAnalytics: true })
@@ -1859,6 +1860,39 @@ async function safeSyncServerStaticPages(db, options = {}) {
   } catch (error) {
     console.error("Icon Listing server page sync failed", error.message);
   }
+}
+
+async function safeNotifyServerCreated(server) {
+  try {
+    await sendDiscordServerCreated(server);
+  } catch (error) {
+    console.error("Icon Listing server notification failed", error.message);
+  }
+}
+
+async function sendDiscordServerCreated(server) {
+  const webhook = discordWebhookUrl();
+  if (!webhook || !server?.id) return;
+  const response = await fetch(webhook, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      content: serverCreatedDiscordMessage(server),
+      allowed_mentions: { parse: [] }
+    })
+  });
+  if (!response.ok) throw new Error(`Discord webhook failed (${response.status}).`);
+}
+
+function discordWebhookUrl() {
+  return clean(process.env["discord-webhook"] || process.env.DISCORD_WEBHOOK || process.env.DISCORD_WEBHOOK_URL);
+}
+
+function serverCreatedDiscordMessage(server) {
+  return `View ${server.name} on iconlisting
+
+Wanna make your own minecraft listing and advertise for free? 
+${siteUrl(serverPath(server))}`;
 }
 
 async function syncServerStaticPages(db, options = {}) {
