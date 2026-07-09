@@ -1214,9 +1214,9 @@
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 95.23809523809523,
-      "sponsored": true,
+      "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
-      "updatedAt": "2026-07-09T07:03:54.827Z",
+      "updatedAt": "2026-06-28T05:53:12.589Z",
       "lastPingAt": "2026-07-09T07:02:55.292Z",
       "analytics": {
         "ipCopyDaily": [],
