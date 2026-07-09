@@ -3639,7 +3639,7 @@ function renderRgbTextGenerator() {
     path: "/tools/rgb-text-generator/"
   });
   const params = new URLSearchParams(location.search);
-  const text = params.get("text") || "Birdflop";
+  const text = params.get("text") || "Iconic";
   const colors = (params.get("colors") || DEFAULT_RGB_STOPS.join(",")).split(",").map(normalizeHexColor).filter(Boolean).slice(0, 12);
   $("#app").innerHTML = `<div class="page rgb-page">
     <section class="tool-hero rgb-hero">
@@ -3652,7 +3652,7 @@ function renderRgbTextGenerator() {
     <section class="rgb-tool">
       <div class="rgb-main">
         <div class="rgb-toolbar">
-          <label class="field rgb-text-field"><span>Input Text</span><input id="rgbInput" class="input rgb-input" value="${escapeHtml(text)}" maxlength="160"></label>
+          <div class="rgb-text-label"><span>Input Text</span><small>Type directly in the gradient box</small></div>
           <div class="rgb-format-buttons">
             <select id="rgbFont" class="select"><option>Default Font</option><option>Bold headline</option><option>Compact chat</option></select>
             <button class="button small active" type="button" data-rgb-style="bold">B</button>
@@ -3661,7 +3661,8 @@ function renderRgbTextGenerator() {
             <button class="button small" type="button" data-rgb-style="strike">S</button>
           </div>
         </div>
-        <div id="rgbPreviewInput" class="rgb-live-input"></div>
+        <input id="rgbInput" type="hidden" value="${escapeHtml(text)}">
+        <div id="rgbPreviewInput" class="rgb-live-input" contenteditable="true" role="textbox" aria-label="Input text" spellcheck="false" data-placeholder="Type here"></div>
         <div id="rgbGradientBar" class="rgb-gradient-bar"></div>
         <div class="rgb-body-grid">
           <aside class="rgb-colors-panel">
@@ -3674,7 +3675,14 @@ function renderRgbTextGenerator() {
             <div id="rgbColorRows" class="rgb-color-rows">${colors.map(rgbColorRow).join("")}</div>
           </aside>
           <div class="rgb-output-panel">
-            <div class="rgb-panel-head"><h2>Output</h2><select id="rgbOutputFormat" class="select"><option value="amp">&amp;#rrggbb</option><option value="legacy">&amp;x&amp;r&amp;r...</option><option value="section">&sect;x&sect;r&sect;r...</option><option value="minimessage">MiniMessage gradient</option></select></div>
+            <div class="rgb-panel-head">
+              <h2>Output</h2>
+              <div class="rgb-output-actions">
+                <select id="rgbOutputFormat" class="select"><option value="amp">&amp;#rrggbb</option><option value="legacy">&amp;x&amp;r&amp;r...</option><option value="section">&sect;x&sect;r&sect;r...</option><option value="minimessage">MiniMessage gradient</option></select>
+                <button id="rgbCopyOutput" class="button small" type="button">Copy</button>
+                <button id="rgbShareUrl" class="button small" type="button">Get URL</button>
+              </div>
+            </div>
             <textarea id="rgbOutput" class="textarea code-input rgb-output" readonly></textarea>
             <div class="rgb-options">
               <label class="field"><span>Prefix</span><input id="rgbPrefix" class="input" placeholder="/nick $"></label>
@@ -3683,14 +3691,6 @@ function renderRgbTextGenerator() {
               <label class="check-row"><input id="rgbLowercase" type="checkbox"> Lowercase hex codes</label>
             </div>
           </div>
-          <aside class="rgb-presets-panel">
-            <div class="rgb-panel-head"><h2>Presets</h2><button id="rgbCopyOutput" class="button small" type="button">Copy</button></div>
-            <button id="rgbShareUrl" class="button wide" type="button">Get URL</button>
-            <div class="rgb-preview-box">
-              <span>Preview</span>
-              <div id="rgbPreview"></div>
-            </div>
-          </aside>
         </div>
       </div>
     </section>
@@ -3709,7 +3709,19 @@ function rgbColorRow(color, index) {
 
 function bindRgbTextGenerator() {
   const update = () => updateRgbGenerator();
-  $("#rgbInput")?.addEventListener("input", update);
+  $("#rgbPreviewInput")?.addEventListener("input", () => {
+    const editor = $("#rgbPreviewInput");
+    $("#rgbInput").value = rgbEditorText(editor).slice(0, 160);
+    updateRgbGenerator({ preserveCaret: true });
+  });
+  $("#rgbPreviewInput")?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") event.preventDefault();
+  });
+  $("#rgbPreviewInput")?.addEventListener("paste", (event) => {
+    event.preventDefault();
+    const text = (event.clipboardData || window.clipboardData).getData("text").replace(/\s+/g, " ").slice(0, 160);
+    document.execCommand("insertText", false, text);
+  });
   $("#rgbOutputFormat")?.addEventListener("change", update);
   $("#rgbPrefix")?.addEventListener("input", update);
   $("#rgbCharsPerColor")?.addEventListener("input", update);
@@ -3784,7 +3796,7 @@ function rgbColors() {
   return colors.length >= 2 ? colors : DEFAULT_RGB_STOPS.slice(0, 2);
 }
 
-function updateRgbGenerator() {
+function updateRgbGenerator(options = {}) {
   const text = $("#rgbInput")?.value || "";
   const colors = rgbColors();
   const styles = rgbStyles();
@@ -3794,9 +3806,59 @@ function updateRgbGenerator() {
   const gradient = gradientForText(text, colors, Number($("#rgbCharsPerColor")?.value || 1), $("#rgbTrimSpaces")?.checked !== false);
   $("#rgbColorCount").textContent = colors.length;
   $("#rgbGradientBar").style.background = `linear-gradient(90deg, ${colors.join(", ")})`;
-  $("#rgbPreview").innerHTML = gradient.map((part) => `<span style="${rgbPreviewStyle(part.color, styles)}">${escapeHtml(part.char)}</span>`).join("") || "&nbsp;";
-  $("#rgbPreviewInput").innerHTML = $("#rgbPreview").innerHTML;
+  renderRgbEditor(gradient, styles, options.preserveCaret === true);
   $("#rgbOutput").value = prefix + rgbFormattedOutput(gradient, colors, format, styles, lowercase);
+}
+
+function rgbEditorText(editor = $("#rgbPreviewInput")) {
+  return String(editor?.textContent || "").replace(/\u00a0/g, " ").replace(/\r?\n/g, " ");
+}
+
+function renderRgbEditor(gradient, styles, preserveCaret = false) {
+  const editor = $("#rgbPreviewInput");
+  if (!editor) return;
+  const wasFocused = document.activeElement === editor;
+  const caret = preserveCaret && wasFocused ? rgbCaretOffset(editor) : null;
+  editor.innerHTML = gradient.length
+    ? gradient.map((part) => `<span style="${rgbPreviewStyle(part.color, styles)}">${part.char === " " ? "&nbsp;" : escapeHtml(part.char)}</span>`).join("")
+    : "";
+  if (wasFocused && caret !== null) restoreRgbCaret(editor, Math.min(caret, rgbEditorText(editor).length));
+}
+
+function rgbCaretOffset(editor) {
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) return rgbEditorText(editor).length;
+  const range = selection.getRangeAt(0);
+  if (!editor.contains(range.endContainer)) return rgbEditorText(editor).length;
+  const prefix = range.cloneRange();
+  prefix.selectNodeContents(editor);
+  prefix.setEnd(range.endContainer, range.endOffset);
+  return prefix.toString().replace(/\u00a0/g, " ").length;
+}
+
+function restoreRgbCaret(editor, offset) {
+  editor.focus();
+  const selection = window.getSelection();
+  const range = document.createRange();
+  let remaining = offset;
+  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+  while (node) {
+    const length = node.nodeValue.length;
+    if (remaining <= length) {
+      range.setStart(node, remaining);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      return;
+    }
+    remaining -= length;
+    node = walker.nextNode();
+  }
+  range.selectNodeContents(editor);
+  range.collapse(false);
+  selection.removeAllRanges();
+  selection.addRange(range);
 }
 
 function rgbStyles() {
