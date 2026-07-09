@@ -81,10 +81,20 @@ const IconListingConfig = {
         description:
           "Browse sponsored Minecraft hosting providers with website links, videos, showcase images, paid sponsor details, and hosting descriptions."
       },
+      plans: {
+        title: "Icon Listing Plans | Server Listing Limits",
+        description:
+          "Compare Icon Listing plans for Minecraft server listing limits and sponsored placement durations. Stripe checkout is coming soon."
+      },
       motdBuilder: {
         title: "Minecraft MOTD Builder | Icon Listing",
         description:
           "Build a two-line Minecraft server MOTD with color codes, formatting, centering, live preview, copy button, and shareable URL."
+      },
+      rgbTextGenerator: {
+        title: "Minecraft RGB Text Generator | Icon Listing",
+        description:
+          "Create RGB gradient Minecraft text for chat, ranks, MOTDs, and server messages with hex colors, formatting, preview, and copy output."
       },
       votifierTester: {
         title: "Votifier Tester | NuVotifier & AzuVotifier Tool",
@@ -114,6 +124,44 @@ const IconListingConfig = {
     voteCooldownHours: 24,
     staleServerDeleteDays: 90
   },
+  plans: {
+    free: {
+      name: "Free",
+      price: "$0/mo",
+      serverLimit: 2,
+      sponsorCredits: 0,
+      sponsorDurationDays: 0,
+      sponsorDurationLabel: "No sponsor slot",
+      description: "List up to 2 servers for free."
+    },
+    premium: {
+      name: "Premium",
+      price: "$15/mo",
+      serverLimit: 5,
+      sponsorCredits: 1,
+      sponsorDurationDays: 14,
+      sponsorDurationLabel: "1 sponsor for 2 weeks",
+      description: "Upload up to 5 servers and sponsor one server for 2 weeks while this subscription is active."
+    },
+    elite: {
+      name: "Elite",
+      price: "$25/mo",
+      serverLimit: 10,
+      sponsorCredits: 1,
+      sponsorDurationDays: 60,
+      sponsorDurationLabel: "1 sponsor for 2 months",
+      description: "Upload up to 10 servers and sponsor one server for 2 months while this subscription is active."
+    },
+    iconic: {
+      name: "Iconic",
+      price: "$40/mo",
+      serverLimit: 15,
+      sponsorCredits: 2,
+      sponsorDurationDays: 150,
+      sponsorDurationLabel: "2 sponsors for 5 months",
+      description: "Upload up to 15 servers and sponsor two servers for 5 months while this subscription is active."
+    }
+  },
   ranking: {
     playerWeight: 1,
     voteWeight: 8,
@@ -141,6 +189,7 @@ const IconListingConfig = {
       sponsoredServers: "Sponsored",
       sponsoredClients: "Sponsored Clients",
       sponsoredHosts: "Sponsored Hosts",
+      plans: "Plans",
       tools: "Tools",
       dashboard: "Dashboard",
       admin: "Admin",
@@ -192,9 +241,19 @@ const IconListingConfig = {
       videoButton: "Watch video",
       paidLabel: "Paid sponsor"
     },
+    plans: {
+      title: "Plans",
+      body: "Choose the listing limit and sponsor access that fits your Minecraft community. Stripe checkout is coming soon.",
+      comingSoon: "Coming soon",
+      currentPlan: "Current plan",
+      serverLimitLabel: "server listings",
+      sponsorLabel: "sponsor access"
+    },
     tools: {
       motdTitle: "MOTD Builder",
       motdBody: "Design a two-line Minecraft server MOTD with a live in-game style preview, centering helper, and shareable URL.",
+      rgbTitle: "RGB Text Generator",
+      rgbBody: "Build Minecraft RGB gradient text with hex colors, formatting, live preview, and copy-ready output.",
       votifierTitle: "Votifier Tester",
       votifierBody: "Check Votifier, NuVotifier, or AzuVotifier settings before connecting voting to a Minecraft server listing."
     },
@@ -211,7 +270,8 @@ const IconListingConfig = {
       title: "Dashboard",
       body: "Edit listings, check rank, or add another server.",
       addButton: "+ Add Server",
-      settingsButton: "Account Settings"
+      settingsButton: "Account Settings",
+      plansButton: "Plans"
     },
     admin: {
       accessRequired: "Admin access is required for this page.",

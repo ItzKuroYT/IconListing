@@ -325,10 +325,16 @@ async function request(action, payload = {}, method = "POST") {
 
 function publicUser(user) {
   if (!user) return null;
+  const plan = planConfigForUser(user);
   return {
     id: user.id,
     username: user.username,
     email: user.email,
+    plan: plan.key,
+    planName: plan.name,
+    serverLimit: serverLimitForUser(user),
+    sponsorCredits: Number(plan.sponsorCredits || 0),
+    sponsorDurationDays: Number(plan.sponsorDurationDays || 0),
     emailOptIn: user.emailOptIn === true,
     emailVerified: user.emailVerified === true,
     emailVerificationPending: user.emailVerified !== true && (!!user.emailVerification?.codeHash || !!user.emailVerificationCode),
@@ -337,6 +343,22 @@ function publicUser(user) {
     admin: isAdmin(user),
     banned: !!user.banned
   };
+}
+
+function planConfigForUser(user) {
+  const plans = CONFIG.plans || {};
+  const key = normalizePlanKey(user?.plan || user?.subscriptionPlan || "free");
+  return { key, ...(plans[key] || plans.free || { name: "Free", serverLimit: 2, sponsorCredits: 0, sponsorDurationDays: 0 }) };
+}
+
+function normalizePlanKey(value = "") {
+  const key = String(value || "free").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+  return CONFIG.plans?.[key] ? key : "free";
+}
+
+function serverLimitForUser(user) {
+  if (isAdmin(user)) return 999;
+  return Math.max(0, Number(planConfigForUser(user).serverLimit || 2));
 }
 
 function fallbackUserFromSession() {
@@ -408,6 +430,14 @@ function fallbackRequest(action, payload) {
     const server = sanitizeServer(payload.server || {});
     const existing = db.servers.find((item) => item.id === server.id);
     if (existing && existing.ownerId !== user.id && !isAdmin(user)) return Promise.reject(new Error("You cannot edit that listing."));
+    if (!existing) {
+      const limit = serverLimitForUser(user);
+      const owned = db.servers.filter((item) => item.ownerId === user.id).length;
+      if (!isAdmin(user) && owned >= limit) {
+        const plan = planConfigForUser(user);
+        return Promise.reject(new Error(`Your ${plan.name} plan allows ${limit} server listings. Delete a listing or upgrade your plan to add another.`));
+      }
+    }
     try {
       ensureUniqueServerListing(db, server, existing?.id || server.id);
     } catch (error) {
@@ -1068,21 +1098,23 @@ function serversDropdownMarkup() {
 
 function sponsoredDropdownMarkup() {
   return `<div class="dropdown">
-    <button class="drop-button" type="button" data-route-group="sponsored sponsored-clients sponsored-hosts">${escapeHtml(copy("nav.sponsoredServers", "Sponsored"))} <span class="chevron" aria-hidden="true">v</span></button>
+    <button class="drop-button" type="button" data-route-group="sponsored sponsored-clients sponsored-hosts plans">${escapeHtml(copy("nav.sponsoredServers", "Sponsored"))} <span class="chevron" aria-hidden="true">v</span></button>
     <div class="dropdown-menu sponsor-menu">
       ${navMenuLink("/sponsored/", copy("sponsoredServers.title", "Sponsored Servers"), "Paid Minecraft server placements", "accent-purple")}
       ${navMenuLink("/sponsored-clients/", copy("nav.sponsoredClients", "Sponsored Clients"), "Client promotions and downloads", "accent-pink")}
       ${navMenuLink("/sponsored-hosts/", copy("nav.sponsoredHosts", "Sponsored Hosts"), "Minecraft hosting sponsors", "accent-blue")}
+      ${navMenuLink("/sponsored/plans/", copy("nav.plans", "Plans"), "Listing limits and sponsor access", "accent-cyan")}
     </div>
   </div>`;
 }
 
 function toolsDropdownMarkup() {
   return `<div class="dropdown">
-    <button class="drop-button" type="button" data-route-group="motd-builder votifier-tester">${escapeHtml(copy("nav.tools", "Tools"))} <span class="chevron" aria-hidden="true">v</span></button>
+    <button class="drop-button" type="button" data-route-group="motd-builder votifier-tester rgb-text-generator">${escapeHtml(copy("nav.tools", "Tools"))} <span class="chevron" aria-hidden="true">v</span></button>
     <div class="dropdown-menu tools-menu">
       ${navMenuLink("/tools/votifier-tester/", copy("tools.votifierTitle", "Votifier Tester"), "Check Votifier, NuVotifier, or AzuVotifier settings", "accent-blue")}
       ${navMenuLink("/tools/motd-builder/", copy("tools.motdTitle", "MOTD Builder"), "Build a two-line Minecraft MOTD", "accent-purple")}
+      ${navMenuLink("/tools/rgb-text-generator/", copy("tools.rgbTitle", "RGB Text Generator"), "Create RGB gradient Minecraft text", "accent-pink")}
     </div>
   </div>`;
 }
@@ -2310,6 +2342,54 @@ function renderHosts(state) {
   bindPager("#hostPager", () => renderHosts(state));
 }
 
+function renderPlans(state) {
+  const plans = Object.entries(CONFIG.plans || {}).filter(([key]) => key !== "free");
+  const currentPlan = normalizePlanKey(state.user?.plan || "free");
+  setSeoMeta({
+    ...defaultPageSeo("plans"),
+    title: CONFIG.seo?.pages?.plans?.title || "Icon Listing Plans",
+    description: CONFIG.seo?.pages?.plans?.description || "Compare Icon Listing plans for server limits and sponsor access.",
+    path: "/sponsored/plans/"
+  });
+  $("#app").innerHTML = `<div class="page">
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h1 class="section-title">${escapeHtml(copy("plans.title", "Plans"))}</h1>
+          <p class="section-copy">${escapeHtml(copy("plans.body", "Choose the listing limit and sponsor access that fits your Minecraft community. Stripe checkout is coming soon."))}</p>
+        </div>
+      </div>
+      <div class="plans-grid">
+        ${planCard("free", CONFIG.plans.free, currentPlan)}
+        ${plans.map(([key, plan]) => planCard(key, plan, currentPlan)).join("")}
+      </div>
+    </section>
+  </div>`;
+}
+
+function planCard(key, plan = {}, currentPlan = "free") {
+  const isCurrent = currentPlan === key;
+  const sponsorLine = Number(plan.sponsorCredits || 0) > 0
+    ? `${Number(plan.sponsorCredits).toLocaleString()}x ${escapeHtml(copy("plans.sponsorLabel", "sponsor access"))} - ${escapeHtml(plan.sponsorDurationLabel || "")}`
+    : escapeHtml(plan.sponsorDurationLabel || "No sponsor slot");
+  return `<article class="plan-card ${key === "elite" ? "featured" : ""}">
+    <div class="plan-head">
+      <div>
+        <h2>${escapeHtml(plan.name || key)}</h2>
+        <p>${escapeHtml(plan.description || "")}</p>
+      </div>
+      ${isCurrent ? `<span class="status-badge">${escapeHtml(copy("plans.currentPlan", "Current plan"))}</span>` : ""}
+    </div>
+    <div class="plan-price">${escapeHtml(plan.price || "")}</div>
+    <ul class="feature-list">
+      <li>${Number(plan.serverLimit || 0).toLocaleString()} ${escapeHtml(copy("plans.serverLimitLabel", "server listings"))}</li>
+      <li>${sponsorLine}</li>
+      <li>Stripe checkout not connected yet</li>
+    </ul>
+    <button class="button primary" type="button" disabled>${escapeHtml(copy("plans.comingSoon", "Coming soon"))}</button>
+  </article>`;
+}
+
 function renderClientList(clients, selector = "#clientList", options = {}) {
   const root = $(selector);
   if (!root) return;
@@ -2640,6 +2720,9 @@ function renderDashboard(state) {
     return;
   }
   const mine = state.servers.filter((server) => server.ownerId === state.user.id);
+  const limit = Number(state.user.serverLimit || serverLimitForUser(state.user));
+  const limitLabel = limit >= 999 ? "Unlimited" : `${mine.length}/${limit}`;
+  const addDisabled = limit < 999 && mine.length >= limit;
   $("#app").innerHTML = `<div class="page">
     <section class="section">
       <div class="section-head">
@@ -2649,6 +2732,17 @@ function renderDashboard(state) {
         </div>
       </div>
       ${emailVerificationPanel(state.user)}
+      <div class="plan-strip">
+        <div>
+          <span class="eyebrow">Current plan</span>
+          <strong>${escapeHtml(state.user.planName || planConfigForUser(state.user).name)}</strong>
+        </div>
+        <div>
+          <span class="eyebrow">Listing slots</span>
+          <strong>${escapeHtml(limitLabel)}</strong>
+        </div>
+        <a class="button" href="${route("/sponsored/plans/")}">${escapeHtml(copy("dashboard.plansButton", "Plans"))}</a>
+      </div>
       <div class="dashboard-list">${mine.length ? mine.map((server) => `<article class="card dash-item">
         <div class="rank">#${server.rank}</div>
         <div>
@@ -2662,7 +2756,7 @@ function renderDashboard(state) {
         </div>
       </article>`).join("") : emptyNotice()}</div>
       <div class="row-actions">
-        <button id="addServerButton" class="button primary">${escapeHtml(copy("dashboard.addButton", "+ Add Server"))}</button>
+        <button id="addServerButton" class="button primary" ${addDisabled ? "disabled" : ""}>${escapeHtml(addDisabled ? "Limit reached" : copy("dashboard.addButton", "+ Add Server"))}</button>
         <button id="settingsButton" class="button">${escapeHtml(copy("dashboard.settingsButton", "Account Settings"))}</button>
       </div>
     </section>
@@ -3536,6 +3630,259 @@ function insertAtCursor(input, text) {
   input.selectionStart = input.selectionEnd = start + text.length;
 }
 
+const DEFAULT_RGB_STOPS = ["#ff0000", "#ff8800", "#ffff00", "#21ff00", "#51dcff", "#f095ff", "#ff0000"];
+
+function renderRgbTextGenerator() {
+  setSeoMeta({
+    title: CONFIG.seo?.pages?.rgbTextGenerator?.title || "Minecraft RGB Text Generator | Icon Listing",
+    description: CONFIG.seo?.pages?.rgbTextGenerator?.description || "Create RGB gradient Minecraft text with hex colors, formatting, preview, and copy-ready output.",
+    path: "/tools/rgb-text-generator/"
+  });
+  const params = new URLSearchParams(location.search);
+  const text = params.get("text") || "Birdflop";
+  const colors = (params.get("colors") || DEFAULT_RGB_STOPS.join(",")).split(",").map(normalizeHexColor).filter(Boolean).slice(0, 12);
+  $("#app").innerHTML = `<div class="page rgb-page">
+    <section class="tool-hero rgb-hero">
+      <div class="tool-icon">RGB</div>
+      <div>
+        <h1 class="section-title">${escapeHtml(copy("tools.rgbTitle", "RGB Text Generator"))}</h1>
+        <p class="section-copy">${escapeHtml(copy("tools.rgbBody", "Build Minecraft RGB gradient text with hex colors, formatting, live preview, and copy-ready output."))}</p>
+      </div>
+    </section>
+    <section class="rgb-tool">
+      <div class="rgb-main">
+        <div class="rgb-toolbar">
+          <label class="field rgb-text-field"><span>Input Text</span><input id="rgbInput" class="input rgb-input" value="${escapeHtml(text)}" maxlength="160"></label>
+          <div class="rgb-format-buttons">
+            <select id="rgbFont" class="select"><option>Default Font</option><option>Bold headline</option><option>Compact chat</option></select>
+            <button class="button small active" type="button" data-rgb-style="bold">B</button>
+            <button class="button small" type="button" data-rgb-style="italic">I</button>
+            <button class="button small active" type="button" data-rgb-style="underline">U</button>
+            <button class="button small" type="button" data-rgb-style="strike">S</button>
+          </div>
+        </div>
+        <div id="rgbPreviewInput" class="rgb-live-input"></div>
+        <div id="rgbGradientBar" class="rgb-gradient-bar"></div>
+        <div class="rgb-body-grid">
+          <aside class="rgb-colors-panel">
+            <div class="rgb-panel-head"><h2><span id="rgbColorCount">${colors.length}</span> Colors</h2><div class="row-actions compact"><button id="rgbRemoveColor" class="button small" type="button">-</button><button id="rgbAddColor" class="button small" type="button">+</button></div></div>
+            <div class="rgb-mini-actions">
+              <button class="button small" type="button" data-rgb-preset="rainbow">Rainbow</button>
+              <button class="button small" type="button" data-rgb-preset="ice">Ice</button>
+              <button class="button small" type="button" data-rgb-preset="icon">Icon</button>
+            </div>
+            <div id="rgbColorRows" class="rgb-color-rows">${colors.map(rgbColorRow).join("")}</div>
+          </aside>
+          <div class="rgb-output-panel">
+            <div class="rgb-panel-head"><h2>Output</h2><select id="rgbOutputFormat" class="select"><option value="amp">&amp;#rrggbb</option><option value="legacy">&amp;x&amp;r&amp;r...</option><option value="section">&sect;x&sect;r&sect;r...</option><option value="minimessage">MiniMessage gradient</option></select></div>
+            <textarea id="rgbOutput" class="textarea code-input rgb-output" readonly></textarea>
+            <div class="rgb-options">
+              <label class="field"><span>Prefix</span><input id="rgbPrefix" class="input" placeholder="/nick $"></label>
+              <label class="field"><span>Characters per color</span><input id="rgbCharsPerColor" class="input" type="number" min="1" max="8" value="1"></label>
+              <label class="check-row"><input id="rgbTrimSpaces" type="checkbox" checked> Trim colors from spaces</label>
+              <label class="check-row"><input id="rgbLowercase" type="checkbox"> Lowercase hex codes</label>
+            </div>
+          </div>
+          <aside class="rgb-presets-panel">
+            <div class="rgb-panel-head"><h2>Presets</h2><button id="rgbCopyOutput" class="button small" type="button">Copy</button></div>
+            <button id="rgbShareUrl" class="button wide" type="button">Get URL</button>
+            <div class="rgb-preview-box">
+              <span>Preview</span>
+              <div id="rgbPreview"></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </div>`;
+  bindRgbTextGenerator();
+}
+
+function rgbColorRow(color, index) {
+  return `<div class="rgb-color-row">
+    <span>${index + 1}</span>
+    <input class="rgb-color-input" type="color" value="${escapeHtml(color)}">
+    <input class="input rgb-hex-input" value="${escapeHtml(color.toUpperCase())}" maxlength="7">
+    <button class="mini-button" type="button" data-rgb-delete="${index}">Delete</button>
+  </div>`;
+}
+
+function bindRgbTextGenerator() {
+  const update = () => updateRgbGenerator();
+  $("#rgbInput")?.addEventListener("input", update);
+  $("#rgbOutputFormat")?.addEventListener("change", update);
+  $("#rgbPrefix")?.addEventListener("input", update);
+  $("#rgbCharsPerColor")?.addEventListener("input", update);
+  $("#rgbTrimSpaces")?.addEventListener("change", update);
+  $("#rgbLowercase")?.addEventListener("change", update);
+  $("#rgbFont")?.addEventListener("change", update);
+  $$("[data-rgb-style]").forEach((button) => button.addEventListener("click", () => {
+    button.classList.toggle("active");
+    update();
+  }));
+  $("#rgbAddColor")?.addEventListener("click", () => {
+    const colors = rgbColors();
+    colors.push(colors[colors.length - 1] || "#ffffff");
+    renderRgbColorRows(colors);
+    update();
+  });
+  $("#rgbRemoveColor")?.addEventListener("click", () => {
+    const colors = rgbColors();
+    if (colors.length > 2) colors.pop();
+    renderRgbColorRows(colors);
+    update();
+  });
+  $$("[data-rgb-preset]").forEach((button) => button.addEventListener("click", () => {
+    const presets = {
+      rainbow: DEFAULT_RGB_STOPS,
+      ice: ["#38bdf8", "#ffffff", "#8b5cf6"],
+      icon: ["#8b5cf6", "#ec4899", "#38bdf8"]
+    };
+    renderRgbColorRows(presets[button.dataset.rgbPreset] || DEFAULT_RGB_STOPS);
+    update();
+  }));
+  $("#rgbColorRows")?.addEventListener("input", (event) => {
+    if (event.target.classList.contains("rgb-color-input")) {
+      event.target.closest(".rgb-color-row").querySelector(".rgb-hex-input").value = event.target.value.toUpperCase();
+    }
+    if (event.target.classList.contains("rgb-hex-input")) {
+      const color = normalizeHexColor(event.target.value);
+      if (color) event.target.closest(".rgb-color-row").querySelector(".rgb-color-input").value = color;
+    }
+    update();
+  });
+  $("#rgbColorRows")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-rgb-delete]");
+    if (!button) return;
+    const colors = rgbColors();
+    if (colors.length <= 2) return;
+    colors.splice(Number(button.dataset.rgbDelete), 1);
+    renderRgbColorRows(colors);
+    update();
+  });
+  $("#rgbCopyOutput")?.addEventListener("click", async () => {
+    await copyText($("#rgbOutput").value);
+    toast("RGB text copied.");
+  });
+  $("#rgbShareUrl")?.addEventListener("click", async () => {
+    const params = new URLSearchParams({ text: $("#rgbInput").value, colors: rgbColors().join(",") });
+    const url = `${location.origin}${route("/tools/rgb-text-generator/")}?${params.toString()}`;
+    history.replaceState(null, "", url);
+    await copyText(url);
+    toast("RGB generator link copied.");
+  });
+  update();
+}
+
+function renderRgbColorRows(colors) {
+  $("#rgbColorRows").innerHTML = colors.map((color, index) => rgbColorRow(color, index)).join("");
+}
+
+function rgbColors() {
+  const rows = $$(".rgb-color-row");
+  const colors = rows.map((row) => normalizeHexColor(row.querySelector(".rgb-hex-input")?.value || row.querySelector(".rgb-color-input")?.value)).filter(Boolean);
+  return colors.length >= 2 ? colors : DEFAULT_RGB_STOPS.slice(0, 2);
+}
+
+function updateRgbGenerator() {
+  const text = $("#rgbInput")?.value || "";
+  const colors = rgbColors();
+  const styles = rgbStyles();
+  const lowercase = $("#rgbLowercase")?.checked;
+  const format = $("#rgbOutputFormat")?.value || "amp";
+  const prefix = $("#rgbPrefix")?.value || "";
+  const gradient = gradientForText(text, colors, Number($("#rgbCharsPerColor")?.value || 1), $("#rgbTrimSpaces")?.checked !== false);
+  $("#rgbColorCount").textContent = colors.length;
+  $("#rgbGradientBar").style.background = `linear-gradient(90deg, ${colors.join(", ")})`;
+  $("#rgbPreview").innerHTML = gradient.map((part) => `<span style="${rgbPreviewStyle(part.color, styles)}">${escapeHtml(part.char)}</span>`).join("") || "&nbsp;";
+  $("#rgbPreviewInput").innerHTML = $("#rgbPreview").innerHTML;
+  $("#rgbOutput").value = prefix + rgbFormattedOutput(gradient, colors, format, styles, lowercase);
+}
+
+function rgbStyles() {
+  return Object.fromEntries($$("[data-rgb-style]").map((button) => [button.dataset.rgbStyle, button.classList.contains("active")]));
+}
+
+function gradientForText(text, colors, charsPerColor = 1, trimSpaces = true) {
+  const chars = [...text];
+  const colorTargets = trimSpaces ? chars.filter((char) => char !== " ") : chars;
+  const total = Math.max(1, Math.ceil(colorTargets.length / Math.max(1, charsPerColor)));
+  let visibleIndex = 0;
+  return chars.map((char) => {
+    if (trimSpaces && char === " ") return { char, color: "" };
+    const colorIndex = Math.floor(visibleIndex / Math.max(1, charsPerColor));
+    visibleIndex += 1;
+    return { char, color: interpolateGradient(colors, total <= 1 ? 0 : colorIndex / (total - 1)) };
+  });
+}
+
+function interpolateGradient(colors, ratio) {
+  if (colors.length === 1) return colors[0];
+  const scaled = Math.max(0, Math.min(1, ratio)) * (colors.length - 1);
+  const index = Math.min(colors.length - 2, Math.floor(scaled));
+  const local = scaled - index;
+  const a = hexToRgb(colors[index]);
+  const b = hexToRgb(colors[index + 1]);
+  return rgbToHex({
+    r: Math.round(a.r + (b.r - a.r) * local),
+    g: Math.round(a.g + (b.g - a.g) * local),
+    b: Math.round(a.b + (b.b - a.b) * local)
+  });
+}
+
+function rgbFormattedOutput(gradient, colors, format, styles, lowercase = false) {
+  const styleCodes = `${styles.bold ? "&l" : ""}${styles.italic ? "&o" : ""}${styles.underline ? "&n" : ""}${styles.strike ? "&m" : ""}`;
+  const section = "\u00a7";
+  if (format === "minimessage") {
+    const tags = [styles.bold ? "bold" : "", styles.italic ? "italic" : "", styles.underline ? "underlined" : "", styles.strike ? "st" : ""].filter(Boolean);
+    const open = tags.map((tag) => `<${tag}>`).join("");
+    const close = tags.reverse().map((tag) => `</${tag}>`).join("");
+    return `${open}<gradient:${colors.map((color) => colorForOutput(color, lowercase)).join(":")}>${$("#rgbInput")?.value || ""}</gradient>${close}`;
+  }
+  return gradient.map((part) => {
+    if (!part.color) return part.char;
+    const color = colorForOutput(part.color, lowercase).replace("#", "");
+    if (format === "legacy") return `&x${[...color].map((char) => `&${char}`).join("")}${styleCodes}${part.char}`;
+    if (format === "section") return `${section}x${[...color].map((char) => `${section}${char}`).join("")}${styleCodes.replace(/&/g, section)}${part.char}`;
+    return `&#${color}${styleCodes}${part.char}`;
+  }).join("");
+}
+
+function colorForOutput(color, lowercase = false) {
+  const next = normalizeHexColor(color) || "#ffffff";
+  return lowercase ? next.toLowerCase() : next.toUpperCase();
+}
+
+function rgbPreviewStyle(color, styles) {
+  return [
+    color ? `color:${color}` : "",
+    styles.bold ? "font-weight:900" : "",
+    styles.italic ? "font-style:italic" : "",
+    styles.underline || styles.strike ? `text-decoration:${[styles.underline ? "underline" : "", styles.strike ? "line-through" : ""].filter(Boolean).join(" ")}` : ""
+  ].filter(Boolean).join(";");
+}
+
+function normalizeHexColor(value = "") {
+  const next = String(value || "").trim();
+  const short = next.match(/^#?([a-f0-9]{3})$/i)?.[1];
+  if (short) return `#${short.split("").map((char) => `${char}${char}`).join("")}`;
+  const full = next.match(/^#?([a-f0-9]{6})$/i)?.[1];
+  return full ? `#${full}`.toLowerCase() : "";
+}
+
+function hexToRgb(hex) {
+  const cleanHex = normalizeHexColor(hex).replace("#", "") || "ffffff";
+  return {
+    r: parseInt(cleanHex.slice(0, 2), 16),
+    g: parseInt(cleanHex.slice(2, 4), 16),
+    b: parseInt(cleanHex.slice(4, 6), 16)
+  };
+}
+
+function rgbToHex({ r, g, b }) {
+  return `#${[r, g, b].map((value) => Math.max(0, Math.min(255, value)).toString(16).padStart(2, "0")).join("")}`;
+}
+
 async function copyText(value) {
   try {
     await navigator.clipboard.writeText(value);
@@ -3663,8 +4010,10 @@ async function boot() {
     else if (page === "sponsored") renderSponsored(state);
     else if (page === "sponsored-clients") renderClients(state);
     else if (page === "sponsored-hosts") renderHosts(state);
+    else if (page === "plans") renderPlans(state);
     else if (page === "motd-builder") renderMotdBuilder(state);
     else if (page === "votifier-tester") renderVotifierTester(state);
+    else if (page === "rgb-text-generator") renderRgbTextGenerator(state);
     else if (page === "login") renderLogin(state);
     else if (page === "dashboard") renderDashboard(state);
     else if (page === "admin") renderAdmin(state);

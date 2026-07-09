@@ -147,6 +147,7 @@ module.exports = async function handler(req, res) {
       const server = validateServer(body.server || {});
       const existing = db.servers.find((item) => item.id === server.id);
       if (existing && existing.ownerId !== user.id && !isAdmin(user)) throw httpError(403, "You cannot edit that listing.");
+      if (!existing) enforceServerLimit(db, user);
       ensureUniqueServerListing(db, server, existing?.id || server.id);
       const previousServerPagePath = existing ? serverStaticPagePath(existing) : "";
       const next = {
@@ -1763,8 +1764,10 @@ function sitemapXml(db) {
     { loc: siteUrl("/sponsored/"), priority: "0.7", changefreq: "weekly" },
     { loc: siteUrl("/sponsored-clients/"), priority: "0.7", changefreq: "weekly" },
     { loc: siteUrl("/sponsored-hosts/"), priority: "0.7", changefreq: "weekly" },
+    { loc: siteUrl("/sponsored/plans/"), priority: "0.7", changefreq: "monthly" },
     { loc: siteUrl("/tools/motd-builder/"), priority: "0.6", changefreq: "monthly" },
     { loc: siteUrl("/tools/votifier-tester/"), priority: "0.6", changefreq: "monthly" },
+    { loc: siteUrl("/tools/rgb-text-generator/"), priority: "0.6", changefreq: "monthly" },
     { loc: siteUrl("/help/"), priority: "0.4", changefreq: "monthly" },
     { loc: siteUrl("/contact/"), priority: "0.4", changefreq: "monthly" }
   ];
@@ -1939,9 +1942,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260701-view-sync-fix">
-    <script src="/config.js?v=20260701-view-sync-fix"></script>
-    <script src="/assets/js/app.js?v=20260701-view-sync-fix" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260709-plans-rgb">
+    <script src="/config.js?v=20260709-plans-rgb"></script>
+    <script src="/assets/js/app.js?v=20260709-plans-rgb" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">
@@ -2490,6 +2493,31 @@ function validateServer(server) {
   if (!CONFIG.countries.includes(next.country)) throw httpError(400, "Select a valid country.");
   if (isBlockedServerHost(next.javaHost) || isBlockedServerHost(next.bedrockHost)) throw httpError(400, "FalixSrv and Aternos servers are not allowed on this listing site.");
   return next;
+}
+
+function enforceServerLimit(db, user) {
+  if (!user || isAdmin(user)) return;
+  const limit = serverLimitForUser(user);
+  const owned = (db.servers || []).filter((server) => server.ownerId === user.id).length;
+  if (owned >= limit) {
+    throw httpError(403, `Your ${planConfigForUser(user).name} plan allows ${limit} server listings. Delete a listing or upgrade your plan to add another.`);
+  }
+}
+
+function planConfigForUser(user) {
+  const plans = CONFIG.plans || {};
+  const key = normalizePlanKey(user?.plan || user?.subscriptionPlan || "free");
+  return { key, ...(plans[key] || plans.free || { name: "Free", serverLimit: 2, sponsorCredits: 0, sponsorDurationDays: 0 }) };
+}
+
+function normalizePlanKey(value = "") {
+  const key = String(value || "free").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+  return CONFIG.plans?.[key] ? key : "free";
+}
+
+function serverLimitForUser(user) {
+  if (isAdmin(user)) return 999;
+  return Math.max(0, Number(planConfigForUser(user).serverLimit || 2));
 }
 
 function ensureUniqueUser(db, user, currentId = "") {
@@ -3060,10 +3088,16 @@ function userWithSessionClaims(user, session = {}) {
 
 function publicUser(user) {
   if (!user) return null;
+  const plan = planConfigForUser(user);
   return {
     id: user.id,
     username: user.username,
     email: user.email,
+    plan: plan.key,
+    planName: plan.name,
+    serverLimit: serverLimitForUser(user),
+    sponsorCredits: Number(plan.sponsorCredits || 0),
+    sponsorDurationDays: Number(plan.sponsorDurationDays || 0),
     emailOptIn: user.emailOptIn === true,
     emailVerified: user.emailVerified === true,
     emailVerificationPending: user.emailVerified !== true && !!user.emailVerification?.codeHash,

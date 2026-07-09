@@ -508,6 +508,12 @@ async function main() {
       password: "secret123"
     });
     assert(login.code === 200 && login.json.user.username.startsWith("Smoke"), "login should return the user");
+    const planReadyDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const planReadyUser = planReadyDb.users.find((item) => item.id === login.json.user.id);
+    assert(planReadyUser, "smoke user should exist before plan fixture update");
+    planReadyUser.plan = "iconic";
+    await fs.writeFile(dbPath, JSON.stringify(planReadyDb));
+    await fs.writeFile(backupPath, JSON.stringify(planReadyDb));
 
     const storageHealth = await call("health", {}, "", "GET", { host: "icon-listing.vercel.app" });
     assert(storageHealth.code === 200 && storageHealth.json.durable === false, "health should report missing durable storage in local smoke");
