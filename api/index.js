@@ -1768,6 +1768,7 @@ function sitemapXml(db) {
     { loc: siteUrl("/tools/motd-builder/"), priority: "0.6", changefreq: "monthly" },
     { loc: siteUrl("/tools/votifier-tester/"), priority: "0.6", changefreq: "monthly" },
     { loc: siteUrl("/tools/rgb-text-generator/"), priority: "0.6", changefreq: "monthly" },
+    { loc: siteUrl("/tools/fonts-generator/"), priority: "0.6", changefreq: "monthly" },
     { loc: siteUrl("/help/"), priority: "0.4", changefreq: "monthly" },
     { loc: siteUrl("/contact/"), priority: "0.4", changefreq: "monthly" }
   ];
@@ -1942,9 +1943,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260709-rgb-editor">
-    <script src="/config.js?v=20260709-rgb-editor"></script>
-    <script src="/assets/js/app.js?v=20260709-rgb-editor" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260709-fonts-rgb-input">
+    <script src="/config.js?v=20260709-fonts-rgb-input"></script>
+    <script src="/assets/js/app.js?v=20260709-fonts-rgb-input" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">

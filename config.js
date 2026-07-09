@@ -96,6 +96,11 @@ const IconListingConfig = {
         description:
           "Create RGB gradient Minecraft text for chat, ranks, MOTDs, and server messages with hex colors, formatting, preview, and copy output."
       },
+      fontsGenerator: {
+        title: "Minecraft Fonts Generator | Icon Listing",
+        description:
+          "Generate Minecraft-ready Unicode fonts including small caps, superscript, subscript, bold, italic, monospace, fullwidth, and styled text."
+      },
       votifierTester: {
         title: "Votifier Tester | NuVotifier & AzuVotifier Tool",
         description:
@@ -254,6 +259,8 @@ const IconListingConfig = {
       motdBody: "Design a two-line Minecraft server MOTD with a live in-game style preview, centering helper, and shareable URL.",
       rgbTitle: "RGB Text Generator",
       rgbBody: "Build Minecraft RGB gradient text with hex colors, formatting, live preview, and copy-ready output.",
+      fontsTitle: "Fonts Generator",
+      fontsBody: "Convert plain text into Minecraft-friendly Unicode styles, including small caps, superscript, subscript, and clean display fonts.",
       votifierTitle: "Votifier Tester",
       votifierBody: "Check Votifier, NuVotifier, or AzuVotifier settings before connecting voting to a Minecraft server listing."
     },

@@ -2066,6 +2066,85 @@ main {
   background: rgba(255, 255, 255, .03);
 }
 
+.fonts-page {
+  display: grid;
+  gap: 20px;
+}
+
+.fonts-hero .tool-icon {
+  background: linear-gradient(135deg, rgba(56, 189, 248, .85), rgba(139, 92, 246, .78));
+}
+
+.font-generator {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(56, 189, 248, .24);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(139, 92, 246, .12), rgba(56, 189, 248, .08)),
+    rgba(18, 18, 24, .72);
+}
+
+.font-generator-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 360px) auto;
+  gap: 12px;
+  align-items: end;
+  justify-content: space-between;
+}
+
+.font-generator-bar .field span,
+.font-box span {
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.font-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.font-box {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.font-textarea {
+  min-height: 300px;
+  padding: 18px;
+  resize: vertical;
+  border-color: rgba(255, 255, 255, .12);
+  background: rgba(10, 10, 14, .82);
+  font-size: 1.14rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.font-output {
+  color: #f6f7ff;
+}
+
+.font-preview {
+  min-height: 68px;
+  padding: 17px;
+  border: 1px solid rgba(139, 92, 246, .32);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(139, 92, 246, .18), rgba(56, 189, 248, .10)),
+    rgba(12, 12, 18, .88);
+  color: #fff;
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
 .button.wide {
   width: 100%;
 }
@@ -2179,6 +2258,8 @@ main {
   .plans-grid,
   .rgb-body-grid,
   .rgb-toolbar,
+  .font-editor-grid,
+  .font-generator-bar,
   .plan-strip {
     grid-template-columns: 1fr;
   }

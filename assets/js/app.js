@@ -1110,11 +1110,12 @@ function sponsoredDropdownMarkup() {
 
 function toolsDropdownMarkup() {
   return `<div class="dropdown">
-    <button class="drop-button" type="button" data-route-group="motd-builder votifier-tester rgb-text-generator">${escapeHtml(copy("nav.tools", "Tools"))} <span class="chevron" aria-hidden="true">v</span></button>
+    <button class="drop-button" type="button" data-route-group="motd-builder votifier-tester rgb-text-generator fonts-generator">${escapeHtml(copy("nav.tools", "Tools"))} <span class="chevron" aria-hidden="true">v</span></button>
     <div class="dropdown-menu tools-menu">
       ${navMenuLink("/tools/votifier-tester/", copy("tools.votifierTitle", "Votifier Tester"), "Check Votifier, NuVotifier, or AzuVotifier settings", "accent-blue")}
       ${navMenuLink("/tools/motd-builder/", copy("tools.motdTitle", "MOTD Builder"), "Build a two-line Minecraft MOTD", "accent-purple")}
       ${navMenuLink("/tools/rgb-text-generator/", copy("tools.rgbTitle", "RGB Text Generator"), "Create RGB gradient Minecraft text", "accent-pink")}
+      ${navMenuLink("/tools/fonts-generator/", copy("tools.fontsTitle", "Fonts Generator"), "Generate small caps, superscript, subscript, and styled text", "accent-cyan")}
     </div>
   </div>`;
 }
@@ -3945,6 +3946,125 @@ function rgbToHex({ r, g, b }) {
   return `#${[r, g, b].map((value) => Math.max(0, Math.min(255, value)).toString(16).padStart(2, "0")).join("")}`;
 }
 
+const FONT_GENERATOR_STYLES = [
+  { id: "small-caps", label: "Small Caps", description: "Clean compact capitals for ranks, tags, and server names." },
+  { id: "superscript", label: "Superscript", description: "Raised tiny text for suffixes and detail labels." },
+  { id: "subscript", label: "Subscript", description: "Lower tiny text for detail labels and themed names." },
+  { id: "bold", label: "Bold", description: "Heavy Unicode text for short labels." },
+  { id: "italic", label: "Italic", description: "Slanted Unicode text for names and soft announcements." },
+  { id: "monospace", label: "Monospace", description: "Even-width Unicode text for clean technical labels." },
+  { id: "fullwidth", label: "Fullwidth", description: "Wide display text for titles and announcements." },
+  { id: "plain", label: "Plain", description: "Normal text with spacing preserved." }
+];
+
+function renderFontsGenerator() {
+  setSeoMeta({
+    title: CONFIG.seo?.pages?.fontsGenerator?.title || "Minecraft Fonts Generator | Icon Listing",
+    description: CONFIG.seo?.pages?.fontsGenerator?.description || "Generate Minecraft-friendly Unicode fonts including small caps, superscript, subscript, bold, monospace, and fullwidth text.",
+    path: "/tools/fonts-generator/"
+  });
+  $("#app").innerHTML = `<div class="page fonts-page">
+    <section class="tool-hero fonts-hero">
+      <div class="tool-icon">Aa</div>
+      <div>
+        <h1 class="section-title">${escapeHtml(copy("tools.fontsTitle", "Fonts Generator"))}</h1>
+        <p class="section-copy">${escapeHtml(copy("tools.fontsBody", "Convert plain text into Minecraft-friendly Unicode styles, including small caps, superscript, subscript, and clean display fonts."))}</p>
+      </div>
+    </section>
+    <section class="font-generator">
+      <div class="font-generator-bar">
+        <label class="field">
+          <span>Font</span>
+          <select id="fontStyle" class="select">
+            ${FONT_GENERATOR_STYLES.map((style) => `<option value="${escapeHtml(style.id)}">${escapeHtml(style.label)}</option>`).join("")}
+          </select>
+        </label>
+        <button id="fontCopyOutput" class="button" type="button">Copy</button>
+      </div>
+      <div class="font-editor-grid">
+        <label class="font-box">
+          <span>Normal text</span>
+          <textarea id="fontInput" class="textarea font-textarea" placeholder="Normal text goes here...">Iconic</textarea>
+        </label>
+        <label class="font-box">
+          <span>Generated text</span>
+          <textarea id="fontOutput" class="textarea font-textarea font-output" readonly placeholder="Generated text will appear here..."></textarea>
+        </label>
+      </div>
+      <div id="fontPreview" class="font-preview" aria-live="polite"></div>
+      <div id="fontDescription" class="fine-print"></div>
+    </section>
+  </div>`;
+  bindFontsGenerator();
+}
+
+function bindFontsGenerator() {
+  $("#fontInput")?.addEventListener("input", updateFontsGenerator);
+  $("#fontStyle")?.addEventListener("change", updateFontsGenerator);
+  $("#fontCopyOutput")?.addEventListener("click", async () => {
+    await copyText($("#fontOutput")?.value || "");
+    toast("Generated font copied.");
+  });
+  updateFontsGenerator();
+}
+
+function updateFontsGenerator() {
+  const input = $("#fontInput")?.value || "";
+  const style = $("#fontStyle")?.value || "small-caps";
+  const output = transformFontText(input, style);
+  const definition = FONT_GENERATOR_STYLES.find((item) => item.id === style) || FONT_GENERATOR_STYLES[0];
+  if ($("#fontOutput")) $("#fontOutput").value = output;
+  if ($("#fontPreview")) $("#fontPreview").textContent = output || "Generated text preview";
+  if ($("#fontDescription")) $("#fontDescription").textContent = definition.description;
+}
+
+function transformFontText(value = "", style = "small-caps") {
+  if (style === "small-caps") return mapByTable(value, SMALL_CAPS_MAP, { lowerFallback: true });
+  if (style === "superscript") return mapByTable(value, SUPERSCRIPT_MAP, { lowerFallback: false });
+  if (style === "subscript") return mapByTable(value, SUBSCRIPT_MAP, { lowerFallback: false });
+  if (style === "bold") return mapMathRange(value, { upper: 0x1D400, lower: 0x1D41A, digit: 0x1D7CE });
+  if (style === "italic") return mapMathRange(value, { upper: 0x1D434, lower: 0x1D44E, exceptions: { h: "ℎ" } });
+  if (style === "monospace") return mapMathRange(value, { upper: 0x1D670, lower: 0x1D68A, digit: 0x1D7F6 });
+  if (style === "fullwidth") return [...value].map((char) => {
+    const code = char.codePointAt(0);
+    if (char === " ") return " ";
+    if (code >= 33 && code <= 126) return String.fromCodePoint(code + 0xFEE0);
+    return char;
+  }).join("");
+  return value;
+}
+
+function mapMathRange(value = "", ranges = {}) {
+  return [...value].map((char) => {
+    if (ranges.exceptions?.[char]) return ranges.exceptions[char];
+    const code = char.codePointAt(0);
+    if (ranges.upper && code >= 65 && code <= 90) return String.fromCodePoint(ranges.upper + code - 65);
+    if (ranges.lower && code >= 97 && code <= 122) return String.fromCodePoint(ranges.lower + code - 97);
+    if (ranges.digit && code >= 48 && code <= 57) return String.fromCodePoint(ranges.digit + code - 48);
+    return char;
+  }).join("");
+}
+
+function mapByTable(value = "", table = {}, options = {}) {
+  return [...value].map((char) => table[char] || (options.lowerFallback ? table[char.toLowerCase()] : "") || char).join("");
+}
+
+const SMALL_CAPS_MAP = {
+  a: "ᴀ", b: "ʙ", c: "ᴄ", d: "ᴅ", e: "ᴇ", f: "ꜰ", g: "ɢ", h: "ʜ", i: "ɪ", j: "ᴊ", k: "ᴋ", l: "ʟ", m: "ᴍ",
+  n: "ɴ", o: "ᴏ", p: "ᴘ", q: "ǫ", r: "ʀ", s: "ꜱ", t: "ᴛ", u: "ᴜ", v: "ᴠ", w: "ᴡ", x: "x", y: "ʏ", z: "ᴢ"
+};
+
+const SUPERSCRIPT_MAP = {
+  A: "ᴬ", B: "ᴮ", D: "ᴰ", E: "ᴱ", G: "ᴳ", H: "ᴴ", I: "ᴵ", J: "ᴶ", K: "ᴷ", L: "ᴸ", M: "ᴹ", N: "ᴺ", O: "ᴼ", P: "ᴾ", R: "ᴿ", T: "ᵀ", U: "ᵁ", V: "ⱽ", W: "ᵂ",
+  a: "ᵃ", b: "ᵇ", c: "ᶜ", d: "ᵈ", e: "ᵉ", f: "ᶠ", g: "ᵍ", h: "ʰ", i: "ᶦ", j: "ʲ", k: "ᵏ", l: "ˡ", m: "ᵐ", n: "ⁿ", o: "ᵒ", p: "ᵖ", r: "ʳ", s: "ˢ", t: "ᵗ", u: "ᵘ", v: "ᵛ", w: "ʷ", x: "ˣ", y: "ʸ", z: "ᶻ",
+  0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹", "+": "⁺", "-": "⁻", "=": "⁼", "(": "⁽", ")": "⁾"
+};
+
+const SUBSCRIPT_MAP = {
+  a: "ₐ", e: "ₑ", h: "ₕ", i: "ᵢ", j: "ⱼ", k: "ₖ", l: "ₗ", m: "ₘ", n: "ₙ", o: "ₒ", p: "ₚ", r: "ᵣ", s: "ₛ", t: "ₜ", u: "ᵤ", v: "ᵥ", x: "ₓ",
+  0: "₀", 1: "₁", 2: "₂", 3: "₃", 4: "₄", 5: "₅", 6: "₆", 7: "₇", 8: "₈", 9: "₉", "+": "₊", "-": "₋", "=": "₌", "(": "₍", ")": "₎"
+};
+
 async function copyText(value) {
   try {
     await navigator.clipboard.writeText(value);
@@ -4076,6 +4196,7 @@ async function boot() {
     else if (page === "motd-builder") renderMotdBuilder(state);
     else if (page === "votifier-tester") renderVotifierTester(state);
     else if (page === "rgb-text-generator") renderRgbTextGenerator(state);
+    else if (page === "fonts-generator") renderFontsGenerator(state);
     else if (page === "login") renderLogin(state);
     else if (page === "dashboard") renderDashboard(state);
     else if (page === "admin") renderAdmin(state);
