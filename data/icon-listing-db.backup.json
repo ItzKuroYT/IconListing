@@ -1213,11 +1213,11 @@
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 95.28985507246377,
+      "uptimePercent": 95.30685920577618,
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
-      "updatedAt": "2026-06-28T05:53:12.589Z",
-      "lastPingAt": "2026-07-09T07:57:24.407Z",
+      "updatedAt": "2026-07-09T07:59:28.615Z",
+      "lastPingAt": "2026-07-09T07:59:30.027Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -1505,16 +1505,16 @@
             "online": true
           },
           {
-            "createdAt": "2026-07-09T07:57:24.407Z",
+            "createdAt": "2026-07-09T07:59:30.027Z",
             "playersOnline": 6,
             "playersMax": 500,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-07-09T07:57:24.407Z",
-      "uptimeChecks": 276,
-      "uptimeSuccesses": 263,
+      "lastSuccessfulPingAt": "2026-07-09T07:59:30.027Z",
+      "uptimeChecks": 277,
+      "uptimeSuccesses": 264,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
