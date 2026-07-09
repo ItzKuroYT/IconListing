@@ -2646,8 +2646,17 @@
       "javaStatusTarget": "play.coffercraft.com",
       "javaSrvResolved": true,
       "analytics": {
-        "ipCopyDaily": [],
-        "ipCopyVisitorDays": {},
+        "ipCopyDaily": [
+          {
+            "date": "2026-07-09",
+            "count": 1
+          }
+        ],
+        "ipCopyVisitorDays": {
+          "2026-07-09": [
+            "b3f1f36fca325bb9"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-07-07T13:08:06.307Z",
