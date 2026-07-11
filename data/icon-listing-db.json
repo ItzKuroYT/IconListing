@@ -2975,7 +2975,23 @@
       "updatedAt": "2026-06-24T23:06:21.714Z"
     }
   ],
-  "hosts": [],
+  "hosts": [
+    {
+      "id": "22aaba5e-1eb5-48d2-8616-55aa1cd6a0b7",
+      "name": "PulsedMC",
+      "url": "https://pulsedmc.net",
+      "youtubeUrl": "",
+      "description": "Minecraft Server Hosting\nYour server, your way.\n\nLaunch a Minecraft server in minutes. Choose a plan, we'll handle the setup, and you're ready to play. Manage everything from your browser—console, files, plugins, mods, and backups. No command line required.\n\nManage from anywhere.\n\nControl your server from any device with an intuitive web panel.\n\nLive console\nFile manager\nPlugin & mod support\nOne-click backups\nFull configuration access\n\nNo SSH. No terminal. Just complete control.\n\nGet online in minutes\n1. Choose a plan\n\nStart with our free plan or upgrade anytime. No credit card required to get started.\n\n2. We handle the setup\n\nWe'll configure your panel account and deploy your Minecraft server. Most servers are ready the same day.\n\n3. Start playing\n\nInvite your friends, install plugins or mods, customize your world, and manage everything from your browser.\n\nOr, if you want it to sound more like premium hosting companies (such as Apex, Bisect, or PebbleHost), you could use:\n\nMinecraft Server Hosting\nEverything you need to host Minecraft.\n\nDeploy your server in minutes with an easy-to-use control panel. We take care of the setup so you can focus on playing.\n\n✔ Browser-based management\nControl your console, files, plugins, mods, and backups from anywhere.\n\n✔ Fast deployment\nChoose a plan and we'll have your server ready as quickly as possible.\n\n✔ Full control\nCustomize every aspect of your server without touching the command line.\n\nHow it works\n\nChoose your plan\nStart free or select the resources you need. No credit card required for the free plan.\n\nWe deploy your server\nYour panel account and Minecraft server are configured for you.\n\nPlay together\nJoin instantly, invite friends, and manage your server from any browser.",
+      "images": [
+        "https://imgur.com/a/rtTG9h6",
+        "https://imgur.com/a/ljQw4g9",
+        "https://imgur.com/a/yUnEeYt"
+      ],
+      "pricing": "paid",
+      "createdAt": "2026-07-11T01:04:47.824Z",
+      "updatedAt": "2026-07-11T01:04:47.824Z"
+    }
+  ],
   "votes": [
     {
       "id": "c6873b08-998c-45e8-9095-66447d8e5e20",
