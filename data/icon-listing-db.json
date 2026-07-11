@@ -3296,7 +3296,7 @@
       ],
       "ownerId": "d2a54f0d-c666-41b4-9c0e-0015963ddb21",
       "ownerName": "benjaminvorm",
-      "votes": 1,
+      "votes": 2,
       "playersOnline": 3,
       "playersMax": 50,
       "version": "forge arclight/Trials 1.20.1",
@@ -3457,6 +3457,12 @@
       "serverId": "f08ab5db-3b64-4766-bdf1-f1948c85be3b",
       "minecraftUsername": "precision033",
       "createdAt": "2026-07-11T16:59:54.216Z"
+    },
+    {
+      "id": "1b2b7718-34e7-48e8-a9c5-7ed8cdc26009",
+      "serverId": "f08ab5db-3b64-4766-bdf1-f1948c85be3b",
+      "minecraftUsername": "MijiKim",
+      "createdAt": "2026-07-11T17:11:19.411Z"
     }
   ],
   "voteIps": {
@@ -3466,7 +3472,9 @@
     },
     "f08ab5db-3b64-4766-bdf1-f1948c85be3b": {
       "visitor:356b9d796e224d08a8709c2b3ed2c33c2180a5e85b13bb556e0397f91e77d3da": "2026-07-11T16:59:54.216Z",
-      "name:precision033": "2026-07-11T16:59:54.216Z"
+      "name:precision033": "2026-07-11T16:59:54.216Z",
+      "visitor:ada7cfa6c332ccd821b74b704a6b17cb92ae3a7deb9f8756ce67e02bc0d49ec5": "2026-07-11T17:11:19.411Z",
+      "name:mijikim": "2026-07-11T17:11:19.411Z"
     }
   },
   "deleted": {
