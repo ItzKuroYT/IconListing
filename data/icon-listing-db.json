@@ -142,10 +142,11 @@
       "emailOptIn": false,
       "emailOptInAt": "",
       "emailVerified": true,
-      "emailVerifiedAt": "2026-07-11T01:26:43.764Z",
+      "emailVerifiedAt": "2026-07-11T01:26:49.715Z",
       "termsAcceptedAt": "2026-07-11T01:26:16.195Z",
       "banned": false,
-      "createdAt": "2026-07-11T01:26:16.195Z"
+      "createdAt": "2026-07-11T01:26:16.195Z",
+      "fromVerifiedSession": true
     }
   ],
   "servers": [
