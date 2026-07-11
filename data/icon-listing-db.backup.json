@@ -3004,7 +3004,7 @@
       ],
       "ownerId": "5c4b4184-7b9f-4773-8a99-e7c31feae416",
       "ownerName": "est93",
-      "votes": 0,
+      "votes": 1,
       "playersOnline": 2,
       "playersMax": 69,
       "version": "BungeeCord 1.8.x-26.1.x",
@@ -3153,9 +3153,20 @@
       "serverId": "4bb119bc-7c4e-4815-88e7-9b4afbb8c379",
       "minecraftUsername": "AnderEv54",
       "createdAt": "2026-07-09T21:43:16.063Z"
+    },
+    {
+      "id": "7e8a0a86-b4ac-4293-aa13-1ae0719431b6",
+      "serverId": "2923c780-368e-47b5-aac4-69da5d5fdb96",
+      "minecraftUsername": "est93",
+      "createdAt": "2026-07-11T01:37:46.435Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "2923c780-368e-47b5-aac4-69da5d5fdb96": {
+      "visitor:17f9b5a675a0e2173fc0de16bad9fc096dd335aab18dbba47337153216a68c2b": "2026-07-11T01:37:46.435Z",
+      "name:est93": "2026-07-11T01:37:46.435Z"
+    }
+  },
   "deleted": {
     "users": {
       "e7f69622-09e1-4b86-af3c-b90fff23b3ca": "2026-06-29T22:53:42.842Z"
