@@ -147,6 +147,25 @@
       "banned": false,
       "createdAt": "2026-07-11T01:26:16.195Z",
       "fromVerifiedSession": true
+    },
+    {
+      "id": "e99da348-7dc1-4113-84aa-031a6fbefaa5",
+      "username": "KBNSpace",
+      "email": "kbnspace@gmail.com",
+      "passwordHash": "8a11eeaf0901a2ed97c62819079cb433:0de9eb5797374568b7a3494c4658e71a45f690f2ec605dac7952ebc1df659d58",
+      "emailOptIn": true,
+      "emailOptInAt": "2026-07-11T05:17:16.380Z",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-07-11T05:17:16.380Z",
+      "banned": false,
+      "createdAt": "2026-07-11T05:17:16.380Z",
+      "emailVerification": {
+        "codeHash": "c223416c34b54d5b602658bdd0200d841a020f1dcd6b38798075d03a7b5dcdfb",
+        "createdAt": "2026-07-11T05:17:16.380Z",
+        "expiresAt": "2026-07-11T05:32:16.380Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
