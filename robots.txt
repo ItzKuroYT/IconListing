@@ -3,4 +3,3 @@ Allow: /
 Disallow: /data/
 
 Sitemap: https://minecraft-listing.iconrealms.net/sitemap.xml
-Sitemap: https://icon-listing.vercel.app/sitemap.xml

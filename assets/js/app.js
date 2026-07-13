@@ -214,7 +214,7 @@ function googleStartUrl() {
 }
 
 function productionApiMessage() {
-  return "This action is temporarily unavailable. Error: 67.";
+  return "This action could not be completed right now. Please try again.";
 }
 
 function networkApiMessage() {
@@ -226,9 +226,13 @@ function isNetworkAbort(error) {
   return error?.name === "AbortError" || message.includes("signal is aborted") || message.includes("aborted without reason") || message.includes("failed to fetch") || message.includes("networkerror");
 }
 
+function isInternalApiMessage(value = "") {
+  return /error\s*:?\s*67|shared storage|permanent storage|temporarily unavailable/i.test(String(value || ""));
+}
+
 function publicApiMessage(action, status) {
   if (action === "vote" && status === 429) return "You can only vote once every 24 hours.";
-  if (action === "vote") return "Vote could not be counted. Error: 67.";
+  if (action === "vote") return "Vote could not be counted. Please try again.";
   if (status === 401) return "Log in again before doing that.";
   if (status === 403) return "You do not have permission to do that.";
   if (status === 404 && ["deleteServer", "trackCopy"].includes(action)) return "That listing could not be found.";
@@ -238,7 +242,9 @@ function publicApiMessage(action, status) {
 
 function publicRequestError(action, error) {
   if (action === "vote" && error?.status === 429) return "You can only vote once every 24 hours.";
-  if (action === "vote") return error?.publicMessage || "Vote could not be counted. Error: 67.";
+  if (action === "vote") return error?.publicMessage || "Vote could not be counted. Please try again.";
+  if ([401, 403, 404, 409].includes(Number(error?.status))) return publicApiMessage(action, Number(error.status));
+  if (Number(error?.status) >= 500 || isInternalApiMessage(error?.message) || isInternalApiMessage(error?.publicMessage)) return productionApiMessage();
   if (isNetworkAbort(error) || isNetworkAbort(error?.originalError)) return networkApiMessage();
   return error?.publicMessage || error?.message || productionApiMessage();
 }
@@ -284,7 +290,7 @@ async function request(action, payload = {}, method = "POST") {
           try {
             json = await response.json();
           } catch {
-            const error = new Error(response.ok ? "The site service returned an unreadable response. Error: 67." : publicApiMessage(action, response.status));
+            const error = new Error(response.ok ? "The site service returned an unreadable response. Please try again." : publicApiMessage(action, response.status));
             error.status = response.status;
             const contentType = response.headers.get("content-type") || "";
             error.stopRetry = response.status >= 400 && response.status < 500 && contentType.includes("application/json");
@@ -938,7 +944,7 @@ function consumeGoogleAuthHash() {
     store.session = { token, user: null };
     return { ok: true, message: "Signed in with Google." };
   }
-  return { ok: false, message: error || "Google sign-in failed. Error: 67." };
+  return { ok: false, message: isInternalApiMessage(error) ? "Google sign-in could not be completed right now. Please try again." : (error || "Google sign-in could not be completed right now. Please try again.") };
 }
 
 function scheduleNetworkRefresh(error) {
@@ -4177,35 +4183,74 @@ function policySectionMarkup(section = {}) {
   </section>`;
 }
 
+function publicBootState() {
+  return {
+    user: store.session?.user || null,
+    users: [],
+    servers: [],
+    clients: [],
+    hosts: [],
+    votes: [],
+    apiHydrating: true
+  };
+}
+
+function pageCanRenderBeforeApi(page) {
+  return !["server", "vote", "dashboard", "admin"].includes(page);
+}
+
+function renderCurrentPage(page, state) {
+  if (page === "home") renderHome(state);
+  else if (page === "servers") renderServers(state);
+  else if (page === "server") renderServerDetail(state);
+  else if (page === "vote") renderVotePage(state);
+  else if (page === "sponsored") renderSponsored(state);
+  else if (page === "sponsored-clients") renderClients(state);
+  else if (page === "sponsored-hosts") renderHosts(state);
+  else if (page === "plans") renderPlans(state);
+  else if (page === "motd-builder") renderMotdBuilder(state);
+  else if (page === "votifier-tester") renderVotifierTester(state);
+  else if (page === "rgb-text-generator") renderRgbTextGenerator(state);
+  else if (page === "fonts-generator") renderFontsGenerator(state);
+  else if (page === "login") renderLogin(state);
+  else if (page === "dashboard") renderDashboard(state);
+  else if (page === "admin") renderAdmin(state);
+  else renderStatic(page);
+}
+
+function showBootFailure(page, error, seoFallbackHtml = "") {
+  if (page === "server" && seoFallbackHtml) {
+    $("#app").innerHTML = seoFallbackHtml;
+    return;
+  }
+  if (pageCanRenderBeforeApi(page)) {
+    console.warn("Icon Listing state refresh failed", error);
+    return;
+  }
+  const refreshing = scheduleNetworkRefresh(error);
+  const message = refreshing ? networkApiMessage() : publicRequestError("state", error);
+  $("#app").innerHTML = `<div class="page"><div class="notice">${escapeHtml(message)}</div></div>`;
+}
+
 async function boot() {
   clearLegacyLocalOverlays();
   const googleAuthResult = consumeGoogleAuthHash();
+  const page = document.body.dataset.page || "home";
+  const seoFallbackHtml = $(".seo-fallback")?.outerHTML || "";
   if (!$("#app")) renderLayout();
+  syncAuthUi(store.session?.user || null);
+  if (pageCanRenderBeforeApi(page)) {
+    renderCurrentPage(page, publicBootState());
+  } else if (page === "server" && seoFallbackHtml) {
+    $("#app").innerHTML = seoFallbackHtml;
+  }
   try {
     const state = await getState();
     syncAuthUi(state.user);
-    const page = document.body.dataset.page || "home";
-    if (page === "home") renderHome(state);
-    else if (page === "servers") renderServers(state);
-    else if (page === "server") renderServerDetail(state);
-    else if (page === "vote") renderVotePage(state);
-    else if (page === "sponsored") renderSponsored(state);
-    else if (page === "sponsored-clients") renderClients(state);
-    else if (page === "sponsored-hosts") renderHosts(state);
-    else if (page === "plans") renderPlans(state);
-    else if (page === "motd-builder") renderMotdBuilder(state);
-    else if (page === "votifier-tester") renderVotifierTester(state);
-    else if (page === "rgb-text-generator") renderRgbTextGenerator(state);
-    else if (page === "fonts-generator") renderFontsGenerator(state);
-    else if (page === "login") renderLogin(state);
-    else if (page === "dashboard") renderDashboard(state);
-    else if (page === "admin") renderAdmin(state);
-    else renderStatic(page);
+    renderCurrentPage(page, state);
     if (googleAuthResult?.message) toast(googleAuthResult.message);
   } catch (error) {
-    const refreshing = scheduleNetworkRefresh(error);
-    const message = refreshing ? networkApiMessage() : publicRequestError("state", error);
-    $("#app").innerHTML = `<div class="page"><div class="notice">${escapeHtml(message)}</div></div>`;
+    showBootFailure(page, error, seoFallbackHtml);
   }
 }
 
