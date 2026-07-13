@@ -1232,6 +1232,7 @@ async function main() {
     assert(serverPage.code === 200 && serverPage.headers["Content-Type"]?.includes("text/html"), "slug server page should return HTML");
     assert(serverPage.body.includes(`${saved.json.server.name} Minecraft Server`), "slug server page should include a server-specific title");
     assert(serverPage.body.includes(`<meta property="og:image"`), "slug server page should include share image metadata");
+    assert(serverPage.body.includes("Server IP") && serverPage.body.includes(`Vote for ${saved.json.server.name}`), "slug server page should include real server details before JavaScript hydrates");
 
     const finalState = await call("state", {}, "", "GET");
     const server = finalState.json.servers.find((item) => item.id === saved.json.server.id);

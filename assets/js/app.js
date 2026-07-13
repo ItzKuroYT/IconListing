@@ -4294,9 +4294,17 @@ function renderCurrentPage(page, state) {
 }
 
 function showBootFailure(page, error, seoFallbackHtml = "") {
-  if (page === "server" && seoFallbackHtml) {
-    $("#app").innerHTML = seoFallbackHtml;
-    return;
+  if (page === "server") {
+    const cachedState = publicBootState();
+    if (findServerFromLocation(cachedState.servers)) {
+      renderServerDetail(cachedState);
+      return;
+    }
+    if (!isNetworkAbort(error) && !isNetworkAbort(error?.originalError)) console.warn("Icon Listing server detail refresh failed", error);
+    if (seoFallbackHtml) {
+      $("#app").innerHTML = seoFallbackHtml;
+      return;
+    }
   }
   if (pageCanRenderBeforeApi(page)) {
     console.warn("Icon Listing state refresh failed", error);
@@ -4317,11 +4325,15 @@ async function boot() {
   syncAuthUi(store.session?.user || null);
   if (pageCanRenderBeforeApi(page)) {
     renderCurrentPage(page, publicBootState());
-    loadPublicSnapshotState().then((snapshotState) => {
-      if (!liveStateRendered && snapshotState) renderCurrentPage(page, snapshotState);
-    });
   } else if (page === "server" && seoFallbackHtml) {
     $("#app").innerHTML = seoFallbackHtml;
+  }
+  if (pageCanRenderBeforeApi(page) || page === "server") {
+    loadPublicSnapshotState().then((snapshotState) => {
+      if (liveStateRendered || !snapshotState) return;
+      if (page === "server" && !findServerFromLocation(snapshotState.servers)) return;
+      renderCurrentPage(page, snapshotState);
+    });
   }
   try {
     const state = await getState();

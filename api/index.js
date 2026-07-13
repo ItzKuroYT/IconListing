@@ -1869,8 +1869,54 @@ function serverPageHtmlForServer(server) {
     type: "article",
     jsonLd,
     bodyTitle: server.name,
-    bodyCopy: description
+    bodyCopy: description,
+    bodyHtml: serverStaticFallbackMarkup(server)
   });
+}
+
+function serverStaticFallbackMarkup(server) {
+  const address = publicServerAddress(server);
+  const bedrockAddress = server.crossPlay || (server.edition === "bedrock" && server.bedrockType !== "realm")
+    ? hostPortDisplay(server.bedrockHost, server.bedrockPort, CONFIG.defaults.bedrockPort)
+    : "";
+  const tags = (server.tags || []).filter(Boolean);
+  const description = escapeHtml(server.description || serverSeoDescription(server)).replace(/\r?\n/g, "<br>");
+  const links = [
+    server.websiteUrl ? `<a class="button" href="${escapeHtmlAttr(server.websiteUrl)}">Website</a>` : "",
+    server.discordUrl ? `<a class="button" href="${escapeHtmlAttr(server.discordUrl)}">Discord</a>` : "",
+    server.youtubeUrl ? `<a class="button" href="${escapeHtmlAttr(server.youtubeUrl)}">Trailer</a>` : ""
+  ].filter(Boolean).join("");
+  return `<section class="section static-server-detail">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Minecraft server listing</p>
+            <h1 class="section-title">${escapeHtml(server.name)}</h1>
+            <p class="section-copy">${escapeHtml(serverSeoDescription(server))}</p>
+          </div>
+          <a class="button primary" href="${escapeHtmlAttr(`/vote/?server=${encodeURIComponent(server.id)}`)}">Vote for ${escapeHtml(server.name)}</a>
+        </div>
+        <div class="grid two">
+          <div class="info-panel">
+            ${staticInfoRow("Status", `<span class="status inline"><span class="dot ${server.online ? "online" : ""}"></span>${server.online ? "Online" : "Offline"}</span>`)}
+            ${staticInfoRow(server.edition === "bedrock" && server.bedrockType === "realm" ? "Realm Code" : "Server IP", escapeHtml(address || "Not listed"))}
+            ${bedrockAddress && bedrockAddress !== address ? staticInfoRow("Bedrock IP", escapeHtml(bedrockAddress)) : ""}
+            ${staticInfoRow("Players", `${Number(server.playersOnline || 0).toLocaleString()}${server.playersMax ? `/${Number(server.playersMax).toLocaleString()}` : ""}`)}
+            ${staticInfoRow("Votes", Number(server.votes || 0).toLocaleString())}
+            ${staticInfoRow("Rank", `#${server.rank || "-"}`)}
+            ${staticInfoRow("Version", escapeHtml(server.version || "Unknown"))}
+          </div>
+          <div class="detail-card">
+            <h2 class="detail-heading">About ${escapeHtml(server.name)}</h2>
+            <div class="description-text">${description}</div>
+            <div class="server-tags">${tags.map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>
+            ${links ? `<div class="row-actions">${links}</div>` : ""}
+          </div>
+        </div>
+      </section>`;
+}
+
+function staticInfoRow(label, value) {
+  return `<div class="info-row"><strong>${escapeHtml(label)}</strong><span>${value}</span></div>`;
 }
 
 function serverNotFoundHtml() {
@@ -1968,7 +2014,7 @@ async function syncServerStaticPages(db, options = {}) {
   }
 }
 
-function appHtml({ title, description, canonical, image, type = "website", jsonLd = null, bodyTitle = "Icon Listing", bodyCopy = "" }) {
+function appHtml({ title, description, canonical, image, type = "website", jsonLd = null, bodyTitle = "Icon Listing", bodyCopy = "", bodyHtml = "" }) {
   const safeTitle = escapeHtmlAttr(trimSeo(title, 59));
   const safeDescription = escapeHtmlAttr(trimSeo(description, 158));
   const safeCanonical = escapeHtmlAttr(canonical);
@@ -1995,16 +2041,16 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260713-admin-sponsor-sync">
-    <script src="/config.js?v=20260713-admin-sponsor-sync"></script>
-    <script src="/assets/js/app.js?v=20260713-admin-sponsor-sync" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260713-server-detail-snapshot">
+    <script src="/config.js?v=20260713-server-detail-snapshot"></script>
+    <script src="/assets/js/app.js?v=20260713-server-detail-snapshot" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">
-      <section class="section">
+      ${bodyHtml || `<section class="section">
         <h1 class="section-title">${escapeHtml(bodyTitle)}</h1>
         <p class="section-copy">${escapeHtml(bodyCopy)}</p>
-      </section>
+      </section>`}
     </main>
   </body>
 </html>`;
