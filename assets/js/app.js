@@ -3231,6 +3231,7 @@ function renderAdmin(state) {
       setButtonLoading(button, "Saving...");
       const result = await request("admin", { command: button.dataset.admin, value: { id: button.dataset.id } });
       state = result.servers ? { ...state, ...result, votes: result.votes || state.votes || [] } : { ...state, users: result.users || state.users };
+      if (result.servers) cachePublicState(result);
       toast("Admin change saved.");
       renderAdmin(state);
     } catch (error) {
@@ -3398,7 +3399,7 @@ function bindAdminClientForms(state) {
   $("#clientForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
-      await request("admin", {
+      const result = await request("admin", {
         command: "saveClient",
         value: {
           id: $("#clientId").value,
@@ -3411,6 +3412,7 @@ function bindAdminClientForms(state) {
           pricing: $("#clientPricing").value
         }
       });
+      cachePublicState(result);
       toast("Sponsored client saved.");
       boot();
     } catch (error) {
@@ -3429,7 +3431,8 @@ function bindAdminClientForms(state) {
   $$("[data-client-delete]").forEach((button) => button.addEventListener("click", async () => {
     if (!confirm("Delete this sponsored client listing?")) return;
     try {
-      await request("admin", { command: "deleteClient", value: { id: button.dataset.clientDelete } });
+      const result = await request("admin", { command: "deleteClient", value: { id: button.dataset.clientDelete } });
+      cachePublicState(result);
       toast("Sponsored client deleted.");
       boot();
     } catch (error) {
@@ -3477,7 +3480,7 @@ function bindAdminHostForms(state) {
   $("#hostForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
-      await request("admin", {
+      const result = await request("admin", {
         command: "saveHost",
         value: {
           id: $("#hostId").value,
@@ -3488,6 +3491,7 @@ function bindAdminHostForms(state) {
           images: [$("#hostImage1").value, $("#hostImage2").value, $("#hostImage3").value].filter(Boolean)
         }
       });
+      cachePublicState(result);
       toast("Sponsored host saved.");
       boot();
     } catch (error) {
@@ -3506,7 +3510,8 @@ function bindAdminHostForms(state) {
   $$("[data-host-delete]").forEach((button) => button.addEventListener("click", async () => {
     if (!confirm("Delete this sponsored host listing?")) return;
     try {
-      await request("admin", { command: "deleteHost", value: { id: button.dataset.hostDelete } });
+      const result = await request("admin", { command: "deleteHost", value: { id: button.dataset.hostDelete } });
+      cachePublicState(result);
       toast("Sponsored host deleted.");
       boot();
     } catch (error) {

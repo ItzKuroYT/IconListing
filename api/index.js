@@ -9,6 +9,7 @@ const CONFIG = require("../config.js");
 const TMP_DB = process.env.ICON_LISTING_DB_PATH || path.join(os.tmpdir(), "icon-listing-db.json");
 const TMP_DB_BACKUP = process.env.ICON_LISTING_DB_BACKUP_PATH || `${TMP_DB}.backup.json`;
 const RECOVERY_DB_PATH = process.env.ICON_LISTING_RECOVERY_DB_PATH || path.join(__dirname, "..", "data", "icon-listing-db.json");
+const PUBLIC_STATE_PATH = "data/public-state.json";
 const SESSION_SECRET = process.env.SESSION_SECRET || "replace-this-secret-in-vercel";
 const PING_TTL_MS = 5 * 60 * 1000;
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
@@ -441,12 +442,18 @@ module.exports = async function handler(req, res) {
         markDeleted(db, "hosts", [id]);
         saveOptions.deletedHosts = [id];
       }
-      await saveDb(db, saveOptions);
-      await safeSyncServerStaticPages(db, {
+      const persistedDb = await saveDb(db, saveOptions);
+      await safeSyncServerStaticPages(persistedDb, {
         writeServerIds: saveOptions.touchedServers || [],
-        deletePagePaths: deletedServerPagePaths
+        deletePagePaths: deletedServerPagePaths,
+        syncPublicState: !!(
+          saveOptions.touchedClients?.length ||
+          saveOptions.deletedClients?.length ||
+          saveOptions.touchedHosts?.length ||
+          saveOptions.deletedHosts?.length
+        )
       });
-      return json(res, 200, writePayload({ ...statePayload(db, user), users: db.users.map(publicUser) }));
+      return json(res, 200, writePayload({ ...statePayload(persistedDb, user), users: persistedDb.users.map(publicUser) }));
     }
 
     throw httpError(404, "Unknown action.");
@@ -1716,6 +1723,10 @@ function publicSnapshotPayload(db) {
   };
 }
 
+function publicSnapshotJson(db) {
+  return JSON.stringify(publicSnapshotPayload(db), null, 2);
+}
+
 function publicSnapshotServer(server) {
   const allowed = [
     "id", "name", "javaHost", "javaPort", "javaSrvResolved", "javaStatusTarget", "crossPlay",
@@ -1950,7 +1961,8 @@ async function syncServerStaticPages(db, options = {}) {
   for (const filePath of deletePagePaths) {
     await deleteGithubFile(filePath, `Delete server page ${filePath}`);
   }
-  if (entries.length || deletePagePaths.length) {
+  if (entries.length || deletePagePaths.length || options.syncPublicState) {
+    await writeGithubTextFile(PUBLIC_STATE_PATH, publicSnapshotJson(db), "Update Icon Listing public snapshot");
     await writeGithubTextFile("404.html", fallback404Html(), "Update Icon Listing route fallback");
     await writeGithubTextFile("sitemap.xml", sitemapXml(db), "Update Icon Listing sitemap");
   }
@@ -1983,9 +1995,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260713-public-state-home">
-    <script src="/config.js?v=20260713-public-state-home"></script>
-    <script src="/assets/js/app.js?v=20260713-public-state-home" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260713-admin-sponsor-sync">
+    <script src="/config.js?v=20260713-admin-sponsor-sync"></script>
+    <script src="/assets/js/app.js?v=20260713-admin-sponsor-sync" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">

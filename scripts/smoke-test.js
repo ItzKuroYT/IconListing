@@ -409,14 +409,16 @@ async function main() {
     process.env.GITHUB_BRANCH = "main";
     process.env.GITHUB_DB_PATH = githubSyncMainPath;
     process.env.GITHUB_DB_BACKUP_PATH = githubSyncBackupPath;
+    const githubSyncPublicStatePath = "data/public-state.json";
+    const githubSyncAdminUser = { ...registeredUser, username: "ItzKuroYT" };
     const githubSyncInitialDb = {
       version: 2,
-      users: [registeredUser],
+      users: [githubSyncAdminUser],
       servers: [
         {
           id: `github-refresh-${suffix}`,
-          ownerId: registeredUser.id,
-          ownerName: registeredUser.username,
+          ownerId: githubSyncAdminUser.id,
+          ownerName: githubSyncAdminUser.username,
           name: `GitHub Refresh Fixture ${suffix}`,
           javaHost: `github-refresh-${suffix}.example.org`,
           javaPort: 25565,
@@ -476,6 +478,14 @@ async function main() {
     );
     assert(githubSaved.code === 200 && githubSaved.json.server.id, "GitHub-backed server save should succeed");
     assert(githubSyncFiles.has(githubSyncBackupPath), "GitHub-backed save should write a backup snapshot");
+    assert(githubSyncFiles.has(githubSyncPublicStatePath), "GitHub-backed server save should update the public listing snapshot");
+    const githubPublicStateAfterSave = JSON.parse(Buffer.from(githubSyncFiles.get(githubSyncPublicStatePath), "base64").toString("utf8"));
+    assert(githubPublicStateAfterSave.servers.some((item) => item.id === githubSaved.json.server.id), "public listing snapshot should include newly saved GitHub-backed servers");
+    assert(!JSON.stringify(githubPublicStateAfterSave).includes("passwordHash"), "public listing snapshot should not include private user fields");
+    const githubSponsor = await call("admin", { command: "toggleSponsor", value: { id: githubSaved.json.server.id } }, verifiedToken);
+    assert(githubSponsor.code === 200 && githubSponsor.json.servers.find((item) => item.id === githubSaved.json.server.id)?.sponsored === true, "GitHub-backed admin sponsor toggles should succeed");
+    const githubPublicStateAfterSponsor = JSON.parse(Buffer.from(githubSyncFiles.get(githubSyncPublicStatePath), "base64").toString("utf8"));
+    assert(githubPublicStateAfterSponsor.servers.find((item) => item.id === githubSaved.json.server.id)?.sponsored === true, "admin sponsor toggles should update the public listing snapshot");
     githubSyncFiles.delete(githubSyncBackupPath);
     githubSyncShas.delete(githubSyncBackupPath);
     githubSyncStaleContents.set(githubSyncMainPath, Buffer.from(JSON.stringify(githubSyncInitialDb)).toString("base64"));
