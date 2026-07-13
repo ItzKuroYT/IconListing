@@ -571,6 +571,7 @@ async function main() {
 
     const description =
       "A real listing created by the smoke test to verify account login, listing creation, mcstatus fallback, Votifier forwarding, vote recording, and monthly vote totals without using premade seed content.\nLine two should keep its line break.\n\nLine four should still be separated after saving.";
+    const largeDataBanner = `data:image/gif;base64,${Buffer.alloc(14000, 71).toString("base64")}`;
     const discordNotifications = [];
     const previousDiscordWebhook = process.env["discord-webhook"];
     const previousDiscordWebhookUpper = process.env.DISCORD_WEBHOOK;
@@ -593,6 +594,7 @@ async function main() {
           javaPort: 25565,
           country: "United States",
           description,
+          bannerUrl: largeDataBanner,
           tags: ["SMP", "Survival"],
           votifierEnabled: true,
           votifierHost: "127.0.0.1",
@@ -1233,6 +1235,8 @@ async function main() {
     assert(serverPage.body.includes(`${saved.json.server.name} Minecraft Server`), "slug server page should include a server-specific title");
     assert(serverPage.body.includes(`<meta property="og:image"`), "slug server page should include share image metadata");
     assert(serverPage.body.includes("Server IP") && serverPage.body.includes(`Vote for ${saved.json.server.name}`), "slug server page should include real server details before JavaScript hydrates");
+    const serverImage = await callPath(`/api?action=serverImage&slug=${encodeURIComponent(savedSlug)}&kind=banner`);
+    assert(serverImage.code === 200 && serverImage.headers["Content-Type"]?.includes("image/gif"), "server image endpoint should stream large uploaded GIF banners");
 
     const finalState = await call("state", {}, "", "GET");
     const server = finalState.json.servers.find((item) => item.id === saved.json.server.id);
@@ -1242,6 +1246,7 @@ async function main() {
     const client = finalState.json.clients.find((item) => item.name === "Smoke Client");
     const host = finalState.json.hosts.find((item) => item.name === "Smoke Hosting");
     assert(server && server.votes === 2, "server should have two counted votes after the next-day vote");
+    assert(server.bannerUrl.includes("action=serverImage") && server.bannerUrl.includes("kind=banner"), "large data banners should be exposed through the server image API instead of being stripped from public state");
     assert(!server.iconListingVoteKey && !server.iconListingVoteQueue && !server.votifierToken, "public state should not expose private vote delivery keys or queues");
     assert(otherServer && otherServer.ownerId === server.ownerId, "same account should keep multiple unique listings");
     assert(bedrockSaved && bedrockSaved.edition === "bedrock" && bedrockSaved.bedrockHost === "bedrock.example.org", "bedrock server fields should be stored");

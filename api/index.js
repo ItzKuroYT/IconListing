@@ -28,6 +28,7 @@ const EMAIL_VERIFICATION_MAX_ATTEMPTS = 8;
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
+const PUBLIC_DATA_IMAGE_LIMIT = 12000;
 const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
 const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage", "googleStart", "googleCallback"]);
@@ -1740,8 +1741,8 @@ function publicSnapshotServer(server) {
   for (const key of allowed) {
     if (server[key] !== undefined) next[key] = server[key];
   }
-  next.bannerUrl = publicListImage(next.bannerUrl);
-  next.iconUrl = publicListImage(next.iconUrl);
+  next.bannerUrl = publicListImage(next.bannerUrl, server, "banner");
+  next.iconUrl = publicListImage(next.iconUrl, server, "icon");
   next.analytics = publicAnalytics(server, { full: false });
   return next;
 }
@@ -2092,9 +2093,22 @@ function serverShareImageUrl(server) {
   return siteUrl(CONFIG.site.iconPath);
 }
 
+function publicServerImageUrl(server, kind = "banner") {
+  const base = clean(CONFIG.api?.productionBasePath || "") || siteUrl("/api");
+  const params = new URLSearchParams({
+    action: "serverImage",
+    slug: serverSlug(server.name, server.id),
+    kind
+  });
+  return `${base}${base.includes("?") ? "&" : "?"}${params.toString()}`;
+}
+
 function serverImage(res, db, req) {
   const server = findServerByKey(db.servers, serverKeyFromRequest(req));
-  const dataUrl = clean(server?.bannerUrl || server?.iconUrl || "");
+  const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
+  const kind = clean(req.query?.kind || url.searchParams.get("kind")).toLowerCase();
+  const source = kind === "icon" ? server?.iconUrl : kind === "banner" ? server?.bannerUrl : (server?.bannerUrl || server?.iconUrl);
+  const dataUrl = clean(source || "");
   const match = dataUrl.match(/^data:(image\/(?:png|jpeg|jpg|gif|webp));base64,([a-z0-9+/=]+)$/i);
   if (!match) {
     res.setHeader("Location", siteUrl(CONFIG.site.iconPath));
@@ -2838,8 +2852,8 @@ function publicServer(server, user = null, options = {}) {
   const canSeePrivate = !!user && (server.ownerId === user.id || isAdmin(user));
   const next = { ...server, analytics: publicAnalytics(server, { full: !!options.fullAnalytics }) };
   if (!options.fullAnalytics) {
-    next.bannerUrl = publicListImage(next.bannerUrl);
-    next.iconUrl = publicListImage(next.iconUrl);
+    next.bannerUrl = publicListImage(next.bannerUrl, server, "banner");
+    next.iconUrl = publicListImage(next.iconUrl, server, "icon");
   }
   delete next.iconListingVoteQueue;
   if (!canSeePrivate) {
@@ -2849,9 +2863,11 @@ function publicServer(server, user = null, options = {}) {
   return next;
 }
 
-function publicListImage(value = "") {
+function publicListImage(value = "", server = null, kind = "banner") {
   const image = clean(value);
-  if (/^data:image\//i.test(image) && image.length > 12000) return "";
+  if (/^data:image\//i.test(image) && image.length > PUBLIC_DATA_IMAGE_LIMIT) {
+    return server?.id ? publicServerImageUrl(server, kind) : "";
+  }
   return image;
 }
 

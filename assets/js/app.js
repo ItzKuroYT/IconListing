@@ -379,17 +379,19 @@ function publicClientState(state = {}, options = {}) {
 
 function publicClientServer(server = {}) {
   const next = normalizeServer({ ...server });
-  next.bannerUrl = publicListImage(next.bannerUrl);
-  next.iconUrl = publicListImage(next.iconUrl);
+  next.bannerUrl = publicListImage(next.bannerUrl, next, "banner");
+  next.iconUrl = publicListImage(next.iconUrl, next, "icon");
   delete next.votifierToken;
   delete next.iconListingVoteKey;
   delete next.iconListingVoteQueue;
   return next;
 }
 
-function publicListImage(value = "") {
+function publicListImage(value = "", server = null, kind = "banner") {
   const image = clean(value);
-  if (/^data:image\//i.test(image) && image.length > 12000) return "";
+  if (/^data:image\//i.test(image) && image.length > 12000) {
+    return server?.id || server?.name ? apiActionUrl("serverImage", { slug: serverSlug(server.name, server.id), kind }) : "";
+  }
   return image;
 }
 
