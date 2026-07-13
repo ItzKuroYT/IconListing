@@ -17,7 +17,8 @@ async function main() {
 
   await fs.writeFile(path.join(outputRoot, "404.html"), __iconListingStatic.fallback404Html());
   await fs.writeFile(path.join(outputRoot, "sitemap.xml"), __iconListingStatic.sitemapXml(db));
-  console.log(`Generated ${entries.length} server pages, 404.html, and sitemap.xml.`);
+  await fs.writeFile(path.join(outputRoot, "data", "public-state.json"), JSON.stringify(__iconListingStatic.publicSnapshotPayload(db), null, 2));
+  console.log(`Generated ${entries.length} server pages, 404.html, sitemap.xml, and data/public-state.json.`);
 }
 
 main().catch((error) => {

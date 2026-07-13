@@ -1705,6 +1705,46 @@ function statePayload(db, user, options = {}) {
   };
 }
 
+function publicSnapshotPayload(db) {
+  const next = migrateDb(db);
+  return {
+    version: 2,
+    generatedAt: new Date().toISOString(),
+    servers: rankServers(next.servers, next.votes).map(publicSnapshotServer),
+    clients: next.clients.map(publicSnapshotClient),
+    hosts: next.hosts.map(publicSnapshotHost)
+  };
+}
+
+function publicSnapshotServer(server) {
+  const allowed = [
+    "id", "name", "javaHost", "javaPort", "javaSrvResolved", "javaStatusTarget", "crossPlay",
+    "bedrockHost", "bedrockPort", "websiteUrl", "discordUrl", "youtubeUrl", "country",
+    "bannerUrl", "description", "tags", "ownerName", "votes", "playersOnline", "playersMax",
+    "version", "online", "uptimePercent", "sponsored", "createdAt", "updatedAt", "lastPingAt",
+    "lastSuccessfulPingAt", "uptimeChecks", "uptimeSuccesses", "edition", "bedrockType",
+    "realmCode", "iconUrl", "rank", "analytics"
+  ];
+  const next = {};
+  for (const key of allowed) {
+    if (server[key] !== undefined) next[key] = server[key];
+  }
+  next.bannerUrl = publicListImage(next.bannerUrl);
+  next.iconUrl = publicListImage(next.iconUrl);
+  next.analytics = publicAnalytics(server, { full: false });
+  return next;
+}
+
+function publicSnapshotClient(client) {
+  const { id, name, description, url, youtubeUrl, images, version, pricing, createdAt, updatedAt } = normalizeClient(client);
+  return { id, name, description, url, youtubeUrl, images, version, pricing, createdAt, updatedAt };
+}
+
+function publicSnapshotHost(host) {
+  const { id, name, description, url, youtubeUrl, images, pricing, createdAt, updatedAt } = normalizeHost(host);
+  return { id, name, description, url, youtubeUrl, images, pricing, createdAt, updatedAt };
+}
+
 function stateDetailServerId(req) {
   const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
   return clean(req.query?.serverId || req.query?.server || req.query?.serverSlug || req.query?.slug || url.searchParams.get("serverId") || url.searchParams.get("id") || url.searchParams.get("server") || url.searchParams.get("serverSlug") || url.searchParams.get("slug") || "");
@@ -1943,9 +1983,9 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260713-seo-fast-render">
-    <script src="/config.js?v=20260713-seo-fast-render"></script>
-    <script src="/assets/js/app.js?v=20260713-seo-fast-render" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260713-public-state-home">
+    <script src="/config.js?v=20260713-public-state-home"></script>
+    <script src="/assets/js/app.js?v=20260713-public-state-home" defer></script>
   </head>
   <body data-page="server">
     <main class="page seo-fallback">
@@ -2739,12 +2779,22 @@ function formatDuration(ms) {
 function publicServer(server, user = null, options = {}) {
   const canSeePrivate = !!user && (server.ownerId === user.id || isAdmin(user));
   const next = { ...server, analytics: publicAnalytics(server, { full: !!options.fullAnalytics }) };
+  if (!options.fullAnalytics) {
+    next.bannerUrl = publicListImage(next.bannerUrl);
+    next.iconUrl = publicListImage(next.iconUrl);
+  }
   delete next.iconListingVoteQueue;
   if (!canSeePrivate) {
     delete next.votifierToken;
     delete next.iconListingVoteKey;
   }
   return next;
+}
+
+function publicListImage(value = "") {
+  const image = clean(value);
+  if (/^data:image\//i.test(image) && image.length > 12000) return "";
+  return image;
 }
 
 function normalizeIconListingVoteQueue(queue = []) {
@@ -3252,6 +3302,7 @@ function html(res, status, body) {
 
 module.exports.__iconListingStatic = {
   fallback404Html,
+  publicSnapshotPayload,
   sitemapXml,
   serverSlug,
   staticServerPageEntries

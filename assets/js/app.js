@@ -9,6 +9,7 @@ const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer"
 const TRUSTPILOT_REVIEW_URL = "https://www.trustpilot.com/review/minecraft-listing.iconrealms.net";
 let turnstileLoadPromise = null;
 const renderedTurnstileWidgets = new Map();
+let publicSnapshotPromise = null;
 
 function copy(path, fallback = "") {
   return path.split(".").reduce((value, key) => value?.[key], CONFIG.copy) ?? fallback;
@@ -44,6 +45,17 @@ const store = {
   },
   set fallbackDb(value) {
     localStorage.setItem("iconListingDb", JSON.stringify(value));
+  },
+  get publicState() {
+    try {
+      return JSON.parse(sessionStorage.getItem("iconListingPublicState") || "null");
+    } catch {
+      return null;
+    }
+  },
+  set publicState(value) {
+    if (value) sessionStorage.setItem("iconListingPublicState", JSON.stringify(value));
+    else sessionStorage.removeItem("iconListingPublicState");
   }
 };
 
@@ -349,6 +361,44 @@ function publicUser(user) {
     admin: isAdmin(user),
     banned: !!user.banned
   };
+}
+
+function publicClientState(state = {}, options = {}) {
+  const servers = Array.isArray(state.servers) ? state.servers.map(publicClientServer) : [];
+  const votes = Array.isArray(state.votes) ? state.votes : [];
+  return {
+    users: [],
+    servers: rankServers(servers, votes),
+    clients: (Array.isArray(state.clients) ? state.clients : []).map(normalizeClient),
+    hosts: (Array.isArray(state.hosts) ? state.hosts : []).map(normalizeHost),
+    votes,
+    user: options.user === undefined ? (store.session?.user || null) : options.user,
+    apiHydrating: !!options.apiHydrating
+  };
+}
+
+function publicClientServer(server = {}) {
+  const next = normalizeServer({ ...server });
+  next.bannerUrl = publicListImage(next.bannerUrl);
+  next.iconUrl = publicListImage(next.iconUrl);
+  delete next.votifierToken;
+  delete next.iconListingVoteKey;
+  delete next.iconListingVoteQueue;
+  return next;
+}
+
+function publicListImage(value = "") {
+  const image = clean(value);
+  if (/^data:image\//i.test(image) && image.length > 12000) return "";
+  return image;
+}
+
+function cachePublicState(state) {
+  try {
+    store.publicState = publicClientState(state, { user: null, apiHydrating: false });
+  } catch {
+    // Public cache is only a speed/SEO fallback.
+  }
 }
 
 function planConfigForUser(user) {
@@ -929,7 +979,22 @@ async function getState() {
   const state = await request("state", detailServerId ? { serverId: detailServerId } : detailServerSlug ? { serverSlug: detailServerSlug } : {}, "GET");
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
-  return { ...state, votes: state.votes || [] };
+  const next = { ...state, votes: state.votes || [] };
+  cachePublicState(next);
+  return next;
+}
+
+async function loadPublicSnapshotState() {
+  if (!publicSnapshotPromise) {
+    publicSnapshotPromise = fetch(route("/data/public-state.json"), { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) throw new Error("Public listing snapshot unavailable.");
+        return response.json();
+      })
+      .then((snapshot) => publicClientState(snapshot, { user: store.session?.user || null, apiHydrating: true }))
+      .catch(() => null);
+  }
+  return publicSnapshotPromise;
 }
 
 function consumeGoogleAuthHash() {
@@ -1182,6 +1247,13 @@ function emptyNotice(title = copy("empty.title", "No servers listed yet"), body 
     <h2>${escapeHtml(title)}</h2>
     <p>${escapeHtml(body)}</p>
     <a class="button primary" href="${href}">${escapeHtml(action)}</a>
+  </div>`;
+}
+
+function loadingNotice(title = "Loading shared listings", body = "Fetching the newest public listings now.") {
+  return `<div class="empty-state loading-state">
+    <h2>${escapeHtml(title)}</h2>
+    <p>${escapeHtml(body)}</p>
   </div>`;
 }
 
@@ -1553,7 +1625,7 @@ function renderServerList(servers, selector = "#serverList", options = {}) {
   const page = clampListPage(options.page || pageFromParams(options.pageParam), totalPages);
   const start = (page - 1) * size;
   const visible = servers.slice(start, start + size);
-  root.innerHTML = visible.length ? visible.map(serverCard).join("") : emptyNotice();
+  root.innerHTML = visible.length ? visible.map(serverCard).join("") : (options.loading ? loadingNotice() : emptyNotice());
   if (options.pagerSelector) {
     const pager = $(options.pagerSelector);
     if (pager) {
@@ -1609,7 +1681,8 @@ function setupFilters(servers, options = {}) {
       page: currentPage,
       pageParam,
       basePath: options.basePath || (document.body.dataset.page === "servers" ? "/servers/" : "/"),
-      params: { q: search, tag, sort: sort === "rank" ? "" : sort }
+      params: { q: search, tag, sort: sort === "rank" ? "" : sort },
+      loading: !!options.loading
     });
     bindPager(options.pagerSelector || "#serverPager", (page) => {
       currentPage = page;
@@ -1683,6 +1756,7 @@ function renderHome(state) {
       ]
     }
   });
+  const loadingListings = !!state.apiHydrating && !state.servers.length;
   const sponsored = state.servers.filter((server) => server.sponsored);
   $("#app").innerHTML = `<div class="page">
     <section class="hero-band compact">
@@ -1743,13 +1817,15 @@ function renderHome(state) {
   renderServerList(sponsored, "#sponsoredList", {
     pagerSelector: "#sponsoredPager",
     pageParam: "sponsoredPage",
-    basePath: "/"
+    basePath: "/",
+    loading: loadingListings
   });
-  setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: "/" });
+  setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: "/", loading: loadingListings });
 }
 
 function renderServers(state) {
   const tag = new URLSearchParams(location.search).get("tag") || "";
+  const loadingListings = !!state.apiHydrating && !state.servers.length;
   setSeoMeta({
     ...defaultPageSeo("servers"),
     title: tag ? `${tag} Minecraft Servers | ${CONFIG.site.name}` : CONFIG.seo?.pages?.servers?.title,
@@ -1812,7 +1888,7 @@ function renderServers(state) {
       </div>
     </section>
   </div>`;
-  setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: "/servers/" });
+  setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: "/servers/", loading: loadingListings });
 }
 
 function renderServerDetail(state) {
@@ -4184,15 +4260,9 @@ function policySectionMarkup(section = {}) {
 }
 
 function publicBootState() {
-  return {
-    user: store.session?.user || null,
-    users: [],
-    servers: [],
-    clients: [],
-    hosts: [],
-    votes: [],
-    apiHydrating: true
-  };
+  const cached = store.publicState;
+  if (cached) return publicClientState(cached, { user: store.session?.user || null, apiHydrating: true });
+  return publicClientState({}, { user: store.session?.user || null, apiHydrating: true });
 }
 
 function pageCanRenderBeforeApi(page) {
@@ -4237,15 +4307,20 @@ async function boot() {
   const googleAuthResult = consumeGoogleAuthHash();
   const page = document.body.dataset.page || "home";
   const seoFallbackHtml = $(".seo-fallback")?.outerHTML || "";
+  let liveStateRendered = false;
   if (!$("#app")) renderLayout();
   syncAuthUi(store.session?.user || null);
   if (pageCanRenderBeforeApi(page)) {
     renderCurrentPage(page, publicBootState());
+    loadPublicSnapshotState().then((snapshotState) => {
+      if (!liveStateRendered && snapshotState) renderCurrentPage(page, snapshotState);
+    });
   } else if (page === "server" && seoFallbackHtml) {
     $("#app").innerHTML = seoFallbackHtml;
   }
   try {
     const state = await getState();
+    liveStateRendered = true;
     syncAuthUi(state.user);
     renderCurrentPage(page, state);
     if (googleAuthResult?.message) toast(googleAuthResult.message);
