@@ -178,6 +178,23 @@
       "googleName": "benjamin vorm",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocIocwoijbDLsZBbe81zktp64hQGB0kDHxT0rnSlW62yQAPK424=s96-c",
       "updatedAt": "2026-07-11T16:52:24.933Z"
+    },
+    {
+      "id": "4089a73f-c526-4b0c-a69b-e979efe159ec",
+      "username": "SylisEwing",
+      "email": "paigeisbetterthanyou10@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-07-15T05:04:27.468Z",
+      "termsAcceptedAt": "2026-07-15T05:04:27.468Z",
+      "googleLinkedAt": "2026-07-15T05:04:27.468Z",
+      "createdAt": "2026-07-15T05:04:27.468Z",
+      "banned": false,
+      "googleSub": "101795455536450808769",
+      "googleName": "Sylis Ewing",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKf27xLfHw2LN4-NiuSxswCUqTmhe2VJrq8zlLUr-2_biJO4uw=s96-c",
+      "updatedAt": "2026-07-15T05:04:27.468Z"
     }
   ],
   "servers": [
