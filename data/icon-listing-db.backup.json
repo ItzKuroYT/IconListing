@@ -220,17 +220,11 @@
       "passwordHash": "709a1e5d947dbf91ff588bb2b371e183:cef0e493132e32b1f406883157028129fd5625ab32fd85a9e0b722badbecd20c",
       "emailOptIn": true,
       "emailOptInAt": "2026-07-15T21:05:13.182Z",
-      "emailVerified": false,
-      "emailVerifiedAt": "",
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-07-15T21:05:51.444Z",
       "termsAcceptedAt": "2026-07-15T21:05:13.182Z",
       "banned": false,
-      "createdAt": "2026-07-15T21:05:13.182Z",
-      "emailVerification": {
-        "codeHash": "79b10c06048e505f9509d312fe33787be5c4742f69d679cba6439242434cc602",
-        "createdAt": "2026-07-15T21:05:13.182Z",
-        "expiresAt": "2026-07-15T21:20:13.182Z",
-        "attempts": 0
-      }
+      "createdAt": "2026-07-15T21:05:13.182Z"
     }
   ],
   "servers": [
