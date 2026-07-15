@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-07-15T19:12:10.732Z",
+  "generatedAt": "2026-07-15T19:12:26.683Z",
   "servers": [
     {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
@@ -614,7 +614,7 @@
       }
     },
     {
-      "id": "1859d31c-f2a0-4eed-93f2-78d7060faa12",
+      "id": "f3f10c77-8974-490a-9c82-82cfdc443c82",
       "name": "CinderSMP",
       "javaHost": "bin-missing.gl.joinmc.link",
       "javaPort": 25565,
@@ -645,9 +645,9 @@
       "online": false,
       "uptimePercent": 0,
       "sponsored": false,
-      "createdAt": "2026-07-15T19:12:02.702Z",
-      "updatedAt": "2026-07-15T19:12:02.702Z",
-      "lastPingAt": "2026-07-15T19:12:04.729Z",
+      "createdAt": "2026-07-15T19:12:21.727Z",
+      "updatedAt": "2026-07-15T19:12:21.727Z",
+      "lastPingAt": "2026-07-15T19:12:21.756Z",
       "uptimeChecks": 1,
       "edition": "java",
       "bedrockType": "server",
