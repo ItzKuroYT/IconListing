@@ -1224,8 +1224,8 @@ async function main() {
 
     const sitemap = await callRaw("sitemap");
     assert(sitemap.code === 200 && sitemap.headers["Content-Type"]?.includes("application/xml"), "sitemap should return XML");
-    assert(sitemap.body.includes("https://www.minecraftlisting.org/"), "sitemap should include the canonical homepage");
-    assert(sitemap.body.includes("https://www.minecraftlisting.org/sponsored-hosts/"), "sitemap should include sponsored hosts");
+    assert(sitemap.body.includes("https://minecraftlisting.org/"), "sitemap should include the canonical homepage");
+    assert(sitemap.body.includes("https://minecraftlisting.org/sponsored-hosts/"), "sitemap should include sponsored hosts");
     const savedSlug = serverSlug(saved.json.server.name);
     assert(sitemap.body.includes(`/server/${savedSlug}`), "sitemap should include saved server listing slug URLs");
     assert(!sitemap.body.includes(`/server/?id=${saved.json.server.id}`), "sitemap should not use query-string server URLs");
