@@ -212,6 +212,25 @@
       "googleName": "Braxton",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKcjVYJKyu2oLvbapCnLdv4kNagxZa_7v9cBf5uRwccqfJu8w=s96-c",
       "updatedAt": "2026-07-15T18:33:59.315Z"
+    },
+    {
+      "id": "86189895-8ed1-42db-a438-6e5c4d80cb20",
+      "username": "kadika333",
+      "email": "rwd1998@protonmail.com",
+      "passwordHash": "709a1e5d947dbf91ff588bb2b371e183:cef0e493132e32b1f406883157028129fd5625ab32fd85a9e0b722badbecd20c",
+      "emailOptIn": true,
+      "emailOptInAt": "2026-07-15T21:05:13.182Z",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-07-15T21:05:13.182Z",
+      "banned": false,
+      "createdAt": "2026-07-15T21:05:13.182Z",
+      "emailVerification": {
+        "codeHash": "79b10c06048e505f9509d312fe33787be5c4742f69d679cba6439242434cc602",
+        "createdAt": "2026-07-15T21:05:13.182Z",
+        "expiresAt": "2026-07-15T21:20:13.182Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
