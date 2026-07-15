@@ -490,7 +490,7 @@ async function readBody(req) {
 }
 
 function actionFromRequest(req) {
-  const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
+  const url = new URL(req.url || "/", "https://www.minecraftlisting.org");
   if (url.pathname.endsWith("/sitemap.xml")) return "sitemap";
   if (/^\/server\/[^/]+\/?$/i.test(url.pathname)) return "serverPage";
   if (/^\/api\/google-callback\/?$/i.test(url.pathname)) return "googleCallback";
@@ -1004,7 +1004,7 @@ function safeReturnPath(value = "/dashboard/") {
 }
 
 function queryValue(req, key) {
-  const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
+  const url = new URL(req.url || "/", "https://www.minecraftlisting.org");
   return req.query?.[key] || url.searchParams.get(key) || "";
 }
 
@@ -1758,12 +1758,12 @@ function publicSnapshotHost(host) {
 }
 
 function stateDetailServerId(req) {
-  const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
+  const url = new URL(req.url || "/", "https://www.minecraftlisting.org");
   return clean(req.query?.serverId || req.query?.server || req.query?.serverSlug || req.query?.slug || url.searchParams.get("serverId") || url.searchParams.get("id") || url.searchParams.get("server") || url.searchParams.get("serverSlug") || url.searchParams.get("slug") || "");
 }
 
 function siteUrl(pathname = "/") {
-  const base = String(CONFIG.site.url || "https://minecraft-listing.iconrealms.net").replace(/\/$/, "");
+  const base = String(CONFIG.site.url || "https://www.minecraftlisting.org").replace(/\/$/, "");
   const path = String(pathname || "/");
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
@@ -1795,7 +1795,7 @@ function findServerByKey(servers = [], key = "") {
 }
 
 function serverKeyFromRequest(req) {
-  const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
+  const url = new URL(req.url || "/", "https://www.minecraftlisting.org");
   const pathMatch = url.pathname.match(/^\/server\/([^/]+)\/?$/i);
   return clean(req.query?.slug || req.query?.serverSlug || req.query?.id || url.searchParams.get("slug") || url.searchParams.get("serverSlug") || url.searchParams.get("id") || (pathMatch ? pathMatch[1] : ""));
 }
@@ -2105,7 +2105,7 @@ function publicServerImageUrl(server, kind = "banner") {
 
 function serverImage(res, db, req) {
   const server = findServerByKey(db.servers, serverKeyFromRequest(req));
-  const url = new URL(req.url || "/", "https://minecraft-listing.iconrealms.net");
+  const url = new URL(req.url || "/", "https://www.minecraftlisting.org");
   const kind = clean(req.query?.kind || url.searchParams.get("kind")).toLowerCase();
   const source = kind === "icon" ? server?.iconUrl : kind === "banner" ? server?.bannerUrl : (server?.bannerUrl || server?.iconUrl);
   const dataUrl = clean(source || "");

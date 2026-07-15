@@ -2,7 +2,7 @@ const IconListingConfig = {
   site: {
     name: "Icon Listing",
     owner: "IconRealms",
-    url: "https://minecraft-listing.iconrealms.net",
+    url: "https://www.minecraftlisting.org",
     basePath: "",
     iconPath: "/assets/icon.png",
     discordUrl: "https://discord.gg/HFyUfk458c",

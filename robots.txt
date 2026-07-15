@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /data/
 
-Sitemap: https://minecraft-listing.iconrealms.net/sitemap.xml
+Sitemap: https://www.minecraftlisting.org/sitemap.xml
