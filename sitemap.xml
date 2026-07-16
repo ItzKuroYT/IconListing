@@ -2,73 +2,73 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://minecraftlisting.org/</loc>
-    <lastmod>2026-07-16T01:57:36.976Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/</loc>
-    <lastmod>2026-07-16T01:57:36.976Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored/</loc>
-    <lastmod>2026-07-16T01:57:36.976Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored-clients/</loc>
-    <lastmod>2026-07-16T01:57:36.977Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored-hosts/</loc>
-    <lastmod>2026-07-16T01:57:36.977Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored/plans/</loc>
-    <lastmod>2026-07-16T01:57:36.977Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/motd-builder/</loc>
-    <lastmod>2026-07-16T01:57:36.977Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/votifier-tester/</loc>
-    <lastmod>2026-07-16T01:57:36.977Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/rgb-text-generator/</loc>
-    <lastmod>2026-07-16T01:57:36.977Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/fonts-generator/</loc>
-    <lastmod>2026-07-16T01:57:36.977Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/help/</loc>
-    <lastmod>2026-07-16T01:57:36.977Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/contact/</loc>
-    <lastmod>2026-07-16T01:57:36.977Z</lastmod>
+    <lastmod>2026-07-16T08:31:50.162Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -85,14 +85,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/GTM-GTA-based-minecraft-server-for-Java/</loc>
-    <lastmod>2026-06-24T14:32:13.157Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Unbent-Flames/</loc>
+    <lastmod>2026-07-08T23:53:25.898Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Unbent-Flames/</loc>
-    <lastmod>2026-07-08T23:53:25.898Z</lastmod>
+    <loc>https://minecraftlisting.org/server/GTM-GTA-based-minecraft-server-for-Java/</loc>
+    <lastmod>2026-06-24T14:32:13.157Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -111,6 +111,12 @@
   <url>
     <loc>https://minecraftlisting.org/server/GroundZero/</loc>
     <lastmod>2026-07-11T16:55:27.628Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Unirealm/</loc>
+    <lastmod>2026-07-16T08:31:42.644Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
