@@ -200,8 +200,7 @@ module.exports = async function handler(req, res) {
       db.votes = db.votes.filter((vote) => vote.serverId !== body.id);
       if (db.voteIps) delete db.voteIps[body.id];
       markDeleted(db, "servers", [body.id]);
-      await saveDb(db, { deletedServers: [body.id] });
-      const persistedDb = await persistedDbAfterWrite();
+      const persistedDb = await saveDb(db, { deletedServers: [body.id] });
       if (persistedDb.servers.some((item) => item.id === body.id)) throw httpError(500, "Listing was not deleted from shared storage. Error: 67.");
       await safeSyncServerStaticPages(persistedDb, { deletePagePaths: [serverStaticPagePath(server)] });
       return json(res, 200, writePayload({ ok: true, deletedServerId: body.id, ...statePayload(persistedDb, user) }));

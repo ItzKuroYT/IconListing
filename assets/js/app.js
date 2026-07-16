@@ -2962,6 +2962,7 @@ function bindDashboard(state) {
       try {
         const result = await request("deleteServer", { id: button.dataset.delete });
         state = result.servers ? { ...state, ...result, votes: result.votes || state.votes || [] } : await getState();
+        if (result.servers) cachePublicState(result);
         toast("Listing deleted.");
         renderDashboard(state);
       } catch (error) {
@@ -3246,6 +3247,7 @@ function renderAdmin(state) {
       setButtonLoading(button, "Deleting...");
       const result = await request("deleteServer", { id: button.dataset.delete });
       state = result.servers ? { ...state, ...result, votes: result.votes || state.votes || [] } : await getState();
+      if (result.servers) cachePublicState(result);
       toast("Listing deleted.");
       renderAdmin(state);
     } catch (error) {
