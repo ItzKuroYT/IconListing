@@ -4596,6 +4596,65 @@
       "uptimeChecks": 13,
       "uptimeSuccesses": 13,
       "iconListingVoteQueue": []
+    },
+    {
+      "id": "14e0c2ce-bacb-42ea-b2c8-f3fb543dd272",
+      "name": "Rough Arena SMP",
+      "edition": "bedrock",
+      "javaHost": "",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "15.235.215.108",
+      "bedrockPort": 11620,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_49b2efbca454d1b8da08dd25c8990410a3ef",
+      "websiteUrl": "",
+      "discordUrl": "https://chat.whatsapp.com/IA7MokBMdpWLWXVCvRZR0P?s=cl&p=a&ilr=0&amv=3",
+      "youtubeUrl": "",
+      "country": "India",
+      "bannerUrl": "",
+      "description": "Welcome to our smp it is based on international server to connect with many people https://chat.whatsapp.com/IA7MokBMdpWLWXVCvRZR0P?s=cl&p=a&ilr=0&amv=3\nIp: 15.235.215.108\nPort: 11620\nBedrock edition minecraft server",
+      "tags": [
+        "Survival",
+        "Farming",
+        "New"
+      ],
+      "ownerId": "4831473e-7383-485f-8993-aa43580a13e3",
+      "ownerName": "JohanChakma",
+      "votes": 0,
+      "playersOnline": 1,
+      "playersMax": 20,
+      "version": "1.26.33",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-07-18T17:47:02.806Z",
+      "updatedAt": "2026-07-18T17:47:02.806Z",
+      "lastPingAt": "2026-07-18T17:47:04.118Z",
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-07-18T17:47:04.118Z",
+            "playersOnline": 1,
+            "playersMax": 20,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-07-18T17:47:04.118Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
     }
   ],
   "clients": [
