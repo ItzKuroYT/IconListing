@@ -2027,6 +2027,7 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <title>${safeTitle}</title>
     <meta name="description" content="${safeDescription}">
     <meta name="robots" content="index, follow, max-image-preview:large">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157143725251440" crossorigin="anonymous"></script>
     <link rel="canonical" href="${safeCanonical}">
     <meta property="og:site_name" content="${escapeHtmlAttr(CONFIG.site.name)}">
     <meta property="og:type" content="${escapeHtmlAttr(type)}">
