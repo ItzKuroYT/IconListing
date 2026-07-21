@@ -133,7 +133,7 @@ const IconListingConfig = {
     free: {
       name: "Free",
       price: "$0/mo",
-      serverLimit: 2,
+      serverLimit: 1,
       sponsorCredits: 0,
       sponsorDurationDays: 0,
       sponsorDurationLabel: "No sponsor slot",
@@ -142,7 +142,7 @@ const IconListingConfig = {
     premium: {
       name: "Premium",
       price: "$15/mo",
-      serverLimit: 5,
+      serverLimit: 3,
       sponsorCredits: 1,
       sponsorDurationDays: 14,
       sponsorDurationLabel: "1 sponsor for 2 weeks",
@@ -151,7 +151,7 @@ const IconListingConfig = {
     elite: {
       name: "Elite",
       price: "$25/mo",
-      serverLimit: 10,
+      serverLimit: 5,
       sponsorCredits: 1,
       sponsorDurationDays: 60,
       sponsorDurationLabel: "1 sponsor for 2 months",
@@ -160,7 +160,7 @@ const IconListingConfig = {
     iconic: {
       name: "Iconic",
       price: "$40/mo",
-      serverLimit: 15,
+      serverLimit: 10,
       sponsorCredits: 2,
       sponsorDurationDays: 150,
       sponsorDurationLabel: "2 sponsors for 5 months",
