@@ -123,7 +123,7 @@ const IconListingConfig = {
     bannerMaxWidth: 468,
     bannerMaxHeight: 60,
     descriptionMinLength: 200,
-    pageSize: 20,
+    pageSize: 10,
     tagsMin: 1,
     tagsMax: 7,
     voteCooldownHours: 24,
