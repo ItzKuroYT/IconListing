@@ -2775,7 +2775,7 @@
       ],
       "ownerId": "98db84eb-6f43-4758-b584-08639d8addeb",
       "ownerName": "AnderEv54",
-      "votes": 6,
+      "votes": 7,
       "playersOnline": 1,
       "playersMax": 50,
       "version": "Paper 1.21.11",
@@ -5111,12 +5111,20 @@
       "serverId": "4bb119bc-7c4e-4815-88e7-9b4afbb8c379",
       "minecraftUsername": "AnderEv54",
       "createdAt": "2026-07-21T03:29:37.512Z"
+    },
+    {
+      "id": "503c0cc9-1350-468e-9f19-8a67f0ea0d41",
+      "serverId": "4bb119bc-7c4e-4815-88e7-9b4afbb8c379",
+      "minecraftUsername": "totallymoon",
+      "createdAt": "2026-07-21T03:38:21.322Z"
     }
   ],
   "voteIps": {
     "4bb119bc-7c4e-4815-88e7-9b4afbb8c379": {
       "visitor:fc1e06197e6cf8a087e4720a9732454cebcf78d07022f15c3cc973ba277e7724": "2026-07-21T03:29:37.512Z",
-      "name:anderev54": "2026-07-21T03:29:37.512Z"
+      "name:anderev54": "2026-07-21T03:29:37.512Z",
+      "visitor:257fdaaf46cecd7cf045bb5d80b4ebd19c54182e42b9d56560676caa74ddb56e": "2026-07-21T03:38:21.322Z",
+      "name:totallymoon": "2026-07-21T03:38:21.322Z"
     }
   },
   "deleted": {
