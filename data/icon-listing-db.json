@@ -276,6 +276,23 @@
       "googleName": "Johan Chakma",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocLxza5Bq4GGfTL9YoGssa2gZ4A9p_SZuma43JODxCRBiD69_IA=s96-c",
       "updatedAt": "2026-07-18T17:43:45.979Z"
+    },
+    {
+      "id": "2762b205-2813-49ca-9876-704e5ed74628",
+      "username": "scribblescrabbleYT",
+      "email": "tristanryon9@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-07-22T23:35:07.649Z",
+      "termsAcceptedAt": "2026-07-22T23:35:07.649Z",
+      "googleLinkedAt": "2026-07-22T23:35:07.649Z",
+      "createdAt": "2026-07-22T23:35:07.649Z",
+      "banned": false,
+      "googleSub": "114414806609540368352",
+      "googleName": "scribblescrabble YT",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocL8B7P2r6S0oZgBy7o0tvi7ePJryK3zzriufowGzxl0xwLmE7kI=s96-c",
+      "updatedAt": "2026-07-22T23:35:07.649Z"
     }
   ],
   "servers": [
