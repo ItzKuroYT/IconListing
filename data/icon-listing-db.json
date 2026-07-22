@@ -5051,6 +5051,65 @@
       "uptimeSuccesses": 15,
       "iconUrl": "",
       "iconListingVoteQueue": []
+    },
+    {
+      "id": "04127b97-8759-4585-b6e3-74cfec0faf4b",
+      "name": "Reindevin' It",
+      "edition": "java",
+      "javaHost": "24.216.79.115",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_c2e3dc4449cd6eb139cd8011939cd5b547da",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/VeWvTuHEgw",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "We Are Reindevin' It!\nWe are an SMP Thats Running on Reindev\nReindev is a Minecraft Beta 1.7.3 Mod\n\na rugged, community driven survival smp powered by the Reindev server jar, built for players who love challenge, exploration, and cooperation. venture into a world where progression feels raw and rewarding, resources matter, and every build tells a story. whether youre forming alliances, carving out your own territory, or taking on dangerous adventures, this smp delivers a balanced mix of nostalgia and modern survival depth. join a world that evolves with its players and thrives on creativity, teamwork, and longterm survival.",
+      "tags": [
+        "Survival",
+        "SMP",
+        "Modded"
+      ],
+      "ownerId": "2762b205-2813-49ca-9876-704e5ed74628",
+      "ownerName": "scribblescrabbleYT",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 0,
+      "sponsored": false,
+      "createdAt": "2026-07-22T23:58:46.403Z",
+      "updatedAt": "2026-07-22T23:58:46.403Z",
+      "lastPingAt": "2026-07-22T23:58:47.579Z",
+      "javaStatusTarget": "24.216.79.115",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-07-22T23:58:47.579Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          }
+        ]
+      },
+      "uptimeChecks": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
     }
   ],
   "clients": [
