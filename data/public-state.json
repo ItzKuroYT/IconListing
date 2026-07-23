@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-07-23T00:21:03.472Z",
+  "generatedAt": "2026-07-23T00:21:43.970Z",
   "servers": [
     {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
@@ -712,10 +712,10 @@
     {
       "id": "ca09a8ba-817b-4124-aaf9-1586971ea7c8",
       "name": "Reindevin' It",
-      "javaHost": "24.216.79.115",
+      "javaHost": "192.168.1.5",
       "javaPort": 25565,
       "javaSrvResolved": false,
-      "javaStatusTarget": "24.216.79.115",
+      "javaStatusTarget": "192.168.1.5",
       "crossPlay": false,
       "bedrockHost": "",
       "bedrockPort": 19132,
@@ -730,7 +730,7 @@
         "SMP",
         "Modded"
       ],
-      "ownerName": "scribblescrabbleYT",
+      "ownerName": "hubabruba",
       "votes": 0,
       "playersOnline": 0,
       "playersMax": 0,
@@ -739,9 +739,9 @@
       "uptimePercent": 0,
       "sponsored": false,
       "createdAt": "2026-07-22T23:58:48.996Z",
-      "updatedAt": "2026-07-23T00:09:40.892Z",
-      "lastPingAt": "2026-07-23T00:19:57.037Z",
-      "uptimeChecks": 3,
+      "updatedAt": "2026-07-23T00:20:52.967Z",
+      "lastPingAt": "2026-07-23T00:20:58.101Z",
+      "uptimeChecks": 4,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
