@@ -5091,8 +5091,8 @@
       "uptimePercent": 0,
       "sponsored": false,
       "createdAt": "2026-07-22T23:58:48.996Z",
-      "updatedAt": "2026-07-23T00:21:39.015Z",
-      "lastPingAt": "2026-07-23T00:21:39.069Z",
+      "updatedAt": "2026-07-23T00:21:45.419Z",
+      "lastPingAt": "2026-07-23T00:21:45.436Z",
       "javaStatusTarget": "192.168.1.5",
       "javaSrvResolved": false,
       "analytics": {
@@ -5100,7 +5100,7 @@
         "ipCopyVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-07-23T00:21:39.069Z",
+            "createdAt": "2026-07-23T00:21:45.436Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
