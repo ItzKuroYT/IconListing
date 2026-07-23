@@ -5096,8 +5096,17 @@
       "javaStatusTarget": "192.168.1.5",
       "javaSrvResolved": false,
       "analytics": {
-        "ipCopyDaily": [],
-        "ipCopyVisitorDays": {},
+        "ipCopyDaily": [
+          {
+            "date": "2026-07-23",
+            "count": 1
+          }
+        ],
+        "ipCopyVisitorDays": {
+          "2026-07-23": [
+            "375503ad3f0c4180"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-07-23T00:21:45.436Z",
