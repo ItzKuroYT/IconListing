@@ -293,6 +293,23 @@
       "googleName": "scribblescrabble YT",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocL8B7P2r6S0oZgBy7o0tvi7ePJryK3zzriufowGzxl0xwLmE7kI=s96-c",
       "updatedAt": "2026-07-22T23:35:07.649Z"
+    },
+    {
+      "id": "023675b2-9c70-43cc-bf59-31cf6ebe5f36",
+      "username": "Games1",
+      "email": "games2000games1@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-07-23T10:07:44.418Z",
+      "termsAcceptedAt": "2026-07-23T10:07:44.418Z",
+      "googleLinkedAt": "2026-07-23T10:07:44.418Z",
+      "createdAt": "2026-07-23T10:07:44.418Z",
+      "banned": false,
+      "googleSub": "111916698454117887994",
+      "googleName": "Games 1",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocIU6pIZi06DLwoxAy_OJ1HQRpvGCEBXwqGQ8aaNNfZsRLyRgg=s96-c",
+      "updatedAt": "2026-07-23T10:07:44.418Z"
     }
   ],
   "servers": [
