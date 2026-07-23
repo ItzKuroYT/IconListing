@@ -2,73 +2,73 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://minecraftlisting.org/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored-clients/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored-hosts/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored/plans/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/motd-builder/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/votifier-tester/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/rgb-text-generator/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/fonts-generator/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/help/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/contact/</loc>
-    <lastmod>2026-07-23T00:09:47.443Z</lastmod>
+    <lastmod>2026-07-23T00:21:05.136Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -79,14 +79,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/GTM-GTA-based-minecraft-server-for-Java/</loc>
-    <lastmod>2026-06-24T14:32:13.157Z</lastmod>
+    <loc>https://minecraftlisting.org/server/CofferCraft/</loc>
+    <lastmod>2026-07-07T13:08:06.265Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/CofferCraft/</loc>
-    <lastmod>2026-07-07T13:08:06.265Z</lastmod>
+    <loc>https://minecraftlisting.org/server/GTM-GTA-based-minecraft-server-for-Java/</loc>
+    <lastmod>2026-06-24T14:32:13.157Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -115,6 +115,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Unirealm/</loc>
+    <lastmod>2026-07-16T08:31:34.016Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Pixelmonia/</loc>
     <lastmod>2026-06-24T19:52:18.582Z</lastmod>
     <changefreq>daily</changefreq>
@@ -139,12 +145,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Unirealm/</loc>
-    <lastmod>2026-07-16T08:31:34.016Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/Calamity-SMP/</loc>
     <lastmod>2026-06-30T15:54:50.226Z</lastmod>
     <changefreq>daily</changefreq>
@@ -164,7 +164,7 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/Reindevin-It/</loc>
-    <lastmod>2026-07-22T23:58:48.996Z</lastmod>
+    <lastmod>2026-07-23T00:09:40.892Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
