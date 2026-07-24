@@ -2,73 +2,73 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://minecraftlisting.org/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored-clients/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored-hosts/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored/plans/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/motd-builder/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/votifier-tester/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/rgb-text-generator/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/fonts-generator/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/help/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/contact/</loc>
-    <lastmod>2026-07-24T08:57:25.200Z</lastmod>
+    <lastmod>2026-07-24T08:58:25.153Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -170,7 +170,7 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/TOMODACHI-SMP/</loc>
-    <lastmod>2026-07-23T10:40:56.242Z</lastmod>
+    <lastmod>2026-07-24T08:57:18.798Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
