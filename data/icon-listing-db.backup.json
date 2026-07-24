@@ -310,6 +310,25 @@
       "googleName": "Games 1",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocIU6pIZi06DLwoxAy_OJ1HQRpvGCEBXwqGQ8aaNNfZsRLyRgg=s96-c",
       "updatedAt": "2026-07-23T10:07:44.418Z"
+    },
+    {
+      "id": "31a08a97-95ad-4c2f-a045-8f66be64e10e",
+      "username": "_Aquaotter_",
+      "email": "aquaottermc@gmail.com",
+      "passwordHash": "29573acbc8a0f7f7b1225b90cdde15c2:872bbac56a39fe38fd71e651be71f2865e0c061bf8bfaafb3423a83a2e81f75c",
+      "emailOptIn": false,
+      "emailOptInAt": "",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-07-24T16:59:09.449Z",
+      "banned": false,
+      "createdAt": "2026-07-24T16:59:09.449Z",
+      "emailVerification": {
+        "codeHash": "f6700d5d4193febaa8974402e997b712dad5d3844491ff56836752f501c7f799",
+        "createdAt": "2026-07-24T16:59:09.449Z",
+        "expiresAt": "2026-07-24T17:14:09.449Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
