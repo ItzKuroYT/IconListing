@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-07-24T08:57:23.618Z",
+  "generatedAt": "2026-07-24T08:58:23.507Z",
   "servers": [
     {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
@@ -781,13 +781,13 @@
       "playersMax": 0,
       "version": "Unknown",
       "online": false,
-      "uptimePercent": 16.666666666666664,
+      "uptimePercent": 14.285714285714285,
       "sponsored": false,
       "createdAt": "2026-07-23T10:40:56.242Z",
-      "updatedAt": "2026-07-23T10:40:56.242Z",
-      "lastPingAt": "2026-07-24T08:56:33.348Z",
+      "updatedAt": "2026-07-24T08:57:18.798Z",
+      "lastPingAt": "2026-07-24T08:57:18.880Z",
       "lastSuccessfulPingAt": "2026-07-23T10:40:59.002Z",
-      "uptimeChecks": 6,
+      "uptimeChecks": 7,
       "uptimeSuccesses": 1,
       "edition": "java",
       "bedrockType": "server",
