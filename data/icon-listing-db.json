@@ -5994,6 +5994,67 @@
       "uptimeChecks": 5,
       "uptimeSuccesses": 5,
       "iconListingVoteQueue": []
+    },
+    {
+      "id": "143f6350-32e3-494b-a57a-9228b7a34204",
+      "name": "LimboMC",
+      "edition": "java",
+      "javaHost": "play.limbomc.net",
+      "javaPort": 25565,
+      "crossPlay": true,
+      "bedrockType": "server",
+      "bedrockHost": "play.limbomc.net",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_e9981bb4c345d9fb2396a81fe6744720d19a",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/PYuB3xQN3g",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "☁️LimboMC☁️\n\n📍LimboMC isn't just any kind of hardcore server!\nonce you die you go to limbo to collect soul wisp to return to 'overworld'.\n\nSome of the stuff we offer:\n🪩Bedrock and Java crossplay\n🔥Intense PvP\n🔖Bounties\n🎟️Unique Experience\n🟢24/7\nand more!",
+      "tags": [
+        "Survival",
+        "Bedrock",
+        "Cross-Play"
+      ],
+      "ownerId": "fa375cee-f310-4cd8-b6d8-409c03319541",
+      "ownerName": "officiallimbomc",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 100,
+      "version": "Velocity 1.7.2-26.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-07-30T00:38:55.936Z",
+      "updatedAt": "2026-07-30T00:38:55.936Z",
+      "lastPingAt": "2026-07-30T00:38:56.308Z",
+      "javaStatusTarget": "play.limbomc.net",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-07-30T00:38:56.308Z",
+            "playersOnline": 0,
+            "playersMax": 100,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-07-30T00:38:56.308Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
     }
   ],
   "clients": [
