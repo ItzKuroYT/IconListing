@@ -6017,7 +6017,7 @@
       "discordUrl": "https://discord.gg/PYuB3xQN3g",
       "youtubeUrl": "",
       "country": "United States",
-      "bannerUrl": "",
+      "bannerUrl": "https://www.image2url.com/r2/default/gifs/1785372132681-8876cfde-542e-4bee-8a2c-b17ce3ec29dc.gif",
       "description": "☁️LimboMC☁️\n\n📍LimboMC isn't just any kind of hardcore server!\nonce you die you go to limbo to collect soul wisp to return to 'overworld'.\n\nSome of the stuff we offer:\n🪩Bedrock and Java crossplay\n🔥Intense PvP\n🔖Bounties\n🎟️Unique Experience\n🟢24/7\nand more!",
       "tags": [
         "Survival",
@@ -6034,8 +6034,8 @@
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-07-30T00:38:55.936Z",
-      "updatedAt": "2026-07-30T00:38:55.936Z",
-      "lastPingAt": "2026-07-30T00:38:56.308Z",
+      "updatedAt": "2026-07-30T00:42:31.047Z",
+      "lastPingAt": "2026-07-30T00:42:31.410Z",
       "javaStatusTarget": "play.limbomc.net",
       "javaSrvResolved": false,
       "analytics": {
@@ -6043,16 +6043,16 @@
         "ipCopyVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-07-30T00:38:56.308Z",
+            "createdAt": "2026-07-30T00:42:31.410Z",
             "playersOnline": 0,
             "playersMax": 100,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-07-30T00:38:56.308Z",
-      "uptimeChecks": 1,
-      "uptimeSuccesses": 1,
+      "lastSuccessfulPingAt": "2026-07-30T00:42:31.410Z",
+      "uptimeChecks": 2,
+      "uptimeSuccesses": 2,
       "iconUrl": "",
       "iconListingVoteQueue": []
     }
