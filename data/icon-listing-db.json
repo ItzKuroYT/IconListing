@@ -380,6 +380,25 @@
       "googleName": "Asher",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJzi1KWDQp01u9XOthrVIEmW73NDbGToaHFZVDNntAQEkKeAqMh=s96-c",
       "updatedAt": "2026-07-28T01:28:05.833Z"
+    },
+    {
+      "id": "fa375cee-f310-4cd8-b6d8-409c03319541",
+      "username": "officiallimbomc",
+      "email": "officiallimbomc@gmail.com",
+      "passwordHash": "8b749f4dc71298022f431401c50bf259:fafafa9650d2389ee4079a096cce3a69be783b6752846cb75d7e1278a2958698",
+      "emailOptIn": false,
+      "emailOptInAt": "",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-07-30T00:36:01.483Z",
+      "banned": false,
+      "createdAt": "2026-07-30T00:36:01.483Z",
+      "emailVerification": {
+        "codeHash": "bffbf67bf85496b95df93976b2b49249a69bcbc7a75ba751d04f47884f662e31",
+        "createdAt": "2026-07-30T00:36:01.483Z",
+        "expiresAt": "2026-07-30T00:51:01.483Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
