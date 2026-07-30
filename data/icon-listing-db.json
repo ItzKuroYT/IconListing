@@ -6026,7 +6026,7 @@
       ],
       "ownerId": "fa375cee-f310-4cd8-b6d8-409c03319541",
       "ownerName": "officiallimbomc",
-      "votes": 0,
+      "votes": 1,
       "playersOnline": 0,
       "playersMax": 100,
       "version": "Velocity 1.7.2-26.2",
@@ -6240,9 +6240,20 @@
       "serverId": "e05bb489-241c-420c-8243-6427106b4476",
       "minecraftUsername": "TheStickBoy",
       "createdAt": "2026-07-26T18:19:02.099Z"
+    },
+    {
+      "id": "c80125cb-78e6-4342-bc84-94c483f92e5d",
+      "serverId": "143f6350-32e3-494b-a57a-9228b7a34204",
+      "minecraftUsername": "Keitoroo",
+      "createdAt": "2026-07-30T00:39:58.365Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "143f6350-32e3-494b-a57a-9228b7a34204": {
+      "visitor:bb71602eafac76d1586e837f65069b38fb9981a22660b9361adaddf15e16e219": "2026-07-30T00:39:58.365Z",
+      "name:keitoroo": "2026-07-30T00:39:58.365Z"
+    }
+  },
   "deleted": {
     "users": {
       "e7f69622-09e1-4b86-af3c-b90fff23b3ca": "2026-06-29T22:53:42.842Z"
