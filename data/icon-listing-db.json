@@ -6034,8 +6034,8 @@
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-07-30T00:38:55.936Z",
-      "updatedAt": "2026-07-30T00:42:31.047Z",
-      "lastPingAt": "2026-07-30T00:42:31.410Z",
+      "updatedAt": "2026-07-30T00:42:38.461Z",
+      "lastPingAt": "2026-07-30T00:42:38.493Z",
       "javaStatusTarget": "play.limbomc.net",
       "javaSrvResolved": false,
       "analytics": {
@@ -6043,14 +6043,14 @@
         "ipCopyVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-07-30T00:42:31.410Z",
+            "createdAt": "2026-07-30T00:42:38.493Z",
             "playersOnline": 0,
             "playersMax": 100,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-07-30T00:42:31.410Z",
+      "lastSuccessfulPingAt": "2026-07-30T00:42:38.493Z",
       "uptimeChecks": 2,
       "uptimeSuccesses": 2,
       "iconUrl": "",
