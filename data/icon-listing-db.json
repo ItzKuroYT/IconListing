@@ -6242,16 +6242,16 @@
       "createdAt": "2026-07-26T18:19:02.099Z"
     },
     {
-      "id": "da87c0fe-9c50-41ef-8a73-2b46cef20a1e",
+      "id": "71a7a7a7-6c5b-4134-9e5d-f2d4f71bddf7",
       "serverId": "143f6350-32e3-494b-a57a-9228b7a34204",
       "minecraftUsername": "Keitoroo",
-      "createdAt": "2026-07-30T00:40:02.267Z"
+      "createdAt": "2026-07-30T00:40:02.365Z"
     }
   ],
   "voteIps": {
     "143f6350-32e3-494b-a57a-9228b7a34204": {
-      "visitor:bb71602eafac76d1586e837f65069b38fb9981a22660b9361adaddf15e16e219": "2026-07-30T00:40:02.267Z",
-      "name:keitoroo": "2026-07-30T00:40:02.267Z"
+      "visitor:bb71602eafac76d1586e837f65069b38fb9981a22660b9361adaddf15e16e219": "2026-07-30T00:40:02.365Z",
+      "name:keitoroo": "2026-07-30T00:40:02.365Z"
     }
   },
   "deleted": {
