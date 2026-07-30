@@ -6180,6 +6180,69 @@
       "uptimeSuccesses": 6,
       "iconUrl": "",
       "iconListingVoteQueue": []
+    },
+    {
+      "id": "97cf7ccf-0ed1-44e4-ab18-2ac2d9934ab2",
+      "name": "Meems smp",
+      "edition": "java",
+      "javaHost": "Meem.mc.gg",
+      "javaPort": 25565,
+      "crossPlay": true,
+      "bedrockType": "server",
+      "bedrockHost": "Meem.mc.gg",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_760aa8bf8e92adfb612a077163cdd9bb5b5b",
+      "websiteUrl": "https://meems.tebex.store/",
+      "discordUrl": "https://discord.gg/8eANk2w4s",
+      "youtubeUrl": "https://youtu.be/KrVRdaDd3ro?si=embXblQe_HAGjBAY",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "Meems smp is a new server that was built by Minecraft veteran owners who’s last server was shutdown after the owners let it die, because of neglect. That being said MEEMS SMP is a community driven server with owners with that one goal in mind each and every season. (NO CRYSTAL PVP)",
+      "tags": [
+        "Survival",
+        "Anarchy",
+        "Economy",
+        "PvP",
+        "New"
+      ],
+      "ownerId": "b2e9f795-d1cf-4abb-b287-db6560f8f17c",
+      "ownerName": "AnnabelleShwartzan",
+      "votes": 0,
+      "playersOnline": 2,
+      "playersMax": 100,
+      "version": "Paper 1.21.11",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-07-30T22:52:00.454Z",
+      "updatedAt": "2026-07-30T22:52:00.455Z",
+      "lastPingAt": "2026-07-30T22:52:00.736Z",
+      "javaStatusTarget": "Meem.mc.gg",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-07-30T22:52:00.736Z",
+            "playersOnline": 2,
+            "playersMax": 100,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-07-30T22:52:00.736Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
     }
   ],
   "clients": [
