@@ -29,8 +29,8 @@ const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
 const PUBLIC_DATA_IMAGE_LIMIT = 12000;
-const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
-const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage", "googleStart", "googleCallback"]);
 const loginFailures = new Map();
 
@@ -247,9 +247,23 @@ module.exports = async function handler(req, res) {
     if (action === "trackCopy") {
       const server = db.servers.find((item) => item.id === body.serverId);
       if (!server) throw httpError(404, "Listing not found.");
-      recordIpCopy(server, req);
-      await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
+      const changed = recordIpCopy(server, req);
+      if (changed) await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
       return json(res, 200, writePayload({ ok: true, analytics: publicAnalytics(server, { full: true }) }));
+    }
+
+    if (action === "trackServerView") {
+      const server = findServerByKey(db.servers, body.serverId || body.serverSlug || body.slug);
+      if (!server) throw httpError(404, "Listing not found.");
+      const changed = recordServerView(server, req);
+      if (changed) await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
+      return json(res, 200, writePayload({ ok: true, analytics: publicAnalytics(server, { full: true }) }));
+    }
+
+    if (action === "trackSiteVisit") {
+      const changed = recordSiteVisit(db, req);
+      const persistedDb = changed ? await saveDb(db) : db;
+      return json(res, 200, writePayload({ ok: true, siteAnalytics: publicSiteAnalytics(persistedDb.siteAnalytics) }));
     }
 
     if (action === "accountUpdate") {
@@ -1039,7 +1053,7 @@ function apiOrigin(value = "") {
 }
 
 function freshDb() {
-  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {}, deleted: { users: {}, servers: {}, clients: {}, hosts: {} } };
+  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {}, siteAnalytics: {}, deleted: { users: {}, servers: {}, clients: {}, hosts: {} } };
 }
 
 function migrateDb(db = freshDb()) {
@@ -1053,6 +1067,7 @@ function migrateDb(db = freshDb()) {
     hosts: Array.isArray(db.hosts) ? db.hosts.filter((host) => !String(host.id || "").startsWith("host-")).map(normalizeHost) : [],
     votes: Array.isArray(db.votes) ? db.votes : [],
     voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {},
+    siteAnalytics: normalizeSiteAnalytics(db.siteAnalytics),
     deleted: normalizeDeleted(db.deleted)
   };
 }
@@ -1187,7 +1202,8 @@ function mergeRecoveryDb(primaryDb, recoveryDb) {
     clients: mergeClientsWithRecovery(primary.clients, recovery.clients, deleted.clients),
     hosts: mergeHostsWithRecovery(primary.hosts, recovery.hosts, deleted.hosts),
     votes: mergeVotesWithRecovery(primary.votes, recovery.votes, servers, deleted.servers),
-    voteIps: pruneDeletedVoteIps(mergeVoteIps(recovery.voteIps, primary.voteIps), deleted.servers)
+    voteIps: pruneDeletedVoteIps(mergeVoteIps(recovery.voteIps, primary.voteIps), deleted.servers),
+    siteAnalytics: mergeSiteAnalytics(primary.siteAnalytics, recovery.siteAnalytics)
   });
 }
 
@@ -1446,7 +1462,8 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
     clients: mergeById(remote.clients, next.clients, deletedClients, ids.touchedClients),
     hosts: mergeById(remote.hosts, next.hosts, deletedHosts, ids.touchedHosts),
     votes: mergeVotes(remote.votes, next.votes, deletedServers, ids.touchedVotes, ids.touchedServers),
-    voteIps: mergeVoteIps(remote.voteIps, next.voteIps, deletedServers)
+    voteIps: mergeVoteIps(remote.voteIps, next.voteIps, deletedServers),
+    siteAnalytics: mergeSiteAnalytics(remote.siteAnalytics, next.siteAnalytics)
   };
   pruneVoteCooldowns(merged);
   ensureMergedWriteIsValid(merged, options);
@@ -1532,6 +1549,7 @@ function hasAnyStoredData(db) {
     db.hosts.length ||
     db.votes.length ||
     Object.keys(db.voteIps || {}).length ||
+    countDailyCopies(normalizeSiteAnalytics(db.siteAnalytics).siteVisitDaily, ANALYTICS_DAYS) ||
     Object.values(deleted).some((items) => Object.keys(items).length)
   );
 }
@@ -1577,7 +1595,12 @@ function mergeById(remoteItems = [], nextItems = [], deletedIds = new Set(), tou
     if (item?.id && !deletedIds.has(item.id)) merged.set(item.id, item);
   }
   for (const item of nextItems) {
-    if (item?.id && !deletedIds.has(item.id)) merged.set(item.id, item);
+    if (!item?.id || deletedIds.has(item.id)) continue;
+    const existing = merged.get(item.id);
+    const nextItem = existing?.analytics || item.analytics
+      ? { ...item, analytics: mergeAnalytics(existing?.analytics, item.analytics) }
+      : item;
+    merged.set(item.id, nextItem);
   }
   return [...merged.values()];
 }
@@ -1708,7 +1731,8 @@ function statePayload(db, user, options = {}) {
     clients: db.clients,
     hosts: db.hosts,
     votes: detailServerId ? publicVotesForServer(db.votes, detailServerId) : [],
-    user: publicUser(user)
+    user: publicUser(user),
+    siteAnalytics: publicSiteAnalytics(db.siteAnalytics)
   };
 }
 
@@ -1719,7 +1743,8 @@ function publicSnapshotPayload(db) {
     generatedAt: new Date().toISOString(),
     servers: rankServers(next.servers, next.votes).map(publicSnapshotServer),
     clients: next.clients.map(publicSnapshotClient),
-    hosts: next.hosts.map(publicSnapshotHost)
+    hosts: next.hosts.map(publicSnapshotHost),
+    siteAnalytics: publicSiteAnalytics(next.siteAnalytics)
   };
 }
 
@@ -1868,6 +1893,7 @@ function serverPageHtmlForServer(server) {
     image,
     type: "article",
     jsonLd,
+    bootData: { server: publicSnapshotServer(server) },
     bodyTitle: server.name,
     bodyCopy: description,
     bodyHtml: serverStaticFallbackMarkup(server)
@@ -1875,48 +1901,118 @@ function serverPageHtmlForServer(server) {
 }
 
 function serverStaticFallbackMarkup(server) {
-  const address = publicServerAddress(server);
-  const bedrockAddress = server.crossPlay || (server.edition === "bedrock" && server.bedrockType !== "realm")
-    ? hostPortDisplay(server.bedrockHost, server.bedrockPort, CONFIG.defaults.bedrockPort)
+  const display = publicSnapshotServer(server);
+  const address = publicServerAddress(display);
+  const bedrockAddress = display.crossPlay || (display.edition === "bedrock" && display.bedrockType !== "realm")
+    ? hostPortDisplay(display.bedrockHost, display.bedrockPort, CONFIG.defaults.bedrockPort)
     : "";
-  const tags = (server.tags || []).filter(Boolean);
-  const description = escapeHtml(server.description || serverSeoDescription(server)).replace(/\r?\n/g, "<br>");
-  const links = [
-    server.websiteUrl ? `<a class="button" href="${escapeHtmlAttr(server.websiteUrl)}">Website</a>` : "",
-    server.discordUrl ? `<a class="button" href="${escapeHtmlAttr(server.discordUrl)}">Discord</a>` : "",
-    server.youtubeUrl ? `<a class="button" href="${escapeHtmlAttr(server.youtubeUrl)}">Trailer</a>` : ""
-  ].filter(Boolean).join("");
-  return `<section class="section static-server-detail">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Minecraft server listing</p>
-            <h1 class="section-title">${escapeHtml(server.name)}</h1>
-            <p class="section-copy">${escapeHtml(serverSeoDescription(server))}</p>
+  const isBedrockRealm = display.edition === "bedrock" && display.bedrockType === "realm";
+  const tags = (display.tags || []).filter(Boolean);
+  const bannerStyle = staticBackgroundStyle(display.bannerUrl);
+  const description = escapeHtml(display.description || serverSeoDescription(display));
+  return `<div class="detail-layout static-server-detail">
+        <aside class="info-panel">
+          <h1>${escapeHtml(display.name)}</h1>
+          ${staticInfoRow("Owner", escapeHtml(display.ownerName || "Server owner"))}
+          ${staticInfoRow("Status", `<span class="status inline"><span class="dot ${display.online ? "online" : ""}"></span>${display.online ? "Online" : "Offline"}</span>`)}
+          ${staticInfoRow("Edition", `<span class="pill">${escapeHtml(staticServerEditionLabel(display))}</span>`)}
+          ${display.edition !== "bedrock" ? staticInfoRow("Java IP", `<span class="copy-row" aria-label="Server IP"><span>${escapeHtml(address || "Not listed")}</span><button class="mini-button" type="button">Copy</button></span>`) : ""}
+          ${display.edition === "bedrock" && isBedrockRealm ? staticInfoRow("Realm Code", `<span class="copy-row" aria-label="Server IP"><span>${escapeHtml(display.realmCode || "Not listed")}</span><button class="mini-button" type="button">Copy</button></span>`) : ""}
+          ${(display.crossPlay || (display.edition === "bedrock" && !isBedrockRealm)) ? staticInfoRow("Bedrock IP", `<span class="copy-row" aria-label="Server IP"><span>${escapeHtml(bedrockAddress || "Not listed")}</span><button class="mini-button" type="button">Copy</button></span>`) : ""}
+          ${display.websiteUrl ? staticInfoRow("Website", `<a href="${escapeHtmlAttr(display.websiteUrl)}">${escapeHtml(display.websiteUrl)}</a>`) : ""}
+          ${display.discordUrl ? staticInfoRow("Discord", `<a href="${escapeHtmlAttr(display.discordUrl)}">Click to join</a>`) : ""}
+          ${staticInfoRow("Players", `${Number(display.playersOnline || 0).toLocaleString()}${display.playersMax ? `/${Number(display.playersMax).toLocaleString()}` : ""}`)}
+          ${staticInfoRow("Version", `<span class="pill">${escapeHtml(display.version || "Unknown")}</span>`)}
+          ${staticInfoRow("Rank", `#${display.rank || "-"}`)}
+          ${staticInfoRow("Votes", Number(display.votes || 0).toLocaleString())}
+          ${staticInfoRow("Uptime", `${Number(display.uptimePercent || 0).toFixed(1)}%`)}
+          ${staticInfoRow("Last Ping", display.lastPingAt ? "recently" : "Not pinged yet")}
+          ${staticInfoRow("Country", escapeHtml(display.country || "Unknown"))}
+          ${staticInfoRow("Tags", `<div class="server-tags">${tags.map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>`)}
+        </aside>
+        <section class="detail-card">
+          <div class="tabs">
+            ${staticDetailTabButton("info", "Info", true)}
+            ${staticDetailTabButton("stats", "Stats")}
+            ${staticDetailTabButton("banners", "Banners")}
+            ${staticDetailTabButton("analytics", "Analytics")}
+            ${staticDetailTabButton("trailer", "Trailer")}
           </div>
-          <a class="button primary" href="${escapeHtmlAttr(`/vote/?server=${encodeURIComponent(server.id)}`)}">Vote for ${escapeHtml(server.name)}</a>
-        </div>
-        <div class="grid two">
-          <div class="info-panel">
-            ${staticInfoRow("Status", `<span class="status inline"><span class="dot ${server.online ? "online" : ""}"></span>${server.online ? "Online" : "Offline"}</span>`)}
-            ${staticInfoRow(server.edition === "bedrock" && server.bedrockType === "realm" ? "Realm Code" : "Server IP", escapeHtml(address || "Not listed"))}
-            ${bedrockAddress && bedrockAddress !== address ? staticInfoRow("Bedrock IP", escapeHtml(bedrockAddress)) : ""}
-            ${staticInfoRow("Players", `${Number(server.playersOnline || 0).toLocaleString()}${server.playersMax ? `/${Number(server.playersMax).toLocaleString()}` : ""}`)}
-            ${staticInfoRow("Votes", Number(server.votes || 0).toLocaleString())}
-            ${staticInfoRow("Rank", `#${server.rank || "-"}`)}
-            ${staticInfoRow("Version", escapeHtml(server.version || "Unknown"))}
+          <div class="detail-body detail-tab-panel active" data-panel="info">
+            <div class="server-showcase">
+              <div class="detail-banner" style="${bannerStyle}"></div>
+              <div>
+                <p class="eyebrow">Server listing</p>
+                <h2>${escapeHtml(display.name)}</h2>
+                <p>${escapeHtml(address || bedrockAddress || "Server address not listed")}</p>
+                <div class="server-tags">${tags.slice(0, 5).map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>
+              </div>
+            </div>
+            <div class="quick-stats">
+              <div class="mini-stat"><strong>${Number(display.playersOnline || 0).toLocaleString()}</strong><span>online now</span></div>
+              <div class="mini-stat"><strong>${Number(display.votes || 0).toLocaleString()}</strong><span>votes</span></div>
+              <div class="mini-stat"><strong>#${display.rank || "-"}</strong><span>rank</span></div>
+            </div>
+            <div class="description-card">
+              <h3>About this server</h3>
+              <div class="description-text">${description}</div>
+            </div>
+            <a class="button vote-wide" href="${escapeHtmlAttr(`/vote/?server=${encodeURIComponent(display.id)}`)}">Vote for ${escapeHtml(display.name)}</a>
           </div>
-          <div class="detail-card">
-            <h2 class="detail-heading">About ${escapeHtml(server.name)}</h2>
-            <div class="description-text">${description}</div>
-            <div class="server-tags">${tags.map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>
-            ${links ? `<div class="row-actions">${links}</div>` : ""}
+          <div class="detail-body detail-tab-panel" data-panel="stats">
+            <h2 class="detail-heading">Player history</h2>
+            <p class="section-copy">Live player history loads with the interactive server page.</p>
           </div>
-        </div>
-      </section>`;
+          <div class="detail-body detail-tab-panel" data-panel="banners">
+            <h2 class="detail-heading">Banners</h2>
+            <div class="generated-banner" style="${bannerStyle}">
+              <div><strong>${escapeHtml(display.name)}</strong><span>${escapeHtml(address || bedrockAddress || "")}</span></div>
+              <div class="generated-banner-stats"><span>${display.online ? "Online" : "Offline"}</span><span>${Number(display.playersOnline || 0).toLocaleString()} players</span></div>
+            </div>
+            <label class="field banner-field"><span>HTML code</span><input class="input code-input" value="${escapeHtmlAttr(staticHtmlBannerCode(display))}" readonly></label>
+            <label class="field banner-field"><span>BB code</span><input class="input code-input" value="${escapeHtmlAttr(staticBbBannerCode(display))}" readonly></label>
+          </div>
+          <div class="detail-body detail-tab-panel" data-panel="analytics">
+            <h2 class="detail-heading">Unique IP copies</h2>
+            <div class="grid two">
+              <div class="mini-stat"><strong>${Number(display.analytics?.ipCopiesLast7 || 0).toLocaleString()}</strong><span>last 7 days</span></div>
+              <div class="mini-stat"><strong>${Number(display.analytics?.ipCopiesLast30 || 0).toLocaleString()}</strong><span>last 30 days</span></div>
+            </div>
+            <p class="detail-note">Only the first copy from the same visitor in a 30-day period is counted.</p>
+          </div>
+          <div class="detail-body detail-tab-panel" data-panel="trailer">
+            <h2 class="detail-heading">Trailer</h2>
+            ${display.youtubeUrl ? `<div class="row-actions"><a class="button primary" href="${escapeHtmlAttr(display.youtubeUrl)}">Watch trailer</a></div>` : `<div class="empty-state"><h2>No trailer added</h2><p>Add a YouTube URL from the dashboard to show a trailer here.</p></div>`}
+          </div>
+        </section>
+      </div>`;
 }
 
 function staticInfoRow(label, value) {
   return `<div class="info-row"><strong>${escapeHtml(label)}</strong><span>${value}</span></div>`;
+}
+
+function staticDetailTabButton(id, label, active = false) {
+  return `<button class="tab ${active ? "active" : ""}" type="button" data-detail-tab="${escapeHtmlAttr(id)}">${escapeHtml(label)}</button>`;
+}
+
+function staticServerEditionLabel(server) {
+  if (server.edition === "bedrock") return server.bedrockType === "realm" ? "Bedrock Realm" : "Bedrock";
+  return server.crossPlay ? "Java + Bedrock" : "Java";
+}
+
+function staticBackgroundStyle(value = "") {
+  const image = clean(value);
+  if (!image) return "";
+  return `background-image:url('${escapeHtmlAttr(image.replace(/\\/g, "\\\\").replace(/'/g, "%27").replace(/\r?\n/g, ""))}')`;
+}
+
+function staticHtmlBannerCode(server) {
+  return `<a href="${siteUrl(serverPath(server))}" target="_blank"><img src="${serverShareImageUrl(server)}" alt="${server.name}"></a>`;
+}
+
+function staticBbBannerCode(server) {
+  return `[url=${siteUrl(serverPath(server))}][img]${serverShareImageUrl(server)}[/img][/url]`;
 }
 
 function serverNotFoundHtml() {
@@ -2014,7 +2110,7 @@ async function syncServerStaticPages(db, options = {}) {
   }
 }
 
-function appHtml({ title, description, canonical, image, type = "website", jsonLd = null, bodyTitle = "Icon Listing", bodyCopy = "", bodyHtml = "" }) {
+function appHtml({ title, description, canonical, image, type = "website", jsonLd = null, bootData = null, bodyTitle = "Icon Listing", bodyCopy = "", bodyHtml = "" }) {
   const safeTitle = escapeHtmlAttr(trimSeo(title, 59));
   const safeDescription = escapeHtmlAttr(trimSeo(description, 158));
   const safeCanonical = escapeHtmlAttr(canonical);
@@ -2041,6 +2137,7 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="twitter:image" content="${safeImage}">
     <meta name="theme-color" content="${escapeHtmlAttr(CONFIG.theme?.colors?.purple || "#8b5cf6")}">
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
+    ${bootData ? `<script>window.__ICON_LISTING_BOOT__=${escapeScriptJson(bootData)};</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
     <link rel="stylesheet" href="/assets/css/styles.css?v=20260713-server-detail-snapshot">
     <script src="/config.js?v=20260713-server-detail-snapshot"></script>
@@ -2865,7 +2962,7 @@ function publicServer(server, user = null, options = {}) {
 
 function publicListImage(value = "", server = null, kind = "banner") {
   const image = clean(value);
-  if (/^data:image\//i.test(image) && image.length > PUBLIC_DATA_IMAGE_LIMIT) {
+  if (/^data:image\//i.test(image)) {
     return server?.id ? publicServerImageUrl(server, kind) : "";
   }
   return image;
@@ -2949,41 +3046,96 @@ function isBlockedServerHost(host = "") {
 
 function publicAnalytics(server, options = {}) {
   const analytics = normalizeAnalytics(server.analytics || {});
+  const source = server.analytics || {};
   const result = {
-    ipCopiesLast7: countDailyCopies(analytics.ipCopyDaily, 7),
-    ipCopiesLast30: countDailyCopies(analytics.ipCopyDaily, ANALYTICS_DAYS)
+    viewsLast7: Math.max(countDailyCopies(analytics.viewDaily, 7), Number(source.viewsLast7 || 0)),
+    viewsLast30: Math.max(countDailyCopies(analytics.viewDaily, ANALYTICS_DAYS), Number(source.viewsLast30 || 0)),
+    ipCopiesLast7: Math.max(countDailyCopies(analytics.ipCopyDaily, 7), Number(source.ipCopiesLast7 || 0)),
+    ipCopiesLast30: Math.max(countDailyCopies(analytics.ipCopyDaily, ANALYTICS_DAYS), Number(source.ipCopiesLast30 || 0))
   };
   if (options.full) {
+    result.viewDaily = denseDailyCopies(analytics.viewDaily, ANALYTICS_DAYS);
     result.ipCopyDaily = denseDailyCopies(analytics.ipCopyDaily, ANALYTICS_DAYS);
     result.playerHistory = compactPlayerHistory(analytics.playerHistory);
   }
   return result;
 }
 
+function publicSiteAnalytics(analytics = {}, options = {}) {
+  const normalized = normalizeSiteAnalytics(analytics);
+  const uniqueVisitsLast7 = Math.max(countDailyCopies(normalized.siteVisitDaily, 7), Number(analytics.uniqueVisitsLast7 || analytics.websiteVisitsLast7 || 0));
+  const uniqueVisitsLast30 = Math.max(countDailyCopies(normalized.siteVisitDaily, ANALYTICS_DAYS), Number(analytics.uniqueVisitsLast30 || analytics.websiteVisitsLast30 || 0));
+  const result = {
+    uniqueVisitsLast7,
+    uniqueVisitsLast30,
+    websiteVisitsLast7: uniqueVisitsLast7,
+    websiteVisitsLast30: uniqueVisitsLast30
+  };
+  if (options.full) result.siteVisitDaily = denseDailyCopies(normalized.siteVisitDaily, ANALYTICS_DAYS);
+  return result;
+}
+
 function normalizeAnalytics(analytics = {}) {
-  const daily = new Map();
-  const visitorDays = normalizeIpCopyVisitorDays(analytics.ipCopyVisitorDays);
+  const ipCopyVisitorDays = normalizeIpCopyVisitorDays(analytics.ipCopyVisitorDays);
+  const ipCopyDaily = normalizeMetricDaily(analytics.ipCopyDaily, ipCopyVisitorDays);
   for (const item of Array.isArray(analytics.ipCopyDaily) ? analytics.ipCopyDaily : []) {
     const date = dateKey(item.date);
-    if (date) daily.set(date, Math.max(Number(daily.get(date) || 0), Number(item.count || 0)));
+    if (date) ipCopyDaily.set(date, Math.max(Number(ipCopyDaily.get(date) || 0), Number(item.count || 0)));
   }
   for (const copy of Array.isArray(analytics.ipCopies) ? analytics.ipCopies : []) {
     const date = dateKey(copy.createdAt);
     if (!date || !isRecentDateKey(date, ANALYTICS_DAYS)) continue;
     const hash = shortVisitorHash(copy.visitorHash || "");
-    const visitors = visitorDays[date] || [];
+    const visitors = ipCopyVisitorDays[date] || [];
     if (hash && !visitors.includes(hash)) {
       if (visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(hash);
-      visitorDays[date] = visitors;
-      daily.set(date, Number(daily.get(date) || 0) + 1);
+      ipCopyVisitorDays[date] = visitors;
+      ipCopyDaily.set(date, Number(ipCopyDaily.get(date) || 0) + 1);
     }
   }
-  pruneVisitorDays(visitorDays);
+  pruneVisitorDays(ipCopyVisitorDays);
+  const viewVisitorDays = normalizeIpCopyVisitorDays(analytics.viewVisitorDays || analytics.serverViewVisitorDays);
+  const viewDaily = normalizeMetricDaily(analytics.viewDaily || analytics.viewsDaily || analytics.serverViewDaily, viewVisitorDays);
+  for (const view of Array.isArray(analytics.views) ? analytics.views : []) {
+    const date = dateKey(view.createdAt);
+    if (!date || !isRecentDateKey(date, ANALYTICS_DAYS)) continue;
+    const hash = shortVisitorHash(view.visitorHash || "");
+    const visitors = viewVisitorDays[date] || [];
+    if (hash && !visitors.includes(hash)) {
+      if (visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(hash);
+      viewVisitorDays[date] = visitors;
+      viewDaily.set(date, Number(viewDaily.get(date) || 0) + 1);
+    }
+  }
+  pruneVisitorDays(viewVisitorDays);
   return {
-    ipCopyDaily: sparseDailyCopies(daily, ANALYTICS_DAYS),
-    ipCopyVisitorDays: visitorDays,
+    ipCopyDaily: sparseDailyCopies(ipCopyDaily, ANALYTICS_DAYS),
+    ipCopyVisitorDays,
+    viewDaily: sparseDailyCopies(viewDaily, ANALYTICS_DAYS),
+    viewVisitorDays,
     playerHistory: compactPlayerHistory(analytics.playerHistory)
   };
+}
+
+function normalizeSiteAnalytics(analytics = {}) {
+  const siteVisitVisitorDays = normalizeIpCopyVisitorDays(analytics.siteVisitVisitorDays || analytics.visitVisitorDays);
+  return {
+    siteVisitDaily: sparseDailyCopies(normalizeMetricDaily(analytics.siteVisitDaily || analytics.visitDaily, siteVisitVisitorDays), ANALYTICS_DAYS),
+    siteVisitVisitorDays
+  };
+}
+
+function normalizeMetricDaily(entries = [], visitorDays = {}) {
+  const daily = new Map();
+  for (const item of Array.isArray(entries) ? entries : []) {
+    const date = dateKey(item.date);
+    if (date) daily.set(date, Math.max(Number(daily.get(date) || 0), Number(item.count || 0)));
+  }
+  for (const [date, hashes] of Object.entries(visitorDays || {})) {
+    const key = dateKey(date);
+    if (key) daily.set(key, Math.max(Number(daily.get(key) || 0), Array.isArray(hashes) ? hashes.length : 0));
+  }
+  return daily;
 }
 
 function normalizeIpCopyVisitorDays(value = {}) {
@@ -3000,19 +3152,87 @@ function normalizeIpCopyVisitorDays(value = {}) {
 
 function recordIpCopy(server, req) {
   const analytics = normalizeAnalytics(server.analytics || {});
-  const date = new Date().toISOString().slice(0, 10);
-  const visitorHash = shortVisitorHash(clientHash(req));
-  const visitors = analytics.ipCopyVisitorDays[date] || [];
-  const alreadyCounted = visitorHash && visitors.includes(visitorHash);
-  if (!alreadyCounted) {
-    if (visitorHash && visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(visitorHash);
-    analytics.ipCopyVisitorDays[date] = visitors;
-    const daily = new Map(analytics.ipCopyDaily.map((item) => [item.date, Number(item.count || 0)]));
-    daily.set(date, Number(daily.get(date) || 0) + 1);
-    analytics.ipCopyDaily = sparseDailyCopies(daily, ANALYTICS_DAYS);
-  }
-  pruneVisitorDays(analytics.ipCopyVisitorDays);
+  const changed = recordUniqueDailyMetric(analytics, "ipCopyDaily", "ipCopyVisitorDays", shortVisitorHash(clientHash(req)));
   server.analytics = analytics;
+  return changed;
+}
+
+function recordServerView(server, req) {
+  const analytics = normalizeAnalytics(server.analytics || {});
+  const changed = recordUniqueDailyMetric(analytics, "viewDaily", "viewVisitorDays", shortVisitorHash(ipHash(req)));
+  server.analytics = analytics;
+  return changed;
+}
+
+function recordSiteVisit(db, req) {
+  const analytics = normalizeSiteAnalytics(db.siteAnalytics || {});
+  const changed = recordUniqueDailyMetric(analytics, "siteVisitDaily", "siteVisitVisitorDays", shortVisitorHash(ipHash(req)));
+  db.siteAnalytics = analytics;
+  return changed;
+}
+
+function recordUniqueDailyMetric(analytics, dailyKey, visitorDaysKey, visitorHash) {
+  if (!analytics[visitorDaysKey] || typeof analytics[visitorDaysKey] !== "object" || Array.isArray(analytics[visitorDaysKey])) analytics[visitorDaysKey] = {};
+  if (!Array.isArray(analytics[dailyKey])) analytics[dailyKey] = [];
+  const date = new Date().toISOString().slice(0, 10);
+  const visitors = analytics[visitorDaysKey][date] || [];
+  if (visitorHash && visitors.includes(visitorHash)) {
+    pruneVisitorDays(analytics[visitorDaysKey]);
+    return false;
+  }
+  if (visitorHash && visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(visitorHash);
+  analytics[visitorDaysKey][date] = visitors;
+  const daily = new Map(analytics[dailyKey].map((item) => [item.date, Number(item.count || 0)]));
+  daily.set(date, Math.max(Number(daily.get(date) || 0) + 1, visitors.length));
+  analytics[dailyKey] = sparseDailyCopies(daily, ANALYTICS_DAYS);
+  pruneVisitorDays(analytics[visitorDaysKey]);
+  return true;
+}
+
+function mergeSiteAnalytics(...items) {
+  const visitorDays = mergeVisitorDays(...items.map((item) => normalizeSiteAnalytics(item).siteVisitVisitorDays));
+  return normalizeSiteAnalytics({
+    siteVisitDaily: mergeDailyCopies(...items.map((item) => normalizeSiteAnalytics(item).siteVisitDaily), sparseDailyCopies(normalizeMetricDaily([], visitorDays), ANALYTICS_DAYS)),
+    siteVisitVisitorDays: visitorDays
+  });
+}
+
+function mergeAnalytics(...items) {
+  const normalized = items.map(normalizeAnalytics);
+  const ipCopyVisitorDays = mergeVisitorDays(...normalized.map((item) => item.ipCopyVisitorDays));
+  const viewVisitorDays = mergeVisitorDays(...normalized.map((item) => item.viewVisitorDays));
+  const playerHistory = compactPlayerHistory(normalized.flatMap((item) => item.playerHistory || []));
+  return normalizeAnalytics({
+    ipCopyDaily: mergeDailyCopies(...normalized.map((item) => item.ipCopyDaily), sparseDailyCopies(normalizeMetricDaily([], ipCopyVisitorDays), ANALYTICS_DAYS)),
+    ipCopyVisitorDays,
+    viewDaily: mergeDailyCopies(...normalized.map((item) => item.viewDaily), sparseDailyCopies(normalizeMetricDaily([], viewVisitorDays), ANALYTICS_DAYS)),
+    viewVisitorDays,
+    playerHistory
+  });
+}
+
+function mergeDailyCopies(...entryLists) {
+  const daily = new Map();
+  for (const entries of entryLists) {
+    for (const item of Array.isArray(entries) ? entries : []) {
+      const date = dateKey(item.date);
+      if (date) daily.set(date, Math.max(Number(daily.get(date) || 0), Number(item.count || 0)));
+    }
+  }
+  return sparseDailyCopies(daily, ANALYTICS_DAYS);
+}
+
+function mergeVisitorDays(...visitorDayItems) {
+  const merged = {};
+  for (const item of visitorDayItems) {
+    const normalized = normalizeIpCopyVisitorDays(item);
+    for (const [date, hashes] of Object.entries(normalized)) {
+      const current = merged[date] || [];
+      merged[date] = [...new Set([...current, ...hashes])].slice(0, COPY_HASHES_PER_DAY_LIMIT);
+    }
+  }
+  pruneVisitorDays(merged);
+  return merged;
 }
 
 function countDailyCopies(entries = [], days = ANALYTICS_DAYS) {
@@ -3079,6 +3299,10 @@ function clientHash(req) {
   const ip = requestIp(req);
   const agent = req.headers["user-agent"] || req.headers["User-Agent"] || "";
   return crypto.createHmac("sha256", SESSION_SECRET).update(`${ip}|${agent}`).digest("hex");
+}
+
+function ipHash(req) {
+  return crypto.createHmac("sha256", SESSION_SECRET).update(requestIp(req)).digest("hex");
 }
 
 function loginRateKey(req, login = "") {

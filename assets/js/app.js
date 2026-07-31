@@ -5,11 +5,13 @@ const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const TRUSTPILOT_REVIEW_URL = "https://www.trustpilot.com/review/minecraftlisting.org";
 let turnstileLoadPromise = null;
 const renderedTurnstileWidgets = new Map();
 let publicSnapshotPromise = null;
+let siteVisitTracked = false;
+const trackedServerViews = new Set();
 
 function copy(path, fallback = "") {
   return path.split(".").reduce((value, key) => value?.[key], CONFIG.copy) ?? fallback;
@@ -68,7 +70,7 @@ function clearLegacyLocalOverlays() {
 }
 
 function freshDb() {
-  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {} };
+  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {}, siteAnalytics: {} };
 }
 
 function migrateDb(db) {
@@ -81,7 +83,8 @@ function migrateDb(db) {
     clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")).map(normalizeClient) : [],
     hosts: Array.isArray(db.hosts) ? db.hosts.filter((host) => !String(host.id || "").startsWith("host-")).map(normalizeHost) : [],
     votes: Array.isArray(db.votes) ? db.votes : [],
-    voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {}
+    voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {},
+    siteAnalytics: normalizeSiteAnalytics(db.siteAnalytics)
   };
   store.fallbackDb = next;
   return next;
@@ -372,9 +375,45 @@ function publicClientState(state = {}, options = {}) {
     clients: (Array.isArray(state.clients) ? state.clients : []).map(normalizeClient),
     hosts: (Array.isArray(state.hosts) ? state.hosts : []).map(normalizeHost),
     votes,
+    siteAnalytics: publicSiteAnalytics(state.siteAnalytics || {}),
     user: options.user === undefined ? (store.session?.user || null) : options.user,
     apiHydrating: !!options.apiHydrating
   };
+}
+
+function embeddedServerFallback() {
+  const server = window.__ICON_LISTING_BOOT__?.server;
+  if (!server || typeof server !== "object" || !server.id) return null;
+  try {
+    return publicClientServer(server);
+  } catch {
+    return null;
+  }
+}
+
+function mergeEmbeddedServerFallback(state = {}) {
+  if (document.body.dataset.page !== "server") return state;
+  const fallback = embeddedServerFallback();
+  if (!fallback) return state;
+  const servers = Array.isArray(state.servers) ? state.servers : [];
+  const existing = findServerFromLocation(servers);
+  if (existing) return state;
+  const nextServers = servers.some((server) => server.id === fallback.id)
+    ? servers.map((server) => (server.id === fallback.id ? { ...server, ...fallback } : server))
+    : [...servers, fallback];
+  return { ...state, servers: rankServers(nextServers, state.votes || []) };
+}
+
+function embeddedServerFallbackState(options = {}) {
+  const fallback = embeddedServerFallback();
+  if (!fallback) return null;
+  return publicClientState({
+    servers: [fallback],
+    votes: Array.isArray(window.__ICON_LISTING_BOOT__?.votes) ? window.__ICON_LISTING_BOOT__.votes : [],
+    clients: [],
+    hosts: [],
+    siteAnalytics: window.__ICON_LISTING_BOOT__?.siteAnalytics || {}
+  }, { user: store.session?.user || null, apiHydrating: options.apiHydrating !== false });
 }
 
 function publicClientServer(server = {}) {
@@ -389,7 +428,7 @@ function publicClientServer(server = {}) {
 
 function publicListImage(value = "", server = null, kind = "banner") {
   const image = clean(value);
-  if (/^data:image\//i.test(image) && image.length > 12000) {
+  if (/^data:image\//i.test(image)) {
     return server?.id || server?.name ? apiActionUrl("serverImage", { slug: serverSlug(server.name, server.id), kind }) : "";
   }
   return image;
@@ -441,6 +480,7 @@ function fallbackRequest(action, payload) {
       })),
       clients: db.clients,
       hosts: db.hosts,
+      siteAnalytics: publicSiteAnalytics(db.siteAnalytics),
       user: publicUser(user),
       votes: detailServerId ? db.votes.filter((vote) => vote.serverId === detailServerId && String(vote.createdAt || "").startsWith(new Date().toISOString().slice(0, 7))) : []
     });
@@ -561,6 +601,18 @@ function fallbackRequest(action, payload) {
     recordLocalIpCopy(server);
     save();
     return Promise.resolve({ ok: true, analytics: publicAnalytics(server, { full: true }) });
+  }
+  if (action === "trackServerView") {
+    const server = db.servers.find((item) => item.id === payload.serverId);
+    if (!server) return Promise.reject(new Error("Listing not found."));
+    recordLocalServerView(server);
+    save();
+    return Promise.resolve({ ok: true, analytics: publicAnalytics(server, { full: true }) });
+  }
+  if (action === "trackSiteVisit") {
+    recordLocalSiteVisit(db);
+    save();
+    return Promise.resolve({ ok: true, siteAnalytics: publicSiteAnalytics(db.siteAnalytics) });
   }
   if (action === "accountUpdate") {
     if (!user) return Promise.reject(new Error("Log in before editing your account."));
@@ -981,7 +1033,7 @@ async function getState() {
   const state = await request("state", detailServerId ? { serverId: detailServerId } : detailServerSlug ? { serverSlug: detailServerSlug } : {}, "GET");
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
-  const next = { ...state, votes: state.votes || [] };
+  const next = mergeEmbeddedServerFallback({ ...state, votes: state.votes || [] });
   cachePublicState(next);
   return next;
 }
@@ -993,7 +1045,7 @@ async function loadPublicSnapshotState() {
         if (!response.ok) throw new Error("Public listing snapshot unavailable.");
         return response.json();
       })
-      .then((snapshot) => publicClientState(snapshot, { user: store.session?.user || null, apiHydrating: true }))
+      .then((snapshot) => mergeEmbeddedServerFallback(publicClientState(snapshot, { user: store.session?.user || null, apiHydrating: true })))
       .catch(() => null);
   }
   return publicSnapshotPromise;
@@ -1261,41 +1313,96 @@ function loadingNotice(title = "Loading shared listings", body = "Fetching the n
 
 function publicAnalytics(server, options = {}) {
   const analytics = normalizeAnalytics(server.analytics || {});
+  const source = server.analytics || {};
   const result = {
-    ipCopiesLast7: countDailyCopies(analytics.ipCopyDaily, 7),
-    ipCopiesLast30: countDailyCopies(analytics.ipCopyDaily, ANALYTICS_DAYS)
+    viewsLast7: Math.max(countDailyCopies(analytics.viewDaily, 7), Number(source.viewsLast7 || 0)),
+    viewsLast30: Math.max(countDailyCopies(analytics.viewDaily, ANALYTICS_DAYS), Number(source.viewsLast30 || 0)),
+    ipCopiesLast7: Math.max(countDailyCopies(analytics.ipCopyDaily, 7), Number(source.ipCopiesLast7 || 0)),
+    ipCopiesLast30: Math.max(countDailyCopies(analytics.ipCopyDaily, ANALYTICS_DAYS), Number(source.ipCopiesLast30 || 0))
   };
   if (options.full) {
+    result.viewDaily = denseDailyCopies(analytics.viewDaily, ANALYTICS_DAYS);
     result.ipCopyDaily = denseDailyCopies(analytics.ipCopyDaily, ANALYTICS_DAYS);
     result.playerHistory = compactPlayerHistory(analytics.playerHistory);
   }
   return result;
 }
 
+function publicSiteAnalytics(analytics = {}, options = {}) {
+  const normalized = normalizeSiteAnalytics(analytics);
+  const uniqueVisitsLast7 = Math.max(countDailyCopies(normalized.siteVisitDaily, 7), Number(analytics.uniqueVisitsLast7 || analytics.websiteVisitsLast7 || 0));
+  const uniqueVisitsLast30 = Math.max(countDailyCopies(normalized.siteVisitDaily, ANALYTICS_DAYS), Number(analytics.uniqueVisitsLast30 || analytics.websiteVisitsLast30 || 0));
+  const result = {
+    uniqueVisitsLast7,
+    uniqueVisitsLast30,
+    websiteVisitsLast7: uniqueVisitsLast7,
+    websiteVisitsLast30: uniqueVisitsLast30
+  };
+  if (options.full) result.siteVisitDaily = denseDailyCopies(normalized.siteVisitDaily, ANALYTICS_DAYS);
+  return result;
+}
+
 function normalizeAnalytics(analytics = {}) {
-  const daily = new Map();
-  const visitorDays = normalizeIpCopyVisitorDays(analytics.ipCopyVisitorDays);
+  const ipCopyVisitorDays = normalizeIpCopyVisitorDays(analytics.ipCopyVisitorDays);
+  const ipCopyDaily = normalizeMetricDaily(analytics.ipCopyDaily, ipCopyVisitorDays);
   for (const item of Array.isArray(analytics.ipCopyDaily) ? analytics.ipCopyDaily : []) {
     const date = dateKey(item.date);
-    if (date) daily.set(date, Math.max(Number(daily.get(date) || 0), Number(item.count || 0)));
+    if (date) ipCopyDaily.set(date, Math.max(Number(ipCopyDaily.get(date) || 0), Number(item.count || 0)));
   }
   for (const copyItem of Array.isArray(analytics.ipCopies) ? analytics.ipCopies : []) {
     const date = dateKey(copyItem.createdAt);
     if (!date || !isRecentDateKey(date, ANALYTICS_DAYS)) continue;
     const hash = shortVisitorHash(copyItem.visitorHash || "");
-    const visitors = visitorDays[date] || [];
+    const visitors = ipCopyVisitorDays[date] || [];
     if (hash && !visitors.includes(hash)) {
       if (visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(hash);
-      visitorDays[date] = visitors;
-      daily.set(date, Number(daily.get(date) || 0) + 1);
+      ipCopyVisitorDays[date] = visitors;
+      ipCopyDaily.set(date, Number(ipCopyDaily.get(date) || 0) + 1);
     }
   }
-  pruneVisitorDays(visitorDays);
+  pruneVisitorDays(ipCopyVisitorDays);
+  const viewVisitorDays = normalizeIpCopyVisitorDays(analytics.viewVisitorDays || analytics.serverViewVisitorDays);
+  const viewDaily = normalizeMetricDaily(analytics.viewDaily || analytics.viewsDaily || analytics.serverViewDaily, viewVisitorDays);
+  for (const view of Array.isArray(analytics.views) ? analytics.views : []) {
+    const date = dateKey(view.createdAt);
+    if (!date || !isRecentDateKey(date, ANALYTICS_DAYS)) continue;
+    const hash = shortVisitorHash(view.visitorHash || "");
+    const visitors = viewVisitorDays[date] || [];
+    if (hash && !visitors.includes(hash)) {
+      if (visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(hash);
+      viewVisitorDays[date] = visitors;
+      viewDaily.set(date, Number(viewDaily.get(date) || 0) + 1);
+    }
+  }
+  pruneVisitorDays(viewVisitorDays);
   return {
-    ipCopyDaily: sparseDailyCopies(daily, ANALYTICS_DAYS),
-    ipCopyVisitorDays: visitorDays,
+    ipCopyDaily: sparseDailyCopies(ipCopyDaily, ANALYTICS_DAYS),
+    ipCopyVisitorDays,
+    viewDaily: sparseDailyCopies(viewDaily, ANALYTICS_DAYS),
+    viewVisitorDays,
     playerHistory: compactPlayerHistory(analytics.playerHistory)
   };
+}
+
+function normalizeSiteAnalytics(analytics = {}) {
+  const siteVisitVisitorDays = normalizeIpCopyVisitorDays(analytics.siteVisitVisitorDays || analytics.visitVisitorDays);
+  return {
+    siteVisitDaily: sparseDailyCopies(normalizeMetricDaily(analytics.siteVisitDaily || analytics.visitDaily, siteVisitVisitorDays), ANALYTICS_DAYS),
+    siteVisitVisitorDays
+  };
+}
+
+function normalizeMetricDaily(entries = [], visitorDays = {}) {
+  const daily = new Map();
+  for (const item of Array.isArray(entries) ? entries : []) {
+    const date = dateKey(item.date);
+    if (date) daily.set(date, Math.max(Number(daily.get(date) || 0), Number(item.count || 0)));
+  }
+  for (const [date, hashes] of Object.entries(visitorDays || {})) {
+    const key = dateKey(date);
+    if (key) daily.set(key, Math.max(Number(daily.get(key) || 0), Array.isArray(hashes) ? hashes.length : 0));
+  }
+  return daily;
 }
 
 function normalizeIpCopyVisitorDays(value = {}) {
@@ -1312,18 +1419,36 @@ function normalizeIpCopyVisitorDays(value = {}) {
 
 function recordLocalIpCopy(server) {
   const analytics = normalizeAnalytics(server.analytics || {});
+  recordLocalDailyMetric(analytics, "ipCopyDaily", "ipCopyVisitorDays");
+  server.analytics = analytics;
+}
+
+function recordLocalServerView(server) {
+  const analytics = normalizeAnalytics(server.analytics || {});
+  recordLocalDailyMetric(analytics, "viewDaily", "viewVisitorDays");
+  server.analytics = analytics;
+}
+
+function recordLocalSiteVisit(db) {
+  const analytics = normalizeSiteAnalytics(db.siteAnalytics || {});
+  recordLocalDailyMetric(analytics, "siteVisitDaily", "siteVisitVisitorDays");
+  db.siteAnalytics = analytics;
+}
+
+function recordLocalDailyMetric(analytics, dailyKey, visitorDaysKey) {
+  if (!analytics[visitorDaysKey] || typeof analytics[visitorDaysKey] !== "object" || Array.isArray(analytics[visitorDaysKey])) analytics[visitorDaysKey] = {};
+  if (!Array.isArray(analytics[dailyKey])) analytics[dailyKey] = [];
   const date = new Date().toISOString().slice(0, 10);
   const visitorHash = shortVisitorHash(store.session?.user?.id || "local");
-  const visitors = analytics.ipCopyVisitorDays[date] || [];
-  if (!visitors.includes(visitorHash)) {
-    if (visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(visitorHash);
-    analytics.ipCopyVisitorDays[date] = visitors;
-    const daily = new Map(analytics.ipCopyDaily.map((item) => [item.date, Number(item.count || 0)]));
-    daily.set(date, Number(daily.get(date) || 0) + 1);
-    analytics.ipCopyDaily = sparseDailyCopies(daily, ANALYTICS_DAYS);
-  }
-  pruneVisitorDays(analytics.ipCopyVisitorDays);
-  server.analytics = analytics;
+  const visitors = analytics[visitorDaysKey][date] || [];
+  if (visitors.includes(visitorHash)) return false;
+  if (visitors.length < COPY_HASHES_PER_DAY_LIMIT) visitors.push(visitorHash);
+  analytics[visitorDaysKey][date] = visitors;
+  const daily = new Map(analytics[dailyKey].map((item) => [item.date, Number(item.count || 0)]));
+  daily.set(date, Math.max(Number(daily.get(date) || 0) + 1, visitors.length));
+  analytics[dailyKey] = sparseDailyCopies(daily, ANALYTICS_DAYS);
+  pruneVisitorDays(analytics[visitorDaysKey]);
+  return true;
 }
 
 function countDailyCopies(entries = [], days = ANALYTICS_DAYS) {
@@ -1455,15 +1580,17 @@ function popularGamemodesCard(servers = []) {
   </article>`;
 }
 
-function directorySidebar(servers = []) {
+function directorySidebar(servers = [], siteAnalytics = {}) {
   const online = onlineServerCount(servers);
   const totalPlayers = servers.reduce((sum, server) => sum + Number(server.playersOnline || 0), 0);
+  const websiteVisits = Number(siteAnalytics.websiteVisitsLast30 ?? siteAnalytics.uniqueVisitsLast30 ?? 0);
   return `<aside class="directory-sidebar">
     ${popularGamemodesCard(servers)}
     <article class="side-card stat-side-card">
       <h2>Live Directory</h2>
       <div class="side-stat"><strong>${Number(online).toLocaleString()}</strong><span>servers online</span></div>
       <div class="side-stat"><strong>${Number(totalPlayers).toLocaleString()}</strong><span>players online</span></div>
+      <div class="side-stat"><strong data-site-visits>${websiteVisits.toLocaleString()}</strong><span>website visits</span></div>
       <a class="button primary side-button" href="${route("/login/")}">Submit a server</a>
     </article>
     <article class="side-card browse-card">
@@ -1526,6 +1653,7 @@ function serverCard(server) {
   const banner = server.bannerUrl ? `background-image:url('${escapeHtml(asset(server.bannerUrl))}')` : "";
   const editionLabel = serverEditionLabel(server);
   const icon = serverIconUrl(server);
+  const views = Number(server.analytics?.viewsLast30 || 0);
   return `<article class="server-card ${server.sponsored ? "sponsored" : ""}" data-server-id="${escapeHtml(server.id)}">
     <a class="server-card-link" href="${serverRoute(server)}" aria-label="Open ${escapeHtml(server.name)} listing"></a>
     <div class="rank-stack">
@@ -1538,6 +1666,7 @@ function serverCard(server) {
       <p class="server-ip">${escapeHtml(serverAddress(server))}</p>
       <p class="server-summary">${escapeHtml(descriptionSnippet(server.description || `${server.name} is a Minecraft server listed with tags, votes, player counts, and status.`))}</p>
       <div class="server-tags"><span class="pill">${escapeHtml(editionLabel)}</span>${(server.tags || []).map((tag) => `<a class="pill above-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)}</a>`).join("")}</div>
+      <div class="server-views">${views.toLocaleString()} unique views</div>
     </div>
     <div class="stats">
       <span class="status"><span class="dot ${server.online ? "online" : ""}"></span>${server.online ? "Online" : "Offline"}</span>
@@ -1795,7 +1924,7 @@ function renderHome(state) {
           <div id="serverList" class="server-list"></div>
           <div id="serverPager"></div>
         </div>
-        ${directorySidebar(state.servers)}
+        ${directorySidebar(state.servers, state.siteAnalytics)}
       </div>
     </section>
     <section class="section seo-section">
@@ -1886,7 +2015,7 @@ function renderServers(state) {
           <div id="serverList" class="server-list"></div>
           <div id="serverPager"></div>
         </div>
-        ${directorySidebar(state.servers)}
+        ${directorySidebar(state.servers, state.siteAnalytics)}
       </div>
     </section>
   </div>`;
@@ -1894,7 +2023,7 @@ function renderServers(state) {
 }
 
 function renderServerDetail(state) {
-  const server = findServerFromLocation(state.servers);
+  const server = findServerFromLocation(state.servers) || embeddedServerFallback();
   if (!server) {
     setSeoMeta({
       title: `Server Not Found | ${CONFIG.site.name}`,
@@ -2001,6 +2130,7 @@ function renderServerDetail(state) {
     </section>
   </div>`;
   bindServerDetail(server);
+  trackServerView(server);
 }
 
 function infoRow(label, value) {
@@ -2035,6 +2165,32 @@ async function copyServerAddress(server, value) {
     // Copying should still succeed even if analytics are unavailable.
   }
   toast("Server address copied.");
+}
+
+function trackServerView(server) {
+  const id = server?.id || "";
+  if (!id || trackedServerViews.has(id)) return;
+  trackedServerViews.add(id);
+  request("trackServerView", { serverId: id }).catch(() => {
+    // Listing views are nice to have, not a reason to interrupt the page.
+  });
+}
+
+function trackSiteVisit() {
+  if (siteVisitTracked) return;
+  siteVisitTracked = true;
+  request("trackSiteVisit", { path: location.pathname }).then((result) => {
+    if (result?.siteAnalytics) updateSiteVisitDisplay(result.siteAnalytics);
+  }).catch(() => {
+    // Visit analytics should never block browsing.
+  });
+}
+
+function updateSiteVisitDisplay(siteAnalytics = {}) {
+  const visits = Number(siteAnalytics.websiteVisitsLast30 ?? siteAnalytics.uniqueVisitsLast30 ?? 0);
+  $$("[data-site-visits]").forEach((node) => {
+    node.textContent = visits.toLocaleString();
+  });
 }
 
 function serverAddress(server) {
@@ -4270,8 +4426,10 @@ function policySectionMarkup(section = {}) {
 
 function publicBootState() {
   const cached = store.publicState;
-  if (cached) return publicClientState(cached, { user: store.session?.user || null, apiHydrating: true });
-  return publicClientState({}, { user: store.session?.user || null, apiHydrating: true });
+  const state = cached
+    ? publicClientState(cached, { user: store.session?.user || null, apiHydrating: true })
+    : publicClientState({}, { user: store.session?.user || null, apiHydrating: true });
+  return mergeEmbeddedServerFallback(state);
 }
 
 function pageCanRenderBeforeApi(page) {
@@ -4299,6 +4457,11 @@ function renderCurrentPage(page, state) {
 
 function showBootFailure(page, error, seoFallbackHtml = "") {
   if (page === "server") {
+    const embeddedState = embeddedServerFallbackState({ apiHydrating: true });
+    if (embeddedState) {
+      renderServerDetail(embeddedState);
+      return;
+    }
     const cachedState = publicBootState();
     if (findServerFromLocation(cachedState.servers)) {
       renderServerDetail(cachedState);
@@ -4324,11 +4487,15 @@ async function boot() {
   const googleAuthResult = consumeGoogleAuthHash();
   const page = document.body.dataset.page || "home";
   const seoFallbackHtml = $(".seo-fallback")?.outerHTML || "";
+  const embeddedState = page === "server" ? embeddedServerFallbackState({ apiHydrating: true }) : null;
   let liveStateRendered = false;
   if (!$("#app")) renderLayout();
   syncAuthUi(store.session?.user || null);
+  trackSiteVisit();
   if (pageCanRenderBeforeApi(page)) {
     renderCurrentPage(page, publicBootState());
+  } else if (page === "server" && embeddedState) {
+    renderServerDetail(embeddedState);
   } else if (page === "server" && seoFallbackHtml) {
     $("#app").innerHTML = seoFallbackHtml;
   }
