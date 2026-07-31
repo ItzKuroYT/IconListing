@@ -424,23 +424,6 @@
       "termsAcceptedAt": "2026-07-31T00:58:27.777Z",
       "banned": false,
       "createdAt": "2026-07-31T00:58:27.777Z"
-    },
-    {
-      "id": "47ad5d05-1404-40f5-9cce-f1ca870437e0",
-      "username": "EtheriumSMP",
-      "email": "etheriummcsmp@gmail.com",
-      "passwordHash": "",
-      "emailOptIn": false,
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-07-31T01:19:48.527Z",
-      "termsAcceptedAt": "2026-07-31T01:19:48.527Z",
-      "googleLinkedAt": "2026-07-31T01:19:48.527Z",
-      "createdAt": "2026-07-31T01:19:48.527Z",
-      "banned": false,
-      "googleSub": "116283632253000671123",
-      "googleName": "Etherium SMP",
-      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocI8WRIHIVQtv3brHYegZotYwGBR6OVr8ntC7RXZag9YRX-5oX8=s96-c",
-      "updatedAt": "2026-07-31T01:19:48.527Z"
     }
   ],
   "servers": [
@@ -8021,7 +8004,7 @@
       "2026-07-31": [
         "d1024c3bf595bcb3",
         "bcb4a0789e63dcfd",
-        "bd3714c0951854e7"
+        "82f1b79f85b7f8d7"
       ]
     }
   },
