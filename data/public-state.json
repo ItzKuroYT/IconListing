@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-07-31T17:13:05.884Z",
+  "generatedAt": "2026-07-31T15:16:33.971Z",
   "servers": [
     {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
@@ -47,8 +47,8 @@
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PulsedMC-Hosting-FREE&kind=icon",
       "rank": 1,
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
+        "viewsLast7": 1,
+        "viewsLast30": 1,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       }
@@ -98,8 +98,8 @@
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=IconSMP&kind=icon",
       "rank": 2,
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
+        "viewsLast7": 1,
+        "viewsLast30": 1,
         "ipCopiesLast7": 1,
         "ipCopiesLast30": 1
       }
@@ -147,8 +147,8 @@
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CofferCraft&kind=icon",
       "rank": 3,
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
+        "viewsLast7": 1,
+        "viewsLast30": 1,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       }
@@ -590,8 +590,8 @@
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=VOIDFALL&kind=icon",
       "rank": 12,
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
+        "viewsLast7": 1,
+        "viewsLast30": 1,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       }
@@ -697,6 +697,55 @@
       }
     },
     {
+      "id": "8cc0d0b3-ab6f-4329-bd33-99bc188ba72b",
+      "name": "Tancraft",
+      "javaHost": "tancraft.org",
+      "javaPort": 25565,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "tancraft.org",
+      "crossPlay": true,
+      "bedrockHost": "tancraft.org",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/3NTZhgBCV6",
+      "youtubeUrl": "",
+      "country": "United Kingdom",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Tancraft&kind=banner",
+      "description": "Tancraft is a UK-based Town and City Roleplay server with jobs, economy, transport, and player-run businesses. Start as a guest, and work your way up to become a citizen with greater perks, property, and opportunities. Join a growing community where your story matters!",
+      "tags": [
+        "Survival",
+        "Economy",
+        "Roleplay",
+        "Towny",
+        "Bedrock"
+      ],
+      "ownerName": "tan",
+      "votes": 0,
+      "playersOnline": 2,
+      "playersMax": 18,
+      "version": "Purpur 26.1.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-07-31T15:16:27.026Z",
+      "updatedAt": "2026-07-31T15:16:27.026Z",
+      "lastPingAt": "2026-07-31T15:16:27.609Z",
+      "lastSuccessfulPingAt": "2026-07-31T15:16:27.609Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Tancraft&kind=icon",
+      "rank": 15,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      }
+    },
+    {
       "id": "f3f10c77-8974-490a-9c82-82cfdc443c82",
       "name": "CinderSMP",
       "javaHost": "bin-missing.gl.joinmc.link",
@@ -738,7 +787,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 15,
+      "rank": 16,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -786,7 +835,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 16,
+      "rank": 17,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -831,10 +880,10 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 17,
+      "rank": 18,
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
+        "viewsLast7": 1,
+        "viewsLast30": 1,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       }
@@ -876,7 +925,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 18,
+      "rank": 19,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -925,7 +974,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 19,
+      "rank": 20,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -975,10 +1024,10 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 20,
+      "rank": 21,
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
+        "viewsLast7": 1,
+        "viewsLast30": 1,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       }
@@ -1022,10 +1071,10 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 21,
+      "rank": 22,
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
+        "viewsLast7": 1,
+        "viewsLast30": 1,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       }
@@ -1077,9 +1126,9 @@
     }
   ],
   "siteAnalytics": {
-    "uniqueVisitsLast7": 2,
-    "uniqueVisitsLast30": 2,
-    "websiteVisitsLast7": 2,
-    "websiteVisitsLast30": 2
+    "uniqueVisitsLast7": 21,
+    "uniqueVisitsLast30": 21,
+    "websiteVisitsLast7": 21,
+    "websiteVisitsLast30": 21
   }
 }
