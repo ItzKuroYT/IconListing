@@ -7473,19 +7473,19 @@
       "javaStatusTarget": "iconmc.minehut.gg",
       "javaSrvResolved": false,
       "analytics": {
-        "ipCopyDaily": [],
-        "ipCopyVisitorDays": {},
-        "viewDaily": [
+        "ipCopyDaily": [
           {
             "date": "2026-07-31",
             "count": 1
           }
         ],
-        "viewVisitorDays": {
+        "ipCopyVisitorDays": {
           "2026-07-31": [
-            "d1024c3bf595bcb3"
+            "9294a2e3aa972e7c"
           ]
         },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-31T00:17:49.315Z",
