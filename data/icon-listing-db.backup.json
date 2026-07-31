@@ -7906,8 +7906,17 @@
       "javaStatusTarget": "tancraft.org",
       "javaSrvResolved": false,
       "analytics": {
-        "ipCopyDaily": [],
-        "ipCopyVisitorDays": {},
+        "ipCopyDaily": [
+          {
+            "date": "2026-07-31",
+            "count": 1
+          }
+        ],
+        "ipCopyVisitorDays": {
+          "2026-07-31": [
+            "9294a2e3aa972e7c"
+          ]
+        },
         "viewDaily": [
           {
             "date": "2026-07-31",
