@@ -4040,7 +4040,7 @@
           "2026-07-31": [
             "634fd5ad7f8e5fb2",
             "867ffa9b8ea6e1fe",
-            "d1024c3bf595bcb3"
+            "7a0e595117520415"
           ]
         },
         "playerHistory": [
@@ -8418,7 +8418,7 @@
     "siteVisitDaily": [
       {
         "date": "2026-07-31",
-        "count": 25
+        "count": 24
       }
     ],
     "siteVisitVisitorDays": {
@@ -8446,8 +8446,7 @@
         "4b74b4f86e3179af",
         "08ffa9430e0213fa",
         "867ffa9b8ea6e1fe",
-        "f8012dcc745851b2",
-        "719879b8e7af7edf"
+        "f8012dcc745851b2"
       ]
     }
   },
