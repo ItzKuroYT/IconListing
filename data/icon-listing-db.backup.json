@@ -411,6 +411,25 @@
       "googleName": "Annabelle Shwartzanegger",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocLGTlf91aRe3MbgD3wV8wPozMEMpI7IIq89xWhKYig_2aOZzw=s96-c",
       "updatedAt": "2026-07-30T22:48:15.042Z"
+    },
+    {
+      "id": "6b3c367d-e800-467d-8f14-bebbc25493a4",
+      "username": "tan",
+      "email": "tanplayzbusiness@outlook.com",
+      "passwordHash": "d78414e250127d5c2a82b77101f41ed3:5e5797ff091b7b017005f6958a4c3180f3892137bdf7529d07ce1031215fe078",
+      "emailOptIn": false,
+      "emailOptInAt": "",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-07-31T00:34:28.328Z",
+      "banned": false,
+      "createdAt": "2026-07-31T00:34:28.328Z",
+      "emailVerification": {
+        "codeHash": "045cea195ee4d2b29450fee45fb7f1600f1ba4755d89989a29ca1806313b5cd5",
+        "createdAt": "2026-07-31T00:34:28.329Z",
+        "expiresAt": "2026-07-31T00:49:28.329Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
@@ -464,17 +483,8 @@
             "6d71441a3636d5fc"
           ]
         },
-        "viewDaily": [
-          {
-            "date": "2026-07-31",
-            "count": 1
-          }
-        ],
-        "viewVisitorDays": {
-          "2026-07-31": [
-            "d1024c3bf595bcb3"
-          ]
-        },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.314Z",
