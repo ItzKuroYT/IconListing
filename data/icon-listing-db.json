@@ -8405,22 +8405,12 @@
       "serverId": "09c0ac09-6b69-4826-b9be-930aaf01c10f",
       "minecraftUsername": "Remains__",
       "createdAt": "2026-07-30T22:52:47.510Z"
-    },
-    {
-      "id": "9c8155b7-7b85-4c5f-a74b-b99e1a8f2240",
-      "serverId": "48c565ba-791e-4c42-9d79-60a90f5a2440",
-      "minecraftUsername": "ItzKuro_",
-      "createdAt": "2026-07-31T17:02:25.483Z"
     }
   ],
   "voteIps": {
     "09c0ac09-6b69-4826-b9be-930aaf01c10f": {
       "visitor:4999708f8b772f2ec5e58d55ce869253911cf3211a38b90466b5efbbdaa5ada1": "2026-07-30T22:52:47.510Z",
       "name:remains__": "2026-07-30T22:52:47.510Z"
-    },
-    "48c565ba-791e-4c42-9d79-60a90f5a2440": {
-      "visitor:9294a2e3aa972e7c443bde219c9bee5c766c1dc0cacca6f2fb714d6a5f743e61": "2026-07-31T17:02:25.483Z",
-      "name:itzkuro_": "2026-07-31T17:02:25.483Z"
     }
   },
   "siteAnalytics": {
