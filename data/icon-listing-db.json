@@ -3999,8 +3999,17 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-07-31",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-07-31": [
+            "d1024c3bf595bcb3"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.542Z",
@@ -7478,6 +7487,54 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-07-31T00:17:49.315Z",
+            "playersOnline": 4136,
+            "playersMax": 1405,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-31T00:17:49.315Z",
+            "playersOnline": 4136,
+            "playersMax": 1405,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-31T00:17:49.315Z",
+            "playersOnline": 4136,
+            "playersMax": 1405,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-31T00:17:49.315Z",
+            "playersOnline": 4136,
+            "playersMax": 1405,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-31T00:17:49.315Z",
+            "playersOnline": 4136,
+            "playersMax": 1405,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-31T00:17:49.315Z",
+            "playersOnline": 4136,
+            "playersMax": 1405,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-31T00:17:49.315Z",
+            "playersOnline": 4136,
+            "playersMax": 1405,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-31T00:17:49.315Z",
+            "playersOnline": 4136,
+            "playersMax": 1405,
+            "online": true
+          },
           {
             "createdAt": "2026-07-31T00:17:49.315Z",
             "playersOnline": 4136,
