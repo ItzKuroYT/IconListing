@@ -4436,6 +4436,16 @@ function pageCanRenderBeforeApi(page) {
   return !["server", "vote", "dashboard", "admin"].includes(page);
 }
 
+function renderAccountLoading(page) {
+  const admin = page === "admin";
+  $("#app").innerHTML = `<div class="page">
+    <div class="notice">
+      <strong>${admin ? "Loading admin panel..." : "Loading dashboard..."}</strong>
+      <p class="section-copy compact">Connecting to the account service.</p>
+    </div>
+  </div>`;
+}
+
 function renderCurrentPage(page, state) {
   if (page === "home") renderHome(state);
   else if (page === "servers") renderServers(state);
@@ -4498,6 +4508,8 @@ async function boot() {
     renderServerDetail(embeddedState);
   } else if (page === "server" && seoFallbackHtml) {
     $("#app").innerHTML = seoFallbackHtml;
+  } else if (page === "dashboard" || page === "admin") {
+    renderAccountLoading(page);
   }
   if (pageCanRenderBeforeApi(page) || page === "server") {
     loadPublicSnapshotState().then((snapshotState) => {

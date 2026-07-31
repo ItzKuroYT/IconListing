@@ -30,6 +30,7 @@ const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
 const PUBLIC_DATA_IMAGE_LIMIT = 12000;
 const GITHUB_WRITE_MAX_RETRIES = 5;
+const GITHUB_STATE_CACHE_MS = 15000;
 const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
 const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage", "googleStart", "googleCallback"]);
@@ -53,7 +54,7 @@ module.exports = async function handler(req, res) {
     }
     const db = migrateDb(await loadDb({
       allowRecoveryOnly: ["state", "sitemap", "login", "health", "serverPage", "serverImage"].includes(action),
-      forceFresh: WRITE_ACTIONS.has(action) || action === "state" || action === "googleCallback"
+      forceFresh: WRITE_ACTIONS.has(action) || action === "googleCallback"
     }));
     const user = await userFromRequest(req, db);
 
@@ -70,15 +71,13 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === "state") {
-      const refreshedServerIds = await refreshPings(db);
-      const saveOptions = {};
-      if (refreshedServerIds.length) saveOptions.touchedServers = refreshedServerIds;
       if (user?.fromVerifiedSession) {
-        saveOptions.requireExistingUsers = [user.id];
-        saveOptions.touchedUsers = [user.id];
-        saveOptions.uniqueUserId = user.id;
+        await saveBestEffortDb(db, {
+          requireExistingUsers: [user.id],
+          touchedUsers: [user.id],
+          uniqueUserId: user.id
+        });
       }
-      if (refreshedServerIds.length || user?.fromVerifiedSession) await saveDb(db, saveOptions);
       return json(res, 200, statePayload(db, user, { detailServerId: stateDetailServerId(req) }));
     }
 
@@ -249,7 +248,7 @@ module.exports = async function handler(req, res) {
       const server = db.servers.find((item) => item.id === body.serverId);
       if (!server) throw httpError(404, "Listing not found.");
       const changed = recordIpCopy(server, req);
-      if (changed) await saveAnalyticsDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
+      if (changed) await saveBestEffortDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
       return json(res, 200, writePayload({ ok: true, analytics: publicAnalytics(server, { full: true }) }));
     }
 
@@ -257,13 +256,13 @@ module.exports = async function handler(req, res) {
       const server = findServerByKey(db.servers, body.serverId || body.serverSlug || body.slug);
       if (!server) throw httpError(404, "Listing not found.");
       const changed = recordServerView(server, req);
-      if (changed) await saveAnalyticsDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
+      if (changed) await saveBestEffortDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
       return json(res, 200, writePayload({ ok: true, analytics: publicAnalytics(server, { full: true }) }));
     }
 
     if (action === "trackSiteVisit") {
       const changed = recordSiteVisit(db, req);
-      const persistedDb = changed ? await saveAnalyticsDb(db) : db;
+      const persistedDb = changed ? await saveBestEffortDb(db) : db;
       return json(res, 200, writePayload({ ok: true, siteAnalytics: publicSiteAnalytics(persistedDb.siteAnalytics) }));
     }
 
@@ -1137,12 +1136,20 @@ async function loadDb(options = {}) {
   if (hasGithubStorage()) {
     const cacheKey = githubStorageKey();
     const cached = githubDbCache.key === cacheKey && githubDbCache.data ? cloneJson(githubDbCache.data) : freshDb();
-    const merged = mergeDurableDb(
-      await readGithubDb({ bypassCache: !!options.forceFresh }),
-      await readGithubBackupDb({ bypassCache: !!options.forceFresh }),
-      await readRecoveryDb(),
-      cached
-    );
+    if (!options.forceFresh && hasAnyStoredData(cached) && Date.now() - Number(githubDbCache.loadedAt || 0) < GITHUB_STATE_CACHE_MS) {
+      return cached;
+    }
+    let primary = freshDb();
+    try {
+      primary = await readGithubDb({ bypassCache: !!options.forceFresh });
+    } catch (error) {
+      if (!options.allowRecoveryOnly) throw error;
+      console.error("Icon Listing shared storage read skipped for recovery response", error.message);
+    }
+    const backup = options.forceFresh || !hasAnyStoredData(primary)
+      ? await readGithubBackupDb({ bypassCache: !!options.forceFresh })
+      : freshDb();
+    const merged = mergeDurableDb(primary, backup, await readRecoveryDb(), cached);
     githubDbCache = { data: cloneJson(merged), sha: githubDbCache.sha, loadedAt: Date.now(), key: cacheKey };
     return merged;
   }
@@ -1166,11 +1173,11 @@ async function saveDb(db, options = {}) {
   return migrateDb(db);
 }
 
-async function saveAnalyticsDb(db, options = {}) {
+async function saveBestEffortDb(db, options = {}) {
   try {
     return await saveDb(db, options);
   } catch (error) {
-    console.error("Icon Listing analytics write skipped", error.message);
+    console.error("Icon Listing best-effort write skipped", error.message);
     return migrateDb(db);
   }
 }
