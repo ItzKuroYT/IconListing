@@ -4033,12 +4033,13 @@
         "viewDaily": [
           {
             "date": "2026-07-31",
-            "count": 1
+            "count": 2
           }
         ],
         "viewVisitorDays": {
           "2026-07-31": [
-            "634fd5ad7f8e5fb2"
+            "634fd5ad7f8e5fb2",
+            "867ffa9b8ea6e1fe"
           ]
         },
         "playerHistory": [
