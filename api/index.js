@@ -29,8 +29,9 @@ const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
 const PUBLIC_DATA_IMAGE_LIMIT = 12000;
+const GITHUB_WRITE_MAX_RETRIES = 5;
 const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
-const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage", "googleStart", "googleCallback"]);
 const loginFailures = new Map();
 
@@ -248,7 +249,7 @@ module.exports = async function handler(req, res) {
       const server = db.servers.find((item) => item.id === body.serverId);
       if (!server) throw httpError(404, "Listing not found.");
       const changed = recordIpCopy(server, req);
-      if (changed) await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
+      if (changed) await saveAnalyticsDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
       return json(res, 200, writePayload({ ok: true, analytics: publicAnalytics(server, { full: true }) }));
     }
 
@@ -256,13 +257,13 @@ module.exports = async function handler(req, res) {
       const server = findServerByKey(db.servers, body.serverId || body.serverSlug || body.slug);
       if (!server) throw httpError(404, "Listing not found.");
       const changed = recordServerView(server, req);
-      if (changed) await saveDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
+      if (changed) await saveAnalyticsDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
       return json(res, 200, writePayload({ ok: true, analytics: publicAnalytics(server, { full: true }) }));
     }
 
     if (action === "trackSiteVisit") {
       const changed = recordSiteVisit(db, req);
-      const persistedDb = changed ? await saveDb(db) : db;
+      const persistedDb = changed ? await saveAnalyticsDb(db) : db;
       return json(res, 200, writePayload({ ok: true, siteAnalytics: publicSiteAnalytics(persistedDb.siteAnalytics) }));
     }
 
@@ -298,8 +299,10 @@ module.exports = async function handler(req, res) {
         }
         throw error;
       }
-      await saveDb(db, { touchedUsers: [target.id], uniqueUserId: target.id });
-      return json(res, 200, writePayload({ ok: true, user: publicUser(target), token: signToken(target), message: "Email verified." }));
+      const persistedDb = await saveDb(db, { touchedUsers: [target.id], uniqueUserId: target.id });
+      const persistedUser = persistedDb.users.find((item) => item.id === target.id || same(item.email, target.email)) || target;
+      if (persistedUser.emailVerified !== true) throw httpError(500, "Email verification was not saved. Error: 67.");
+      return json(res, 200, writePayload({ ok: true, user: publicUser(persistedUser), token: signToken(persistedUser), message: "Email verified." }));
     }
 
     if (action === "resendEmailVerification") {
@@ -1163,6 +1166,15 @@ async function saveDb(db, options = {}) {
   return migrateDb(db);
 }
 
+async function saveAnalyticsDb(db, options = {}) {
+  try {
+    return await saveDb(db, options);
+  } catch (error) {
+    console.error("Icon Listing analytics write skipped", error.message);
+    return migrateDb(db);
+  }
+}
+
 async function persistedDbAfterWrite() {
   return migrateDb(await loadDb({ forceFresh: true }));
 }
@@ -1320,7 +1332,7 @@ async function readGithubDb(options = {}) {
   return cloneJson(db);
 }
 
-async function writeGithubDb(db, options = {}, retry = true) {
+async function writeGithubDb(db, options = {}, attempt = 0) {
   let normalized = migrateDb(db);
   const cacheKey = githubStorageKey();
   const cachedBeforeFreshRead = githubDbCache.key === cacheKey && githubDbCache.data ? cloneJson(githubDbCache.data) : freshDb();
@@ -1344,9 +1356,10 @@ async function writeGithubDb(db, options = {}, retry = true) {
     headers: githubHeaders(),
     body: JSON.stringify(body)
   });
-  if (response.status === 409 && retry) {
+  if ((response.status === 409 || response.status === 422) && attempt < GITHUB_WRITE_MAX_RETRIES) {
     githubDbCache = { data: null, sha: null, loadedAt: 0, key: "" };
-    return writeGithubDb(normalized, options, false);
+    await sleep(150 * (attempt + 1) + Math.floor(Math.random() * 120));
+    return writeGithubDb(normalized, options, attempt + 1);
   }
   if (!response.ok) throw new Error(`GitHub database write failed (${response.status}).`);
   const payload = await response.json();
@@ -1680,6 +1693,10 @@ function githubReadHeaders() {
 
 function cloneJson(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function parseDbFromStorage(content = "") {
@@ -2124,6 +2141,7 @@ function appHtml({ title, description, canonical, image, type = "website", jsonL
     <meta name="description" content="${safeDescription}">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157143725251440" crossorigin="anonymous"></script>
+    <meta name="google-adsense-account" content="ca-pub-5157143725251440">
     <link rel="canonical" href="${safeCanonical}">
     <meta property="og:site_name" content="${escapeHtmlAttr(CONFIG.site.name)}">
     <meta property="og:type" content="${escapeHtmlAttr(type)}">

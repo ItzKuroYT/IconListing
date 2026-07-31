@@ -1,6 +1,10 @@
 {
   "version": 2,
+<<<<<<< Updated upstream
   "generatedAt": "2026-07-31T00:18:06.365Z",
+=======
+  "generatedAt": "2026-07-31T00:41:11.485Z",
+>>>>>>> Stashed changes
   "servers": [
     {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
@@ -37,10 +41,17 @@
       "sponsored": true,
       "createdAt": "2026-07-11T05:20:38.114Z",
       "updatedAt": "2026-07-13T06:26:41.637Z",
+<<<<<<< Updated upstream
       "lastPingAt": "2026-07-31T00:13:57.555Z",
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.555Z",
       "uptimeChecks": 136,
       "uptimeSuccesses": 136,
+=======
+      "lastPingAt": "2026-07-31T00:08:25.923Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.923Z",
+      "uptimeChecks": 135,
+      "uptimeSuccesses": 135,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -133,6 +144,7 @@
       "playersMax": 50,
       "version": "Paper 1.21.11",
       "online": true,
+<<<<<<< Updated upstream
       "uptimePercent": 98.99497487437185,
       "sponsored": false,
       "createdAt": "2026-07-07T13:08:06.265Z",
@@ -141,6 +153,16 @@
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.522Z",
       "uptimeChecks": 199,
       "uptimeSuccesses": 197,
+=======
+      "uptimePercent": 98.98989898989899,
+      "sponsored": false,
+      "createdAt": "2026-07-07T13:08:06.265Z",
+      "updatedAt": "2026-07-07T13:08:06.265Z",
+      "lastPingAt": "2026-07-31T00:08:25.894Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.894Z",
+      "uptimeChecks": 198,
+      "uptimeSuccesses": 196,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -179,23 +201,39 @@
       ],
       "ownerName": "MaxFullCalypse",
       "votes": 0,
+<<<<<<< Updated upstream
       "playersOnline": 46,
       "playersMax": 47,
+=======
+      "playersOnline": 51,
+      "playersMax": 52,
+>>>>>>> Stashed changes
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
+<<<<<<< Updated upstream
       "lastPingAt": "2026-07-31T00:13:56.940Z",
       "lastSuccessfulPingAt": "2026-07-31T00:13:56.940Z",
       "uptimeChecks": 455,
       "uptimeSuccesses": 455,
+=======
+      "lastPingAt": "2026-07-31T00:08:25.726Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.726Z",
+      "uptimeChecks": 454,
+      "uptimeSuccesses": 454,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=GTM-GTA-based-minecraft-server-for-Java&kind=icon",
+<<<<<<< Updated upstream
       "rank": 4,
+=======
+      "rank": 3,
+>>>>>>> Stashed changes
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -234,6 +272,7 @@
       "playersMax": 500,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
+<<<<<<< Updated upstream
       "uptimePercent": 97.06546275395034,
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
@@ -242,11 +281,25 @@
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.112Z",
       "uptimeChecks": 443,
       "uptimeSuccesses": 430,
+=======
+      "uptimePercent": 97.05882352941177,
+      "sponsored": false,
+      "createdAt": "2026-06-24T23:07:18.215Z",
+      "updatedAt": "2026-07-09T07:59:28.615Z",
+      "lastPingAt": "2026-07-31T00:08:25.843Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.843Z",
+      "uptimeChecks": 442,
+      "uptimeSuccesses": 429,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=IconGens&kind=icon",
+<<<<<<< Updated upstream
       "rank": 5,
+=======
+      "rank": 4,
+>>>>>>> Stashed changes
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -283,6 +336,7 @@
       "playersMax": 333,
       "version": "Purpur 1.21.11",
       "online": true,
+<<<<<<< Updated upstream
       "uptimePercent": 98.07073954983923,
       "sponsored": false,
       "createdAt": "2026-07-01T05:09:11.571Z",
@@ -291,11 +345,25 @@
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.510Z",
       "uptimeChecks": 311,
       "uptimeSuccesses": 305,
+=======
+      "uptimePercent": 98.06451612903226,
+      "sponsored": false,
+      "createdAt": "2026-07-01T05:09:11.571Z",
+      "updatedAt": "2026-07-08T23:53:25.898Z",
+      "lastPingAt": "2026-07-31T00:08:25.880Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.880Z",
+      "uptimeChecks": 310,
+      "uptimeSuccesses": 304,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unbent-Flames&kind=icon",
+<<<<<<< Updated upstream
       "rank": 6,
+=======
+      "rank": 5,
+>>>>>>> Stashed changes
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -330,6 +398,7 @@
       "playersMax": 100,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
+<<<<<<< Updated upstream
       "uptimePercent": 99.45945945945947,
       "sponsored": false,
       "createdAt": "2026-07-08T02:51:29.618Z",
@@ -338,6 +407,16 @@
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.534Z",
       "uptimeChecks": 185,
       "uptimeSuccesses": 184,
+=======
+      "uptimePercent": 99.45652173913044,
+      "sponsored": false,
+      "createdAt": "2026-07-08T02:51:29.618Z",
+      "updatedAt": "2026-07-08T02:51:29.618Z",
+      "lastPingAt": "2026-07-31T00:08:25.902Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.902Z",
+      "uptimeChecks": 184,
+      "uptimeSuccesses": 183,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -380,6 +459,7 @@
       "playersMax": 50,
       "version": "forge arclight/Trials 1.20.1",
       "online": true,
+<<<<<<< Updated upstream
       "uptimePercent": 99.20634920634922,
       "sponsored": false,
       "createdAt": "2026-07-11T16:55:27.628Z",
@@ -388,6 +468,16 @@
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.566Z",
       "uptimeChecks": 126,
       "uptimeSuccesses": 125,
+=======
+      "uptimePercent": 99.2,
+      "sponsored": false,
+      "createdAt": "2026-07-11T16:55:27.628Z",
+      "updatedAt": "2026-07-11T16:55:27.628Z",
+      "lastPingAt": "2026-07-31T00:08:25.931Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.931Z",
+      "uptimeChecks": 125,
+      "uptimeSuccesses": 124,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -425,7 +515,11 @@
       ],
       "ownerName": "AnnabelleShwartzan",
       "votes": 1,
+<<<<<<< Updated upstream
       "playersOnline": 5,
+=======
+      "playersOnline": 6,
+>>>>>>> Stashed changes
       "playersMax": 100,
       "version": "Paper 1.21.11",
       "online": true,
@@ -433,15 +527,26 @@
       "sponsored": false,
       "createdAt": "2026-07-30T22:52:01.841Z",
       "updatedAt": "2026-07-30T22:52:01.841Z",
+<<<<<<< Updated upstream
       "lastPingAt": "2026-07-31T00:13:57.671Z",
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.671Z",
       "uptimeChecks": 6,
       "uptimeSuccesses": 6,
+=======
+      "lastPingAt": "2026-07-31T00:08:27.654Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:27.654Z",
+      "uptimeChecks": 5,
+      "uptimeSuccesses": 5,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
+<<<<<<< Updated upstream
       "rank": 9,
+=======
+      "rank": 8,
+>>>>>>> Stashed changes
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -481,8 +586,13 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
+<<<<<<< Updated upstream
       "lastPingAt": "2026-07-31T00:13:57.073Z",
       "uptimeChecks": 450,
+=======
+      "lastPingAt": "2026-07-31T00:08:25.813Z",
+      "uptimeChecks": 449,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -525,6 +635,7 @@
       "playersMax": 20,
       "version": "Maintenance",
       "online": true,
+<<<<<<< Updated upstream
       "uptimePercent": 79.9554565701559,
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
@@ -533,6 +644,16 @@
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.098Z",
       "uptimeChecks": 449,
       "uptimeSuccesses": 359,
+=======
+      "uptimePercent": 79.91071428571429,
+      "sponsored": false,
+      "createdAt": "2026-06-24T22:19:40.168Z",
+      "updatedAt": "2026-06-24T22:20:23.472Z",
+      "lastPingAt": "2026-07-31T00:08:25.832Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.832Z",
+      "uptimeChecks": 448,
+      "uptimeSuccesses": 358,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -576,6 +697,7 @@
       "playersMax": 0,
       "version": "Unknown",
       "online": false,
+<<<<<<< Updated upstream
       "uptimePercent": 50,
       "sponsored": false,
       "createdAt": "2026-06-30T07:10:31.396Z",
@@ -583,6 +705,15 @@
       "lastPingAt": "2026-07-31T00:13:57.486Z",
       "lastSuccessfulPingAt": "2026-07-08T23:53:03.705Z",
       "uptimeChecks": 352,
+=======
+      "uptimePercent": 50.142450142450144,
+      "sponsored": false,
+      "createdAt": "2026-06-30T07:10:31.396Z",
+      "updatedAt": "2026-07-03T21:44:22.763Z",
+      "lastPingAt": "2026-07-31T00:08:25.862Z",
+      "lastSuccessfulPingAt": "2026-07-08T23:53:03.705Z",
+      "uptimeChecks": 351,
+>>>>>>> Stashed changes
       "uptimeSuccesses": 176,
       "edition": "java",
       "bedrockType": "server",
@@ -646,6 +777,55 @@
       }
     },
     {
+      "id": "2923c780-368e-47b5-aac4-69da5d5fdb96",
+      "name": "Idacraft.net",
+      "javaHost": "idacraft.net",
+      "javaPort": 25565,
+      "javaSrvResolved": true,
+      "javaStatusTarget": "idacraft.net",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/gKckBfwkUt",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Idacraftnet&kind=banner",
+      "description": "IdaCraft.net — A small, friendly Minecraft survival server with simple gameplay, helpful plugins, and a welcoming community. We support both cracked and premium accounts, so anyone can join and start building.",
+      "tags": [
+        "Survival",
+        "Factions",
+        "PvP",
+        "SMP",
+        "Modded"
+      ],
+      "ownerName": "est93",
+      "votes": 1,
+      "playersOnline": 0,
+      "playersMax": 69,
+      "version": "BungeeCord 1.8.x-26.1.x",
+      "online": true,
+      "uptimePercent": 93.61702127659575,
+      "sponsored": false,
+      "createdAt": "2026-07-11T01:34:35.522Z",
+      "updatedAt": "2026-07-11T01:34:35.523Z",
+      "lastPingAt": "2026-07-31T00:08:25.913Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.913Z",
+      "uptimeChecks": 141,
+      "uptimeSuccesses": 132,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Idacraftnet&kind=icon",
+      "rank": 12,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      }
+    },
+    {
       "id": "967335b0-0966-4cb7-b01d-796dd61b8b76",
       "name": "Unirealm",
       "javaHost": "play.unirealm.net",
@@ -672,7 +852,11 @@
       ],
       "ownerName": "BlahBlah",
       "votes": 0,
+<<<<<<< Updated upstream
       "playersOnline": 3,
+=======
+      "playersOnline": 4,
+>>>>>>> Stashed changes
       "playersMax": 200,
       "version": "Paper 1.21.11",
       "online": true,
@@ -680,15 +864,26 @@
       "sponsored": false,
       "createdAt": "2026-07-16T08:31:34.016Z",
       "updatedAt": "2026-07-16T08:31:34.016Z",
+<<<<<<< Updated upstream
       "lastPingAt": "2026-07-31T00:13:57.588Z",
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.588Z",
       "uptimeChecks": 72,
       "uptimeSuccesses": 72,
+=======
+      "lastPingAt": "2026-07-31T00:08:25.950Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.950Z",
+      "uptimeChecks": 71,
+      "uptimeSuccesses": 71,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
+<<<<<<< Updated upstream
       "rank": 14,
+=======
+      "rank": 13,
+>>>>>>> Stashed changes
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -724,6 +919,7 @@
       "playersMax": 20,
       "version": "Paper 1.21.11",
       "online": true,
+<<<<<<< Updated upstream
       "uptimePercent": 99.70501474926253,
       "sponsored": false,
       "createdAt": "2026-06-30T15:54:50.226Z",
@@ -732,11 +928,25 @@
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.496Z",
       "uptimeChecks": 339,
       "uptimeSuccesses": 338,
+=======
+      "uptimePercent": 99.70414201183432,
+      "sponsored": false,
+      "createdAt": "2026-06-30T15:54:50.226Z",
+      "updatedAt": "2026-06-30T15:54:50.226Z",
+      "lastPingAt": "2026-07-31T00:08:25.872Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.872Z",
+      "uptimeChecks": 338,
+      "uptimeSuccesses": 337,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
+<<<<<<< Updated upstream
       "rank": 15,
+=======
+      "rank": 14,
+>>>>>>> Stashed changes
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -774,6 +984,7 @@
       "playersMax": 999,
       "version": "Paper 26.2",
       "online": true,
+<<<<<<< Updated upstream
       "uptimePercent": 84.81012658227847,
       "sponsored": false,
       "createdAt": "2026-07-15T19:12:21.727Z",
@@ -782,11 +993,25 @@
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.578Z",
       "uptimeChecks": 79,
       "uptimeSuccesses": 67,
+=======
+      "uptimePercent": 84.61538461538461,
+      "sponsored": false,
+      "createdAt": "2026-07-15T19:12:21.727Z",
+      "updatedAt": "2026-07-15T19:12:21.727Z",
+      "lastPingAt": "2026-07-31T00:08:25.941Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:25.941Z",
+      "uptimeChecks": 78,
+      "uptimeSuccesses": 66,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
+<<<<<<< Updated upstream
       "rank": 16,
+=======
+      "rank": 15,
+>>>>>>> Stashed changes
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -819,6 +1044,7 @@
       "playersMax": 0,
       "version": "Bedrock",
       "online": false,
+<<<<<<< Updated upstream
       "uptimePercent": 25,
       "sponsored": false,
       "createdAt": "2026-07-18T17:47:06.038Z",
@@ -826,6 +1052,15 @@
       "lastPingAt": "2026-07-31T00:13:57.602Z",
       "lastSuccessfulPingAt": "2026-07-21T09:35:31.877Z",
       "uptimeChecks": 60,
+=======
+      "uptimePercent": 25.423728813559322,
+      "sponsored": false,
+      "createdAt": "2026-07-18T17:47:06.038Z",
+      "updatedAt": "2026-07-18T17:47:06.038Z",
+      "lastPingAt": "2026-07-31T00:08:25.959Z",
+      "lastSuccessfulPingAt": "2026-07-21T09:35:31.877Z",
+      "uptimeChecks": 59,
+>>>>>>> Stashed changes
       "uptimeSuccesses": 15,
       "edition": "bedrock",
       "bedrockType": "server",
@@ -870,8 +1105,13 @@
       "sponsored": false,
       "createdAt": "2026-07-22T23:58:48.996Z",
       "updatedAt": "2026-07-23T00:21:45.419Z",
+<<<<<<< Updated upstream
       "lastPingAt": "2026-07-31T00:13:57.612Z",
       "uptimeChecks": 44,
+=======
+      "lastPingAt": "2026-07-31T00:08:25.968Z",
+      "uptimeChecks": 43,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -913,6 +1153,7 @@
       "playersMax": 0,
       "version": "Unknown",
       "online": false,
+<<<<<<< Updated upstream
       "uptimePercent": 47.368421052631575,
       "sponsored": false,
       "createdAt": "2026-07-23T10:40:56.242Z",
@@ -920,12 +1161,25 @@
       "lastPingAt": "2026-07-31T00:13:57.635Z",
       "lastSuccessfulPingAt": "2026-07-28T01:54:50.976Z",
       "uptimeChecks": 38,
+=======
+      "uptimePercent": 48.64864864864865,
+      "sponsored": false,
+      "createdAt": "2026-07-23T10:40:56.242Z",
+      "updatedAt": "2026-07-24T08:58:17.242Z",
+      "lastPingAt": "2026-07-31T00:08:25.987Z",
+      "lastSuccessfulPingAt": "2026-07-28T01:54:50.976Z",
+      "uptimeChecks": 37,
+>>>>>>> Stashed changes
       "uptimeSuccesses": 18,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
+<<<<<<< Updated upstream
       "rank": 19,
+=======
+      "rank": 18,
+>>>>>>> Stashed changes
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -967,10 +1221,17 @@
       "sponsored": false,
       "createdAt": "2026-07-28T01:53:56.492Z",
       "updatedAt": "2026-07-28T01:53:56.492Z",
+<<<<<<< Updated upstream
       "lastPingAt": "2026-07-31T00:13:57.645Z",
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.645Z",
       "uptimeChecks": 15,
       "uptimeSuccesses": 15,
+=======
+      "lastPingAt": "2026-07-31T00:08:27.635Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:27.635Z",
+      "uptimeChecks": 14,
+      "uptimeSuccesses": 14,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -1014,10 +1275,17 @@
       "sponsored": false,
       "createdAt": "2026-07-30T00:38:55.936Z",
       "updatedAt": "2026-07-30T00:42:38.461Z",
+<<<<<<< Updated upstream
       "lastPingAt": "2026-07-31T00:13:57.657Z",
       "lastSuccessfulPingAt": "2026-07-31T00:13:57.657Z",
       "uptimeChecks": 11,
       "uptimeSuccesses": 11,
+=======
+      "lastPingAt": "2026-07-31T00:08:27.642Z",
+      "lastSuccessfulPingAt": "2026-07-31T00:08:27.642Z",
+      "uptimeChecks": 10,
+      "uptimeSuccesses": 10,
+>>>>>>> Stashed changes
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
