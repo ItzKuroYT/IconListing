@@ -5771,17 +5771,8 @@
             "375503ad3f0c4180"
           ]
         },
-        "viewDaily": [
-          {
-            "date": "2026-07-31",
-            "count": 1
-          }
-        ],
-        "viewVisitorDays": {
-          "2026-07-31": [
-            "0c66f5a4183f54fb"
-          ]
-        },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-23T10:41:37.913Z",
@@ -8033,7 +8024,7 @@
     "siteVisitDaily": [
       {
         "date": "2026-07-31",
-        "count": 15
+        "count": 16
       }
     ],
     "siteVisitVisitorDays": {
@@ -8052,7 +8043,8 @@
         "2cafaa77f30bfa4e",
         "c998b36ed9ffd827",
         "32646f54a9327cca",
-        "0c66f5a4183f54fb"
+        "0c66f5a4183f54fb",
+        "5f4ee4256f45f32a"
       ]
     }
   },
