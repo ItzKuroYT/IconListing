@@ -7997,12 +7997,13 @@
     "siteVisitDaily": [
       {
         "date": "2026-07-31",
-        "count": 1
+        "count": 2
       }
     ],
     "siteVisitVisitorDays": {
       "2026-07-31": [
-        "d1024c3bf595bcb3"
+        "d1024c3bf595bcb3",
+        "bcb4a0789e63dcfd"
       ]
     }
   },
