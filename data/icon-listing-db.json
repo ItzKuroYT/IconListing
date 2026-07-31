@@ -5420,12 +5420,13 @@
         "viewDaily": [
           {
             "date": "2026-07-31",
-            "count": 1
+            "count": 2
           }
         ],
         "viewVisitorDays": {
           "2026-07-31": [
-            "32646f54a9327cca"
+            "32646f54a9327cca",
+            "2cafaa77f30bfa4e"
           ]
         },
         "playerHistory": [
@@ -5780,17 +5781,8 @@
             "375503ad3f0c4180"
           ]
         },
-        "viewDaily": [
-          {
-            "date": "2026-07-31",
-            "count": 1
-          }
-        ],
-        "viewVisitorDays": {
-          "2026-07-31": [
-            "358537e678329018"
-          ]
-        },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-23T10:41:37.913Z",
