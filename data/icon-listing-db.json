@@ -5420,13 +5420,12 @@
         "viewDaily": [
           {
             "date": "2026-07-31",
-            "count": 2
+            "count": 1
           }
         ],
         "viewVisitorDays": {
           "2026-07-31": [
-            "32646f54a9327cca",
-            "2cafaa77f30bfa4e"
+            "32646f54a9327cca"
           ]
         },
         "playerHistory": [
@@ -6127,8 +6126,17 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-07-31",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-07-31": [
+            "634fd5ad7f8e5fb2"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-07-30T04:40:35.913Z",
