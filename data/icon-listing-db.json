@@ -411,19 +411,6 @@
       "googleName": "Annabelle Shwartzanegger",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocLGTlf91aRe3MbgD3wV8wPozMEMpI7IIq89xWhKYig_2aOZzw=s96-c",
       "updatedAt": "2026-07-30T22:48:15.042Z"
-    },
-    {
-      "id": "6b3c367d-e800-467d-8f14-bebbc25493a4",
-      "username": "tan",
-      "email": "tanplayzbusiness@outlook.com",
-      "passwordHash": "d78414e250127d5c2a82b77101f41ed3:5e5797ff091b7b017005f6958a4c3180f3892137bdf7529d07ce1031215fe078",
-      "emailOptIn": false,
-      "emailOptInAt": "",
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-07-31T00:35:19.833Z",
-      "termsAcceptedAt": "2026-07-31T00:34:28.328Z",
-      "banned": false,
-      "createdAt": "2026-07-31T00:34:28.328Z"
     }
   ],
   "servers": [
