@@ -3334,8 +3334,17 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-07-31",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-07-31": [
+            "d1024c3bf595bcb3"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.519Z",
@@ -8415,10 +8424,6 @@
     }
   ],
   "voteIps": {
-    "09c0ac09-6b69-4826-b9be-930aaf01c10f": {
-      "visitor:4999708f8b772f2ec5e58d55ce869253911cf3211a38b90466b5efbbdaa5ada1": "2026-07-30T22:52:47.510Z",
-      "name:remains__": "2026-07-30T22:52:47.510Z"
-    },
     "48c565ba-791e-4c42-9d79-60a90f5a2440": {
       "visitor:9294a2e3aa972e7c443bde219c9bee5c766c1dc0cacca6f2fb714d6a5f743e61": "2026-07-31T17:10:43.860Z",
       "name:itzkuro_": "2026-07-31T17:10:43.860Z"
