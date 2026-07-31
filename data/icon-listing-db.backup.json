@@ -464,6 +464,8 @@
             "6d71441a3636d5fc"
           ]
         },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.314Z",
@@ -808,6 +810,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.413Z",
@@ -1161,6 +1165,8 @@
             "b3f1f36fca325bb9"
           ]
         },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.435Z",
@@ -1508,6 +1514,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.450Z",
@@ -1892,6 +1900,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.471Z",
@@ -2244,6 +2254,8 @@
             "b3f1f36fca325bb9"
           ]
         },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.483Z",
@@ -2599,6 +2611,8 @@
             "b3f1f36fca325bb9"
           ]
         },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.496Z",
@@ -2944,6 +2958,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.508Z",
@@ -3287,6 +3303,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.519Z",
@@ -3632,6 +3650,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.531Z",
@@ -3979,6 +3999,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.542Z",
@@ -4325,6 +4347,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.553Z",
@@ -4670,6 +4694,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.563Z",
@@ -5018,6 +5044,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:31:35.526Z",
@@ -5358,7 +5386,75 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-07-26T23:26:24.763Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-27T02:54:36.182Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-27T20:48:33.303Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-28T01:54:50.954Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-28T20:47:29.769Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-29T05:29:44.187Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-29T22:03:42.104Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-30T00:43:08.205Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-30T02:57:46.899Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-30T04:40:31.038Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-31T00:08:25.959Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
           {
             "createdAt": "2026-07-18T17:47:06.051Z",
             "playersOnline": 1,
@@ -5644,7 +5740,147 @@
             "375503ad3f0c4180"
           ]
         },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-07-23T10:41:37.913Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-23T15:35:23.500Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-24T01:05:09.674Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-24T09:29:45.082Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-24T16:59:37.248Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-24T18:53:59.818Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-25T18:17:54.441Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-25T20:08:01.745Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-26T12:15:12.261Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-26T18:18:38.925Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-26T20:11:48.042Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-26T21:12:17.690Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-26T23:26:29.849Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-27T02:54:36.193Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-27T20:48:38.393Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-28T01:54:50.964Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-28T20:47:32.506Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-29T05:29:45.652Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-29T22:03:47.188Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-30T00:43:13.291Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-30T02:57:46.905Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-30T04:40:34.945Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-31T00:08:25.968Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
           {
             "createdAt": "2026-07-23T00:28:57.948Z",
             "playersOnline": 0,
@@ -5850,7 +6086,147 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-07-23T10:40:59.002Z",
+            "playersOnline": 3,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-23T15:35:23.512Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-24T01:05:14.965Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-24T09:29:45.089Z",
+            "playersOnline": 1,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-24T16:59:38.244Z",
+            "playersOnline": 2,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-24T18:54:00.795Z",
+            "playersOnline": 3,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-25T18:17:55.439Z",
+            "playersOnline": 1,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-25T20:08:02.767Z",
+            "playersOnline": 0,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-26T12:15:12.271Z",
+            "playersOnline": 0,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-26T18:18:39.996Z",
+            "playersOnline": 5,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-26T20:11:49.018Z",
+            "playersOnline": 3,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-26T21:12:17.700Z",
+            "playersOnline": 4,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-26T23:26:30.888Z",
+            "playersOnline": 3,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-27T02:54:36.207Z",
+            "playersOnline": 0,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-27T20:48:39.473Z",
+            "playersOnline": 3,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-28T01:54:50.976Z",
+            "playersOnline": 0,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-28T20:47:33.570Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-29T05:29:46.623Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-29T22:03:48.146Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-30T00:43:14.234Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-30T02:57:46.921Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-30T04:40:35.913Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-07-31T00:08:25.987Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
           {
             "createdAt": "2026-07-23T10:40:59.002Z",
             "playersOnline": 3,
@@ -6046,7 +6422,57 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-07-28T01:53:56.615Z",
+            "playersOnline": 1,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-28T20:47:33.653Z",
+            "playersOnline": 1,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-29T05:29:46.706Z",
+            "playersOnline": 0,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-29T22:03:48.232Z",
+            "playersOnline": 0,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-30T00:43:15.730Z",
+            "playersOnline": 0,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-30T02:57:46.931Z",
+            "playersOnline": 4,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-30T04:40:37.568Z",
+            "playersOnline": 1,
+            "playersMax": 20,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-31T00:08:27.635Z",
+            "playersOnline": 0,
+            "playersMax": 20,
+            "online": true
+          },
           {
             "createdAt": "2026-07-28T01:53:56.615Z",
             "playersOnline": 1,
@@ -6148,7 +6574,33 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-07-30T00:42:38.493Z",
+            "playersOnline": 0,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-30T02:57:46.940Z",
+            "playersOnline": 0,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-30T04:40:38.924Z",
+            "playersOnline": 0,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-07-31T00:08:27.642Z",
+            "playersOnline": 0,
+            "playersMax": 100,
+            "online": true
+          },
           {
             "createdAt": "2026-07-30T00:42:38.493Z",
             "playersOnline": 0,
@@ -6229,7 +6681,15 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-07-31T00:08:27.654Z",
+            "playersOnline": 6,
+            "playersMax": 100,
+            "online": true
+          },
           {
             "createdAt": "2026-07-31T00:08:27.654Z",
             "playersOnline": 6,
@@ -6441,6 +6901,10 @@
       "visitor:4999708f8b772f2ec5e58d55ce869253911cf3211a38b90466b5efbbdaa5ada1": "2026-07-30T22:52:47.510Z",
       "name:remains__": "2026-07-30T22:52:47.510Z"
     }
+  },
+  "siteAnalytics": {
+    "siteVisitDaily": [],
+    "siteVisitVisitorDays": {}
   },
   "deleted": {
     "users": {
