@@ -511,6 +511,68 @@ main {
   max-width: 920px;
 }
 
+.seo-link-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.seo-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(139, 92, 246, .35);
+  border-radius: 5px;
+  background: rgba(139, 92, 246, .08);
+  color: #e9d5ff;
+  font-size: .92rem;
+  font-weight: 750;
+}
+
+.seo-link:hover {
+  border-color: rgba(236, 72, 153, .55);
+  background: rgba(236, 72, 153, .12);
+  color: #fff;
+}
+
+.seo-rank-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seo-rank-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: #121217;
+}
+
+.seo-rank-list a {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seo-rank-list span {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: .86rem;
+}
+
 .toolbar {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) minmax(150px, 220px) minmax(150px, 220px);
@@ -2264,6 +2326,7 @@ main {
   .directory-layout,
   .plans-grid,
   .rgb-body-grid,
+  .seo-rank-list,
   .rgb-toolbar,
   .font-editor-grid,
   .font-generator-bar,

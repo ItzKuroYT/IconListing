@@ -34,15 +34,23 @@ const IconListingConfig = {
     requestTimeoutMs: 25000
   },
   seo: {
-    defaultTitle: "Best Minecraft Servers 2026 | Icon Listing",
+    defaultTitle: "Best Minecraft Servers | Minecraft Listing 2026",
     defaultDescription:
-      "Browse top Minecraft servers for SMP, Survival, Skyblock, Factions, Lifesteal, Prison, PvP, Bedrock, and cross-play. Check status and vote.",
+      "Find top Minecraft servers, top 10 rankings, SMP, Survival, Skyblock, PvP, Bedrock, Java, and free Minecraft advertising for server owners.",
     keywords: [
+      "minecraft listing",
       "minecraft servers",
       "minecraft server list",
       "best minecraft servers",
       "best minecraft servers 2026",
       "top minecraft servers",
+      "top 10 minecraft servers",
+      "minecraft advertising",
+      "minecraft server advertising",
+      "advertise minecraft server",
+      "free minecraft server advertising",
+      "minecraft server promotion",
+      "minecraft listing site",
       "minecraft smp servers",
       "survival minecraft servers",
       "skyblock servers",
@@ -57,19 +65,19 @@ const IconListingConfig = {
     ],
     pages: {
       home: {
-        title: "Best Minecraft Servers 2026 | Icon Listing",
+        title: "Best Minecraft Servers | Minecraft Listing 2026",
         description:
-          "Find Minecraft servers by gamemode, rank, votes, status, and player count. Browse SMP, Survival, Skyblock, Factions, Lifesteal, Prison, and PvP."
+          "Find top Minecraft servers by rank, votes, players, status, and tags. Browse SMP, Survival, Skyblock, PvP, Bedrock, Java, and advertise free."
       },
       servers: {
-        title: "Minecraft Server List | SMP, Skyblock, PvP",
+        title: "Minecraft Server List | Top Servers 2026",
         description:
-          "Browse a Minecraft server list with SMP, Survival, Skyblock, Factions, Lifesteal, Prison, PvP, Bedrock, Java, and cross-play servers."
+          "Browse a Minecraft server list with top servers, SMP, Survival, Skyblock, Factions, Lifesteal, Prison, PvP, Bedrock, Java, and cross-play."
       },
       sponsored: {
-        title: "Featured Minecraft Servers | Sponsored List",
+        title: "Advertise Minecraft Servers | Sponsored",
         description:
-          "Discover featured Minecraft servers with sponsored placements, server IPs, tags, live status, player counts, trailers, banners, and vote links."
+          "Advertise Minecraft servers with sponsored placements, server IPs, tags, live status, player counts, trailers, banners, and vote links."
       },
       sponsoredClients: {
         title: "Minecraft Clients | Sponsored Downloads",
@@ -208,19 +216,19 @@ const IconListingConfig = {
     home: {
       eyebrow: "Minecraft server list - built for real communities.",
       title: "Best Minecraft Servers",
-      body: "Find Minecraft servers by gamemode, live player count, votes, tags, and status. Browse SMP, Survival, Skyblock, Factions, Lifesteal, Prison, PvP, Bedrock, Java, and cross-play communities.",
-      browseButton: "Browse servers",
-      submitButton: "Submit a server",
+      body: "Find top Minecraft servers by gamemode, live player count, votes, tags, and status. Browse SMP, Survival, Skyblock, Factions, Lifesteal, Prison, PvP, Bedrock, Java, and cross-play communities, or advertise your Minecraft server for free.",
+      browseButton: "Browse Minecraft servers",
+      submitButton: "Advertise your server",
       manageButton: "Manage listings",
       sponsoredTitle: "Sponsored Servers",
       sponsoredBody: "Paid placements. Marked separately from the main list.",
       allTitle: "All Servers",
-      allBody: "Sorted by rank by default. Use search if you already know what you want."
+      allBody: "Sorted by rank by default. Compare top Minecraft servers by votes, player count, tags, and status."
     },
     servers: {
       title: "Minecraft Server List",
       taggedTitleSuffix: "Servers",
-      body: "Search Minecraft servers by name, IP, gamemode, tag, rank, votes, players, and status.",
+      body: "Search top Minecraft servers by name, IP, gamemode, tag, rank, votes, players, and status.",
       searchPlaceholder: "Search by name, IP, or tag"
     },
     sponsoredServers: {

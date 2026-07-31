@@ -498,9 +498,13 @@ async function main() {
       "user-agent": "IconListingGithubStaleVoteSmoke"
     });
     assert(githubStaleVote.code === 200, "voting for a newly saved GitHub listing should survive stale GitHub reads");
+    assert(githubStaleVote.json.server?.votes === 1, "stale GitHub vote response should include the updated server vote count");
+    assert((githubStaleVote.json.votes || []).some((item) => item.serverId === githubSaved.json.server.id), "stale GitHub vote response should include the monthly vote row");
     const githubStoredAfterStaleVote = JSON.parse(Buffer.from(githubSyncFiles.get(githubSyncMainPath), "base64").toString("utf8"));
     assert(githubStoredAfterStaleVote.servers.some((item) => item.id === githubSaved.json.server.id), "stale GitHub vote writes must not erase the voted listing");
     assert(githubStoredAfterStaleVote.votes.some((item) => item.serverId === githubSaved.json.server.id), "stale GitHub vote writes must keep the vote row");
+    const githubPublicStateAfterVote = JSON.parse(Buffer.from(githubSyncFiles.get(githubSyncPublicStatePath), "base64").toString("utf8"));
+    assert(githubPublicStateAfterVote.servers.find((item) => item.id === githubSaved.json.server.id)?.votes === 1, "vote writes should update the public listing snapshot");
     githubSyncStaleContents.set(githubSyncMainPath, Buffer.from(JSON.stringify(githubSyncInitialDb)).toString("base64"));
     githubSyncStaleReads.set(githubSyncMainPath, 2);
     const githubStaleState = await call("state", {}, "", "GET");

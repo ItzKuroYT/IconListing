@@ -1030,7 +1030,9 @@ async function getState() {
   const params = new URLSearchParams(location.search);
   const detailServerId = ["server", "vote"].includes(page) ? (params.get("id") || params.get("server")) : "";
   const detailServerSlug = page === "server" ? serverSlugFromPath() : "";
-  const state = await request("state", detailServerId ? { serverId: detailServerId } : detailServerSlug ? { serverSlug: detailServerSlug } : {}, "GET");
+  const stateParams = detailServerId ? { serverId: detailServerId } : detailServerSlug ? { serverSlug: detailServerSlug } : {};
+  if (page === "dashboard" || page === "admin") stateParams.fresh = "1";
+  const state = await request("state", stateParams, "GET");
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
   const next = mergeEmbeddedServerFallback({ ...state, votes: state.votes || [] });
@@ -1553,6 +1555,28 @@ function popularTagLinks(limit = 12) {
   )).join("");
 }
 
+function searchIntentLinks() {
+  const links = [
+    ["Best Minecraft Servers", "/servers/"],
+    ["Top Minecraft Servers", "/servers/?sort=players"],
+    ["Top 10 Minecraft Servers", "/servers/?sort=players"],
+    ["Minecraft Server List", "/servers/"],
+    ["Minecraft Listing", "/servers/"],
+    ["Advertise Minecraft Server", "/login/"],
+    ["Free Minecraft Advertising", "/login/"],
+    ["Java Minecraft Servers", "/servers/?tag=Java"],
+    ["Bedrock Minecraft Servers", "/servers/?tag=Bedrock"],
+    ["Crossplay Minecraft Servers", "/servers/?tag=Cross-Play"]
+  ];
+  return links.map(([label, href]) => `<a class="seo-link" href="${route(href)}">${escapeHtml(label)}</a>`).join("");
+}
+
+function topServerSeoLinks(servers = [], limit = 10) {
+  const top = rankServers(servers || [], []).slice(0, limit);
+  if (!top.length) return "";
+  return `<ol class="seo-rank-list">${top.map((server) => `<li><a href="${serverRoute(server)}">${escapeHtml(server.name)} Minecraft server</a><span>${Number(server.playersOnline || 0).toLocaleString()} players</span></li>`).join("")}</ol>`;
+}
+
 function popularGamemodeStats(servers = [], limit = 8) {
   const stats = new Map();
   for (const server of servers) {
@@ -1614,6 +1638,10 @@ const HOME_FAQS = [
   {
     question: "How are Minecraft servers ranked?",
     answer: "Icon Listing ranks servers using player activity, votes, and listing data. Sponsored servers are clearly marked separately so players can tell promoted placements apart from normal listings."
+  },
+  {
+    question: "Can I advertise my Minecraft server for free?",
+    answer: "Yes. Server owners can create a free listing to advertise a Minecraft server with an IP, description, tags, banner, trailer, website, Discord link, and vote page."
   }
 ];
 
@@ -1625,6 +1653,10 @@ const SERVER_LIST_FAQS = [
   {
     question: "Can I search by server IP or gamemode?",
     answer: "Yes. You can search by server name, IP address, tag, or gamemode, then sort by rank, votes, newest listings, or online player counts."
+  },
+  {
+    question: "What makes a top Minecraft server?",
+    answer: "A top Minecraft server usually has active players, clear rules, useful descriptions, stable uptime, recent votes, and gamemodes that match what players are searching for."
   }
 ];
 
@@ -1841,26 +1873,39 @@ function serverSeoDescription(server) {
 function serverJsonLd(server) {
   return {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    name: server.name,
-    url: absoluteUrl(serverPath(server)),
-    description: trimSeo(server.description || serverSeoDescription(server), 300),
-    keywords: [...(server.tags || []), "Minecraft server", "Minecraft server list"].join(", "),
-    image: absoluteUrl(asset(server.bannerUrl || CONFIG.site.iconPath)),
-    about: {
-      "@type": "VideoGame",
-      name: "Minecraft"
-    },
-    mainEntity: {
-      "@type": "Thing",
-      name: server.name,
-      description: trimSeo(server.description || serverSeoDescription(server), 300),
-      url: absoluteUrl(serverPath(server))
-    }
+    "@graph": [
+      {
+        "@type": "WebPage",
+        name: `${server.name} Minecraft Server`,
+        url: absoluteUrl(serverPath(server)),
+        description: trimSeo(server.description || serverSeoDescription(server), 300),
+        keywords: [...(server.tags || []), "Minecraft Listing", "Minecraft server", "Minecraft server list", "best Minecraft servers", "top Minecraft servers"].join(", "),
+        image: absoluteUrl(asset(server.bannerUrl || CONFIG.site.iconPath)),
+        about: {
+          "@type": "VideoGame",
+          name: "Minecraft"
+        },
+        mainEntity: {
+          "@type": "Thing",
+          name: server.name,
+          description: trimSeo(server.description || serverSeoDescription(server), 300),
+          url: absoluteUrl(serverPath(server))
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Minecraft Listing", item: absoluteUrl("/") },
+          { "@type": "ListItem", position: 2, name: "Minecraft Servers", item: absoluteUrl("/servers/") },
+          { "@type": "ListItem", position: 3, name: server.name, item: absoluteUrl(serverPath(server)) }
+        ]
+      }
+    ]
   };
 }
 
 function renderHome(state) {
+  const topServers = rankServers(state.servers || [], state.votes || []).slice(0, 10);
   setSeoMeta({
     ...defaultPageSeo("home"),
     jsonLd: {
@@ -1871,6 +1916,7 @@ function renderHome(state) {
           name: CONFIG.site.name,
           url: absoluteUrl("/"),
           description: CONFIG.seo?.pages?.home?.description || CONFIG.seo?.defaultDescription,
+          keywords: "Minecraft Listing, Minecraft servers, best Minecraft servers, top Minecraft servers, Minecraft advertising",
           potentialAction: {
             "@type": "SearchAction",
             target: `${absoluteUrl("/servers/")}?q={search_term_string}`,
@@ -1882,6 +1928,22 @@ function renderHome(state) {
           name: CONFIG.site.owner || CONFIG.site.name,
           url: absoluteUrl("/"),
           logo: absoluteUrl(CONFIG.site.iconPath)
+        },
+        {
+          "@type": "CollectionPage",
+          name: "Best Minecraft Servers",
+          url: absoluteUrl("/servers/"),
+          description: CONFIG.seo?.pages?.servers?.description || CONFIG.seo?.defaultDescription,
+          mainEntity: {
+            "@type": "ItemList",
+            name: "Top Minecraft Servers",
+            itemListElement: topServers.map((server, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: absoluteUrl(serverPath(server)),
+              name: `${server.name} Minecraft Server`
+            }))
+          }
         },
         faqJsonLd(HOME_FAQS)
       ]
@@ -1928,13 +1990,23 @@ function renderHome(state) {
       </div>
     </section>
     <section class="section seo-section">
+      <h2 class="section-title">Best Minecraft Servers and Top Rankings</h2>
+      <p class="section-copy">Icon Listing is a Minecraft server list for players searching for the best Minecraft servers, top Minecraft servers, active SMP communities, PvP networks, Survival worlds, Bedrock servers, Java servers, and cross-play servers. Rankings use live player counts, votes, status, tags, and listing quality so players can compare servers before joining.</p>
+      ${topServerSeoLinks(state.servers)}
+    </section>
+    <section class="section seo-section">
       <h2 class="section-title">Browse Minecraft Servers by Gamemode</h2>
       <p class="section-copy">Find servers by the way you actually play: survival worlds, SMP communities, economy servers, PvP networks, Skyblock islands, prison progression, Bedrock support, and cross-play servers for friends on different editions.</p>
       <div class="server-tags">${popularTagLinks()}</div>
     </section>
     <section class="section seo-section">
+      <h2 class="section-title">Advertise a Minecraft Server for Free</h2>
+      <p class="section-copy">Server owners can use Icon Listing as free Minecraft advertising. Create a listing with your server IP, banner, formatted description, trailer, Discord invite, website, tags, vote page, and status details so players can discover your community from search and from the server directory.</p>
+      <div class="seo-link-grid">${searchIntentLinks()}</div>
+    </section>
+    <section class="section seo-section">
       <h2 class="section-title">Popular Minecraft Server Searches</h2>
-      <p class="section-copy">Players often search for active SMP servers, survival servers with land claims, Skyblock servers with economies, Lifesteal servers with PvP, Prison servers with progression, and Bedrock or cross-play servers they can join with friends. Icon Listing keeps those searches connected to real listings with status, votes, descriptions, and server details.</p>
+      <p class="section-copy">Players often search for top 10 Minecraft servers, active SMP servers, survival servers with land claims, Skyblock servers with economies, Lifesteal servers with PvP, Prison servers with progression, Factions servers, and Bedrock or cross-play servers they can join with friends. Icon Listing keeps those searches connected to real listings with status, votes, descriptions, and server details.</p>
     </section>
     <section class="section seo-section">
       <h2 class="section-title">How Icon Listing Helps Players Choose</h2>
@@ -1957,6 +2029,7 @@ function renderHome(state) {
 function renderServers(state) {
   const tag = new URLSearchParams(location.search).get("tag") || "";
   const loadingListings = !!state.apiHydrating && !state.servers.length;
+  const listTitle = tag ? `${tag} Minecraft Servers` : "Best Minecraft Server List";
   setSeoMeta({
     ...defaultPageSeo("servers"),
     title: tag ? `${tag} Minecraft Servers | ${CONFIG.site.name}` : CONFIG.seo?.pages?.servers?.title,
@@ -1970,7 +2043,7 @@ function renderServers(state) {
       "@graph": [
         {
           "@type": "CollectionPage",
-          name: tag ? `${tag} Minecraft Servers` : "Minecraft Server List",
+          name: listTitle,
           url: absoluteUrl(tag ? `/servers/?tag=${encodeURIComponent(tag)}` : "/servers/"),
           description: tag
             ? `Browse ${tag} Minecraft servers by rank, votes, players, tags, and status.`
@@ -2004,6 +2077,16 @@ function renderServers(state) {
         <h2 class="section-title">${tag ? `Find ${escapeHtml(tag)} Minecraft Servers` : "Find the Right Minecraft Server"}</h2>
         <p class="section-copy">${tag ? `Compare ${escapeHtml(tag)} servers by activity, votes, tags, descriptions, and status. Open a listing to view the server IP, details, trailer, banners, and vote page.` : "Use search, tags, and sorting to compare Minecraft servers by activity, votes, newest listings, and gamemode. Every listing links to a detail page with server information and voting."}</p>
         <div class="server-tags">${popularTagLinks()}</div>
+      </section>
+      <section class="seo-section">
+        <h2 class="section-title">${tag ? `Top ${escapeHtml(tag)} Minecraft Servers` : "Top 10 Minecraft Servers"}</h2>
+        <p class="section-copy">${tag ? `The best ${escapeHtml(tag)} Minecraft servers usually have active players, clear descriptions, stable uptime, and vote activity. Use the list below to compare ${escapeHtml(tag)} communities before joining.` : "Looking for the best Minecraft servers? Compare the top 10 Minecraft servers by live players, votes, rank, tags, status, server IP, and descriptions before joining a new community."}</p>
+        ${topServerSeoLinks(tag ? state.servers.filter((server) => (server.tags || []).includes(tag)) : state.servers)}
+      </section>
+      <section class="seo-section">
+        <h2 class="section-title">Minecraft Server Advertising</h2>
+        <p class="section-copy">Icon Listing helps server owners advertise Minecraft servers with a dedicated listing page, clean server URL, vote button, tags, banners, descriptions, trailers, Discord links, website links, and search-friendly details. Start with a free listing, then use sponsored placements when you want extra visibility.</p>
+        <div class="seo-link-grid">${searchIntentLinks()}</div>
       </section>
       <section class="seo-section">
         <h2 class="section-title">Compare Minecraft Servers Before Joining</h2>
@@ -2048,8 +2131,9 @@ function renderServerDetail(state) {
     keywords: [...(server.tags || []), server.name, server.javaHost, server.bedrockHost, server.realmCode].filter(Boolean),
     jsonLd: serverJsonLd(server)
   });
-  $("#app").innerHTML = `<div class="page detail-layout">
-    <aside class="info-panel">
+  $("#app").innerHTML = `<div class="page">
+    <div class="detail-layout">
+      <aside class="info-panel">
       <h1>${escapeHtml(server.name)}</h1>
       ${infoRow("Owner", owner)}
       ${infoRow("Status", `<span class="status inline"><span class="dot ${server.online ? "online" : ""}"></span>${server.online ? "Online" : "Offline"}</span>`)}
@@ -2128,9 +2212,23 @@ function renderServerDetail(state) {
         <a class="button primary" href="${route("/dashboard/")}">Open dashboard</a>
       </div>` : ""}
     </section>
+    </div>
+    ${serverDetailSeoBlock(server)}
   </div>`;
   bindServerDetail(server);
   trackServerView(server);
+}
+
+function serverDetailSeoBlock(server) {
+  const tags = (server.tags || []).filter(Boolean);
+  const tagLinks = tags.length
+    ? tags.map((tag) => `<a class="seo-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)} Minecraft servers</a>`).join("")
+    : popularTagLinks(8);
+  return `<section class="section seo-section">
+    <h2 class="section-title">More Minecraft Servers Like ${escapeHtml(server.name)}</h2>
+    <p class="section-copy">${escapeHtml(server.name)} is part of the Icon Listing Minecraft server list. Compare this listing with other top Minecraft servers by gamemode, votes, player count, status, tags, banners, trailers, and server details before joining.</p>
+    <div class="seo-link-grid">${tagLinks}${searchIntentLinks()}</div>
+  </section>`;
 }
 
 function infoRow(label, value) {
@@ -2406,9 +2504,14 @@ function renderVotePage(state) {
     event.preventDefault();
     try {
       const result = await request("vote", { serverId: server.id, minecraftUsername: $("#minecraftUsername").value });
-      state.votes = [...(state.votes || []), result.vote].filter(Boolean);
-      const updatedServer = result.server || { ...server, votes: Number(server.votes || 0) + 1 };
-      state.servers = rankServers(state.servers.map((item) => (item.id === server.id ? { ...item, ...updatedServer } : item)), state.votes);
+      state.votes = Array.isArray(result.votes) ? result.votes : [...(state.votes || []), result.vote].filter(Boolean);
+      if (Array.isArray(result.servers)) {
+        state.servers = rankServers(result.servers, state.votes);
+      } else {
+        const updatedServer = result.server || { ...server, votes: Number(server.votes || 0) + 1 };
+        state.servers = rankServers(state.servers.map((item) => (item.id === server.id ? { ...item, ...updatedServer } : item)), state.votes);
+      }
+      if (result.servers) cachePublicState(result);
       toast("Vote counted. Thanks for supporting this server.");
       renderVotePage(state);
     } catch (error) {
@@ -2991,7 +3094,7 @@ function renderDashboard(state) {
           <p class="server-ip">${escapeHtml(serverAddress(server))}</p>
         </div>
         <div class="row-actions">
-          <a class="button" href="${serverRoute(server, { byId: true })}">View</a>
+          <a class="button" href="${serverRoute(server)}">View</a>
           <button class="button" data-edit="${escapeHtml(server.id)}">Edit</button>
           <button class="button danger" data-delete="${escapeHtml(server.id)}">Delete</button>
         </div>
@@ -3292,6 +3395,7 @@ async function submitServerForm(event) {
     toast("Listing saved to shared storage.");
     if (Array.isArray(result.servers) && result.user) {
       syncAuthUi(result.user);
+      cachePublicState(result);
       renderDashboard({ ...result, votes: result.votes || [] });
     } else {
       boot();
@@ -4466,6 +4570,13 @@ function renderCurrentPage(page, state) {
 }
 
 function showBootFailure(page, error, seoFallbackHtml = "") {
+  if (page === "vote") {
+    const cachedState = publicBootState();
+    if (findServerFromLocation(cachedState.servers)) {
+      renderVotePage(cachedState);
+      return;
+    }
+  }
   if (page === "server") {
     const embeddedState = embeddedServerFallbackState({ apiHydrating: true });
     if (embeddedState) {
@@ -4511,10 +4622,11 @@ async function boot() {
   } else if (page === "dashboard" || page === "admin") {
     renderAccountLoading(page);
   }
-  if (pageCanRenderBeforeApi(page) || page === "server") {
+  if (pageCanRenderBeforeApi(page) || page === "server" || page === "vote") {
     loadPublicSnapshotState().then((snapshotState) => {
       if (liveStateRendered || !snapshotState) return;
       if (page === "server" && !findServerFromLocation(snapshotState.servers)) return;
+      if (page === "vote" && !findServerFromLocation(snapshotState.servers)) return;
       renderCurrentPage(page, snapshotState);
     });
   }
