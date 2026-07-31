@@ -2276,8 +2276,17 @@
             "b3f1f36fca325bb9"
           ]
         },
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-07-31",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-07-31": [
+            "693536465a4e88ab"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-07-16T08:32:06.483Z",
