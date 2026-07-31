@@ -7527,13 +7527,12 @@
         "viewDaily": [
           {
             "date": "2026-07-31",
-            "count": 2
+            "count": 1
           }
         ],
         "viewVisitorDays": {
           "2026-07-31": [
-            "634fd5ad7f8e5fb2",
-            "ed8fc8e9658a1fbd"
+            "634fd5ad7f8e5fb2"
           ]
         },
         "playerHistory": [
@@ -8057,8 +8056,8 @@
         "5f4ee4256f45f32a",
         "358537e678329018",
         "2ffbf52ad214f66f",
-        "ed8fc8e9658a1fbd",
-        "cd410133be383eea"
+        "cd410133be383eea",
+        "ed8fc8e9658a1fbd"
       ]
     }
   },
