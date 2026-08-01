@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-01T02:35:32.147Z",
+  "generatedAt": "2026-08-01T02:37:27.036Z",
   "servers": [
     {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
@@ -759,7 +759,7 @@
       "youtubeUrl": "",
       "country": "United States",
       "bannerUrl": "",
-      "description": "Icon SMP | Season 1\n\nStrength SMP\nCustom auction house\nKoth + Envoys\nTeams\nAnd more\n\nthe server is still under development, this is a work in progress description\nthe server is still under development, this is a work in progress description\nthe server is still under development, this is a work in progress description",
+      "description": "🌾 Icon SMP | Season 1\n\n⚔️ Strength SMP\n🏪 Custom Auction House\n👑 KOTH & Envoys\n👥 Teams\n🎁 Daily Rewards\n⏳ Playtime Rewards (/ptr)\n🛠️ Custom Crafts\n💰 EconomyShopGUI\n✨ And much more!\n\n🌐 play.IconMC.minehut.gg",
       "tags": [
         "Survival",
         "Economy",
@@ -778,9 +778,9 @@
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-07-31T00:17:47.994Z",
-      "updatedAt": "2026-08-01T02:35:26.851Z",
-      "lastPingAt": "2026-08-01T02:35:28.176Z",
-      "lastSuccessfulPingAt": "2026-08-01T02:35:28.176Z",
+      "updatedAt": "2026-08-01T02:37:20.794Z",
+      "lastPingAt": "2026-08-01T02:37:22.124Z",
+      "lastSuccessfulPingAt": "2026-08-01T02:37:22.124Z",
       "uptimeChecks": 3,
       "uptimeSuccesses": 3,
       "edition": "java",
