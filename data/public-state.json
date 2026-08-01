@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-01T17:25:25.354Z",
+  "generatedAt": "2026-08-01T17:25:32.216Z",
   "servers": [
     {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
@@ -595,7 +595,7 @@
       }
     },
     {
-      "id": "f2796ebe-cf1c-4d53-bd19-06f95b8447dc",
+      "id": "91199c2f-e292-40cf-b0f5-ab4fa3de3c7d",
       "name": "Kepler Nations",
       "javaHost": "play.keplermc.net",
       "javaPort": 25565,
@@ -627,10 +627,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-08-01T17:25:19.119Z",
-      "updatedAt": "2026-08-01T17:25:19.119Z",
-      "lastPingAt": "2026-08-01T17:25:20.615Z",
-      "lastSuccessfulPingAt": "2026-08-01T17:25:20.615Z",
+      "createdAt": "2026-08-01T17:25:21.335Z",
+      "updatedAt": "2026-08-01T17:25:21.335Z",
+      "lastPingAt": "2026-08-01T17:25:21.347Z",
+      "lastSuccessfulPingAt": "2026-08-01T17:25:21.347Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
