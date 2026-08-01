@@ -424,6 +424,23 @@
       "termsAcceptedAt": "2026-07-31T00:58:27.777Z",
       "banned": false,
       "createdAt": "2026-07-31T00:58:27.777Z"
+    },
+    {
+      "id": "72f11a18-9942-406a-a58e-f942689a54aa",
+      "username": "SiriApple",
+      "email": "siriapple20012001@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-08-01T01:41:37.671Z",
+      "termsAcceptedAt": "2026-08-01T01:41:37.671Z",
+      "googleLinkedAt": "2026-08-01T01:41:37.671Z",
+      "createdAt": "2026-08-01T01:41:37.671Z",
+      "banned": false,
+      "googleSub": "115303447537011340211",
+      "googleName": "Siri Apple",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKrhsOmv-7lBx1V7NeqiRAR84ng4lv7lfWBUdhleZsRmrHvMw=s96-c",
+      "updatedAt": "2026-08-01T01:41:37.671Z"
     }
   ],
   "servers": [
