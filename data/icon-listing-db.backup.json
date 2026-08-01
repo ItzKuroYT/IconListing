@@ -424,23 +424,6 @@
       "termsAcceptedAt": "2026-07-31T00:58:27.777Z",
       "banned": false,
       "createdAt": "2026-07-31T00:58:27.777Z"
-    },
-    {
-      "id": "72f11a18-9942-406a-a58e-f942689a54aa",
-      "username": "SiriApple",
-      "email": "siriapple20012001@gmail.com",
-      "passwordHash": "",
-      "emailOptIn": false,
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-08-01T01:41:37.671Z",
-      "termsAcceptedAt": "2026-08-01T01:41:37.671Z",
-      "googleLinkedAt": "2026-08-01T01:41:37.671Z",
-      "createdAt": "2026-08-01T01:41:37.671Z",
-      "banned": false,
-      "googleSub": "115303447537011340211",
-      "googleName": "Siri Apple",
-      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKrhsOmv-7lBx1V7NeqiRAR84ng4lv7lfWBUdhleZsRmrHvMw=s96-c",
-      "updatedAt": "2026-08-01T01:41:37.671Z"
     }
   ],
   "servers": [
@@ -8241,6 +8224,71 @@
       "lastSuccessfulPingAt": "2026-07-31T15:16:27.609Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
+      "iconListingVoteQueue": []
+    },
+    {
+      "id": "2eab34f9-9d08-40f6-8e18-0234ed73d4fa",
+      "name": "GreenBeanSMP",
+      "edition": "java",
+      "javaHost": "play.GreenBeanSMP.kozow.com",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_b21fe200f07d4efb08086fca1cfcc2955583",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/vcTg9PnP4N",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "This is a MC server where you can get crates and other items. Try this ip if the other one doesnt work weakness-watercolor.tun.ply.gg 1.21.11 JAVA NO BEDROCK. You can also RTP and tpa Pls Join This minecraft server",
+      "tags": [
+        "Survival",
+        "Anarchy",
+        "SMP",
+        "Vanilla",
+        "New"
+      ],
+      "ownerId": "72f11a18-9942-406a-a58e-f942689a54aa",
+      "ownerName": "SiriApple",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 1000,
+      "version": "Paper 1.21.11",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-08-01T01:46:07.018Z",
+      "updatedAt": "2026-08-01T01:46:07.018Z",
+      "lastPingAt": "2026-08-01T01:46:08.666Z",
+      "javaStatusTarget": "play.GreenBeanSMP.kozow.com",
+      "javaSrvResolved": true,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-08-01T01:46:08.666Z",
+            "playersOnline": 0,
+            "playersMax": 1000,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-08-01T01:46:08.666Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
       "iconListingVoteQueue": []
     }
   ],
