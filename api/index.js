@@ -180,13 +180,14 @@ module.exports = async function handler(req, res) {
       });
       const persistedServer = persistedDb.servers.find((item) => item.id === next.id);
       if (!persistedServer) throw httpError(500, "Listing was not saved to shared storage. Error: 67.");
+      const verifiedDb = await verifyPersistedServer(next.id, persistedDb);
       await safeSyncServerStaticPages(persistedDb, {
         writeServerIds: [persistedServer.id],
         deletePagePaths: previousServerPagePath && previousServerPagePath !== serverStaticPagePath(persistedServer) ? [previousServerPagePath] : []
       });
       if (!existing) await safeNotifyServerCreated(persistedServer);
       return json(res, 200, writePayload({
-        ...statePayload(persistedDb, user, { detailServerId: persistedServer.id }),
+        ...statePayload(verifiedDb, user, { detailServerId: persistedServer.id }),
         server: publicServer(persistedServer, user, { fullAnalytics: true })
       }));
     }
@@ -1201,6 +1202,9 @@ async function saveDb(db, options = {}) {
 
 async function saveBestEffortDb(db, options = {}) {
   try {
+    if (hasGithubStorage() && options.persistBestEffort !== true) {
+      return migrateDb(db);
+    }
     return await saveDb(db, options);
   } catch (error) {
     console.error("Icon Listing best-effort write skipped", error.message);
@@ -1210,6 +1214,19 @@ async function saveBestEffortDb(db, options = {}) {
 
 async function persistedDbAfterWrite() {
   return migrateDb(await loadDb({ forceFresh: true }));
+}
+
+async function verifyPersistedServer(serverId, fallbackDb) {
+  if (!serverId || !hasGithubStorage()) return migrateDb(fallbackDb);
+  try {
+    const db = await persistedDbAfterWrite();
+    if (db.servers.some((item) => item.id === serverId)) return db;
+  } catch (error) {
+    console.error("Icon Listing post-save read verification failed", error.message);
+  }
+  const fallback = migrateDb(fallbackDb);
+  if (fallback.servers.some((item) => item.id === serverId)) return fallback;
+  throw httpError(500, "Listing was not saved to shared storage. Error: 67.");
 }
 
 async function readLocalBackupDb() {

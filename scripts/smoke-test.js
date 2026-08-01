@@ -507,6 +507,15 @@ async function main() {
     assert(githubPublicStateAfterVote.servers.find((item) => item.id === githubSaved.json.server.id)?.votes === 1, "vote writes should update the public listing snapshot");
     githubSyncStaleContents.set(githubSyncMainPath, Buffer.from(JSON.stringify(githubSyncInitialDb)).toString("base64"));
     githubSyncStaleReads.set(githubSyncMainPath, 2);
+    const githubTrackVisit = await call("trackSiteVisit", {}, "", "POST", {
+      "x-forwarded-for": "198.51.100.88",
+      "user-agent": "IconListingGithubStaleTrackingSmoke"
+    });
+    assert(githubTrackVisit.code === 200, "best-effort visit tracking should still return successfully during stale GitHub reads");
+    const githubStoredAfterTracking = JSON.parse(Buffer.from(githubSyncFiles.get(githubSyncMainPath), "base64").toString("utf8"));
+    assert(githubStoredAfterTracking.servers.some((item) => item.id === githubSaved.json.server.id), "best-effort tracking must not overwrite a newly saved listing");
+    githubSyncStaleContents.set(githubSyncMainPath, Buffer.from(JSON.stringify(githubSyncInitialDb)).toString("base64"));
+    githubSyncStaleReads.set(githubSyncMainPath, 2);
     const githubStaleState = await call("state", {}, "", "GET");
     assert(githubStaleState.code === 200, "state should survive a stale GitHub read after a listing save");
     const githubStoredAfterStaleWrite = JSON.parse(Buffer.from(githubSyncFiles.get(githubSyncMainPath), "base64").toString("utf8"));
