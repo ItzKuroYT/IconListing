@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-07-31T22:24:00.137Z",
+  "generatedAt": "2026-08-01T01:46:13.908Z",
   "servers": [
     {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
@@ -344,8 +344,8 @@
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Timelords&kind=icon",
       "rank": 7,
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
+        "viewsLast7": 2,
+        "viewsLast30": 2,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       }
@@ -746,57 +746,6 @@
       }
     },
     {
-      "id": "cb42efd4-fbfd-47da-abdb-b153b7f07f9c",
-      "name": "Mobcraft SMP",
-      "javaHost": "survival.mobcraft.org",
-      "javaPort": 25565,
-      "javaSrvResolved": true,
-      "javaStatusTarget": "survival.mobcraft.org",
-      "crossPlay": false,
-      "bedrockHost": "",
-      "bedrockPort": 19132,
-      "websiteUrl": "https://mobcraft.org",
-      "discordUrl": "https://discord.gg/jKcu677TN",
-      "youtubeUrl": "https://www.youtube.com/watch?v=g73mFF9O5nY",
-      "country": "United Kingdom",
-      "bannerUrl": "https://minecraft.menu/banner-6463-33947.gif",
-      "description": "🌍 WELCOME TO MOBCRAFT – A NEXT-GEN MINECRAFT EXPERIENCE! 💎✨\nStep into a world built for adventure, progression, and endless fun 👇\n\n🪙 Features:\n🛡️ CUSTOM ARMOR & TOOLS – Gear up with powerful custom equipment\n📈 RANK-UP SYSTEM – Climb the ranks and unlock awesome perks\n🌲 EXPANSIVE WORLD – Explore, build, survive, and thrive\n💸 BALANCED ECONOMY – Trade, sell, and stack your riches\n⚔️ EVENTS & BOSSES – Take on exciting challenges with friends\n\n:Exp: Experience:\n✨ COSMETICS SYSTEM – Express yourself with particles, projectiles, emotes, pets, furniture & more\n🎯 SKILLS & JOBS SYSTEM – Level up abilities and earn money through immersive professions\n🐟 CUSTOM FISHING SYSTEM – Discover rare catches, loot, and hidden treasures\n📜 QUESTS & MISSIONS – Complete engaging tasks and progress through rewarding storylines\n🎁 BATTLEPASS SYSTEM – Unlock seasonal rewards, cosmetics, and exclusive content\n\n🎁 Daily rewards, loot crates, and exclusive rank perks keep every session exciting!\n💬 Friendly, active community with staff ready to help 24/7",
-      "tags": [
-        "Survival",
-        "Economy",
-        "PvP",
-        "SMP",
-        "Farming",
-        "Vanilla",
-        "New"
-      ],
-      "ownerName": "moonke123",
-      "votes": 0,
-      "playersOnline": 2,
-      "playersMax": 100,
-      "version": "Velocity 1.7.2-26.2",
-      "online": true,
-      "uptimePercent": 100,
-      "sponsored": false,
-      "createdAt": "2026-07-31T22:23:53.982Z",
-      "updatedAt": "2026-07-31T22:23:53.982Z",
-      "lastPingAt": "2026-07-31T22:23:55.510Z",
-      "lastSuccessfulPingAt": "2026-07-31T22:23:55.510Z",
-      "uptimeChecks": 1,
-      "uptimeSuccesses": 1,
-      "edition": "java",
-      "bedrockType": "server",
-      "realmCode": "",
-      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Mobcraft-SMP&kind=icon",
-      "rank": 16,
-      "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
-      }
-    },
-    {
       "id": "f3f10c77-8974-490a-9c82-82cfdc443c82",
       "name": "CinderSMP",
       "javaHost": "bin-missing.gl.joinmc.link",
@@ -838,7 +787,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 17,
+      "rank": 16,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -886,7 +835,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 18,
+      "rank": 17,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -931,7 +880,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 19,
+      "rank": 18,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -976,7 +925,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 20,
+      "rank": 19,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1025,7 +974,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 21,
+      "rank": 20,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1075,7 +1024,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 22,
+      "rank": 21,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1122,10 +1071,59 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 23,
+      "rank": 22,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      }
+    },
+    {
+      "id": "2eab34f9-9d08-40f6-8e18-0234ed73d4fa",
+      "name": "GreenBeanSMP",
+      "javaHost": "play.GreenBeanSMP.kozow.com",
+      "javaPort": 25565,
+      "javaSrvResolved": true,
+      "javaStatusTarget": "play.GreenBeanSMP.kozow.com",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/vcTg9PnP4N",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "This is a MC server where you can get crates and other items. Try this ip if the other one doesnt work weakness-watercolor.tun.ply.gg 1.21.11 JAVA NO BEDROCK. You can also RTP and tpa Pls Join This minecraft server",
+      "tags": [
+        "Survival",
+        "Anarchy",
+        "SMP",
+        "Vanilla",
+        "New"
+      ],
+      "ownerName": "SiriApple",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 1000,
+      "version": "Paper 1.21.11",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-08-01T01:46:07.018Z",
+      "updatedAt": "2026-08-01T01:46:07.018Z",
+      "lastPingAt": "2026-08-01T01:46:08.666Z",
+      "lastSuccessfulPingAt": "2026-08-01T01:46:08.666Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "",
+      "rank": 23,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       }
@@ -1177,9 +1175,9 @@
     }
   ],
   "siteAnalytics": {
-    "uniqueVisitsLast7": 29,
-    "uniqueVisitsLast30": 29,
-    "websiteVisitsLast7": 29,
-    "websiteVisitsLast30": 29
+    "uniqueVisitsLast7": 32,
+    "uniqueVisitsLast30": 32,
+    "websiteVisitsLast7": 32,
+    "websiteVisitsLast30": 32
   }
 }
