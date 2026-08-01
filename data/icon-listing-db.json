@@ -424,6 +424,23 @@
       "termsAcceptedAt": "2026-07-31T00:58:27.777Z",
       "banned": false,
       "createdAt": "2026-07-31T00:58:27.777Z"
+    },
+    {
+      "id": "665d8b49-6cac-4710-815f-9918272d3aa6",
+      "username": "kapdapperham",
+      "email": "kasperethegamer@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-08-01T17:23:01.030Z",
+      "termsAcceptedAt": "2026-08-01T17:23:01.030Z",
+      "googleLinkedAt": "2026-08-01T17:23:01.030Z",
+      "createdAt": "2026-08-01T17:23:01.030Z",
+      "banned": false,
+      "googleSub": "109973092110087162315",
+      "googleName": "kapdapper ham",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKSzCcvMA4f6eku_1_KCuYvxyd2DiCdeqxR4fVxsbi5psosmAI=s96-c",
+      "updatedAt": "2026-08-01T17:23:01.030Z"
     }
   ],
   "servers": [
@@ -8274,11 +8291,14 @@
       "uptimeSuccesses": 1,
       "iconUrl": "",
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
-      }
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": []
+      },
+      "iconListingVoteKey": "",
+      "iconListingVoteQueue": []
     },
     {
       "id": "cb42efd4-fbfd-47da-abdb-b153b7f07f9c",
@@ -8329,10 +8349,11 @@
       "updatedAt": "2026-07-31T22:23:53.982Z",
       "lastPingAt": "2026-07-31T22:23:55.510Z",
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": []
       },
       "lastSuccessfulPingAt": "2026-07-31T22:23:55.510Z",
       "uptimeChecks": 1,
@@ -8537,12 +8558,7 @@
       "createdAt": "2026-07-31T17:10:43.860Z"
     }
   ],
-  "voteIps": {
-    "48c565ba-791e-4c42-9d79-60a90f5a2440": {
-      "visitor:9294a2e3aa972e7c443bde219c9bee5c766c1dc0cacca6f2fb714d6a5f743e61": "2026-07-31T17:10:43.860Z",
-      "name:itzkuro_": "2026-07-31T17:10:43.860Z"
-    }
-  },
+  "voteIps": {},
   "siteAnalytics": {
     "siteVisitDaily": [
       {
