@@ -8424,10 +8424,10 @@
       "createdAt": "2026-07-31T17:10:43.860Z"
     },
     {
-      "id": "1cb729e3-7b7a-473d-a651-7fc8f42c66ca",
+      "id": "a786d54f-ec75-4445-9be9-ea5f13ef806e",
       "serverId": "09c0ac09-6b69-4826-b9be-930aaf01c10f",
       "minecraftUsername": "Meems34",
-      "createdAt": "2026-08-01T03:01:01.091Z"
+      "createdAt": "2026-08-01T03:01:07.198Z"
     }
   ],
   "voteIps": {
@@ -8436,8 +8436,8 @@
       "name:itzkuro_": "2026-07-31T17:10:43.860Z"
     },
     "09c0ac09-6b69-4826-b9be-930aaf01c10f": {
-      "visitor:6596d32cd59d3cb92bee3bb547e585c2437b4c34b90bc481d5d443b9b604de7d": "2026-08-01T03:01:01.091Z",
-      "name:meems34": "2026-08-01T03:01:01.091Z"
+      "visitor:6596d32cd59d3cb92bee3bb547e585c2437b4c34b90bc481d5d443b9b604de7d": "2026-08-01T03:01:07.198Z",
+      "name:meems34": "2026-08-01T03:01:07.198Z"
     }
   },
   "siteAnalytics": {
@@ -8448,7 +8448,7 @@
       },
       {
         "date": "2026-08-01",
-        "count": 4
+        "count": 3
       }
     ],
     "siteVisitVisitorDays": {
@@ -8486,8 +8486,7 @@
       "2026-08-01": [
         "d1024c3bf595bcb3",
         "eca6c3073c704191",
-        "4795493b6517ca25",
-        "6f1c72362456487e"
+        "4795493b6517ca25"
       ]
     }
   },
