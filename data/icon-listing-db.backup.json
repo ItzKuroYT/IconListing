@@ -8395,7 +8395,7 @@
       ],
       "ownerId": "665d8b49-6cac-4710-815f-9918272d3aa6",
       "ownerName": "kapdapperham",
-      "votes": 1,
+      "votes": 2,
       "playersOnline": 4,
       "playersMax": 100,
       "version": "Paper 26.1.2",
@@ -8414,6 +8414,54 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-08-01T17:25:28.447Z",
+            "playersOnline": 4,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-08-01T17:25:28.447Z",
+            "playersOnline": 4,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-08-01T17:25:28.447Z",
+            "playersOnline": 4,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-08-01T17:25:28.447Z",
+            "playersOnline": 4,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-08-01T17:25:28.447Z",
+            "playersOnline": 4,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-08-01T17:25:28.447Z",
+            "playersOnline": 4,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-08-01T17:25:28.447Z",
+            "playersOnline": 4,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-08-01T17:25:28.447Z",
+            "playersOnline": 4,
+            "playersMax": 100,
+            "online": true
+          },
           {
             "createdAt": "2026-08-01T17:25:28.447Z",
             "playersOnline": 4,
@@ -8643,16 +8691,24 @@
       "createdAt": "2026-07-31T17:10:43.860Z"
     },
     {
-      "id": "1311dcd9-0664-44bb-9914-c09d59b6b78b",
+      "id": "6f2a2ff4-b31d-434b-80b9-9488c3cb1344",
       "serverId": "80a40c17-5ed1-48f3-9a0d-9f57ba052f27",
       "minecraftUsername": "kapdapper",
-      "createdAt": "2026-08-01T17:27:25.492Z"
+      "createdAt": "2026-08-01T17:27:25.217Z"
+    },
+    {
+      "id": "7e37df30-7a48-42c7-8f43-66df9fa21016",
+      "serverId": "80a40c17-5ed1-48f3-9a0d-9f57ba052f27",
+      "minecraftUsername": "ItzKuro_",
+      "createdAt": "2026-08-01T17:28:13.025Z"
     }
   ],
   "voteIps": {
     "80a40c17-5ed1-48f3-9a0d-9f57ba052f27": {
-      "visitor:cde7bf35144d91fca39f84034515059d1ca35f3e87eda09b3848371bb886f313": "2026-08-01T17:27:25.492Z",
-      "name:kapdapper": "2026-08-01T17:27:25.492Z"
+      "visitor:cde7bf35144d91fca39f84034515059d1ca35f3e87eda09b3848371bb886f313": "2026-08-01T17:27:25.217Z",
+      "name:kapdapper": "2026-08-01T17:27:25.217Z",
+      "visitor:9294a2e3aa972e7c443bde219c9bee5c766c1dc0cacca6f2fb714d6a5f743e61": "2026-08-01T17:28:13.025Z",
+      "name:itzkuro_": "2026-08-01T17:28:13.025Z"
     }
   },
   "siteAnalytics": {
