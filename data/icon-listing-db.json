@@ -8697,18 +8697,18 @@
       "createdAt": "2026-08-01T17:27:25.217Z"
     },
     {
-      "id": "7e37df30-7a48-42c7-8f43-66df9fa21016",
+      "id": "1012d40c-5701-4ab4-bfc4-744150be45cd",
       "serverId": "80a40c17-5ed1-48f3-9a0d-9f57ba052f27",
-      "minecraftUsername": "ItzKuro_",
-      "createdAt": "2026-08-01T17:28:13.025Z"
+      "minecraftUsername": "triggershot3",
+      "createdAt": "2026-08-01T17:28:25.967Z"
     }
   ],
   "voteIps": {
     "80a40c17-5ed1-48f3-9a0d-9f57ba052f27": {
       "visitor:cde7bf35144d91fca39f84034515059d1ca35f3e87eda09b3848371bb886f313": "2026-08-01T17:27:25.217Z",
       "name:kapdapper": "2026-08-01T17:27:25.217Z",
-      "visitor:9294a2e3aa972e7c443bde219c9bee5c766c1dc0cacca6f2fb714d6a5f743e61": "2026-08-01T17:28:13.025Z",
-      "name:itzkuro_": "2026-08-01T17:28:13.025Z"
+      "visitor:8afb4143d3139b7e9195bb3a8f6bc11ad893d5968500aa200b8f8aea1893a602": "2026-08-01T17:28:25.967Z",
+      "name:triggershot3": "2026-08-01T17:28:25.967Z"
     }
   },
   "siteAnalytics": {
