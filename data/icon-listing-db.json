@@ -8425,6 +8425,18 @@
             "playersOnline": 4,
             "playersMax": 100,
             "online": true
+          },
+          {
+            "createdAt": "2026-08-01T17:25:28.447Z",
+            "playersOnline": 4,
+            "playersMax": 100,
+            "online": true
+          },
+          {
+            "createdAt": "2026-08-01T17:25:28.447Z",
+            "playersOnline": 4,
+            "playersMax": 100,
+            "online": true
           }
         ]
       },
@@ -8631,16 +8643,16 @@
       "createdAt": "2026-07-31T17:10:43.860Z"
     },
     {
-      "id": "9cfa525c-5e97-45a8-9f5f-8fb6f0962af5",
+      "id": "1ddd8071-2b2c-497b-8cee-b479462f5050",
       "serverId": "80a40c17-5ed1-48f3-9a0d-9f57ba052f27",
       "minecraftUsername": "kapdapper",
-      "createdAt": "2026-08-01T17:27:19.110Z"
+      "createdAt": "2026-08-01T17:27:20.749Z"
     }
   ],
   "voteIps": {
     "80a40c17-5ed1-48f3-9a0d-9f57ba052f27": {
-      "visitor:cde7bf35144d91fca39f84034515059d1ca35f3e87eda09b3848371bb886f313": "2026-08-01T17:27:19.111Z",
-      "name:kapdapper": "2026-08-01T17:27:19.111Z"
+      "visitor:cde7bf35144d91fca39f84034515059d1ca35f3e87eda09b3848371bb886f313": "2026-08-01T17:27:20.749Z",
+      "name:kapdapper": "2026-08-01T17:27:20.749Z"
     }
   },
   "siteAnalytics": {
