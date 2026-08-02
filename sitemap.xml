@@ -2,267 +2,273 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://minecraftlisting.org/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?sort=players</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?sort=votes</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored-clients/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored-hosts/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored/plans/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/motd-builder/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/votifier-tester/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/rgb-text-generator/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/fonts-generator/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/help/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/contact/</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Survival</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Factions</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Skyblock</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Creative</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Anarchy</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=OneBlock</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Economy</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=PvP</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Pixelmon</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Lifesteal</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=KitPvP</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Cobblemon</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=SMP</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=BoxPvP</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Roleplay</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Earth</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Prison</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=RPG</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Towny</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Raiding</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Gens</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Farming</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Vanilla</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Minigames</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=BedWars</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Parkour</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Java</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Bedrock</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=Cross-Play</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/?tag=New</loc>
-    <lastmod>2026-08-02T21:43:03.590Z</lastmod>
+    <lastmod>2026-08-02T21:43:32.623Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/IconSMP/</loc>
+    <lastmod>2026-08-02T21:42:48.183Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/CofferCraft/</loc>
@@ -337,12 +343,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/IconSMP/</loc>
-    <lastmod>2026-08-02T21:35:53.588Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/Unirealm/</loc>
     <lastmod>2026-07-16T08:31:34.016Z</lastmod>
     <changefreq>daily</changefreq>
@@ -374,7 +374,7 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/PulsedMC-Hosting-FREE/</loc>
-    <lastmod>2026-08-02T21:42:58.295Z</lastmod>
+    <lastmod>2026-08-02T21:43:26.761Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
