@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-02T21:32:21.996Z",
+  "generatedAt": "2026-08-02T21:35:45.667Z",
   "servers": [
     {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
@@ -659,8 +659,8 @@
       "discordUrl": "https://discord.gg/fMbfFW7PWX",
       "youtubeUrl": "",
       "country": "United States",
-      "bannerUrl": "",
-      "description": "🔥 ICONSMP — NOW OPEN! 🔥\n\nReady for a fresh survival experience?\n\nJoin ICONSMP, where classic survival meets custom features built to keep the game exciting from day one.\n\n⚔ Features\n🌟 StrengthSMP\n🏪 Player Auction House\n👥 Teams System\n🌍 Random Teleport (`/rtp`) to get started\n💰 EconomyShopGUI\n🕵️ Black Market\n⏰ Playtime Rewards\n📈 Active Development & Updates\n\nWhether you're building an empire, dominating PvP, or becoming the richest player on the server, there's always something to work toward.\n\nIP: iconmc.minehut.gg\n\nGrab your friends and start your adventure today!",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=IconSMP&kind=banner",
+      "description": "🌾 Icon SMP | Season 1\n\n⚔️ Strength SMP\n🏪 Custom Auction House\n👑 KOTH & Envoys\n👥 Teams\n🎁 Daily Rewards\n⏳ Playtime Rewards (/ptr)\n🛠️ Custom Crafts\n💰 EconomyShopGUI\n✨ And much more!\n\n🌐 play.IconMC.minehut.gg",
       "tags": [
         "Survival",
         "Economy",
@@ -679,11 +679,11 @@
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-07-31T00:17:47.994Z",
-      "updatedAt": "2026-08-02T21:32:16.164Z",
-      "lastPingAt": "2026-08-02T21:32:17.455Z",
-      "lastSuccessfulPingAt": "2026-08-02T21:32:17.455Z",
-      "uptimeChecks": 4,
-      "uptimeSuccesses": 4,
+      "updatedAt": "2026-08-02T21:35:37.955Z",
+      "lastPingAt": "2026-08-02T21:35:39.324Z",
+      "lastSuccessfulPingAt": "2026-08-02T21:35:39.324Z",
+      "uptimeChecks": 5,
+      "uptimeSuccesses": 5,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
