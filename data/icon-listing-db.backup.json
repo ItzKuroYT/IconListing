@@ -475,6 +475,23 @@
       "googleName": "FutureFries",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJkjMN10a8fl3M6UEmtQFHoVgG3n66-WBSrchp1nU1fxdEEQqs=s96-c",
       "updatedAt": "2026-08-04T19:27:35.736Z"
+    },
+    {
+      "id": "a667502c-0ef0-44e3-b869-23a2a3dfda56",
+      "username": "ZephyrBiscuit",
+      "email": "lordfarqwhad@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-08-04T20:51:29.003Z",
+      "termsAcceptedAt": "2026-08-04T20:51:29.003Z",
+      "googleLinkedAt": "2026-08-04T20:51:29.003Z",
+      "createdAt": "2026-08-04T20:51:29.003Z",
+      "banned": false,
+      "googleSub": "107918465779646665963",
+      "googleName": "Zephyr Biscuit",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJjxfMVsURESwGVZ_89fNKRyKju2_xZGkpHvReat8sU0J8C3Dx1=s96-c",
+      "updatedAt": "2026-08-04T20:51:29.003Z"
     }
   ],
   "servers": [
