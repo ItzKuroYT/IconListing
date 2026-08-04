@@ -8600,7 +8600,7 @@
       "iconListingVoteQueue": []
     },
     {
-      "id": "889afa4c-6972-45c6-8b3e-ea68ff6cc941",
+      "id": "fe6b8e30-88fa-4e3e-9208-11b16d723184",
       "name": "Futurelands",
       "edition": "java",
       "javaHost": "51.79.228.170",
@@ -8641,9 +8641,9 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-08-04T19:32:04.125Z",
-      "updatedAt": "2026-08-04T19:32:04.125Z",
-      "lastPingAt": "2026-08-04T19:32:05.778Z",
+      "createdAt": "2026-08-04T19:32:15.223Z",
+      "updatedAt": "2026-08-04T19:32:15.223Z",
+      "lastPingAt": "2026-08-04T19:32:15.255Z",
       "iconUrl": "data:image/png;base64,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",
       "javaStatusTarget": "51.79.228.170:25584",
       "javaSrvResolved": false,
@@ -8654,14 +8654,14 @@
         "viewVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-08-04T19:32:05.778Z",
+            "createdAt": "2026-08-04T19:32:15.255Z",
             "playersOnline": 6,
             "playersMax": 50,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-08-04T19:32:05.778Z",
+      "lastSuccessfulPingAt": "2026-08-04T19:32:15.255Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "iconListingVoteQueue": []
