@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-02T21:43:31.099Z",
+  "generatedAt": "2026-08-04T08:09:07.021Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -227,7 +227,7 @@
         "Cross-Play"
       ],
       "ownerName": "kadika333",
-      "votes": 4,
+      "votes": 5,
       "playersOnline": 2,
       "playersMax": 333,
       "version": "Purpur 1.21.11",
