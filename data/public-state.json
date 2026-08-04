@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-04T08:09:07.021Z",
+  "generatedAt": "2026-08-04T19:32:11.667Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -646,6 +646,57 @@
       }
     },
     {
+      "id": "889afa4c-6972-45c6-8b3e-ea68ff6cc941",
+      "name": "Futurelands",
+      "javaHost": "51.79.228.170",
+      "javaPort": 25584,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "51.79.228.170:25584",
+      "crossPlay": true,
+      "bedrockHost": "51.79.228.170",
+      "bedrockPort": 25584,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/GZfErHUpcw",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Futurelands&kind=banner",
+      "description": "🌍Welcome to Future Lands SMP!\n\nFuturelands is a feature-rich Minecraft SMP server with a thriving, cross-platform community. Whether you're playing on Java or Bedrock, you can join from Xbox, PS4, Switch, PC, laptop, or mobile and enjoy a smooth, exciting survival experience, no add-ons needed. Our server runs 24/7 with no lag, powerful anti-hack systems, and active admins to keep things safe, friendly, and fun. We offer many exclusive Java features even for Bedrock players, including advanced commands and unique gameplay mechanics.\n\n🛡️ Server Features:\n-🛑 Hacks and cheats are completely ineffective\n- 🔨 Build freely, even above the Nether\n- 🖐️ Use your offhand for item placement\n- 🪑 Sit on any block using /sit\n- 🏘️ Beautiful natural spawn area with rentable houses\n- 🧑‍🤝‍🧑 Friendly, welcoming community\n- 🧱 Silk Touch allows you to mine spawners\n- 📍 Handy commands like /sethome, /home, /spawn, /rtp\n- ⚔️ Clans & Clan Wars\n- 📱 Crossplay with Java and Bedrock (Switch, Xbox, PS4, PC, mobile, etc.)\n- 🏠 Claim system to protect your base\n- 🎉 Frequent events and community activities\n\n🔐 Login & Registration Info:\nFor your safety, all players must register and log in:\n/register password password – Use this when joining for the first time. Replace password with your chosen password.\n/login password – Use this command every time you rejoin.\n(Need help changing your password? Make a ticket on discord server and tag admin.)\n\n🧩 Joining Details:\nBedrock:\nIP: 51.79.228.170\nPORT: 25584\n\nJava:\nIP: 51.79.228.170:25584\n\nTo learn more about Futurelands, get support, chat with other members, and stay updated with the latest announcements and events, join our Discord server. We look forward to having you join us on this exciting SMP adventure!\n\nhttps://discord.gg/GZfErHUpcw",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP",
+        "Vanilla",
+        "Parkour",
+        "Cross-Play",
+        "New"
+      ],
+      "ownerName": "FutureFries",
+      "votes": 0,
+      "playersOnline": 6,
+      "playersMax": 50,
+      "version": "Paper 26.1.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-08-04T19:32:04.125Z",
+      "updatedAt": "2026-08-04T19:32:04.125Z",
+      "lastPingAt": "2026-08-04T19:32:05.778Z",
+      "lastSuccessfulPingAt": "2026-08-04T19:32:05.778Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Futurelands&kind=icon",
+      "rank": 14,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      }
+    },
+    {
       "id": "967335b0-0966-4cb7-b01d-796dd61b8b76",
       "name": "Unirealm",
       "javaHost": "play.unirealm.net",
@@ -688,7 +739,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
-      "rank": 14,
+      "rank": 15,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -737,7 +788,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Tancraft&kind=icon",
-      "rank": 15,
+      "rank": 16,
       "analytics": {
         "viewsLast7": 2,
         "viewsLast30": 2,
@@ -788,7 +839,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Mobcraft-SMP&kind=icon",
-      "rank": 16,
+      "rank": 17,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -838,7 +889,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 17,
+      "rank": 18,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -886,7 +937,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 18,
+      "rank": 19,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -937,7 +988,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PulsedMC-Hosting-FREE&kind=icon",
-      "rank": 19,
+      "rank": 20,
       "analytics": {
         "viewsLast7": 2,
         "viewsLast30": 2,
@@ -982,7 +1033,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 20,
+      "rank": 21,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1027,7 +1078,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 21,
+      "rank": 22,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1076,7 +1127,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 22,
+      "rank": 23,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1126,7 +1177,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 23,
+      "rank": 24,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1173,7 +1224,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 24,
+      "rank": 25,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1222,7 +1273,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 25,
+      "rank": 26,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
