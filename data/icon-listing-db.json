@@ -2642,7 +2642,7 @@
       ],
       "ownerId": "db155e7a-81d1-4625-9f60-fb0cb21273f7",
       "ownerName": "kadika333",
-      "votes": 4,
+      "votes": 5,
       "playersOnline": 2,
       "playersMax": 333,
       "version": "Purpur 1.21.11",
@@ -8796,9 +8796,20 @@
       "serverId": "80a40c17-5ed1-48f3-9a0d-9f57ba052f27",
       "minecraftUsername": "Zayla_",
       "createdAt": "2026-08-01T18:31:34.644Z"
+    },
+    {
+      "id": "0812a4e0-cde7-46ab-9f86-4303b6bf479e",
+      "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
+      "minecraftUsername": "kian_k",
+      "createdAt": "2026-08-04T08:09:02.127Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
+      "visitor:8aa44941212ae4d85d4e5e177d005e0ea37f70e9edd7f92f7a845a88cd39ccce": "2026-08-04T08:09:02.127Z",
+      "name:kian_k": "2026-08-04T08:09:02.127Z"
+    }
+  },
   "siteAnalytics": {
     "siteVisitDaily": [
       {
