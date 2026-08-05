@@ -8724,7 +8724,7 @@
       ],
       "ownerId": "a667502c-0ef0-44e3-b869-23a2a3dfda56",
       "ownerName": "ZephyrBiscuit",
-      "votes": 0,
+      "votes": 1,
       "playersOnline": 2,
       "playersMax": 100,
       "version": "forge arclight/Trials 1.20.1",
@@ -8743,6 +8743,12 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-08-04T21:24:59.100Z",
+            "playersOnline": 2,
+            "playersMax": 100,
+            "online": true
+          },
           {
             "createdAt": "2026-08-04T21:24:59.100Z",
             "playersOnline": 2,
@@ -8976,12 +8982,22 @@
       "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
       "minecraftUsername": "kian_k",
       "createdAt": "2026-08-04T08:09:02.127Z"
+    },
+    {
+      "id": "2fbe9c01-06c6-4c6a-aa8b-dd0d293d10d7",
+      "serverId": "ea618e53-d6cc-4291-9822-8be484779eb3",
+      "minecraftUsername": "Aldwulf",
+      "createdAt": "2026-08-05T01:37:39.227Z"
     }
   ],
   "voteIps": {
     "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
       "visitor:8aa44941212ae4d85d4e5e177d005e0ea37f70e9edd7f92f7a845a88cd39ccce": "2026-08-04T08:09:02.127Z",
       "name:kian_k": "2026-08-04T08:09:02.127Z"
+    },
+    "ea618e53-d6cc-4291-9822-8be484779eb3": {
+      "visitor:0f9ec5391f7a11b2196adb68cab36b67e994c48c2a02987a4c875f083a297ae3": "2026-08-05T01:37:39.227Z",
+      "name:aldwulf": "2026-08-05T01:37:39.227Z"
     }
   },
   "siteAnalytics": {
