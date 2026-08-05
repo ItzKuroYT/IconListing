@@ -8990,10 +8990,10 @@
       "createdAt": "2026-08-05T01:37:39.227Z"
     },
     {
-      "id": "4f6b3d23-a949-44f6-951d-7d0af83d6814",
+      "id": "d33894c4-2b22-4d48-87eb-897bfd3e9b13",
       "serverId": "09c0ac09-6b69-4826-b9be-930aaf01c10f",
       "minecraftUsername": "Remains__",
-      "createdAt": "2026-08-05T02:28:01.092Z"
+      "createdAt": "2026-08-05T02:28:03.699Z"
     }
   ],
   "voteIps": {
@@ -9006,8 +9006,8 @@
       "name:aldwulf": "2026-08-05T01:37:39.227Z"
     },
     "09c0ac09-6b69-4826-b9be-930aaf01c10f": {
-      "visitor:0d7bb2453c6e573366f762d18c530c076569cbac0a58ccc534ca12d118cf3870": "2026-08-05T02:28:01.092Z",
-      "name:remains__": "2026-08-05T02:28:01.092Z"
+      "visitor:0d7bb2453c6e573366f762d18c530c076569cbac0a58ccc534ca12d118cf3870": "2026-08-05T02:28:03.699Z",
+      "name:remains__": "2026-08-05T02:28:03.699Z"
     }
   },
   "siteAnalytics": {
