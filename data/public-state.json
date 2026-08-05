@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-04T21:25:06.489Z",
+  "generatedAt": "2026-08-05T01:37:44.111Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -249,7 +249,7 @@
         "viewsLast7": 0,
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
-        "ipCopiesLast30": 1
+        "ipCopiesLast30": 0
       }
     },
     {
@@ -450,6 +450,55 @@
       }
     },
     {
+      "id": "ea618e53-d6cc-4291-9822-8be484779eb3",
+      "name": "Iron to Empire",
+      "javaHost": "play.irontoempire.com",
+      "javaPort": 25565,
+      "javaSrvResolved": true,
+      "javaStatusTarget": "play.irontoempire.com",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "https://irontoempire.com/",
+      "discordUrl": "https://discord.gg/uNqJFFVY9f",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Iron-to-Empire&kind=banner",
+      "description": "Installation Guide (for Modpack) - You can download the Modpack directly from  our website and then just double click install! \n\nDM me on Discord if you need help with installation (ogsigurd)\n\nWe are essentially a super-upgraded \"Factions\" type server. We use a custom plugin called \"Feudal\" that allows for:\nOnly online wars\nWar and Economy Points (so military and economic conquest are viable)\nAdvanced mechanics like: Tribute, Taxes, and custom inter-Kingdom politics.\n\n\nWe are \"vanilla-esque\" but are slightly in the future compared to vanilla (welcome to the age of early firearms, pikes, and simple flying machines!)",
+      "tags": [
+        "Survival",
+        "Factions",
+        "Economy",
+        "PvP",
+        "RPG"
+      ],
+      "ownerName": "ZephyrBiscuit",
+      "votes": 1,
+      "playersOnline": 2,
+      "playersMax": 100,
+      "version": "forge arclight/Trials 1.20.1",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-08-04T21:24:59.018Z",
+      "updatedAt": "2026-08-04T21:24:59.018Z",
+      "lastPingAt": "2026-08-04T21:24:59.100Z",
+      "lastSuccessfulPingAt": "2026-08-04T21:24:59.100Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Iron-to-Empire&kind=icon",
+      "rank": 10,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      }
+    },
+    {
       "id": "e624d227-5bd0-45ce-9aea-270560258b62",
       "name": "Pixelmonia",
       "javaHost": "Only bedrock not java",
@@ -487,7 +536,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 10,
+      "rank": 11,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -537,7 +586,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 11,
+      "rank": 12,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -588,7 +637,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=VOIDFALL&kind=icon",
-      "rank": 12,
+      "rank": 13,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -637,7 +686,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Idacraftnet&kind=icon",
-      "rank": 13,
+      "rank": 14,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -688,7 +737,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Futurelands&kind=icon",
-      "rank": 14,
+      "rank": 15,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -739,7 +788,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
-      "rank": 15,
+      "rank": 16,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -788,7 +837,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Tancraft&kind=icon",
-      "rank": 16,
+      "rank": 17,
       "analytics": {
         "viewsLast7": 2,
         "viewsLast30": 2,
@@ -839,55 +888,6 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Mobcraft-SMP&kind=icon",
-      "rank": 17,
-      "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
-      }
-    },
-    {
-      "id": "ea618e53-d6cc-4291-9822-8be484779eb3",
-      "name": "Iron to Empire",
-      "javaHost": "play.irontoempire.com",
-      "javaPort": 25565,
-      "javaSrvResolved": true,
-      "javaStatusTarget": "play.irontoempire.com",
-      "crossPlay": false,
-      "bedrockHost": "",
-      "bedrockPort": 19132,
-      "websiteUrl": "https://irontoempire.com/",
-      "discordUrl": "https://discord.gg/uNqJFFVY9f",
-      "youtubeUrl": "",
-      "country": "United States",
-      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Iron-to-Empire&kind=banner",
-      "description": "Installation Guide (for Modpack) - You can download the Modpack directly from  our website and then just double click install! \n\nDM me on Discord if you need help with installation (ogsigurd)\n\nWe are essentially a super-upgraded \"Factions\" type server. We use a custom plugin called \"Feudal\" that allows for:\nOnly online wars\nWar and Economy Points (so military and economic conquest are viable)\nAdvanced mechanics like: Tribute, Taxes, and custom inter-Kingdom politics.\n\n\nWe are \"vanilla-esque\" but are slightly in the future compared to vanilla (welcome to the age of early firearms, pikes, and simple flying machines!)",
-      "tags": [
-        "Survival",
-        "Factions",
-        "Economy",
-        "PvP",
-        "RPG"
-      ],
-      "ownerName": "ZephyrBiscuit",
-      "votes": 0,
-      "playersOnline": 2,
-      "playersMax": 100,
-      "version": "forge arclight/Trials 1.20.1",
-      "online": true,
-      "uptimePercent": 100,
-      "sponsored": false,
-      "createdAt": "2026-08-04T21:24:59.018Z",
-      "updatedAt": "2026-08-04T21:24:59.018Z",
-      "lastPingAt": "2026-08-04T21:24:59.100Z",
-      "lastSuccessfulPingAt": "2026-08-04T21:24:59.100Z",
-      "uptimeChecks": 1,
-      "uptimeSuccesses": 1,
-      "edition": "java",
-      "bedrockType": "server",
-      "realmCode": "",
-      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Iron-to-Empire&kind=icon",
       "rank": 18,
       "analytics": {
         "viewsLast7": 0,
