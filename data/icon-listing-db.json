@@ -492,6 +492,23 @@
       "googleName": "Zephyr Biscuit",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJjxfMVsURESwGVZ_89fNKRyKju2_xZGkpHvReat8sU0J8C3Dx1=s96-c",
       "updatedAt": "2026-08-04T20:51:29.003Z"
+    },
+    {
+      "id": "a5acba4b-ebaf-4b40-9594-faadc21eaaca",
+      "username": "OleDalen",
+      "email": "ssuppae@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-08-05T00:34:43.963Z",
+      "termsAcceptedAt": "2026-08-05T00:34:43.963Z",
+      "googleLinkedAt": "2026-08-05T00:34:43.963Z",
+      "createdAt": "2026-08-05T00:34:43.963Z",
+      "banned": false,
+      "googleSub": "101319115791596799674",
+      "googleName": "Ole Dalen",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJtjDlOKsPDkMBBYrfRBL5xgYoBiFiEZsnZ8IAcBWUE7j1jRs4=s96-c",
+      "updatedAt": "2026-08-05T00:34:43.963Z"
     }
   ],
   "servers": [
@@ -2690,17 +2707,8 @@
       "javaStatusTarget": "unbent.mnt.li",
       "javaSrvResolved": true,
       "analytics": {
-        "ipCopyDaily": [
-          {
-            "date": "2026-07-06",
-            "count": 1
-          }
-        ],
-        "ipCopyVisitorDays": {
-          "2026-07-06": [
-            "b3f1f36fca325bb9"
-          ]
-        },
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
