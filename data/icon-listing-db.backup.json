@@ -7272,7 +7272,7 @@
       ],
       "ownerId": "b2e9f795-d1cf-4abb-b287-db6560f8f17c",
       "ownerName": "AnnabelleShwartzan",
-      "votes": 2,
+      "votes": 3,
       "playersOnline": 4,
       "playersMax": 100,
       "version": "Paper 1.21.11",
@@ -9002,9 +9002,20 @@
       "serverId": "09c0ac09-6b69-4826-b9be-930aaf01c10f",
       "minecraftUsername": "Remains__",
       "createdAt": "2026-08-05T02:28:05.586Z"
+    },
+    {
+      "id": "0e44c21c-ea50-4ce3-abb8-93171d069b7e",
+      "serverId": "09c0ac09-6b69-4826-b9be-930aaf01c10f",
+      "minecraftUsername": "Remains__",
+      "createdAt": "2026-08-07T04:04:56.818Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "09c0ac09-6b69-4826-b9be-930aaf01c10f": {
+      "visitor:96403a095e6e4ac6d7b589bdcb3b87a27e57ce495788cc932a5f3f9709227767": "2026-08-07T04:04:56.818Z",
+      "name:remains__": "2026-08-07T04:04:56.818Z"
+    }
+  },
   "siteAnalytics": {
     "siteVisitDaily": [
       {
