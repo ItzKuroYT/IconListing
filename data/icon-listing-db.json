@@ -509,6 +509,23 @@
       "googleName": "Ole Dalen",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJtjDlOKsPDkMBBYrfRBL5xgYoBiFiEZsnZ8IAcBWUE7j1jRs4=s96-c",
       "updatedAt": "2026-08-05T00:34:43.963Z"
+    },
+    {
+      "id": "a6a08b22-2bd2-48ba-a512-a288aae6ad12",
+      "username": "FeatureResells",
+      "email": "featureresells@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-08-07T03:05:41.605Z",
+      "termsAcceptedAt": "2026-08-07T03:05:41.605Z",
+      "googleLinkedAt": "2026-08-07T03:05:41.605Z",
+      "createdAt": "2026-08-07T03:05:41.605Z",
+      "banned": false,
+      "googleSub": "109659090796719981702",
+      "googleName": "Feature Resells",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJu9PvQ37Nsj9UhFseUXrwIz_hY5GynonQg8zdMf8VPmTYxsg=s96-c",
+      "updatedAt": "2026-08-07T03:05:41.605Z"
     }
   ],
   "servers": [
@@ -2350,17 +2367,8 @@
       "javaStatusTarget": "162.245.187.170:25566",
       "javaSrvResolved": false,
       "analytics": {
-        "ipCopyDaily": [
-          {
-            "date": "2026-07-08",
-            "count": 1
-          }
-        ],
-        "ipCopyVisitorDays": {
-          "2026-07-08": [
-            "b3f1f36fca325bb9"
-          ]
-        },
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
@@ -8996,20 +9004,7 @@
       "createdAt": "2026-08-05T02:28:05.586Z"
     }
   ],
-  "voteIps": {
-    "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
-      "visitor:8aa44941212ae4d85d4e5e177d005e0ea37f70e9edd7f92f7a845a88cd39ccce": "2026-08-04T08:09:02.127Z",
-      "name:kian_k": "2026-08-04T08:09:02.127Z"
-    },
-    "ea618e53-d6cc-4291-9822-8be484779eb3": {
-      "visitor:0f9ec5391f7a11b2196adb68cab36b67e994c48c2a02987a4c875f083a297ae3": "2026-08-05T01:37:39.227Z",
-      "name:aldwulf": "2026-08-05T01:37:39.227Z"
-    },
-    "09c0ac09-6b69-4826-b9be-930aaf01c10f": {
-      "visitor:0d7bb2453c6e573366f762d18c530c076569cbac0a58ccc534ca12d118cf3870": "2026-08-05T02:28:05.586Z",
-      "name:remains__": "2026-08-05T02:28:05.586Z"
-    }
-  },
+  "voteIps": {},
   "siteAnalytics": {
     "siteVisitDaily": [
       {
