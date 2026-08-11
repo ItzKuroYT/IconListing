@@ -543,6 +543,23 @@
       "googleName": "Brayden Pagel",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJ2eTJV_o5tk0nYWfXfKvpfh5YvKi_ujpza6FcuV6nccf05PU8=s96-c",
       "updatedAt": "2026-08-10T23:36:32.028Z"
+    },
+    {
+      "id": "f618b02c-275d-4e9a-a0ec-fe065b96424a",
+      "username": "MatteoPaun",
+      "email": "matteopaun04@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-08-11T06:09:57.108Z",
+      "termsAcceptedAt": "2026-08-11T06:09:57.108Z",
+      "googleLinkedAt": "2026-08-11T06:09:57.108Z",
+      "createdAt": "2026-08-11T06:09:57.108Z",
+      "banned": false,
+      "googleSub": "111378027585630392799",
+      "googleName": "Matteo Paun",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocLxWrHNkonnkRxCcooI83L0EyLRaX6_1GBhz24IwzHPWskenQ=s96-c",
+      "updatedAt": "2026-08-11T06:09:57.108Z"
     }
   ],
   "servers": [
