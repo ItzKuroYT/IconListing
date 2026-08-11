@@ -5,7 +5,7 @@ const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const TRUSTPILOT_REVIEW_URL = "https://www.trustpilot.com/review/minecraftlisting.org";
 let turnstileLoadPromise = null;
 const renderedTurnstileWidgets = new Map();
@@ -3101,6 +3101,7 @@ function renderDashboard(state) {
       </article>`).join("") : emptyNotice()}</div>
       <div class="row-actions">
         <button id="addServerButton" class="button primary" ${addDisabled ? "disabled" : ""}>${escapeHtml(addDisabled ? "Limit reached" : copy("dashboard.addButton", "+ Add Server"))}</button>
+        <button id="syncDashboardButton" class="button">Sync Dashboard</button>
         <button id="settingsButton" class="button">${escapeHtml(copy("dashboard.settingsButton", "Account Settings"))}</button>
       </div>
     </section>
@@ -3204,6 +3205,25 @@ function bindDashboard(state) {
   $("#settingsButton")?.addEventListener("click", () => {
     $("#settingsPanel").classList.toggle("hidden");
     $("#serverFormPanel").classList.add("hidden");
+  });
+  $("#syncDashboardButton")?.addEventListener("click", async () => {
+    const button = $("#syncDashboardButton");
+    setButtonLoading(button, "Syncing...");
+    try {
+      const result = await request("syncDashboard", {});
+      state = result.servers ? { ...state, ...result, votes: result.votes || state.votes || [] } : await getState();
+      if (result.user) {
+        store.session = { token: store.session?.token, user: result.user };
+        syncAuthUi(result.user);
+      }
+      if (result.servers) cachePublicState(result);
+      const count = Number(result.syncedCount || 0);
+      toast(count ? `Synced ${count} listing${count === 1 ? "" : "s"}.` : "No matching listings found.");
+      renderDashboard(state);
+    } catch (error) {
+      toast(error.message);
+      setButtonLoading(button, "Sync Dashboard", false);
+    }
   });
   $$("[data-edit]").forEach((button) => {
     button.addEventListener("click", () => {

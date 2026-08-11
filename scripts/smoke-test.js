@@ -538,6 +538,50 @@ async function main() {
     await fs.writeFile(dbPath, JSON.stringify(planReadyDb));
     await fs.writeFile(backupPath, JSON.stringify(planReadyDb));
 
+    const syncFixtureDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const syncOwner = syncFixtureDb.users.find((item) => item.id === login.json.user.id);
+    const protectedOwner = {
+      id: `protected-owner-${suffix}`,
+      username: `ProtectedOwner${String(suffix).slice(-5)}`,
+      email: `protected-owner-${suffix}@example.com`,
+      passwordHash: "unused",
+      emailVerified: true,
+      banned: false,
+      createdAt: new Date().toISOString()
+    };
+    const reclaimableListing = {
+      id: `sync-dashboard-${suffix}`,
+      ownerId: `recovered-sync-dashboard-${suffix}`,
+      ownerName: syncOwner.username,
+      name: `Sync Dashboard SMP ${String(suffix).slice(-5)}`,
+      javaHost: `sync-dashboard-${suffix}.example.org`,
+      javaPort: 25565,
+      country: "United States",
+      description: "A recovered listing whose visible owner name still matches the logged in account, but whose stored owner id was orphaned. The dashboard sync action should repair the owner id so the listing becomes editable again.",
+      tags: ["SMP"],
+      votes: 0
+    };
+    const protectedListing = {
+      ...reclaimableListing,
+      id: `sync-protected-${suffix}`,
+      ownerId: protectedOwner.id,
+      ownerName: syncOwner.username,
+      name: `Protected Sync SMP ${String(suffix).slice(-5)}`,
+      javaHost: `sync-protected-${suffix}.example.org`
+    };
+    syncFixtureDb.users.push(protectedOwner);
+    syncFixtureDb.servers.push(reclaimableListing, protectedListing);
+    await fs.writeFile(dbPath, JSON.stringify(syncFixtureDb));
+    await fs.writeFile(backupPath, JSON.stringify(syncFixtureDb));
+    const beforeDashboardSync = await call("state", {}, login.json.token, "GET");
+    assert(beforeDashboardSync.json.servers.find((item) => item.id === reclaimableListing.id)?.ownerId !== login.json.user.id, "orphaned owner-name matches should start outside the dashboard");
+    const dashboardSync = await call("syncDashboard", {}, login.json.token);
+    assert(dashboardSync.code === 200 && dashboardSync.json.syncedCount === 1, "dashboard sync should reclaim exactly the orphaned matching listing");
+    assert(dashboardSync.json.servers.find((item) => item.id === reclaimableListing.id)?.ownerId === login.json.user.id, "dashboard sync should repair the orphaned listing owner id");
+    assert(dashboardSync.json.servers.find((item) => item.id === protectedListing.id)?.ownerId === protectedOwner.id, "dashboard sync should not take a listing from another stored account");
+    const afterDashboardSyncDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    assert(afterDashboardSyncDb.servers.find((item) => item.id === reclaimableListing.id)?.ownerId === login.json.user.id, "dashboard sync ownership repair should persist to storage");
+
     const storageHealth = await call("health", {}, "", "GET", { host: "icon-listing.vercel.app" });
     assert(storageHealth.code === 200 && storageHealth.json.durable === false, "health should report missing durable storage in local smoke");
     const fakeProductionWrite = await call("saveServer", { server: { name: "Should Not Save", javaHost: "no-storage.example.org", country: "United States", description: "This listing should be rejected in a production-like request when GitHub storage is not configured, preventing Vercel temporary storage from pretending the listing was saved across browsers.", tags: ["SMP"] } }, login.json.token, "POST", { host: "icon-listing.vercel.app" });
@@ -1373,7 +1417,7 @@ async function main() {
     if (deleteAccountPreviousResendFromEmail === undefined) delete process.env.RESEND_FROM_EMAIL;
     else process.env.RESEND_FROM_EMAIL = deleteAccountPreviousResendFromEmail;
 
-    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, dashboard ownership sync, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     tcpServers.forEach((server) => server.close());

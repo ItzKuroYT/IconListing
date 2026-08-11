@@ -32,8 +32,8 @@ const PUBLIC_DATA_IMAGE_LIMIT = 12000;
 const GITHUB_WRITE_MAX_RETRIES = 5;
 const GITHUB_STATE_CACHE_MS = 15000;
 const DISCORD_WEBHOOK_TIMEOUT_MS = 2500;
-const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "vote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
-const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "vote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "syncDashboard", "vote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage", "googleStart", "googleCallback"]);
 const loginFailures = new Map();
 
@@ -205,6 +205,40 @@ module.exports = async function handler(req, res) {
       if (persistedDb.servers.some((item) => item.id === body.id)) throw httpError(500, "Listing was not deleted from shared storage. Error: 67.");
       await safeSyncServerStaticPages(persistedDb, { deletePagePaths: [serverStaticPagePath(server)] });
       return json(res, 200, writePayload({ ok: true, deletedServerId: body.id, ...statePayload(persistedDb, user) }));
+    }
+
+    if (action === "syncDashboard") {
+      requireLogin(user);
+      const syncedServerIds = [];
+      const now = new Date().toISOString();
+      db.servers = db.servers.map((server) => {
+        if (!canSyncServerOwnerToUser(db, server, user)) return server;
+        syncedServerIds.push(server.id);
+        return {
+          ...server,
+          ownerId: user.id,
+          ownerName: user.username,
+          updatedAt: now
+        };
+      });
+      const saveOptions = syncedServerIds.length
+        ? {
+            touchedServers: syncedServerIds,
+            requireExistingUsers: user.fromTokenSnapshot ? [] : [user.id]
+          }
+        : {};
+      const persistedDb = syncedServerIds.length ? await saveDb(db, saveOptions) : db;
+      const missingSynced = syncedServerIds.find((id) => {
+        const server = persistedDb.servers.find((item) => item.id === id);
+        return !server || server.ownerId !== user.id;
+      });
+      if (missingSynced) throw httpError(500, "Dashboard sync was not saved to shared storage. Error: 67.");
+      return json(res, 200, writePayload({
+        ok: true,
+        syncedCount: syncedServerIds.length,
+        syncedServerIds,
+        ...statePayload(persistedDb, user)
+      }));
     }
 
     if (action === "vote") {
@@ -3125,6 +3159,20 @@ function publicServer(server, user = null, options = {}) {
     delete next.iconListingVoteKey;
   }
   return next;
+}
+
+function canSyncServerOwnerToUser(db, server, user) {
+  if (!server?.id || !user?.id) return false;
+  if (server.ownerId === user.id) return false;
+  if (!same(server.ownerName, user.username)) return false;
+  const existingOwnerId = clean(server.ownerId || "");
+  const existingOwner = existingOwnerId ? db.users.find((item) => item.id === existingOwnerId) : null;
+  return (
+    !existingOwner ||
+    existingOwner.id === user.id ||
+    same(existingOwner.username, user.username) ||
+    existingOwnerId.startsWith("recovered-")
+  );
 }
 
 function publicListImage(value = "", server = null, kind = "banner") {
