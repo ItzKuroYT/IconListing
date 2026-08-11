@@ -32,6 +32,9 @@ const PUBLIC_DATA_IMAGE_LIMIT = 12000;
 const GITHUB_WRITE_MAX_RETRIES = 5;
 const GITHUB_STATE_CACHE_MS = 15000;
 const DISCORD_WEBHOOK_TIMEOUT_MS = 2500;
+const MCSTATUS_TIMEOUT_MS = 1800;
+const PING_REFRESH_LIMIT = 24;
+const PING_REFRESH_CONCURRENCY = 8;
 const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "syncDashboard", "vote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
 const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage", "googleStart", "googleCallback"]);
@@ -72,14 +75,25 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === "state") {
-      if (user?.fromVerifiedSession) {
-        await saveBestEffortDb(db, {
-          requireExistingUsers: [user.id],
-          touchedUsers: [user.id],
-          uniqueUserId: user.id
+      const changedServerIds = await refreshPings(db);
+      let responseDb = db;
+      const shouldRepairVerifiedSession = !!user?.fromVerifiedSession;
+      if (changedServerIds.length || shouldRepairVerifiedSession) {
+        responseDb = await saveBestEffortDb(db, {
+          requireExistingUsers: shouldRepairVerifiedSession ? [user.id] : [],
+          touchedUsers: shouldRepairVerifiedSession ? [user.id] : [],
+          uniqueUserId: shouldRepairVerifiedSession ? user.id : "",
+          touchedServers: changedServerIds,
+          persistBestEffort: changedServerIds.length > 0
         });
+        if (changedServerIds.length) {
+          await safeSyncServerStaticPages(responseDb, {
+            syncPublicState: true,
+            syncRouteFiles: false
+          });
+        }
       }
-      return json(res, 200, statePayload(db, user, { detailServerId: stateDetailServerId(req) }));
+      return json(res, 200, statePayload(responseDb, user, { detailServerId: stateDetailServerId(req) }));
     }
 
     if (action === "googleCallback") {
@@ -2456,25 +2470,48 @@ async function cleanupStaleServers(db) {
 
 async function refreshPings(db) {
   const changedServerIds = [];
-  for (const server of db.servers) {
-    if (shouldRefreshPing(server)) {
-      await updatePing(server);
-      if (server.id) changedServerIds.push(server.id);
-    }
+  const staleServers = [...db.servers]
+    .filter(shouldRefreshPing)
+    .sort((a, b) => lastPingSortTime(a) - lastPingSortTime(b))
+    .slice(0, PING_REFRESH_LIMIT);
+  for (let index = 0; index < staleServers.length; index += PING_REFRESH_CONCURRENCY) {
+    const batch = staleServers.slice(index, index + PING_REFRESH_CONCURRENCY);
+    const results = await Promise.all(batch.map(async (server) => {
+      const changed = await updatePing(server);
+      return changed && server.id ? server.id : "";
+    }));
+    changedServerIds.push(...results.filter(Boolean));
   }
   return changedServerIds;
 }
 
 function shouldRefreshPing(server) {
+  const lastAttemptAt = dateMs(server.lastPingAttemptAt || "");
+  if (lastAttemptAt && Date.now() - lastAttemptAt <= PING_TTL_MS) return false;
   if (!server.lastPingAt) return true;
   if (server.edition === "java" && !server.javaStatusTarget) return true;
-  return Date.now() - new Date(server.lastPingAt).getTime() > PING_TTL_MS;
+  return Date.now() - dateMs(server.lastPingAt) > PING_TTL_MS;
+}
+
+function lastPingSortTime(server) {
+  return dateMs(server.lastPingAt || server.lastPingAttemptAt || "") || 0;
+}
+
+function dateMs(value = "") {
+  const time = new Date(value || 0).getTime();
+  return Number.isFinite(time) ? time : 0;
 }
 
 async function updatePing(server) {
   const ping = server.edition === "bedrock" ? await pingBedrock(server) : await pingJava(server);
   const now = new Date().toISOString();
+  if (ping.checked === false) {
+    server.lastPingAttemptAt = now;
+    return true;
+  }
   server.lastPingAt = now;
+  server.lastPingAttemptAt = now;
+  delete server.lastPingFailedAt;
   server.online = ping.online;
   server.playersOnline = ping.playersOnline;
   server.playersMax = ping.playersMax;
@@ -2493,6 +2530,7 @@ async function updatePing(server) {
     server.uptimeChecks = Number(server.uptimeChecks || 0) + 1;
   }
   server.uptimePercent = server.uptimeChecks ? (Number(server.uptimeSuccesses || 0) / server.uptimeChecks) * 100 : 0;
+  return true;
 }
 
 function recordPlayerSnapshot(server, createdAt) {
@@ -2518,20 +2556,22 @@ function recordPlayerSnapshot(server, createdAt) {
 
 async function pingJava(server) {
   const targets = javaStatusTargets(server);
-  let last = null;
+  let lastChecked = null;
+  let lastUnchecked = null;
   for (const target of targets) {
-    last = await pingJavaTarget(target);
-    if (last.online) return last;
+    const result = await pingJavaTarget(target);
+    if (result.checked && result.online) return result;
+    if (result.checked) lastChecked = result;
+    else lastUnchecked = result;
   }
-  return last || { online: false, playersOnline: 0, playersMax: 0, version: "Unknown", statusTarget: targets[0] || "" };
+  return lastChecked || lastUnchecked || { checked: false, online: false, playersOnline: 0, playersMax: 0, version: "Unknown", statusTarget: targets[0] || "" };
 }
 
 async function pingJavaTarget(target) {
   try {
-    const response = await fetch(`https://api.mcstatus.io/v2/status/java/${encodeURIComponent(target)}`);
-    if (!response.ok) throw new Error("mcstatus request failed");
-    const data = await response.json();
+    const data = await fetchMcstatusJson(`https://api.mcstatus.io/v2/status/java/${encodeURIComponent(target)}`);
     return {
+      checked: true,
       online: !!data.online,
       playersOnline: Number(data.players?.online || 0),
       playersMax: Number(data.players?.max || 0),
@@ -2541,7 +2581,26 @@ async function pingJavaTarget(target) {
       iconUrl: normalizeMinecraftIcon(data.icon || data.favicon || "")
     };
   } catch {
-    return { online: false, playersOnline: 0, playersMax: 0, version: "Unknown", statusTarget: target, srvResolved: false };
+    return { checked: false, online: false, playersOnline: 0, playersMax: 0, version: "Unknown", statusTarget: target, srvResolved: false };
+  }
+}
+
+async function fetchMcstatusJson(url) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), MCSTATUS_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      cache: "no-store",
+      headers: {
+        accept: "application/json",
+        "user-agent": "IconListing/1.0"
+      }
+    });
+    if (!response.ok) throw new Error(`mcstatus request failed (${response.status})`);
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -2571,14 +2630,13 @@ function isIpAddress(host = "") {
 
 async function pingBedrock(server) {
   if (server.bedrockType === "realm") {
-    return { online: false, playersOnline: 0, playersMax: 0, version: "Bedrock Realm" };
+    return { checked: true, online: false, playersOnline: 0, playersMax: 0, version: "Bedrock Realm" };
   }
   try {
     const target = `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}`;
-    const response = await fetch(`https://api.mcstatus.io/v2/status/bedrock/${encodeURIComponent(target)}`);
-    if (!response.ok) throw new Error("mcstatus bedrock request failed");
-    const data = await response.json();
+    const data = await fetchMcstatusJson(`https://api.mcstatus.io/v2/status/bedrock/${encodeURIComponent(target)}`);
     return {
+      checked: true,
       online: !!data.online,
       playersOnline: Number(data.players?.online || 0),
       playersMax: Number(data.players?.max || 0),
@@ -2586,7 +2644,7 @@ async function pingBedrock(server) {
       iconUrl: normalizeMinecraftIcon(data.icon || data.favicon || "")
     };
   } catch {
-    return { online: false, playersOnline: 0, playersMax: 0, version: "Bedrock" };
+    return { checked: false, online: false, playersOnline: 0, playersMax: 0, version: "Bedrock" };
   }
 }
 

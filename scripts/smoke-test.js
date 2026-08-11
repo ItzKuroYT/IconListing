@@ -582,6 +582,48 @@ async function main() {
     const afterDashboardSyncDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
     assert(afterDashboardSyncDb.servers.find((item) => item.id === reclaimableListing.id)?.ownerId === login.json.user.id, "dashboard sync ownership repair should persist to storage");
 
+    const pingRefreshDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const staleOnlineServer = {
+      id: `stale-ping-${suffix}`,
+      ownerId: login.json.user.id,
+      ownerName: login.json.user.username,
+      name: `Stale Ping SMP ${String(suffix).slice(-5)}`,
+      edition: "java",
+      javaHost: `stale-ping-${suffix}.example.org`,
+      javaPort: 25565,
+      javaStatusTarget: `stale-ping-${suffix}.example.org`,
+      country: "United States",
+      description: "A listing that was saved as online in the past. A later state request should refresh stale ping data, notice the server is now offline, clear stale players, and persist the corrected status.",
+      tags: ["SMP"],
+      online: true,
+      playersOnline: 3,
+      playersMax: 100,
+      version: "Paper 1.21.1",
+      votes: 0,
+      lastPingAt: "2026-01-01T00:00:00.000Z"
+    };
+    pingRefreshDb.servers.push(staleOnlineServer);
+    await fs.writeFile(dbPath, JSON.stringify(pingRefreshDb));
+    await fs.writeFile(backupPath, JSON.stringify(pingRefreshDb));
+    const previousPingFetch = global.fetch;
+    global.fetch = async (url, options = {}) => {
+      if (String(url).includes("api.mcstatus.io/v2/status/java/")) {
+        return { ok: true, status: 200, json: async () => ({ online: false, players: { online: 0, max: 0 }, version: { name_clean: "Unknown" } }) };
+      }
+      return previousPingFetch(url, options);
+    };
+    const refreshedPingState = await call("state", {}, login.json.token, "GET");
+    global.fetch = previousPingFetch;
+    const refreshedPingServer = refreshedPingState.json.servers.find((item) => item.id === staleOnlineServer.id);
+    assert(refreshedPingServer?.online === false && refreshedPingServer.playersOnline === 0, "state should refresh stale pings and clear offline player counts");
+    const refreshedPingDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const persistedPingServer = refreshedPingDb.servers.find((item) => item.id === staleOnlineServer.id);
+    assert(persistedPingServer?.online === false && persistedPingServer.playersOnline === 0, "stale ping refresh should persist corrected offline status");
+    refreshedPingDb.servers = refreshedPingDb.servers.filter((item) => ![reclaimableListing.id, protectedListing.id, staleOnlineServer.id].includes(item.id));
+    refreshedPingDb.users = refreshedPingDb.users.filter((item) => item.id !== protectedOwner.id);
+    await fs.writeFile(dbPath, JSON.stringify(refreshedPingDb));
+    await fs.writeFile(backupPath, JSON.stringify(refreshedPingDb));
+
     const storageHealth = await call("health", {}, "", "GET", { host: "icon-listing.vercel.app" });
     assert(storageHealth.code === 200 && storageHealth.json.durable === false, "health should report missing durable storage in local smoke");
     const fakeProductionWrite = await call("saveServer", { server: { name: "Should Not Save", javaHost: "no-storage.example.org", country: "United States", description: "This listing should be rejected in a production-like request when GitHub storage is not configured, preventing Vercel temporary storage from pretending the listing was saved across browsers.", tags: ["SMP"] } }, login.json.token, "POST", { host: "icon-listing.vercel.app" });
@@ -1417,7 +1459,7 @@ async function main() {
     if (deleteAccountPreviousResendFromEmail === undefined) delete process.env.RESEND_FROM_EMAIL;
     else process.env.RESEND_FROM_EMAIL = deleteAccountPreviousResendFromEmail;
 
-    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, dashboard ownership sync, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, dashboard ownership sync, stale ping refresh, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     tcpServers.forEach((server) => server.close());
