@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-12T02:10:04.315Z",
+  "generatedAt": "2026-08-12T02:18:04.185Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -177,7 +177,7 @@
         "Cross-Play"
       ],
       "ownerName": "kadika333",
-      "votes": 5,
+      "votes": 6,
       "playersOnline": 1,
       "playersMax": 333,
       "version": "Velocity 1.7.2-26.2",
