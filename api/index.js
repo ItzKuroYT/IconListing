@@ -2568,10 +2568,19 @@ async function pingJava(server) {
 }
 
 async function pingJavaTarget(target) {
+  const results = await Promise.all([
+    pingJavaViaMcstatusIo(target),
+    pingJavaViaMcsrvstat(target)
+  ]);
+  return chooseStatusResult(results, target, "Unknown");
+}
+
+async function pingJavaViaMcstatusIo(target) {
   try {
-    const data = await fetchMcstatusJson(`https://api.mcstatus.io/v2/status/java/${encodeURIComponent(target)}`);
+    const data = await fetchStatusJson(`https://api.mcstatus.io/v2/status/java/${encodeURIComponent(target)}?query=false&timeout=2`);
     return {
       checked: true,
+      provider: "mcstatus.io",
       online: !!data.online,
       playersOnline: Number(data.players?.online || 0),
       playersMax: Number(data.players?.max || 0),
@@ -2581,11 +2590,55 @@ async function pingJavaTarget(target) {
       iconUrl: normalizeMinecraftIcon(data.icon || data.favicon || "")
     };
   } catch {
-    return { checked: false, online: false, playersOnline: 0, playersMax: 0, version: "Unknown", statusTarget: target, srvResolved: false };
+    return uncheckedStatus(target, "Unknown", "mcstatus.io");
   }
 }
 
-async function fetchMcstatusJson(url) {
+async function pingJavaViaMcsrvstat(target) {
+  try {
+    const data = await fetchStatusJson(`https://api.mcsrvstat.us/3/${encodeURIComponent(target)}`);
+    return {
+      checked: true,
+      provider: "mcsrvstat",
+      online: !!data.online,
+      playersOnline: Number(data.players?.online || 0),
+      playersMax: Number(data.players?.max || 0),
+      version: typeof data.version === "string" ? data.version : data.version?.name_clean || data.version?.name || "Unknown",
+      statusTarget: target,
+      srvResolved: !!data.debug?.srv,
+      iconUrl: normalizeMinecraftIcon(data.icon || data.favicon || "")
+    };
+  } catch {
+    return uncheckedStatus(target, "Unknown", "mcsrvstat");
+  }
+}
+
+function chooseStatusResult(results, target, fallbackVersion) {
+  const checked = results.filter((result) => result?.checked);
+  if (!checked.length) return uncheckedStatus(target, fallbackVersion);
+  const mcstatusIo = checked.find((result) => result.provider === "mcstatus.io");
+  const mcsrvstat = checked.find((result) => result.provider === "mcsrvstat");
+  if (mcstatusIo && mcsrvstat && mcstatusIo.online !== mcsrvstat.online) {
+    return mcsrvstat;
+  }
+  const online = checked.find((result) => result.online);
+  return online || checked[checked.length - 1];
+}
+
+function uncheckedStatus(statusTarget, version = "Unknown", provider = "") {
+  return {
+    checked: false,
+    provider,
+    online: false,
+    playersOnline: 0,
+    playersMax: 0,
+    version,
+    statusTarget,
+    srvResolved: false
+  };
+}
+
+async function fetchStatusJson(url) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), MCSTATUS_TIMEOUT_MS);
   try {
@@ -2597,7 +2650,7 @@ async function fetchMcstatusJson(url) {
         "user-agent": "IconListing/1.0"
       }
     });
-    if (!response.ok) throw new Error(`mcstatus request failed (${response.status})`);
+    if (!response.ok) throw new Error(`server status request failed (${response.status})`);
     return response.json();
   } finally {
     clearTimeout(timeout);
@@ -2632,19 +2685,47 @@ async function pingBedrock(server) {
   if (server.bedrockType === "realm") {
     return { checked: true, online: false, playersOnline: 0, playersMax: 0, version: "Bedrock Realm" };
   }
+  const target = `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}`;
+  const results = await Promise.all([
+    pingBedrockViaMcstatusIo(target),
+    pingBedrockViaMcsrvstat(target)
+  ]);
+  return chooseStatusResult(results, target, "Bedrock");
+}
+
+async function pingBedrockViaMcstatusIo(target) {
   try {
-    const target = `${server.bedrockHost}:${Number(server.bedrockPort || CONFIG.defaults.bedrockPort)}`;
-    const data = await fetchMcstatusJson(`https://api.mcstatus.io/v2/status/bedrock/${encodeURIComponent(target)}`);
+    const data = await fetchStatusJson(`https://api.mcstatus.io/v2/status/bedrock/${encodeURIComponent(target)}?timeout=2`);
     return {
       checked: true,
+      provider: "mcstatus.io",
       online: !!data.online,
       playersOnline: Number(data.players?.online || 0),
       playersMax: Number(data.players?.max || 0),
+      statusTarget: target,
       version: data.version?.name_clean || data.version?.name_raw || data.version?.name || "Bedrock",
       iconUrl: normalizeMinecraftIcon(data.icon || data.favicon || "")
     };
   } catch {
-    return { checked: false, online: false, playersOnline: 0, playersMax: 0, version: "Bedrock" };
+    return uncheckedStatus(target, "Bedrock", "mcstatus.io");
+  }
+}
+
+async function pingBedrockViaMcsrvstat(target) {
+  try {
+    const data = await fetchStatusJson(`https://api.mcsrvstat.us/bedrock/3/${encodeURIComponent(target)}`);
+    return {
+      checked: true,
+      provider: "mcsrvstat",
+      online: !!data.online,
+      playersOnline: Number(data.players?.online || 0),
+      playersMax: Number(data.players?.max || 0),
+      statusTarget: target,
+      version: typeof data.version === "string" ? data.version : data.version?.name || "Bedrock",
+      iconUrl: normalizeMinecraftIcon(data.icon || data.favicon || "")
+    };
+  } catch {
+    return uncheckedStatus(target, "Bedrock", "mcsrvstat");
   }
 }
 

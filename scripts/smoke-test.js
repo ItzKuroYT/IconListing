@@ -608,17 +608,20 @@ async function main() {
     const previousPingFetch = global.fetch;
     global.fetch = async (url, options = {}) => {
       if (String(url).includes("api.mcstatus.io/v2/status/java/")) {
-        return { ok: true, status: 200, json: async () => ({ online: false, players: { online: 0, max: 0 }, version: { name_clean: "Unknown" } }) };
+        return { ok: true, status: 200, json: async () => ({ online: true, players: { online: 3, max: 100 }, version: { name_clean: "Paper 1.21.1" } }) };
+      }
+      if (String(url).includes("api.mcsrvstat.us/3/")) {
+        return { ok: true, status: 200, json: async () => ({ online: false, players: { online: 0, max: 0 }, version: "Unknown", debug: { srv: false } }) };
       }
       return previousPingFetch(url, options);
     };
     const refreshedPingState = await call("state", {}, login.json.token, "GET");
     global.fetch = previousPingFetch;
     const refreshedPingServer = refreshedPingState.json.servers.find((item) => item.id === staleOnlineServer.id);
-    assert(refreshedPingServer?.online === false && refreshedPingServer.playersOnline === 0, "state should refresh stale pings and clear offline player counts");
+    assert(refreshedPingServer?.online === false && refreshedPingServer.playersOnline === 0, "state should use the second status provider to clear stale false-online player counts");
     const refreshedPingDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
     const persistedPingServer = refreshedPingDb.servers.find((item) => item.id === staleOnlineServer.id);
-    assert(persistedPingServer?.online === false && persistedPingServer.playersOnline === 0, "stale ping refresh should persist corrected offline status");
+    assert(persistedPingServer?.online === false && persistedPingServer.playersOnline === 0, "stale ping refresh should persist corrected offline status from the second provider");
     refreshedPingDb.servers = refreshedPingDb.servers.filter((item) => ![reclaimableListing.id, protectedListing.id, staleOnlineServer.id].includes(item.id));
     refreshedPingDb.users = refreshedPingDb.users.filter((item) => item.id !== protectedOwner.id);
     await fs.writeFile(dbPath, JSON.stringify(refreshedPingDb));
@@ -1459,7 +1462,7 @@ async function main() {
     if (deleteAccountPreviousResendFromEmail === undefined) delete process.env.RESEND_FROM_EMAIL;
     else process.env.RESEND_FROM_EMAIL = deleteAccountPreviousResendFromEmail;
 
-    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, dashboard ownership sync, stale ping refresh, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, dashboard ownership sync, stale/mismatched ping refresh, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     tcpServers.forEach((server) => server.close());
