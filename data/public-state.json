@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-12T02:07:45.703Z",
+  "generatedAt": "2026-08-12T02:08:12.530Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -182,14 +182,14 @@
       "playersMax": 333,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 97.46835443037975,
+      "uptimePercent": 97.47634069400631,
       "sponsored": false,
       "createdAt": "2026-07-01T05:09:11.571Z",
-      "updatedAt": "2026-08-12T02:07:38.249Z",
-      "lastPingAt": "2026-08-12T02:07:38.547Z",
-      "lastSuccessfulPingAt": "2026-08-12T02:07:38.547Z",
-      "uptimeChecks": 316,
-      "uptimeSuccesses": 308,
+      "updatedAt": "2026-08-12T02:08:05.369Z",
+      "lastPingAt": "2026-08-12T02:08:05.421Z",
+      "lastSuccessfulPingAt": "2026-08-12T02:08:05.421Z",
+      "uptimeChecks": 317,
+      "uptimeSuccesses": 309,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
