@@ -10348,10 +10348,10 @@
       "createdAt": "2026-08-12T02:17:59.076Z"
     },
     {
-      "id": "391973b8-f52b-4a3e-9af9-3c1fe98ab7ef",
+      "id": "22efdf49-7387-4ddf-9db4-2c2d71429725",
       "serverId": "4bb119bc-7c4e-4815-88e7-9b4afbb8c379",
       "minecraftUsername": "AnderEv54",
-      "createdAt": "2026-08-13T01:52:43.676Z"
+      "createdAt": "2026-08-13T01:52:41.530Z"
     }
   ],
   "voteIps": {
@@ -10360,8 +10360,8 @@
       "name:kadika333": "2026-08-12T02:17:59.077Z"
     },
     "4bb119bc-7c4e-4815-88e7-9b4afbb8c379": {
-      "visitor:25a70d16672be1cbdb348e78db24a1e96b71f6e4b58ed768272c5f4fff5425bc": "2026-08-13T01:52:43.676Z",
-      "name:anderev54": "2026-08-13T01:52:43.676Z"
+      "visitor:25a70d16672be1cbdb348e78db24a1e96b71f6e4b58ed768272c5f4fff5425bc": "2026-08-13T01:52:41.530Z",
+      "name:anderev54": "2026-08-13T01:52:41.530Z"
     }
   },
   "siteAnalytics": {
