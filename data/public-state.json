@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-13T23:12:29.809Z",
+  "generatedAt": "2026-08-13T23:16:41.528Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -795,6 +795,55 @@
       }
     },
     {
+      "id": "fa627ea2-58a3-48ea-b6ba-b2d033738cec",
+      "name": "Lurith MC",
+      "javaHost": "Play.marthosting.fyi",
+      "javaPort": 25577,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "Play.marthosting.fyi:25577",
+      "crossPlay": true,
+      "bedrockHost": "Play.marthosting.fyi",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/vNX2USUfx3",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "Yep — for that Icon Listing description box, I’d make it much shorter and more promotional than the full server summary.\nCopy/paste this:\nLurith MC is a Java + Bedrock cross-play Minecraft network focused on Survival, economy, PvP, minigames, and community features. Join a growing SMP with custom shops, balanced buy/sell prices, Discord integration, Minecraft chat relay, events, giveaways, and more. Play on Java or Bedrock and connect at play.marthosting.fyi.",
+      "tags": [
+        "Economy",
+        "SMP",
+        "Minigames",
+        "Cross-Play",
+        "Modded"
+      ],
+      "ownerName": "JesuaMartinez",
+      "votes": 0,
+      "playersOnline": 2,
+      "playersMax": 200,
+      "version": "Velocity 1.7.2-26.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-08-13T23:16:31.290Z",
+      "updatedAt": "2026-08-13T23:16:31.290Z",
+      "lastPingAt": "2026-08-13T23:16:33.097Z",
+      "lastSuccessfulPingAt": "2026-08-13T23:16:33.097Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "",
+      "rank": 17,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      }
+    },
+    {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
       "name": "PulsedMC - Hosting - FREE",
       "javaHost": "play.pulsedmc.net",
@@ -837,7 +886,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PulsedMC-Hosting-FREE&kind=icon",
-      "rank": 17,
+      "rank": 18,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 2,
@@ -885,7 +934,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 18,
+      "rank": 19,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -935,7 +984,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 19,
+      "rank": 20,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -986,7 +1035,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
-      "rank": 20,
+      "rank": 21,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1031,7 +1080,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 21,
+      "rank": 22,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1076,7 +1125,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 22,
+      "rank": 23,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1125,7 +1174,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 23,
+      "rank": 24,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1175,7 +1224,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 24,
+      "rank": 25,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1222,7 +1271,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 25,
+      "rank": 26,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1271,7 +1320,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 26,
+      "rank": 27,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1322,7 +1371,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Futurelands&kind=icon",
-      "rank": 27,
+      "rank": 28,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
