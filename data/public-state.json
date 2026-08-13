@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-13T23:16:48.429Z",
+  "generatedAt": "2026-08-13T23:16:56.869Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -795,7 +795,7 @@
       }
     },
     {
-      "id": "7d327d30-c290-4803-b1f8-7ec98f0af438",
+      "id": "8fdd473e-1462-4d0d-a731-0eee87e0827f",
       "name": "Lurith MC",
       "javaHost": "Play.marthosting.fyi",
       "javaPort": 25577,
@@ -825,10 +825,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-08-13T23:16:40.960Z",
-      "updatedAt": "2026-08-13T23:16:40.960Z",
-      "lastPingAt": "2026-08-13T23:16:41.018Z",
-      "lastSuccessfulPingAt": "2026-08-13T23:16:41.018Z",
+      "createdAt": "2026-08-13T23:16:43.738Z",
+      "updatedAt": "2026-08-13T23:16:43.738Z",
+      "lastPingAt": "2026-08-13T23:16:43.794Z",
+      "lastSuccessfulPingAt": "2026-08-13T23:16:43.794Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
