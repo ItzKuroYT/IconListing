@@ -10348,10 +10348,10 @@
       "createdAt": "2026-08-12T02:17:59.076Z"
     },
     {
-      "id": "2f2dea05-fe2d-4bf7-a047-a7f115aed1fa",
+      "id": "a3b60cd1-d1ee-4c02-9b32-af2c882a073f",
       "serverId": "4bb119bc-7c4e-4815-88e7-9b4afbb8c379",
       "minecraftUsername": "coffercraft",
-      "createdAt": "2026-08-13T01:52:51.984Z"
+      "createdAt": "2026-08-13T01:52:53.116Z"
     }
   ],
   "voteIps": {
@@ -10360,8 +10360,8 @@
       "name:kadika333": "2026-08-12T02:17:59.077Z"
     },
     "4bb119bc-7c4e-4815-88e7-9b4afbb8c379": {
-      "visitor:25a70d16672be1cbdb348e78db24a1e96b71f6e4b58ed768272c5f4fff5425bc": "2026-08-13T01:52:51.984Z",
-      "name:coffercraft": "2026-08-13T01:52:51.984Z"
+      "visitor:25a70d16672be1cbdb348e78db24a1e96b71f6e4b58ed768272c5f4fff5425bc": "2026-08-13T01:52:53.116Z",
+      "name:coffercraft": "2026-08-13T01:52:53.116Z"
     }
   },
   "siteAnalytics": {
