@@ -10118,6 +10118,72 @@
       "uptimeSuccesses": 14,
       "iconListingVoteQueue": [],
       "lastPingAttemptAt": "2026-08-13T23:10:31.523Z"
+    },
+    {
+      "id": "fa627ea2-58a3-48ea-b6ba-b2d033738cec",
+      "name": "Lurith MC",
+      "edition": "java",
+      "javaHost": "Play.marthosting.fyi",
+      "javaPort": 25577,
+      "crossPlay": true,
+      "bedrockType": "server",
+      "bedrockHost": "Play.marthosting.fyi",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_69953e0c4cfac66e673f60a654a7cc849ce1",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/vNX2USUfx3",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "Yep — for that Icon Listing description box, I’d make it much shorter and more promotional than the full server summary.\nCopy/paste this:\nLurith MC is a Java + Bedrock cross-play Minecraft network focused on Survival, economy, PvP, minigames, and community features. Join a growing SMP with custom shops, balanced buy/sell prices, Discord integration, Minecraft chat relay, events, giveaways, and more. Play on Java or Bedrock and connect at play.marthosting.fyi.",
+      "tags": [
+        "Economy",
+        "SMP",
+        "Minigames",
+        "Cross-Play",
+        "Modded"
+      ],
+      "ownerId": "3e3e557c-b3e4-456d-bb12-e9e9e4e06923",
+      "ownerName": "JesuaMartinez",
+      "votes": 0,
+      "playersOnline": 2,
+      "playersMax": 200,
+      "version": "Velocity 1.7.2-26.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-08-13T23:16:31.290Z",
+      "updatedAt": "2026-08-13T23:16:31.290Z",
+      "lastPingAt": "2026-08-13T23:16:33.097Z",
+      "lastPingAttemptAt": "2026-08-13T23:16:33.097Z",
+      "javaStatusTarget": "Play.marthosting.fyi:25577",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-08-13T23:16:33.097Z",
+            "playersOnline": 2,
+            "playersMax": 200,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-08-13T23:16:33.097Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
     }
   ],
   "clients": [
