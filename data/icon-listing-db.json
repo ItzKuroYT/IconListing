@@ -10120,7 +10120,7 @@
       "lastPingAttemptAt": "2026-08-13T23:10:31.523Z"
     },
     {
-      "id": "8fdd473e-1462-4d0d-a731-0eee87e0827f",
+      "id": "f7f489b2-ae28-444d-9120-96befa9dcd7e",
       "name": "Lurith MC",
       "edition": "java",
       "javaHost": "Play.marthosting.fyi",
@@ -10159,10 +10159,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-08-13T23:16:43.738Z",
-      "updatedAt": "2026-08-13T23:16:43.738Z",
-      "lastPingAt": "2026-08-13T23:16:43.794Z",
-      "lastPingAttemptAt": "2026-08-13T23:16:43.794Z",
+      "createdAt": "2026-08-13T23:16:54.317Z",
+      "updatedAt": "2026-08-13T23:16:54.317Z",
+      "lastPingAt": "2026-08-13T23:16:54.375Z",
+      "lastPingAttemptAt": "2026-08-13T23:16:54.375Z",
       "javaStatusTarget": "Play.marthosting.fyi:25577",
       "javaSrvResolved": false,
       "analytics": {
@@ -10172,14 +10172,14 @@
         "viewVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-08-13T23:16:43.794Z",
+            "createdAt": "2026-08-13T23:16:54.375Z",
             "playersOnline": 2,
             "playersMax": 200,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-08-13T23:16:43.794Z",
+      "lastSuccessfulPingAt": "2026-08-13T23:16:54.375Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "iconUrl": "",
