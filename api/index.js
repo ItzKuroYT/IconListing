@@ -1927,8 +1927,34 @@ function serverPath(server) {
   return `/server/${encodeURIComponent(serverSlug(server.name, server.id))}/`;
 }
 
+function tagSlug(value = "") {
+  const slug = String(value || "")
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase()
+    .slice(0, 80);
+  return slug || "minecraft-servers";
+}
+
+function tagPath(tag = "") {
+  return `/servers/${encodeURIComponent(tagSlug(tag))}/`;
+}
+
+function tagBySlug(slug = "") {
+  const key = tagSlug(decodeUriPart(slug));
+  return [...new Set([...CONFIG.gamemodes, ...CONFIG.generalTags])]
+    .find((tag) => tagSlug(tag) === key) || "";
+}
+
 function serverStaticPagePath(server) {
   return path.posix.join("server", serverSlug(server.name, server.id), "index.html");
+}
+
+function tagStaticPagePath(tag) {
+  return path.posix.join("servers", tagSlug(tag), "index.html");
 }
 
 function findServerByKey(servers = [], key = "") {
@@ -1957,8 +1983,6 @@ function sitemapXml(db) {
   const staticUrls = [
     { loc: siteUrl("/"), priority: "1.0", changefreq: "daily" },
     { loc: siteUrl("/servers/"), priority: "0.9", changefreq: "daily" },
-    { loc: siteUrl("/servers/?sort=players"), priority: "0.85", changefreq: "daily" },
-    { loc: siteUrl("/servers/?sort=votes"), priority: "0.85", changefreq: "daily" },
     { loc: siteUrl("/sponsored/"), priority: "0.7", changefreq: "weekly" },
     { loc: siteUrl("/sponsored-clients/"), priority: "0.7", changefreq: "weekly" },
     { loc: siteUrl("/sponsored-hosts/"), priority: "0.7", changefreq: "weekly" },
@@ -1970,8 +1994,8 @@ function sitemapXml(db) {
     { loc: siteUrl("/help/"), priority: "0.4", changefreq: "monthly" },
     { loc: siteUrl("/contact/"), priority: "0.4", changefreq: "monthly" }
   ];
-  const tagUrls = [...new Set([...CONFIG.gamemodes, "Java", "Bedrock", "Cross-Play", "New"])].map((tag) => ({
-    loc: siteUrl(`/servers/?tag=${encodeURIComponent(tag)}`),
+  const tagUrls = [...new Set([...CONFIG.gamemodes, ...CONFIG.generalTags, "Java"])].map((tag) => ({
+    loc: siteUrl(tagPath(tag)),
     priority: "0.75",
     changefreq: "daily"
   }));
@@ -2016,11 +2040,27 @@ function serverPageHtmlForServer(server) {
           name: "Minecraft"
         },
         mainEntity: {
-          "@type": "Thing",
+          "@type": "GameServer",
           name: server.name,
           description,
-          url: canonical
+          url: canonical,
+          game: "Minecraft",
+          serverStatus: server.online ? "Online" : "Offline",
+          playersOnline: Number(server.playersOnline || 0),
+          maximumPlayers: Number(server.playersMax || 0),
+          keywords,
+          inLanguage: "en"
         }
+      },
+      {
+        "@type": "ItemList",
+        name: `${server.name} Minecraft server details`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: `Server IP: ${publicServerAddress(server) || "Not listed"}` },
+          { "@type": "ListItem", position: 2, name: `Status: ${server.online ? "Online" : "Offline"}` },
+          { "@type": "ListItem", position: 3, name: `Votes: ${Number(server.votes || 0).toLocaleString()}` },
+          { "@type": "ListItem", position: 4, name: `Tags: ${(server.tags || []).join(", ") || "Minecraft server"}` }
+        ]
       },
       {
         "@type": "BreadcrumbList",
@@ -2136,10 +2176,141 @@ function serverStaticFallbackMarkup(server) {
       ${staticServerSeoBlock(display)}`;
 }
 
+function tagPageHtmlForTag(db, tag) {
+  const cleanTag = tagBySlug(tag) || tag;
+  const ranked = rankServers(db.servers, db.votes);
+  const taggedServers = ranked.filter((server) => (server.tags || []).includes(cleanTag) || staticServerEditionLabel(server).toLowerCase().includes(String(cleanTag).toLowerCase()));
+  const title = trimSeo(`${cleanTag} Minecraft Servers | ${CONFIG.site.name}`, 59);
+  const description = trimSeo(`Browse ${cleanTag} Minecraft servers by rank, votes, live players, status, IP, and tags. Find active ${cleanTag} communities and vote for favorites.`, 158);
+  const canonical = siteUrl(tagPath(cleanTag));
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: `${cleanTag} Minecraft Servers`,
+        url: canonical,
+        description,
+        about: {
+          "@type": "VideoGame",
+          name: "Minecraft"
+        },
+        mainEntity: {
+          "@type": "ItemList",
+          name: `Top ${cleanTag} Minecraft Servers`,
+          itemListElement: taggedServers.slice(0, 20).map((server, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: siteUrl(serverPath(server)),
+            name: `${server.name} Minecraft Server`
+          }))
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Minecraft Listing", item: siteUrl("/") },
+          { "@type": "ListItem", position: 2, name: "Minecraft Servers", item: siteUrl("/servers/") },
+          { "@type": "ListItem", position: 3, name: `${cleanTag} Servers`, item: canonical }
+        ]
+      },
+      faqJsonLdForTag(cleanTag)
+    ]
+  };
+  return appHtml({
+    title,
+    description,
+    canonical,
+    image: siteUrl(CONFIG.site.iconPath),
+    keywords: [
+      `${cleanTag} Minecraft servers`,
+      `best ${cleanTag} Minecraft servers`,
+      `top ${cleanTag} Minecraft servers`,
+      `${cleanTag} server list`,
+      "Minecraft servers",
+      "Minecraft server list",
+      "advertise Minecraft server"
+    ].join(", "),
+    jsonLd,
+    bodyTitle: `${cleanTag} Minecraft Servers`,
+    bodyCopy: description,
+    bodyHtml: tagStaticFallbackMarkup(cleanTag, taggedServers),
+    page: "servers"
+  });
+}
+
+function tagStaticFallbackMarkup(tag, servers = []) {
+  const top = servers.slice(0, 10);
+  return `<section class="section seo-section">
+        <h1 class="section-title">${escapeHtml(tag)} Minecraft Servers</h1>
+        <p class="section-copy">Browse ${escapeHtml(tag)} Minecraft servers by rank, votes, player activity, status, server IP, tags, and descriptions. These listings help players compare active ${escapeHtml(tag)} communities before joining.</p>
+        <div class="seo-link-grid">${staticSearchIntentLinks()}${staticCategoryLinks(tag)}</div>
+      </section>
+      <section class="section seo-section">
+        <h2 class="section-title">Top ${escapeHtml(tag)} Minecraft Servers</h2>
+        ${top.length ? `<ol class="seo-rank-list">${top.map((server) => `<li><a href="${escapeHtmlAttr(serverPath(server))}">${escapeHtml(server.name)} Minecraft server</a><span>${Number(server.playersOnline || 0).toLocaleString()} players</span></li>`).join("")}</ol>` : `<p class="section-copy">No ${escapeHtml(tag)} servers are listed yet. Server owners can create a listing to advertise a Minecraft server for free.</p>`}
+      </section>
+      <section class="section seo-section">
+        <h2 class="section-title">Find ${escapeHtml(tag)} Servers With Real Details</h2>
+        <p class="section-copy">Each Icon Listing page can show a server address, live status, player count, vote total, tags, banner, trailer, Discord link, website link, and formatted description. That gives players more context than a plain IP list.</p>
+      </section>
+      <section class="section seo-section">
+        <h2 class="section-title">${escapeHtml(tag)} Minecraft Server FAQ</h2>
+        ${faqMarkupForTag(tag)}
+      </section>`;
+}
+
+function staticCategoryLinks(currentTag = "") {
+  return [...new Set([...CONFIG.gamemodes.slice(0, 12), "Java", "Bedrock", "Cross-Play"])]
+    .filter((tag) => tag !== currentTag)
+    .slice(0, 10)
+    .map((tag) => `<a class="seo-link" href="${escapeHtmlAttr(tagPath(tag))}">${escapeHtml(tag)} Minecraft servers</a>`)
+    .join("");
+}
+
+function faqJsonLdForTag(tag) {
+  const article = /^[aeiou]/i.test(tag) ? "an" : "a";
+  return {
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `How do I find good ${tag} Minecraft servers?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `Compare ${tag} Minecraft servers by player activity, votes, online status, descriptions, tags, and server details before joining.`
+        }
+      },
+      {
+        "@type": "Question",
+        name: `Can I advertise ${article} ${tag} Minecraft server?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `Yes. Server owners can create a free listing with a server IP, description, tags, banner, trailer, links, and voting.`
+        }
+      }
+    ]
+  };
+}
+
+function faqMarkupForTag(tag) {
+  const article = /^[aeiou]/i.test(tag) ? "an" : "a";
+  return `<div class="faq-list">
+        <article class="faq-item">
+          <h3>How do I find good ${escapeHtml(tag)} Minecraft servers?</h3>
+          <p>Compare ${escapeHtml(tag)} Minecraft servers by player activity, votes, online status, descriptions, tags, and server details before joining.</p>
+        </article>
+        <article class="faq-item">
+          <h3>Can I advertise ${article} ${escapeHtml(tag)} Minecraft server?</h3>
+          <p>Yes. Server owners can create a free listing with a server IP, description, tags, banner, trailer, links, and voting.</p>
+        </article>
+      </div>`;
+}
+
 function staticServerSeoBlock(server) {
   const tags = (server.tags || []).filter(Boolean);
   const tagLinks = tags.length
-    ? tags.map((tag) => `<a class="seo-link" href="${escapeHtmlAttr(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)} Minecraft servers</a>`).join("")
+    ? tags.map((tag) => `<a class="seo-link" href="${escapeHtmlAttr(tagPath(tag))}">${escapeHtml(tag)} Minecraft servers</a>`).join("")
     : staticSearchIntentLinks();
   return `<section class="section seo-section">
           <h2 class="section-title">More Minecraft Servers Like ${escapeHtml(server.name)}</h2>
@@ -2151,15 +2322,15 @@ function staticServerSeoBlock(server) {
 function staticSearchIntentLinks() {
   const links = [
     ["Best Minecraft Servers", "/servers/"],
-    ["Top Minecraft Servers", "/servers/?sort=players"],
-    ["Top 10 Minecraft Servers", "/servers/?sort=players"],
+    ["Top Minecraft Servers", "/servers/"],
+    ["Top 10 Minecraft Servers", "/servers/"],
     ["Minecraft Server List", "/servers/"],
     ["Minecraft Listing", "/servers/"],
     ["Advertise Minecraft Server", "/login/"],
     ["Free Minecraft Advertising", "/login/"],
-    ["Java Minecraft Servers", "/servers/?tag=Java"],
-    ["Bedrock Minecraft Servers", "/servers/?tag=Bedrock"],
-    ["Crossplay Minecraft Servers", "/servers/?tag=Cross-Play"]
+    ["Java Minecraft Servers", tagPath("Java")],
+    ["Bedrock Minecraft Servers", tagPath("Bedrock")],
+    ["Crossplay Minecraft Servers", tagPath("Cross-Play")]
   ];
   return links.map(([label, href]) => `<a class="seo-link" href="${escapeHtmlAttr(href)}">${escapeHtml(label)}</a>`).join("");
 }
@@ -2211,6 +2382,15 @@ function staticServerPageEntries(db) {
     server,
     filePath: serverStaticPagePath(server),
     html: serverPageHtmlForServer(server)
+  }));
+}
+
+function staticTagPageEntries(db) {
+  const next = migrateDb(db);
+  return [...new Set([...CONFIG.gamemodes, ...CONFIG.generalTags, "Java"])].map((tag) => ({
+    tag,
+    filePath: tagStaticPagePath(tag),
+    html: tagPageHtmlForTag(next, tag)
   }));
 }
 
@@ -2301,7 +2481,7 @@ async function syncServerStaticPages(db, options = {}) {
   }
 }
 
-function appHtml({ title, description, canonical, image, type = "website", keywords = "", jsonLd = null, bootData = null, bodyTitle = "Icon Listing", bodyCopy = "", bodyHtml = "" }) {
+function appHtml({ title, description, canonical, image, type = "website", keywords = "", jsonLd = null, bootData = null, bodyTitle = "Icon Listing", bodyCopy = "", bodyHtml = "", page = "server" }) {
   const safeTitle = escapeHtmlAttr(trimSeo(title, 59));
   const safeDescription = escapeHtmlAttr(trimSeo(description, 158));
   const safeCanonical = escapeHtmlAttr(canonical);
@@ -2337,7 +2517,7 @@ function appHtml({ title, description, canonical, image, type = "website", keywo
     <script src="/config.js?v=20260713-server-detail-snapshot"></script>
     <script src="/assets/js/app.js?v=20260713-server-detail-snapshot" defer></script>
   </head>
-  <body data-page="server">
+  <body data-page="${escapeHtmlAttr(page)}">
     <main class="page seo-fallback">
       ${bodyHtml || `<section class="section">
         <h1 class="section-title">${escapeHtml(bodyTitle)}</h1>
@@ -3957,5 +4137,7 @@ module.exports.__iconListingStatic = {
   publicSnapshotPayload,
   sitemapXml,
   serverSlug,
-  staticServerPageEntries
+  staticServerPageEntries,
+  staticTagPageEntries,
+  tagSlug
 };

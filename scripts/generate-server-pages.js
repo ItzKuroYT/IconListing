@@ -8,8 +8,9 @@ const { __iconListingStatic } = require("../api/index.js");
 async function main() {
   const db = JSON.parse(await fs.readFile(dbPath, "utf8"));
   const entries = __iconListingStatic.staticServerPageEntries(db);
+  const tagEntries = __iconListingStatic.staticTagPageEntries(db);
 
-  for (const entry of entries) {
+  for (const entry of [...entries, ...tagEntries]) {
     const filePath = path.join(outputRoot, entry.filePath);
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, entry.html);
@@ -18,7 +19,7 @@ async function main() {
   await fs.writeFile(path.join(outputRoot, "404.html"), __iconListingStatic.fallback404Html());
   await fs.writeFile(path.join(outputRoot, "sitemap.xml"), __iconListingStatic.sitemapXml(db));
   await fs.writeFile(path.join(outputRoot, "data", "public-state.json"), JSON.stringify(__iconListingStatic.publicSnapshotPayload(db), null, 2));
-  console.log(`Generated ${entries.length} server pages, 404.html, sitemap.xml, and data/public-state.json.`);
+  console.log(`Generated ${entries.length} server pages, ${tagEntries.length} category pages, 404.html, sitemap.xml, and data/public-state.json.`);
 }
 
 main().catch((error) => {

@@ -438,8 +438,6 @@ const IconListingConfig = {
   moderation: {
     replacement: "***",
     blockedServerHosts: [
-      "falixsrv.me",
-      "falixserver.me",
       "aternos.me",
       "aternos.org"
     ],
@@ -496,7 +494,7 @@ const IconListingConfig = {
     "BedWars",
     "Parkour"
   ],
-  generalTags: ["Bedrock", "Cross-Play", "Modded", "Whitelist", "New", "Old"],
+  generalTags: ["Bedrock", "Cross-Play", "Modded", "Whitelist", "Vote Rewards", "New", "Old"],
   countries: [
     "Afghanistan",
     "Albania",

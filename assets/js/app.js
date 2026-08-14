@@ -1188,23 +1188,23 @@ function navMenuLink(href, title, body = "", extra = "") {
 }
 
 function serversDropdownMarkup() {
-  const gamemodes = CONFIG.gamemodes.slice(0, 12).map((tag) => navMenuLink(`/servers/?tag=${encodeURIComponent(tag)}`, tag, "Browse ranked servers")).join("");
+  const gamemodes = CONFIG.gamemodes.slice(0, 12).map((tag) => navMenuLink(tagPath(tag), tag, "Browse ranked servers")).join("");
   return `<div class="dropdown mega-dropdown">
     <button class="drop-button" type="button" data-route-group="servers">Servers <span class="chevron" aria-hidden="true">v</span></button>
     <div class="dropdown-menu mega-menu">
       <div class="mega-column">
         <div class="dropdown-section-title">Java edition</div>
-        ${navMenuLink("/servers/?tag=Java", "Java Servers", "Servers for Minecraft Java Edition")}
+        ${navMenuLink(tagPath("Java"), "Java Servers", "Servers for Minecraft Java Edition")}
         ${navMenuLink("/servers/?sort=players", "Popular Java Servers", "Sort by active players")}
         ${navMenuLink("/servers/?sort=new", "Newest Java Servers", "Recently submitted listings")}
-        ${navMenuLink("/servers/?tag=Modded", "Modded Servers", "Modded and custom gameplay")}
+        ${navMenuLink(tagPath("Modded"), "Modded Servers", "Modded and custom gameplay")}
       </div>
       <div class="mega-column">
         <div class="dropdown-section-title">Bedrock edition</div>
-        ${navMenuLink("/servers/?tag=Bedrock", "Bedrock Servers", "Servers for Bedrock players")}
-        ${navMenuLink("/servers/?tag=Cross-Play", "Crossplay Servers", "Java and Bedrock together")}
-        ${navMenuLink("/servers/?tag=New", "Newest Bedrock Servers", "Fresh Bedrock listings")}
-        ${navMenuLink("/servers/?tag=Vote%20Rewards", "Vote Reward Servers", "Communities with vote rewards")}
+        ${navMenuLink(tagPath("Bedrock"), "Bedrock Servers", "Servers for Bedrock players")}
+        ${navMenuLink(tagPath("Cross-Play"), "Crossplay Servers", "Java and Bedrock together")}
+        ${navMenuLink(tagPath("New"), "Newest Bedrock Servers", "Fresh Bedrock listings")}
+        ${navMenuLink(tagPath("Vote Rewards"), "Vote Reward Servers", "Communities with vote rewards")}
       </div>
       <div class="mega-column wide">
         <div class="dropdown-section-title">Server game modes</div>
@@ -1217,7 +1217,7 @@ function serversDropdownMarkup() {
           <input name="q" class="input" type="search" placeholder="Find a specific server">
         </form>
         <div class="dropdown-section-title">Quick filters</div>
-        ${["Survival", "SMP", "Skyblock", "Prison", "PvP", "Factions"].map((tag) => `<a class="quick-filter" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)}</a>`).join("")}
+        ${["Survival", "SMP", "Skyblock", "Prison", "PvP", "Factions"].map((tag) => `<a class="quick-filter" href="${route(tagPath(tag))}">${escapeHtml(tag)}</a>`).join("")}
       </div>
     </div>
   </div>`;
@@ -1527,6 +1527,33 @@ function serverPath(server) {
   return `/server/${encodeURIComponent(serverSlug(server.name, server.id))}/`;
 }
 
+function tagSlug(value = "") {
+  const slug = String(value || "")
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase()
+    .slice(0, 80);
+  return slug || "minecraft-servers";
+}
+
+function tagPath(tag = "") {
+  return `/servers/${encodeURIComponent(tagSlug(tag))}/`;
+}
+
+function tagBySlug(slug = "") {
+  const key = tagSlug(slug);
+  return [...new Set([...(CONFIG.gamemodes || []), ...(CONFIG.generalTags || [])])]
+    .find((tag) => tagSlug(tag) === key) || "";
+}
+
+function tagFromPath() {
+  const match = location.pathname.match(/\/servers\/([^/?#]+)\/?$/i);
+  return match ? tagBySlug(decodeURIComponent(match[1] || "")) : "";
+}
+
 function serverRoute(server, options = {}) {
   if (options.byId && server?.id) return route(`/server/?id=${encodeURIComponent(server.id)}`);
   return route(serverPath(server));
@@ -1551,22 +1578,22 @@ function findServerFromLocation(servers = []) {
 
 function popularTagLinks(limit = 12) {
   return [...CONFIG.gamemodes.slice(0, limit - 3), "Bedrock", "Cross-Play", "New"].slice(0, limit).map((tag) => (
-    `<a class="pill" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)} servers</a>`
+    `<a class="pill" href="${route(tagPath(tag))}">${escapeHtml(tag)} servers</a>`
   )).join("");
 }
 
 function searchIntentLinks() {
   const links = [
     ["Best Minecraft Servers", "/servers/"],
-    ["Top Minecraft Servers", "/servers/?sort=players"],
-    ["Top 10 Minecraft Servers", "/servers/?sort=players"],
+    ["Top Minecraft Servers", "/servers/"],
+    ["Top 10 Minecraft Servers", "/servers/"],
     ["Minecraft Server List", "/servers/"],
     ["Minecraft Listing", "/servers/"],
     ["Advertise Minecraft Server", "/login/"],
     ["Free Minecraft Advertising", "/login/"],
-    ["Java Minecraft Servers", "/servers/?tag=Java"],
-    ["Bedrock Minecraft Servers", "/servers/?tag=Bedrock"],
-    ["Crossplay Minecraft Servers", "/servers/?tag=Cross-Play"]
+    ["Java Minecraft Servers", tagPath("Java")],
+    ["Bedrock Minecraft Servers", tagPath("Bedrock")],
+    ["Crossplay Minecraft Servers", tagPath("Cross-Play")]
   ];
   return links.map(([label, href]) => `<a class="seo-link" href="${route(href)}">${escapeHtml(label)}</a>`).join("");
 }
@@ -1596,7 +1623,7 @@ function popularGamemodesCard(servers = []) {
   const rows = popularGamemodeStats(servers);
   return `<article class="side-card popular-card">
     <h2><span class="side-icon">G</span> Popular Gamemodes</h2>
-    <div class="popular-rows">${rows.map((item, index) => `<a class="popular-row" href="${route(`/servers/?tag=${encodeURIComponent(item.tag)}`)}">
+    <div class="popular-rows">${rows.map((item, index) => `<a class="popular-row" href="${route(tagPath(item.tag))}">
       <span class="popular-rank">#${index + 1}</span>
       <strong>${escapeHtml(item.tag)}</strong>
       <span class="player-badge">${Number(item.players || 0).toLocaleString()} players</span>
@@ -1620,7 +1647,7 @@ function directorySidebar(servers = [], siteAnalytics = {}) {
     <article class="side-card browse-card">
       <h2>Browse Faster</h2>
       <div class="server-tags">
-        ${["Java", "Bedrock", "Cross-Play", "SMP", "PvP", "Survival"].map((tag) => `<a class="pill" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)}</a>`).join("")}
+        ${["Java", "Bedrock", "Cross-Play", "SMP", "PvP", "Survival"].map((tag) => `<a class="pill" href="${route(tagPath(tag))}">${escapeHtml(tag)}</a>`).join("")}
       </div>
     </article>
   </aside>`;
@@ -1697,7 +1724,7 @@ function serverCard(server) {
       <h3 class="server-title">${escapeHtml(server.name)} ${server.sponsored ? `<span class="pill">Sponsored</span>` : ""}</h3>
       <p class="server-ip">${escapeHtml(serverAddress(server))}</p>
       <p class="server-summary">${escapeHtml(descriptionSnippet(server.description || `${server.name} is a Minecraft server listed with tags, votes, player counts, and status.`))}</p>
-      <div class="server-tags"><span class="pill">${escapeHtml(editionLabel)}</span>${(server.tags || []).map((tag) => `<a class="pill above-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)}</a>`).join("")}</div>
+      <div class="server-tags"><span class="pill">${escapeHtml(editionLabel)}</span>${(server.tags || []).map((tag) => `<a class="pill above-link" href="${route(tagPath(tag))}">${escapeHtml(tag)}</a>`).join("")}</div>
       <div class="server-views">${views.toLocaleString()} unique views</div>
     </div>
     <div class="stats">
@@ -1820,10 +1847,11 @@ function toolbarMarkup(selectedTag = "") {
 
 function setupFilters(servers, options = {}) {
   const params = new URLSearchParams(location.search);
-  const initialTag = params.get("tag") || $("#tagFilter")?.value || "";
+  const initialTag = options.initialTag || tagFromPath() || params.get("tag") || $("#tagFilter")?.value || "";
   const initialSearch = params.get("q") || "";
   const initialSort = params.get("sort") || "rank";
   const pageParam = options.pageParam || "page";
+  const pathTag = tagFromPath();
   let currentPage = pageFromParams(pageParam);
   if ($("#tagFilter")) $("#tagFilter").value = initialTag;
   if ($("#searchInput")) $("#searchInput").value = initialSearch;
@@ -1844,7 +1872,7 @@ function setupFilters(servers, options = {}) {
       page: currentPage,
       pageParam,
       basePath: options.basePath || (document.body.dataset.page === "servers" ? "/servers/" : "/"),
-      params: { q: search, tag, sort: sort === "rank" ? "" : sort },
+      params: { q: search, tag: pathTag && tag === pathTag ? "" : tag, sort: sort === "rank" ? "" : sort },
       loading: !!options.loading
     });
     bindPager(options.pagerSelector || "#serverPager", (page) => {
@@ -1871,6 +1899,8 @@ function serverSeoDescription(server) {
 }
 
 function serverJsonLd(server) {
+  const tags = (server.tags || []).filter(Boolean);
+  const address = serverAddress(server);
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -1886,11 +1916,27 @@ function serverJsonLd(server) {
           name: "Minecraft"
         },
         mainEntity: {
-          "@type": "Thing",
+          "@type": "GameServer",
           name: server.name,
           description: trimSeo(server.description || serverSeoDescription(server), 300),
-          url: absoluteUrl(serverPath(server))
+          url: absoluteUrl(serverPath(server)),
+          game: "Minecraft",
+          serverStatus: server.online ? "Online" : "Offline",
+          playersOnline: Number(server.playersOnline || 0),
+          maximumPlayers: Number(server.playersMax || 0),
+          keywords: tags.join(", "),
+          inLanguage: "en"
         }
+      },
+      {
+        "@type": "ItemList",
+        name: `${server.name} Minecraft server details`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: `Server IP: ${address || "Not listed"}` },
+          { "@type": "ListItem", position: 2, name: `Status: ${server.online ? "Online" : "Offline"}` },
+          { "@type": "ListItem", position: 3, name: `Players: ${Number(server.playersOnline || 0).toLocaleString()}${server.playersMax ? `/${Number(server.playersMax).toLocaleString()}` : ""}` },
+          { "@type": "ListItem", position: 4, name: `Tags: ${tags.join(", ") || "Minecraft server"}` }
+        ]
       },
       {
         "@type": "BreadcrumbList",
@@ -1898,6 +1944,37 @@ function serverJsonLd(server) {
           { "@type": "ListItem", position: 1, name: "Minecraft Listing", item: absoluteUrl("/") },
           { "@type": "ListItem", position: 2, name: "Minecraft Servers", item: absoluteUrl("/servers/") },
           { "@type": "ListItem", position: 3, name: server.name, item: absoluteUrl(serverPath(server)) }
+        ]
+      }
+    ]
+  };
+}
+
+function toolJsonLd({ name, path, description, keywords = [] }) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        name,
+        url: absoluteUrl(path),
+        applicationCategory: "UtilityApplication",
+        operatingSystem: "Web",
+        description,
+        keywords: [...keywords, "Minecraft Listing", "Minecraft server tools", "Minecraft servers"].filter(Boolean).join(", "),
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Minecraft Listing", item: absoluteUrl("/") },
+          { "@type": "ListItem", position: 2, name: "Minecraft Tools", item: absoluteUrl("/tools/rgb-text-generator/") },
+          { "@type": "ListItem", position: 3, name, item: absoluteUrl(path) }
         ]
       }
     ]
@@ -2027,7 +2104,7 @@ function renderHome(state) {
 }
 
 function renderServers(state) {
-  const tag = new URLSearchParams(location.search).get("tag") || "";
+  const tag = tagFromPath() || new URLSearchParams(location.search).get("tag") || "";
   const loadingListings = !!state.apiHydrating && !state.servers.length;
   const listTitle = tag ? `${tag} Minecraft Servers` : "Best Minecraft Server List";
   setSeoMeta({
@@ -2036,7 +2113,7 @@ function renderServers(state) {
     description: tag
       ? `Browse ${tag} Minecraft servers by rank, votes, players, tags, and status. Find active ${tag} communities and vote for your favorites.`
       : CONFIG.seo?.pages?.servers?.description,
-    path: tag ? `/servers/?tag=${encodeURIComponent(tag)}` : "/servers/",
+    path: tag ? tagPath(tag) : "/servers/",
     keywords: tag ? [tag, `${tag} Minecraft servers`] : [],
     jsonLd: {
       "@context": "https://schema.org",
@@ -2044,7 +2121,7 @@ function renderServers(state) {
         {
           "@type": "CollectionPage",
           name: listTitle,
-          url: absoluteUrl(tag ? `/servers/?tag=${encodeURIComponent(tag)}` : "/servers/"),
+          url: absoluteUrl(tag ? tagPath(tag) : "/servers/"),
           description: tag
             ? `Browse ${tag} Minecraft servers by rank, votes, players, tags, and status.`
             : CONFIG.seo?.pages?.servers?.description
@@ -2052,7 +2129,7 @@ function renderServers(state) {
         {
           "@type": "ItemList",
           name: tag ? `${tag} Minecraft Servers` : "Minecraft Servers",
-          url: absoluteUrl(tag ? `/servers/?tag=${encodeURIComponent(tag)}` : "/servers/"),
+          url: absoluteUrl(tag ? tagPath(tag) : "/servers/"),
           itemListElement: state.servers.slice(0, 20).map((server, index) => ({
             "@type": "ListItem",
             position: index + 1,
@@ -2102,7 +2179,7 @@ function renderServers(state) {
       </div>
     </section>
   </div>`;
-  setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: "/servers/", loading: loadingListings });
+  setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: tag ? tagPath(tag) : "/servers/", initialTag: tag, loading: loadingListings });
 }
 
 function renderServerDetail(state) {
@@ -2222,11 +2299,11 @@ function renderServerDetail(state) {
 function serverDetailSeoBlock(server) {
   const tags = (server.tags || []).filter(Boolean);
   const tagLinks = tags.length
-    ? tags.map((tag) => `<a class="seo-link" href="${route(`/servers/?tag=${encodeURIComponent(tag)}`)}">${escapeHtml(tag)} Minecraft servers</a>`).join("")
+    ? tags.map((tag) => `<a class="seo-link" href="${route(tagPath(tag))}">${escapeHtml(tag)} Minecraft servers</a>`).join("")
     : popularTagLinks(8);
   return `<section class="section seo-section">
     <h2 class="section-title">More Minecraft Servers Like ${escapeHtml(server.name)}</h2>
-    <p class="section-copy">${escapeHtml(server.name)} is part of the Icon Listing Minecraft server list. Compare this listing with other top Minecraft servers by gamemode, votes, player count, status, tags, banners, trailers, and server details before joining.</p>
+    <p class="section-copy">${escapeHtml(server.name)} is part of the Icon Listing Minecraft server list. The listing includes ${escapeHtml(serverAddress(server) || "server address details")}, ${server.online ? `${Number(server.playersOnline || 0).toLocaleString()} players online` : "current status"}, ${Number(server.votes || 0).toLocaleString()} votes, ${tags.length ? `${escapeHtml(tags.join(", "))} tags` : "Minecraft tags"}, banners, trailers, and server details. Compare it with other top Minecraft servers before joining.</p>
     <div class="seo-link-grid">${tagLinks}${searchIntentLinks()}</div>
   </section>`;
 }
@@ -3829,7 +3906,13 @@ function renderMotdBuilder() {
   setSeoMeta({
     title: CONFIG.seo?.pages?.motdBuilder?.title || "Minecraft MOTD Builder | Icon Listing",
     description: CONFIG.seo?.pages?.motdBuilder?.description || "Build a two-line Minecraft server MOTD with colors, formatting, centering, live preview, raw output, and shareable URL.",
-    path: "/tools/motd-builder/"
+    path: "/tools/motd-builder/",
+    jsonLd: toolJsonLd({
+      name: "Minecraft MOTD Builder",
+      path: "/tools/motd-builder/",
+      description: CONFIG.seo?.pages?.motdBuilder?.description,
+      keywords: ["Minecraft MOTD builder", "Minecraft server MOTD", "Minecraft color codes"]
+    })
   });
   const params = new URLSearchParams(location.search);
   const line1 = params.get("line1") || "&6&lAwesome &aMinecraft&f Server";
@@ -4008,7 +4091,13 @@ function renderRgbTextGenerator() {
   setSeoMeta({
     title: CONFIG.seo?.pages?.rgbTextGenerator?.title || "Minecraft RGB Text Generator | Icon Listing",
     description: CONFIG.seo?.pages?.rgbTextGenerator?.description || "Create RGB gradient Minecraft text with hex colors, formatting, preview, and copy-ready output.",
-    path: "/tools/rgb-text-generator/"
+    path: "/tools/rgb-text-generator/",
+    jsonLd: toolJsonLd({
+      name: "Minecraft RGB Text Generator",
+      path: "/tools/rgb-text-generator/",
+      description: CONFIG.seo?.pages?.rgbTextGenerator?.description,
+      keywords: ["Minecraft RGB text generator", "gradient text generator", "Minecraft chat colors"]
+    })
   });
   const params = new URLSearchParams(location.search);
   const text = params.get("text") || "Iconic";
@@ -4332,7 +4421,13 @@ function renderFontsGenerator() {
   setSeoMeta({
     title: CONFIG.seo?.pages?.fontsGenerator?.title || "Minecraft Fonts Generator | Icon Listing",
     description: CONFIG.seo?.pages?.fontsGenerator?.description || "Generate Minecraft-friendly Unicode fonts including small caps, superscript, subscript, bold, monospace, and fullwidth text.",
-    path: "/tools/fonts-generator/"
+    path: "/tools/fonts-generator/",
+    jsonLd: toolJsonLd({
+      name: "Minecraft Fonts Generator",
+      path: "/tools/fonts-generator/",
+      description: CONFIG.seo?.pages?.fontsGenerator?.description,
+      keywords: ["Minecraft fonts generator", "small caps generator", "superscript generator", "subscript generator"]
+    })
   });
   $("#app").innerHTML = `<div class="page fonts-page">
     <section class="tool-hero fonts-hero">
@@ -4448,7 +4543,13 @@ function renderVotifierTester() {
   setSeoMeta({
     title: CONFIG.seo?.pages?.votifierTester?.title || "Votifier Tester | NuVotifier & AzuVotifier Tool",
     description: CONFIG.seo?.pages?.votifierTester?.description || "Test Votifier, NuVotifier, and AzuVotifier settings with host, port, token or public key, and a Minecraft username.",
-    path: "/tools/votifier-tester/"
+    path: "/tools/votifier-tester/",
+    jsonLd: toolJsonLd({
+      name: "Votifier Tester",
+      path: "/tools/votifier-tester/",
+      description: CONFIG.seo?.pages?.votifierTester?.description,
+      keywords: ["Votifier tester", "NuVotifier tester", "AzuVotifier tester", "Minecraft server voting"]
+    })
   });
   $("#app").innerHTML = `<div class="page tool-page">
     <section class="tool-hero">
