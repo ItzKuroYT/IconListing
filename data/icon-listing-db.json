@@ -594,6 +594,23 @@
       "googleName": "Brayden Pagel",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocIe8f-GHFnc94oaWOEXiKqhpK2ivfGzlqNdjye755S1KL1yVHRb=s96-c",
       "updatedAt": "2026-08-13T23:41:05.444Z"
+    },
+    {
+      "id": "5e38e3eb-ec7c-4323-a690-fb6c895e5039",
+      "username": "ChloeMontalvo",
+      "email": "cbmontalvo05@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-08-15T01:26:50.930Z",
+      "termsAcceptedAt": "2026-08-15T01:26:50.930Z",
+      "googleLinkedAt": "2026-08-15T01:26:50.930Z",
+      "createdAt": "2026-08-15T01:26:50.930Z",
+      "banned": false,
+      "googleSub": "107220615153789737215",
+      "googleName": "Chloe Montalvo",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJPL9YbnaJU3-2VxNRItpcT6JJ9RTYBwsXIE8QX9wmvPHQxUg=s96-c",
+      "updatedAt": "2026-08-15T01:26:50.930Z"
     }
   ],
   "servers": [
