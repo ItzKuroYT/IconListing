@@ -10535,7 +10535,7 @@
       ],
       "ownerId": "5e38e3eb-ec7c-4323-a690-fb6c895e5039",
       "ownerName": "ChloeMontalvo",
-      "votes": 1,
+      "votes": 2,
       "playersOnline": 5,
       "playersMax": 150,
       "version": "Velocity 1.7.2-26.2",
@@ -10555,6 +10555,18 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-08-16T05:20:50.866Z",
+            "playersOnline": 5,
+            "playersMax": 150,
+            "online": true
+          },
+          {
+            "createdAt": "2026-08-16T05:20:50.866Z",
+            "playersOnline": 5,
+            "playersMax": 150,
+            "online": true
+          },
           {
             "createdAt": "2026-08-16T05:20:50.866Z",
             "playersOnline": 5,
@@ -10830,12 +10842,20 @@
       "serverId": "6c9196be-ba02-4c10-829d-0c5a764c2217",
       "minecraftUsername": "YnwXXX",
       "createdAt": "2026-08-16T05:23:14.469Z"
+    },
+    {
+      "id": "ce74828c-f5a3-44d9-bb12-173bfb109050",
+      "serverId": "6c9196be-ba02-4c10-829d-0c5a764c2217",
+      "minecraftUsername": "Shazam188",
+      "createdAt": "2026-08-16T05:24:35.166Z"
     }
   ],
   "voteIps": {
     "6c9196be-ba02-4c10-829d-0c5a764c2217": {
       "visitor:f8b45c26299adbf9052d2522d6a53a089ba0555188046703a5091d75b7985684": "2026-08-16T05:23:14.469Z",
-      "name:ynwxxx": "2026-08-16T05:23:14.469Z"
+      "name:ynwxxx": "2026-08-16T05:23:14.469Z",
+      "visitor:49b688c7fe58beb0321ff87f53e4e9626e5da7923998b484072842ebaa081624": "2026-08-16T05:24:35.166Z",
+      "name:shazam188": "2026-08-16T05:24:35.166Z"
     }
   },
   "siteAnalytics": {
