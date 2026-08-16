@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-16T05:20:56.087Z",
+  "generatedAt": "2026-08-16T05:21:03.721Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -695,7 +695,7 @@
       }
     },
     {
-      "id": "6c9196be-ba02-4c10-829d-0c5a764c2217",
+      "id": "5179be19-1b04-463e-a297-8f8ebefb00d6",
       "name": "Etherium SMP",
       "javaHost": "etherium.minecraft.best",
       "javaPort": 25565,
@@ -726,10 +726,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-08-16T05:20:49.059Z",
-      "updatedAt": "2026-08-16T05:20:49.059Z",
-      "lastPingAt": "2026-08-16T05:20:50.866Z",
-      "lastSuccessfulPingAt": "2026-08-16T05:20:50.866Z",
+      "createdAt": "2026-08-16T05:20:58.742Z",
+      "updatedAt": "2026-08-16T05:20:58.742Z",
+      "lastPingAt": "2026-08-16T05:20:58.767Z",
+      "lastSuccessfulPingAt": "2026-08-16T05:20:58.767Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
