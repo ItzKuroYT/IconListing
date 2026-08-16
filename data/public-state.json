@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-16T05:26:04.142Z",
+  "generatedAt": "2026-08-16T05:26:16.019Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -236,8 +236,8 @@
       "sponsored": false,
       "createdAt": "2026-08-16T05:20:49.059Z",
       "updatedAt": "2026-08-16T05:20:49.059Z",
-      "lastPingAt": "2026-08-16T05:25:58.134Z",
-      "lastSuccessfulPingAt": "2026-08-16T05:25:58.134Z",
+      "lastPingAt": "2026-08-16T05:26:11.780Z",
+      "lastSuccessfulPingAt": "2026-08-16T05:26:11.780Z",
       "uptimeChecks": 2,
       "uptimeSuccesses": 2,
       "edition": "java",
