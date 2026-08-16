@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-16T05:23:19.829Z",
+  "generatedAt": "2026-08-16T05:24:39.786Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -474,7 +474,7 @@
         "New"
       ],
       "ownerName": "ChloeMontalvo",
-      "votes": 1,
+      "votes": 2,
       "playersOnline": 5,
       "playersMax": 150,
       "version": "Velocity 1.7.2-26.2",
