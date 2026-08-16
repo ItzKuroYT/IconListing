@@ -10535,7 +10535,7 @@
       ],
       "ownerId": "5e38e3eb-ec7c-4323-a690-fb6c895e5039",
       "ownerName": "ChloeMontalvo",
-      "votes": 0,
+      "votes": 1,
       "playersOnline": 5,
       "playersMax": 150,
       "version": "Velocity 1.7.2-26.2",
@@ -10555,6 +10555,12 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-08-16T05:20:50.866Z",
+            "playersOnline": 5,
+            "playersMax": 150,
+            "online": true
+          },
           {
             "createdAt": "2026-08-16T05:20:50.866Z",
             "playersOnline": 5,
@@ -10818,9 +10824,20 @@
       "serverId": "4bb119bc-7c4e-4815-88e7-9b4afbb8c379",
       "minecraftUsername": "coffercraft",
       "createdAt": "2026-08-13T01:52:53.116Z"
+    },
+    {
+      "id": "54df9fef-c6e5-4d08-a120-45a55115b6e0",
+      "serverId": "6c9196be-ba02-4c10-829d-0c5a764c2217",
+      "minecraftUsername": "YnwXXX",
+      "createdAt": "2026-08-16T05:23:14.469Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "6c9196be-ba02-4c10-829d-0c5a764c2217": {
+      "visitor:f8b45c26299adbf9052d2522d6a53a089ba0555188046703a5091d75b7985684": "2026-08-16T05:23:14.469Z",
+      "name:ynwxxx": "2026-08-16T05:23:14.469Z"
+    }
+  },
   "siteAnalytics": {
     "siteVisitDaily": [
       {
