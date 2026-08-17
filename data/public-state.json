@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-17T04:50:00.739Z",
+  "generatedAt": "2026-08-17T04:50:40.032Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -34,9 +34,9 @@
       "version": "Velocity 1.7.2-26.2",
       "online": true,
       "uptimePercent": 97.77777777777777,
-      "sponsored": true,
+      "sponsored": false,
       "createdAt": "2026-07-31T00:17:47.994Z",
-      "updatedAt": "2026-08-02T21:42:48.183Z",
+      "updatedAt": "2026-08-17T04:50:34.247Z",
       "lastPingAt": "2026-08-17T04:04:44.299Z",
       "lastSuccessfulPingAt": "2026-08-17T04:04:44.299Z",
       "uptimeChecks": 45,
