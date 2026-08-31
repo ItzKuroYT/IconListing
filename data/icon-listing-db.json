@@ -10772,6 +10772,70 @@
       "uptimeChecks": 90,
       "uptimeSuccesses": 90,
       "iconListingVoteQueue": []
+    },
+    {
+      "id": "213cc025-c8c7-4792-9af3-8a89964c5257",
+      "name": "Rage SMP",
+      "edition": "java",
+      "javaHost": "n-nyc-11.folium.host:25961",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_35f6aa575d9fbc1ead1b47dc293d091536d5",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/v7js8tSra",
+      "youtubeUrl": "",
+      "country": "Afghanistan",
+      "bannerUrl": "",
+      "description": "a sever RAGE SM P join now PLAY play wit teams or work on your own RAGE SMP............................................................................................................................................................................................JOIN NOW",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP"
+      ],
+      "ownerId": "8ca19a17-2d64-45ba-a069-50d2bc2e574a",
+      "ownerName": "AlfieAlfiecreasey",
+      "votes": 0,
+      "playersOnline": 4,
+      "playersMax": 50,
+      "version": "Paper 26.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-08-31T22:13:24.965Z",
+      "updatedAt": "2026-08-31T22:13:24.965Z",
+      "lastPingAt": "2026-08-31T22:13:25.413Z",
+      "lastPingAttemptAt": "2026-08-31T22:13:25.413Z",
+      "javaStatusTarget": "n-nyc-11.folium.host:25961",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-08-31T22:13:25.413Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-08-31T22:13:25.413Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
     }
   ],
   "clients": [
