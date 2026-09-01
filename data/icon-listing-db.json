@@ -11422,7 +11422,21 @@
       "createdAt": "2026-08-19T22:15:42.953Z"
     }
   ],
-  "reviews": [],
+  "reviews": [
+    {
+      "id": "fffd81cb-adb2-41bd-a8b6-4c605b25d8cd",
+      "serverId": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
+      "userId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
+      "username": "ItzKuroYT",
+      "rating": 5,
+      "comment": "Honestly a fun server! you go around and collect stuff and fight.. 10/10",
+      "createdAt": "2026-09-01T23:15:54.984Z",
+      "updatedAt": "2026-09-01T23:15:54.984Z",
+      "hidden": false,
+      "hiddenAt": "",
+      "ownerReply": null
+    }
+  ],
   "communityVotes": [
     {
       "id": "65a7fc00-f4bb-4da8-9c89-f384ea1c8662",
