@@ -89,6 +89,11 @@ const IconListingConfig = {
         description:
           "Browse sponsored Minecraft hosting providers with website links, videos, showcase images, paid sponsor details, and hosting descriptions."
       },
+      community: {
+        title: "Minecraft Server Community | Weekly Vote & Leaderboards",
+        description:
+          "Vote for the weekly Minecraft server community highlight and compare top voted, most active, and best reviewed Minecraft servers."
+      },
       plans: {
         title: "Icon Listing Plans | Server Listing Limits",
         description:
@@ -178,6 +183,8 @@ const IconListingConfig = {
   ranking: {
     playerWeight: 1,
     voteWeight: 8,
+    reviewWeight: 12,
+    communityHighlightBoost: 50000,
     sponsoredBoost: 100000
   },
   defaults: {
@@ -202,6 +209,7 @@ const IconListingConfig = {
       sponsoredServers: "Sponsored",
       sponsoredClients: "Sponsored Clients",
       sponsoredHosts: "Sponsored Hosts",
+      community: "Community",
       plans: "Plans",
       tools: "Tools",
       dashboard: "Dashboard",

@@ -35,8 +35,8 @@ const DISCORD_WEBHOOK_TIMEOUT_MS = 2500;
 const MCSTATUS_TIMEOUT_MS = 1800;
 const PING_REFRESH_LIMIT = 24;
 const PING_REFRESH_CONCURRENCY = 8;
-const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "syncDashboard", "vote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
-const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage", "googleStart", "googleCallback"]);
 const loginFailures = new Map();
 
@@ -213,6 +213,8 @@ module.exports = async function handler(req, res) {
       if (server.ownerId !== user.id && !isAdmin(user)) throw httpError(403, "You cannot delete that listing.");
       db.servers = db.servers.filter((item) => item.id !== body.id);
       db.votes = db.votes.filter((vote) => vote.serverId !== body.id);
+      db.reviews = db.reviews.filter((review) => review.serverId !== body.id);
+      db.communityVotes = db.communityVotes.filter((vote) => vote.serverId !== body.id);
       if (db.voteIps) delete db.voteIps[body.id];
       markDeleted(db, "servers", [body.id]);
       const persistedDb = await saveDb(db, { deletedServers: [body.id] });
@@ -286,6 +288,101 @@ module.exports = async function handler(req, res) {
       }));
     }
 
+    if (action === "submitReview") {
+      requireLogin(user);
+      requireFields(body, ["serverId", "rating", "comment"]);
+      const server = db.servers.find((item) => item.id === body.serverId);
+      if (!server) throw httpError(404, "Listing not found.");
+      if (server.ownerId === user.id) throw httpError(403, "Server owners cannot review their own listing.");
+      const rating = Math.round(Number(body.rating || 0));
+      const comment = cleanText(body.comment || "");
+      if (rating < 1 || rating > 5) throw httpError(400, "Choose a rating from 1 to 5 stars.");
+      if (comment.length < 9 || comment.length > 100) throw httpError(400, "Reviews need a comment between 9 and 100 characters.");
+      if (hasBlockedText(comment)) throw httpError(400, "That review needs different wording.");
+      const now = new Date().toISOString();
+      const existing = db.reviews.find((item) => item.serverId === server.id && item.userId === user.id && item.hidden !== true);
+      const review = normalizeReview({
+        ...existing,
+        id: existing?.id || createId(),
+        serverId: server.id,
+        userId: user.id,
+        username: user.username,
+        rating,
+        comment,
+        createdAt: existing?.createdAt || now,
+        updatedAt: now,
+        hidden: false
+      });
+      db.reviews = existing
+        ? db.reviews.map((item) => (item.id === existing.id ? review : item))
+        : [...db.reviews, review];
+      const persistedDb = await saveDb(db, { requireExistingServers: [server.id], requireExistingUsers: user.fromTokenSnapshot ? [] : [user.id], touchedReviews: [review.id] });
+      await safeSyncServerStaticPages(persistedDb, { writeServerIds: [server.id], syncPublicState: true, syncRouteFiles: false });
+      return json(res, 200, writePayload({
+        ok: true,
+        ...statePayload(persistedDb, user, { detailServerId: server.id }),
+        review: publicReview(review)
+      }));
+    }
+
+    if (action === "replyReview") {
+      requireLogin(user);
+      requireFields(body, ["reviewId", "comment"]);
+      const review = db.reviews.find((item) => item.id === body.reviewId && item.hidden !== true);
+      if (!review) throw httpError(404, "Review not found.");
+      const server = db.servers.find((item) => item.id === review.serverId);
+      if (!server) throw httpError(404, "Listing not found.");
+      if (server.ownerId !== user.id && !isAdmin(user)) throw httpError(403, "Only the server owner can reply to reviews.");
+      const comment = cleanText(body.comment || "");
+      if (comment.length < 2 || comment.length > 300) throw httpError(400, "Replies must be between 2 and 300 characters.");
+      if (hasBlockedText(comment)) throw httpError(400, "That reply needs different wording.");
+      review.ownerReply = { userId: user.id, username: user.username, comment, createdAt: new Date().toISOString() };
+      review.updatedAt = new Date().toISOString();
+      const persistedDb = await saveDb(db, { requireExistingServers: [server.id], requireExistingUsers: user.fromTokenSnapshot ? [] : [user.id], touchedReviews: [review.id] });
+      await safeSyncServerStaticPages(persistedDb, { writeServerIds: [server.id], syncPublicState: true, syncRouteFiles: false });
+      return json(res, 200, writePayload({
+        ok: true,
+        ...statePayload(persistedDb, user, { detailServerId: server.id })
+      }));
+    }
+
+    if (action === "deleteReview") {
+      requireLogin(user);
+      if (!isAdmin(user)) throw httpError(403, "Admin access is required.");
+      requireFields(body, ["reviewId"]);
+      const review = db.reviews.find((item) => item.id === body.reviewId);
+      if (!review) throw httpError(404, "Review not found.");
+      review.hidden = true;
+      review.hiddenAt = new Date().toISOString();
+      review.updatedAt = review.hiddenAt;
+      const persistedDb = await saveDb(db, { requireExistingUsers: user.fromTokenSnapshot ? [] : [user.id], touchedReviews: [review.id] });
+      await safeSyncServerStaticPages(persistedDb, { writeServerIds: [review.serverId], syncPublicState: true, syncRouteFiles: false });
+      return json(res, 200, writePayload({
+        ok: true,
+        ...statePayload(persistedDb, user, { detailServerId: review.serverId })
+      }));
+    }
+
+    if (action === "communityVote") {
+      requireLogin(user);
+      requireFields(body, ["serverId"]);
+      const server = db.servers.find((item) => item.id === body.serverId);
+      if (!server) throw httpError(404, "Listing not found.");
+      const week = weekKey();
+      if (db.communityVotes.some((item) => item.userId === user.id && item.week === week)) {
+        throw httpError(409, "You already voted in this week's community highlight.");
+      }
+      const vote = { id: createId(), serverId: server.id, userId: user.id, username: user.username, week, createdAt: new Date().toISOString() };
+      db.communityVotes.push(vote);
+      const persistedDb = await saveDb(db, { requireExistingServers: [server.id], requireExistingUsers: user.fromTokenSnapshot ? [] : [user.id], touchedCommunityVotes: [vote.id] });
+      await safeSyncServerStaticPages(persistedDb, { writeServerIds: [server.id], syncPublicState: true, syncRouteFiles: false });
+      return json(res, 200, writePayload({
+        ok: true,
+        ...statePayload(persistedDb, user, { detailServerId: server.id }),
+        communityVote: normalizeCommunityVote(vote)
+      }));
+    }
+
     if (action === "pluginPoll") {
       requireFields(body, ["key"]);
       const key = cleanVoteKey(body.key);
@@ -307,7 +404,7 @@ module.exports = async function handler(req, res) {
       const server = db.servers.find((item) => item.id === body.serverId);
       if (!server) throw httpError(404, "Listing not found.");
       const changed = recordIpCopy(server, req);
-      if (changed) await saveBestEffortDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
+      if (changed) await saveBestEffortDb(db, { requireExistingServers: [server.id], touchedServers: [server.id], persistBestEffort: true });
       return json(res, 200, writePayload({ ok: true, analytics: publicAnalytics(server, { full: true }) }));
     }
 
@@ -315,13 +412,13 @@ module.exports = async function handler(req, res) {
       const server = findServerByKey(db.servers, body.serverId || body.serverSlug || body.slug);
       if (!server) throw httpError(404, "Listing not found.");
       const changed = recordServerView(server, req);
-      if (changed) await saveBestEffortDb(db, { requireExistingServers: [server.id], touchedServers: [server.id] });
+      if (changed) await saveBestEffortDb(db, { requireExistingServers: [server.id], touchedServers: [server.id], persistBestEffort: true });
       return json(res, 200, writePayload({ ok: true, analytics: publicAnalytics(server, { full: true }) }));
     }
 
     if (action === "trackSiteVisit") {
       const changed = recordSiteVisit(db, req);
-      const persistedDb = changed ? await saveBestEffortDb(db) : db;
+      const persistedDb = changed ? await saveBestEffortDb(db, { persistBestEffort: true }) : db;
       return json(res, 200, writePayload({ ok: true, siteAnalytics: publicSiteAnalytics(persistedDb.siteAnalytics) }));
     }
 
@@ -1130,7 +1227,7 @@ function apiOrigin(value = "") {
 }
 
 function freshDb() {
-  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {}, siteAnalytics: {}, deleted: { users: {}, servers: {}, clients: {}, hosts: {} } };
+  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], reviews: [], communityVotes: [], voteIps: {}, siteAnalytics: {}, deleted: { users: {}, servers: {}, clients: {}, hosts: {} } };
 }
 
 function migrateDb(db = freshDb()) {
@@ -1143,6 +1240,8 @@ function migrateDb(db = freshDb()) {
     clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")).map(normalizeClient) : [],
     hosts: Array.isArray(db.hosts) ? db.hosts.filter((host) => !String(host.id || "").startsWith("host-")).map(normalizeHost) : [],
     votes: Array.isArray(db.votes) ? db.votes : [],
+    reviews: Array.isArray(db.reviews) ? db.reviews.map(normalizeReview).filter(Boolean) : [],
+    communityVotes: Array.isArray(db.communityVotes) ? db.communityVotes.map(normalizeCommunityVote).filter(Boolean) : [],
     voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {},
     siteAnalytics: normalizeSiteAnalytics(db.siteAnalytics),
     deleted: normalizeDeleted(db.deleted)
@@ -1186,6 +1285,46 @@ function normalizeHost(host) {
     url: host.url || host.websiteUrl || "",
     images: images.filter(Boolean).slice(0, 3),
     pricing: "paid"
+  };
+}
+
+function normalizeReview(review) {
+  if (!review || typeof review !== "object") return null;
+  const rating = Math.max(1, Math.min(5, Number(review.rating || 0)));
+  if (!review.id || !review.serverId || !review.userId || !rating) return null;
+  const reply = review.ownerReply && typeof review.ownerReply === "object"
+    ? {
+        userId: clean(review.ownerReply.userId),
+        username: cleanText(review.ownerReply.username),
+        comment: cleanText(review.ownerReply.comment).slice(0, 300),
+        createdAt: cleanText(review.ownerReply.createdAt || new Date().toISOString())
+      }
+    : null;
+  return {
+    id: clean(review.id),
+    serverId: clean(review.serverId),
+    userId: clean(review.userId),
+    username: cleanText(review.username),
+    rating,
+    comment: cleanText(review.comment).slice(0, 100),
+    createdAt: cleanText(review.createdAt || new Date().toISOString()),
+    updatedAt: cleanText(review.updatedAt || review.createdAt || new Date().toISOString()),
+    hidden: review.hidden === true,
+    hiddenAt: cleanText(review.hiddenAt || ""),
+    ownerReply: reply
+  };
+}
+
+function normalizeCommunityVote(vote) {
+  if (!vote || typeof vote !== "object") return null;
+  if (!vote.id || !vote.serverId || !vote.userId) return null;
+  return {
+    id: clean(vote.id),
+    serverId: clean(vote.serverId),
+    userId: clean(vote.userId),
+    username: cleanText(vote.username),
+    week: clean(vote.week || weekKey(vote.createdAt)),
+    createdAt: cleanText(vote.createdAt || new Date().toISOString())
   };
 }
 
@@ -1312,6 +1451,8 @@ function mergeRecoveryDb(primaryDb, recoveryDb) {
     clients: mergeClientsWithRecovery(primary.clients, recovery.clients, deleted.clients),
     hosts: mergeHostsWithRecovery(primary.hosts, recovery.hosts, deleted.hosts),
     votes: mergeVotesWithRecovery(primary.votes, recovery.votes, servers, deleted.servers),
+    reviews: mergeReviewsWithRecovery(primary.reviews, recovery.reviews, servers, deleted.servers),
+    communityVotes: mergeCommunityVotesWithRecovery(primary.communityVotes, recovery.communityVotes, servers, deleted.servers),
     voteIps: pruneDeletedVoteIps(mergeVoteIps(recovery.voteIps, primary.voteIps), deleted.servers),
     siteAnalytics: mergeSiteAnalytics(primary.siteAnalytics, recovery.siteAnalytics)
   });
@@ -1399,6 +1540,30 @@ function mergeVotesWithRecovery(primaryVotes = [], recoveryVotes = [], servers =
     if (vote?.id && serverIds.has(vote.serverId) && !deletedServers[vote.serverId]) merged.set(vote.id, vote);
   }
   return [...merged.values()];
+}
+
+function mergeReviewsWithRecovery(primaryReviews = [], recoveryReviews = [], servers = [], deletedServers = {}) {
+  const serverIds = new Set(servers.map((server) => server.id));
+  const merged = new Map();
+  for (const review of recoveryReviews) {
+    if (review?.id && serverIds.has(review.serverId) && !deletedServers[review.serverId]) merged.set(review.id, normalizeReview(review));
+  }
+  for (const review of primaryReviews) {
+    if (review?.id && serverIds.has(review.serverId) && !deletedServers[review.serverId]) merged.set(review.id, normalizeReview(review));
+  }
+  return [...merged.values()].filter(Boolean);
+}
+
+function mergeCommunityVotesWithRecovery(primaryVotes = [], recoveryVotes = [], servers = [], deletedServers = {}) {
+  const serverIds = new Set(servers.map((server) => server.id));
+  const merged = new Map();
+  for (const vote of recoveryVotes) {
+    if (vote?.id && serverIds.has(vote.serverId) && !deletedServers[vote.serverId]) merged.set(vote.id, normalizeCommunityVote(vote));
+  }
+  for (const vote of primaryVotes) {
+    if (vote?.id && serverIds.has(vote.serverId) && !deletedServers[vote.serverId]) merged.set(vote.id, normalizeCommunityVote(vote));
+  }
+  return [...merged.values()].filter(Boolean);
 }
 
 let githubDbCache = { data: null, sha: null, loadedAt: 0, key: "" };
@@ -1577,6 +1742,8 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
     clients: mergeById(remote.clients, next.clients, deletedClients, ids.touchedClients),
     hosts: mergeById(remote.hosts, next.hosts, deletedHosts, ids.touchedHosts),
     votes: mergeVotes(remote.votes, next.votes, deletedServers, ids.touchedVotes, ids.touchedServers),
+    reviews: mergeReviews(remote.reviews, next.reviews, deletedServers, ids.touchedReviews),
+    communityVotes: mergeCommunityVotes(remote.communityVotes, next.communityVotes, deletedServers, ids.touchedCommunityVotes),
     voteIps: mergeVoteIps(remote.voteIps, next.voteIps, deletedServers),
     siteAnalytics: mergeSiteAnalytics(remote.siteAnalytics, next.siteAnalytics)
   };
@@ -1639,6 +1806,8 @@ function ensureWriteDoesNotLoseData(remoteDb, nextDb, options = {}) {
   assertNoUnexpectedLoss("client", remote.clients, next.clients, deletedClients);
   assertNoUnexpectedLoss("host", remote.hosts, next.hosts, deletedHosts);
   assertNoUnexpectedVoteLoss(remote.votes, next.votes, deletedServers);
+  assertNoUnexpectedReviewLoss(remote.reviews, next.reviews, deletedServers);
+  assertNoUnexpectedCommunityVoteLoss(remote.communityVotes, next.communityVotes, deletedServers);
 }
 
 function assertNoUnexpectedLoss(label, remoteItems = [], nextItems = [], deletedIds = new Set()) {
@@ -1655,6 +1824,20 @@ function assertNoUnexpectedVoteLoss(remoteVotes = [], nextVotes = [], deletedSer
   }
 }
 
+function assertNoUnexpectedReviewLoss(remoteReviews = [], nextReviews = [], deletedServerIds = new Set()) {
+  const allowedLoss = remoteReviews.filter((review) => deletedServerIds.has(review.serverId)).length;
+  if (nextReviews.length + allowedLoss < remoteReviews.length) {
+    throw httpError(409, "Storage protection blocked an unexpected review data change. Please refresh and try again.");
+  }
+}
+
+function assertNoUnexpectedCommunityVoteLoss(remoteVotes = [], nextVotes = [], deletedServerIds = new Set()) {
+  const allowedLoss = remoteVotes.filter((vote) => deletedServerIds.has(vote.serverId)).length;
+  if (nextVotes.length + allowedLoss < remoteVotes.length) {
+    throw httpError(409, "Storage protection blocked an unexpected community vote data change. Please refresh and try again.");
+  }
+}
+
 function hasAnyStoredData(db) {
   const deleted = normalizeDeleted(db.deleted);
   return !!(
@@ -1663,6 +1846,8 @@ function hasAnyStoredData(db) {
     db.clients.length ||
     db.hosts.length ||
     db.votes.length ||
+    db.reviews.length ||
+    db.communityVotes.length ||
     Object.keys(db.voteIps || {}).length ||
     countDailyCopies(normalizeSiteAnalytics(db.siteAnalytics).siteVisitDaily, ANALYTICS_DAYS) ||
     Object.values(deleted).some((items) => Object.keys(items).length)
@@ -1690,7 +1875,9 @@ function writeIdSets(options = {}) {
     touchedServers: new Set(options.touchedServers || []),
     touchedClients: new Set(options.touchedClients || []),
     touchedHosts: new Set(options.touchedHosts || []),
-    touchedVotes: new Set(options.touchedVotes || [])
+    touchedVotes: new Set(options.touchedVotes || []),
+    touchedReviews: new Set(options.touchedReviews || []),
+    touchedCommunityVotes: new Set(options.touchedCommunityVotes || [])
   };
 }
 
@@ -1729,6 +1916,32 @@ function mergeVotes(remoteVotes = [], nextVotes = [], deletedServerIds = new Set
   };
   remoteVotes.forEach(add);
   nextVotes.forEach(add);
+  return [...merged.values()];
+}
+
+function mergeReviews(remoteReviews = [], nextReviews = [], deletedServerIds = new Set(), touchedReviewIds = new Set()) {
+  const merged = new Map();
+  const add = (review, prefer = false) => {
+    const next = normalizeReview(review);
+    if (!next?.id || deletedServerIds.has(next.serverId)) return;
+    if (!prefer && merged.has(next.id)) return;
+    merged.set(next.id, next);
+  };
+  remoteReviews.forEach((review) => add(review));
+  nextReviews.forEach((review) => add(review, touchedReviewIds.has(review?.id)));
+  return [...merged.values()];
+}
+
+function mergeCommunityVotes(remoteVotes = [], nextVotes = [], deletedServerIds = new Set(), touchedVoteIds = new Set()) {
+  const merged = new Map();
+  const add = (vote, prefer = false) => {
+    const next = normalizeCommunityVote(vote);
+    if (!next?.id || deletedServerIds.has(next.serverId)) return;
+    if (!prefer && merged.has(next.id)) return;
+    merged.set(next.id, next);
+  };
+  remoteVotes.forEach((vote) => add(vote));
+  nextVotes.forEach((vote) => add(vote, touchedVoteIds.has(vote?.id)));
   return [...merged.values()];
 }
 
@@ -1842,15 +2055,101 @@ function shouldEncryptStorage() {
   return String(process.env.ICON_LISTING_ENCRYPT_DB || "").toLowerCase() === "true";
 }
 
+function publicReview(review) {
+  const next = normalizeReview(review);
+  if (!next || next.hidden) return null;
+  return {
+    id: next.id,
+    serverId: next.serverId,
+    userId: next.userId,
+    username: next.username || "Player",
+    rating: next.rating,
+    comment: next.comment,
+    createdAt: next.createdAt,
+    updatedAt: next.updatedAt,
+    ownerReply: next.ownerReply
+  };
+}
+
+function publicReviews(reviews = []) {
+  return (reviews || []).map(publicReview).filter(Boolean);
+}
+
+function publicReviewsForServer(reviews = [], serverId = "") {
+  return publicReviews(reviews).filter((review) => review.serverId === serverId);
+}
+
+function reviewStatsForServer(reviews = [], serverId = "") {
+  const list = publicReviewsForServer(reviews, serverId);
+  const count = list.length;
+  const average = count ? Math.round((list.reduce((sum, review) => sum + Number(review.rating || 0), 0) / count) * 10) / 10 : 0;
+  return { average, count };
+}
+
+function publicCommunityVotes(votes = [], week = weekKey()) {
+  return (votes || [])
+    .map(normalizeCommunityVote)
+    .filter((vote) => vote && vote.week === week)
+    .map(({ id, serverId, username, week, createdAt }) => ({ id, serverId, username, week, createdAt }));
+}
+
+function communityVoteCounts(votes = [], week = weekKey()) {
+  const counts = new Map();
+  for (const vote of votes || []) {
+    const next = normalizeCommunityVote(vote);
+    if (!next || next.week !== week) continue;
+    counts.set(next.serverId, (counts.get(next.serverId) || 0) + 1);
+  }
+  return counts;
+}
+
+function communityHighlightServerId(votes = [], week = weekKey()) {
+  const counts = communityVoteCounts(votes, week);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] || "";
+}
+
+function publicCommunitySummary(db) {
+  const next = migrateDb(db);
+  const week = weekKey();
+  const counts = communityVoteCounts(next.communityVotes, week);
+  const ranked = rankServers(next.servers, next.votes, next.reviews, next.communityVotes);
+  const serverById = new Map(ranked.map((server) => [server.id, server]));
+  const weekly = [...counts.entries()]
+    .map(([serverId, votes]) => ({ server: serverById.get(serverId), votes }))
+    .filter((item) => item.server)
+    .sort((a, b) => b.votes - a.votes || (a.server.rank || 9999) - (b.server.rank || 9999))
+    .slice(0, 10);
+  const byVotes = [...ranked].sort((a, b) => Number(b.votes || 0) - Number(a.votes || 0) || (a.rank || 9999) - (b.rank || 9999)).slice(0, 3);
+  const byPlayers = [...ranked].sort((a, b) => Number(b.playersOnline || 0) - Number(a.playersOnline || 0) || (a.rank || 9999) - (b.rank || 9999)).slice(0, 3);
+  const byReviews = [...ranked]
+    .filter((server) => Number(server.reviewStats?.count || 0) > 0)
+    .sort((a, b) => Number(b.reviewStats?.average || 0) - Number(a.reviewStats?.average || 0) || Number(b.reviewStats?.count || 0) - Number(a.reviewStats?.count || 0))
+    .slice(0, 3);
+  return {
+    week,
+    highlightedServerId: communityHighlightServerId(next.communityVotes, week),
+    weekly: weekly.map((item) => ({ server: publicSnapshotServer(item.server), votes: item.votes })),
+    leaderboards: {
+      topVoted: byVotes.map(publicSnapshotServer),
+      mostPlayers: byPlayers.map(publicSnapshotServer),
+      bestReviewed: byReviews.map(publicSnapshotServer)
+    }
+  };
+}
+
 function statePayload(db, user, options = {}) {
   const detailServerKey = clean(options.detailServerId || options.detailServerKey || "");
   const detailServer = detailServerKey ? findServerByKey(db.servers, detailServerKey) : null;
   const detailServerId = detailServer?.id || detailServerKey;
+  const rankedServers = rankServers(db.servers, db.votes, db.reviews, db.communityVotes);
   return {
-    servers: rankServers(db.servers, db.votes).map((server) => publicServer(server, user, { fullAnalytics: server.id === detailServerId })),
+    servers: rankedServers.map((server) => publicServer(server, user, { fullAnalytics: server.id === detailServerId })),
     clients: db.clients,
     hosts: db.hosts,
     votes: detailServerId ? publicVotesForServer(db.votes, detailServerId) : [],
+    reviews: detailServerId ? publicReviewsForServer(db.reviews, detailServerId) : publicReviews(db.reviews),
+    communityVotes: publicCommunityVotes(db.communityVotes),
+    community: publicCommunitySummary(db),
     user: publicUser(user),
     siteAnalytics: publicSiteAnalytics(db.siteAnalytics)
   };
@@ -1861,9 +2160,12 @@ function publicSnapshotPayload(db) {
   return {
     version: 2,
     generatedAt: new Date().toISOString(),
-    servers: rankServers(next.servers, next.votes).map(publicSnapshotServer),
+    servers: rankServers(next.servers, next.votes, next.reviews, next.communityVotes).map(publicSnapshotServer),
     clients: next.clients.map(publicSnapshotClient),
     hosts: next.hosts.map(publicSnapshotHost),
+    reviews: publicReviews(next.reviews),
+    communityVotes: publicCommunityVotes(next.communityVotes),
+    community: publicCommunitySummary(next),
     siteAnalytics: publicSiteAnalytics(next.siteAnalytics)
   };
 }
@@ -1879,7 +2181,7 @@ function publicSnapshotServer(server) {
     "bannerUrl", "description", "tags", "ownerName", "votes", "playersOnline", "playersMax",
     "version", "online", "uptimePercent", "sponsored", "createdAt", "updatedAt", "lastPingAt",
     "lastSuccessfulPingAt", "uptimeChecks", "uptimeSuccesses", "edition", "bedrockType",
-    "realmCode", "iconUrl", "rank", "analytics"
+    "realmCode", "iconUrl", "rank", "analytics", "reviewStats", "communityVotesThisWeek", "communityHighlighted"
   ];
   const next = {};
   for (const key of allowed) {
@@ -1986,6 +2288,7 @@ function sitemapXml(db) {
     { loc: siteUrl("/sponsored/"), priority: "0.7", changefreq: "weekly" },
     { loc: siteUrl("/sponsored-clients/"), priority: "0.7", changefreq: "weekly" },
     { loc: siteUrl("/sponsored-hosts/"), priority: "0.7", changefreq: "weekly" },
+    { loc: siteUrl("/community/"), priority: "0.8", changefreq: "daily" },
     { loc: siteUrl("/sponsored/plans/"), priority: "0.7", changefreq: "monthly" },
     { loc: siteUrl("/tools/motd-builder/"), priority: "0.6", changefreq: "monthly" },
     { loc: siteUrl("/tools/votifier-tester/"), priority: "0.6", changefreq: "monthly" },
@@ -1999,7 +2302,7 @@ function sitemapXml(db) {
     priority: "0.75",
     changefreq: "daily"
   }));
-  const serverUrls = rankServers(db.servers, db.votes).map((server) => ({
+  const serverUrls = rankServers(db.servers, db.votes, db.reviews, db.communityVotes).map((server) => ({
     loc: siteUrl(serverPath(server)),
     priority: server.sponsored ? "0.8" : "0.6",
     changefreq: "daily",
@@ -2014,7 +2317,7 @@ function sitemapUrlEntry(item) {
 }
 
 function serverPageHtml(db, req) {
-  const server = findServerByKey(rankServers(db.servers, db.votes), serverKeyFromRequest(req));
+  const server = findServerByKey(rankServers(db.servers, db.votes, db.reviews, db.communityVotes), serverKeyFromRequest(req));
   if (!server) return serverNotFoundHtml();
   return serverPageHtmlForServer(server);
 }
@@ -2048,6 +2351,15 @@ function serverPageHtmlForServer(server) {
           serverStatus: server.online ? "Online" : "Offline",
           playersOnline: Number(server.playersOnline || 0),
           maximumPlayers: Number(server.playersMax || 0),
+          ...(Number(server.reviewStats?.count || 0) > 0 ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: Number(server.reviewStats.average || 0),
+              reviewCount: Number(server.reviewStats.count || 0),
+              bestRating: 5,
+              worstRating: 1
+            }
+          } : {}),
           keywords,
           inLanguage: "en"
         }
@@ -2059,7 +2371,8 @@ function serverPageHtmlForServer(server) {
           { "@type": "ListItem", position: 1, name: `Server IP: ${publicServerAddress(server) || "Not listed"}` },
           { "@type": "ListItem", position: 2, name: `Status: ${server.online ? "Online" : "Offline"}` },
           { "@type": "ListItem", position: 3, name: `Votes: ${Number(server.votes || 0).toLocaleString()}` },
-          { "@type": "ListItem", position: 4, name: `Tags: ${(server.tags || []).join(", ") || "Minecraft server"}` }
+          { "@type": "ListItem", position: 4, name: `Rating: ${server.reviewStats?.count ? `${server.reviewStats.average}/5 from ${server.reviewStats.count} reviews` : "No reviews yet"}` },
+          { "@type": "ListItem", position: 5, name: `Tags: ${(server.tags || []).join(", ") || "Minecraft server"}` }
         ]
       },
       {
@@ -2112,6 +2425,7 @@ function serverStaticFallbackMarkup(server) {
           ${staticInfoRow("Version", `<span class="pill">${escapeHtml(display.version || "Unknown")}</span>`)}
           ${staticInfoRow("Rank", `#${display.rank || "-"}`)}
           ${staticInfoRow("Votes", Number(display.votes || 0).toLocaleString())}
+          ${staticInfoRow("Reviews", staticReviewSummaryText(display))}
           ${staticInfoRow("Uptime", `${Number(display.uptimePercent || 0).toFixed(1)}%`)}
           ${staticInfoRow("Last Ping", display.lastPingAt ? "recently" : "Not pinged yet")}
           ${staticInfoRow("Country", escapeHtml(display.country || "Unknown"))}
@@ -2124,6 +2438,7 @@ function serverStaticFallbackMarkup(server) {
             ${staticDetailTabButton("banners", "Banners")}
             ${staticDetailTabButton("analytics", "Analytics")}
             ${staticDetailTabButton("trailer", "Trailer")}
+            ${staticDetailTabButton("reviews", "Reviews")}
           </div>
           <div class="detail-body detail-tab-panel active" data-panel="info">
             <div class="server-showcase">
@@ -2138,6 +2453,7 @@ function serverStaticFallbackMarkup(server) {
             <div class="quick-stats">
               <div class="mini-stat"><strong>${Number(display.playersOnline || 0).toLocaleString()}</strong><span>online now</span></div>
               <div class="mini-stat"><strong>${Number(display.votes || 0).toLocaleString()}</strong><span>votes</span></div>
+              <div class="mini-stat"><strong>${staticReviewStars(display)}</strong><span>${Number(display.reviewStats?.count || 0).toLocaleString()} reviews</span></div>
               <div class="mini-stat"><strong>#${display.rank || "-"}</strong><span>rank</span></div>
             </div>
             <div class="description-card">
@@ -2145,6 +2461,10 @@ function serverStaticFallbackMarkup(server) {
               <div class="description-text">${description}</div>
             </div>
             <a class="button vote-wide" href="${escapeHtmlAttr(`/vote/?server=${encodeURIComponent(display.id)}`)}">Vote for ${escapeHtml(display.name)}</a>
+          </div>
+          <div class="detail-body detail-tab-panel" data-panel="reviews">
+            <h2 class="detail-heading">Community reviews</h2>
+            <p class="section-copy">${escapeHtml(staticReviewSummarySentence(display))}</p>
           </div>
           <div class="detail-body detail-tab-panel" data-panel="stats">
             <h2 class="detail-heading">Player history</h2>
@@ -2178,7 +2498,7 @@ function serverStaticFallbackMarkup(server) {
 
 function tagPageHtmlForTag(db, tag) {
   const cleanTag = tagBySlug(tag) || tag;
-  const ranked = rankServers(db.servers, db.votes);
+  const ranked = rankServers(db.servers, db.votes, db.reviews, db.communityVotes);
   const taggedServers = ranked.filter((server) => (server.tags || []).includes(cleanTag) || staticServerEditionLabel(server).toLowerCase().includes(String(cleanTag).toLowerCase()));
   const title = trimSeo(`${cleanTag} Minecraft Servers | ${CONFIG.site.name}`, 59);
   const description = trimSeo(`Browse ${cleanTag} Minecraft servers by rank, votes, live players, status, IP, and tags. Find active ${cleanTag} communities and vote for favorites.`, 158);
@@ -2319,6 +2639,25 @@ function staticServerSeoBlock(server) {
         </section>`;
 }
 
+function staticReviewSummaryText(server) {
+  const stats = server.reviewStats || {};
+  const count = Number(stats.count || 0);
+  if (!count) return "No reviews yet";
+  return `${Number(stats.average || 0).toFixed(1)}/5 from ${count.toLocaleString()} review${count === 1 ? "" : "s"}`;
+}
+
+function staticReviewStars(server) {
+  const average = Number(server.reviewStats?.average || 0);
+  return average ? `${average.toFixed(1)}/5` : "New";
+}
+
+function staticReviewSummarySentence(server) {
+  const stats = server.reviewStats || {};
+  const count = Number(stats.count || 0);
+  if (!count) return `${server.name} does not have public reviews yet. Players can leave a short moderated review after logging in.`;
+  return `${server.name} has an average community rating of ${Number(stats.average || 0).toFixed(1)} out of 5 from ${count.toLocaleString()} public review${count === 1 ? "" : "s"}. Reviews help players compare Minecraft servers beyond copied descriptions or banners.`;
+}
+
 function staticSearchIntentLinks() {
   const links = [
     ["Best Minecraft Servers", "/servers/"],
@@ -2378,7 +2717,7 @@ function serverNotFoundHtml() {
 
 function staticServerPageEntries(db) {
   const next = migrateDb(db);
-  return rankServers(next.servers, next.votes).map((server) => ({
+  return rankServers(next.servers, next.votes, next.reviews, next.communityVotes).map((server) => ({
     server,
     filePath: serverStaticPagePath(server),
     html: serverPageHtmlForServer(server)
@@ -3813,6 +4152,17 @@ function dateKey(value = "") {
   return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "";
 }
 
+function weekKey(value = new Date().toISOString()) {
+  const parsed = new Date(value);
+  const source = Number.isFinite(parsed.getTime()) ? parsed : new Date();
+  const date = new Date(Date.UTC(source.getUTCFullYear(), source.getUTCMonth(), source.getUTCDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const week = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+
 function isRecentDateKey(date, days) {
   const time = new Date(`${date}T00:00:00.000Z`).getTime();
   if (!Number.isFinite(time)) return false;
@@ -3885,16 +4235,31 @@ function createId() {
   ].join("-");
 }
 
-function rankServers(servers, votes = []) {
+function rankServers(servers, votes = [], reviews = [], communityVotes = []) {
+  const highlightedServerId = communityHighlightServerId(communityVotes);
+  const currentCommunityVotes = communityVoteCounts(communityVotes);
   return [...servers]
-    .map((server) => ({ ...server, votes: displayedVoteCount(server, votes) }))
-    .sort((a, b) => scoreServer(b, votes) - scoreServer(a, votes))
+    .map((server) => ({
+      ...server,
+      votes: displayedVoteCount(server, votes),
+      reviewStats: reviewStatsForServer(reviews, server.id),
+      communityVotesThisWeek: currentCommunityVotes.get(server.id) || 0,
+      communityHighlighted: server.id === highlightedServerId
+    }))
+    .sort((a, b) => scoreServer(b, votes, reviews, communityVotes) - scoreServer(a, votes, reviews, communityVotes))
     .map((server, index) => ({ ...server, rank: index + 1 }));
 }
 
-function scoreServer(server, votes) {
+function scoreServer(server, votes = [], reviews = [], communityVotes = []) {
   const voteCount = displayedVoteCount(server, votes);
-  return (server.playersOnline || 0) * CONFIG.ranking.playerWeight + voteCount * CONFIG.ranking.voteWeight + (server.sponsored ? CONFIG.ranking.sponsoredBoost : 0);
+  const stats = server.reviewStats || reviewStatsForServer(reviews, server.id);
+  const reviewBoost = Number(stats.average || 0) > 3.5
+    ? Number(stats.average || 0) * Number(CONFIG.ranking.reviewWeight || 0) + Math.min(Number(stats.count || 0), 50)
+    : 0;
+  const highlightBoost = (server.communityHighlighted || server.id === communityHighlightServerId(communityVotes))
+    ? Number(CONFIG.ranking.communityHighlightBoost || 0)
+    : 0;
+  return (server.playersOnline || 0) * CONFIG.ranking.playerWeight + voteCount * CONFIG.ranking.voteWeight + reviewBoost + highlightBoost + (server.sponsored ? CONFIG.ranking.sponsoredBoost : 0);
 }
 
 function displayedVoteCount(server, votes = []) {

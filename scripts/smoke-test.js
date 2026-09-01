@@ -721,6 +721,21 @@ async function main() {
     assert(discordNotifications[0].content.includes("View Smoke Test SMP on iconlisting"), "Discord webhook should include the server name");
     assert(discordNotifications[0].content.includes(`/server/${serverSlug(saved.json.server.name)}`), "Discord webhook should include the server slug URL");
 
+    const ownerReview = await call("submitReview", { serverId: saved.json.server.id, rating: 5, comment: "Owner review should fail." }, login.json.token);
+    assert(ownerReview.code === 403, "server owners should not be able to review their own listing");
+    const shortReview = await call("submitReview", { serverId: saved.json.server.id, rating: 5, comment: "short" }, googleSession);
+    assert(shortReview.code === 400, "reviews should require a useful short comment");
+    const review = await call("submitReview", { serverId: saved.json.server.id, rating: 5, comment: "Helpful active server." }, googleSession);
+    let reviewId = review.json.review.id;
+    assert(review.code === 200 && review.json.reviews.length === 1, "a non-owner should be able to review a server");
+    assert(review.json.servers.find((item) => item.id === saved.json.server.id)?.reviewStats?.average === 5, "saved reviews should update public review stats");
+    const ownerReply = await call("replyReview", { reviewId, comment: "Thanks for the helpful feedback." }, login.json.token);
+    assert(ownerReply.code === 200 && ownerReply.json.reviews[0].ownerReply?.comment.includes("Thanks"), "server owners should be able to reply to reviews");
+    const communityVote = await call("communityVote", { serverId: saved.json.server.id }, googleSession);
+    assert(communityVote.code === 200 && communityVote.json.community?.highlightedServerId === saved.json.server.id, "weekly community votes should highlight the leading server");
+    const duplicateCommunityVote = await call("communityVote", { serverId: saved.json.server.id }, googleSession);
+    assert(duplicateCommunityVote.code === 409, "users should only vote once per weekly community highlight");
+
     const duplicateName = await call(
       "saveServer",
       {
@@ -1237,6 +1252,11 @@ async function main() {
     const adminVerify = await call("verifyEmail", { code: adminVerificationCode, verificationToken: admin.json.verificationToken });
     assert(adminVerify.code === 200 && adminVerify.json.token, "admin email verification should return an admin session");
     const adminToken = adminVerify.json.token;
+    const adminDeleteReview = await call("deleteReview", { reviewId }, adminToken);
+    assert(adminDeleteReview.code === 200 && !adminDeleteReview.json.reviews.some((item) => item.id === reviewId), "admins should be able to remove reviews");
+    const replacementReview = await call("submitReview", { serverId: saved.json.server.id, rating: 4, comment: "Still a solid server." }, googleSession);
+    reviewId = replacementReview.json.review.id;
+    assert(replacementReview.code === 200 && replacementReview.json.review.rating === 4, "reviewers should be able to post a new review after admin removal");
     global.fetch = adminPreviousFetch;
     if (adminPreviousResendApiKey === undefined) delete process.env.RESEND_API_KEY;
     else process.env.RESEND_API_KEY = adminPreviousResendApiKey;
@@ -1348,6 +1368,8 @@ async function main() {
     const client = finalState.json.clients.find((item) => item.name === "Smoke Client");
     const host = finalState.json.hosts.find((item) => item.name === "Smoke Hosting");
     assert(server && server.votes === 2, "server should have two counted votes after the next-day vote");
+    assert(server.reviewStats?.count === 1 && server.reviewStats.average === 4, "public state should expose saved review stats");
+    assert(finalState.json.community?.highlightedServerId === saved.json.server.id, "public state should expose the weekly community highlight");
     assert(server.bannerUrl.includes("action=serverImage") && server.bannerUrl.includes("kind=banner"), "large data banners should be exposed through the server image API instead of being stripped from public state");
     assert(!server.iconListingVoteKey && !server.iconListingVoteQueue && !server.votifierToken, "public state should not expose private vote delivery keys or queues");
     assert(otherServer && otherServer.ownerId === server.ownerId, "same account should keep multiple unique listings");
@@ -1364,6 +1386,7 @@ async function main() {
     const detailServer = detailState.json.servers.find((item) => item.id === saved.json.server.id);
     assert(Array.isArray(detailServer.analytics.ipCopyDaily) && Array.isArray(detailServer.analytics.playerHistory), "detail state should include full analytics for the requested server");
     assert(detailState.json.votes.length === 2, "detail state should include current-month votes for only the requested server");
+    assert(detailState.json.reviews.length === 1 && detailState.json.reviews[0].id === reviewId, "detail state should include public reviews for the requested server");
     const votePageState = await call("state", { server: saved.json.server.id }, "", "GET");
     assert(votePageState.json.votes.length === 2, "vote page state should accept the server query parameter used by vote links");
     const slugDetailState = await call("state", { serverSlug: savedSlug }, "", "GET");
@@ -1386,6 +1409,8 @@ async function main() {
 
     const backup = JSON.parse(await fs.readFile(backupPath, "utf8"));
     assert(Array.isArray(backup.servers) && backup.servers.length >= 5, "backup JSON should preserve server listings");
+    assert(backup.reviews.some((item) => item.id === reviewId), "backup JSON should preserve server reviews");
+    assert(backup.communityVotes.some((item) => item.serverId === saved.json.server.id), "backup JSON should preserve weekly community votes");
     await fs.writeFile(recoveryPath, JSON.stringify({ version: 2, users: [], servers: [{ ...saved.json.server, id: "recovery-server", name: "Recovery SMP", javaHost: "recovery.example.org", description: "Recovery server listing used to verify bundled JSON recovery merges into an incomplete API state without replacing existing listings." }], clients: [], votes: [], voteIps: {} }));
     const recoveredState = await call("state", {}, "", "GET");
     assert(recoveredState.json.servers.some((item) => item.id === "recovery-server"), "state should merge bundled recovery servers");
@@ -1462,7 +1487,7 @@ async function main() {
     if (deleteAccountPreviousResendFromEmail === undefined) delete process.env.RESEND_FROM_EMAIL;
     else process.env.RESEND_FROM_EMAIL = deleteAccountPreviousResendFromEmail;
 
-    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, dashboard ownership sync, stale/mismatched ping refresh, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, dashboard ownership sync, reviews, community highlights, stale/mismatched ping refresh, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     tcpServers.forEach((server) => server.close());

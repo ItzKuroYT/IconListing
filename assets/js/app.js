@@ -5,7 +5,7 @@ const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const TRUSTPILOT_REVIEW_URL = "https://www.trustpilot.com/review/minecraftlisting.org";
 let turnstileLoadPromise = null;
 const renderedTurnstileWidgets = new Map();
@@ -70,7 +70,7 @@ function clearLegacyLocalOverlays() {
 }
 
 function freshDb() {
-  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], voteIps: {}, siteAnalytics: {} };
+  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], reviews: [], communityVotes: [], voteIps: {}, siteAnalytics: {} };
 }
 
 function migrateDb(db) {
@@ -83,6 +83,8 @@ function migrateDb(db) {
     clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")).map(normalizeClient) : [],
     hosts: Array.isArray(db.hosts) ? db.hosts.filter((host) => !String(host.id || "").startsWith("host-")).map(normalizeHost) : [],
     votes: Array.isArray(db.votes) ? db.votes : [],
+    reviews: Array.isArray(db.reviews) ? db.reviews.map(normalizeReview).filter(Boolean) : [],
+    communityVotes: Array.isArray(db.communityVotes) ? db.communityVotes.map(normalizeCommunityVote).filter(Boolean) : [],
     voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {},
     siteAnalytics: normalizeSiteAnalytics(db.siteAnalytics)
   };
@@ -127,6 +129,46 @@ function normalizeHost(host) {
     url: host.url || host.websiteUrl || "",
     images: images.filter(Boolean).slice(0, 3),
     pricing: "paid"
+  };
+}
+
+function normalizeReview(review) {
+  if (!review || typeof review !== "object") return null;
+  const rating = Math.max(1, Math.min(5, Number(review.rating || 0)));
+  if (!review.id || !review.serverId || !review.userId || !rating) return null;
+  const ownerReply = review.ownerReply && typeof review.ownerReply === "object"
+    ? {
+        userId: clean(review.ownerReply.userId),
+        username: cleanText(review.ownerReply.username),
+        comment: cleanText(review.ownerReply.comment).slice(0, 300),
+        createdAt: cleanText(review.ownerReply.createdAt || new Date().toISOString())
+      }
+    : null;
+  return {
+    id: clean(review.id),
+    serverId: clean(review.serverId),
+    userId: clean(review.userId),
+    username: cleanText(review.username) || "Player",
+    rating,
+    comment: cleanText(review.comment).slice(0, 100),
+    createdAt: cleanText(review.createdAt || new Date().toISOString()),
+    updatedAt: cleanText(review.updatedAt || review.createdAt || new Date().toISOString()),
+    hidden: review.hidden === true,
+    hiddenAt: cleanText(review.hiddenAt || ""),
+    ownerReply
+  };
+}
+
+function normalizeCommunityVote(vote) {
+  if (!vote || typeof vote !== "object") return null;
+  if (!vote.id || !vote.serverId || !vote.userId) return null;
+  return {
+    id: clean(vote.id),
+    serverId: clean(vote.serverId),
+    userId: clean(vote.userId),
+    username: cleanText(vote.username) || "Player",
+    week: clean(vote.week || weekKey(vote.createdAt)),
+    createdAt: cleanText(vote.createdAt || new Date().toISOString())
   };
 }
 
@@ -248,6 +290,9 @@ function isInternalApiMessage(value = "") {
 function publicApiMessage(action, status) {
   if (action === "vote" && status === 429) return "You can only vote once every 24 hours.";
   if (action === "vote") return "Vote could not be counted. Please try again.";
+  if (action === "communityVote" && status === 409) return "You already voted in this week's community highlight.";
+  if (action === "submitReview" && status === 403) return "Server owners cannot review their own listing.";
+  if (["submitReview", "replyReview", "deleteReview", "communityVote"].includes(action) && status === 404) return "That server or review could not be found.";
   if (status === 401) return "Log in again before doing that.";
   if (status === 403) return "You do not have permission to do that.";
   if (status === 404 && ["deleteServer", "trackCopy"].includes(action)) return "That listing could not be found.";
@@ -369,12 +414,17 @@ function publicUser(user) {
 function publicClientState(state = {}, options = {}) {
   const servers = Array.isArray(state.servers) ? state.servers.map(publicClientServer) : [];
   const votes = Array.isArray(state.votes) ? state.votes : [];
+  const reviews = Array.isArray(state.reviews) ? state.reviews.map(normalizeReview).filter(Boolean).filter((review) => review.hidden !== true) : [];
+  const communityVotes = Array.isArray(state.communityVotes) ? state.communityVotes.map(normalizeCommunityVote).filter(Boolean) : [];
   return {
     users: [],
-    servers: rankServers(servers, votes),
+    servers: rankServers(servers, votes, reviews, communityVotes),
     clients: (Array.isArray(state.clients) ? state.clients : []).map(normalizeClient),
     hosts: (Array.isArray(state.hosts) ? state.hosts : []).map(normalizeHost),
     votes,
+    reviews,
+    communityVotes: publicCommunityVotes(communityVotes),
+    community: state.community || publicCommunitySummary({ servers, votes, reviews, communityVotes }),
     siteAnalytics: publicSiteAnalytics(state.siteAnalytics || {}),
     user: options.user === undefined ? (store.session?.user || null) : options.user,
     apiHydrating: !!options.apiHydrating
@@ -401,7 +451,7 @@ function mergeEmbeddedServerFallback(state = {}) {
   const nextServers = servers.some((server) => server.id === fallback.id)
     ? servers.map((server) => (server.id === fallback.id ? { ...server, ...fallback } : server))
     : [...servers, fallback];
-  return { ...state, servers: rankServers(nextServers, state.votes || []) };
+  return { ...state, servers: rankServers(nextServers, state.votes || [], state.reviews || [], state.communityVotes || []) };
 }
 
 function embeddedServerFallbackState(options = {}) {
@@ -410,6 +460,8 @@ function embeddedServerFallbackState(options = {}) {
   return publicClientState({
     servers: [fallback],
     votes: Array.isArray(window.__ICON_LISTING_BOOT__?.votes) ? window.__ICON_LISTING_BOOT__.votes : [],
+    reviews: Array.isArray(window.__ICON_LISTING_BOOT__?.reviews) ? window.__ICON_LISTING_BOOT__.reviews : [],
+    communityVotes: Array.isArray(window.__ICON_LISTING_BOOT__?.communityVotes) ? window.__ICON_LISTING_BOOT__.communityVotes : [],
     clients: [],
     hosts: [],
     siteAnalytics: window.__ICON_LISTING_BOOT__?.siteAnalytics || {}
@@ -426,6 +478,87 @@ function publicClientServer(server = {}) {
   return next;
 }
 
+function publicReview(review) {
+  const next = normalizeReview(review);
+  if (!next || next.hidden) return null;
+  return {
+    id: next.id,
+    serverId: next.serverId,
+    userId: next.userId,
+    username: next.username,
+    rating: next.rating,
+    comment: next.comment,
+    createdAt: next.createdAt,
+    updatedAt: next.updatedAt,
+    ownerReply: next.ownerReply
+  };
+}
+
+function publicReviews(reviews = []) {
+  return (reviews || []).map(publicReview).filter(Boolean);
+}
+
+function publicReviewsForServer(reviews = [], serverId = "") {
+  return publicReviews(reviews).filter((review) => review.serverId === serverId);
+}
+
+function reviewStatsForServer(reviews = [], serverId = "") {
+  const list = publicReviewsForServer(reviews, serverId);
+  const count = list.length;
+  const average = count ? Math.round((list.reduce((sum, review) => sum + Number(review.rating || 0), 0) / count) * 10) / 10 : 0;
+  return { average, count };
+}
+
+function publicCommunityVotes(votes = [], week = weekKey()) {
+  return (votes || [])
+    .map(normalizeCommunityVote)
+    .filter((vote) => vote && vote.week === week)
+    .map(({ id, serverId, username, week, createdAt }) => ({ id, serverId, username, week, createdAt }));
+}
+
+function communityVoteCounts(votes = [], week = weekKey()) {
+  const counts = new Map();
+  for (const vote of votes || []) {
+    const next = normalizeCommunityVote(vote);
+    if (!next || next.week !== week) continue;
+    counts.set(next.serverId, (counts.get(next.serverId) || 0) + 1);
+  }
+  return counts;
+}
+
+function communityHighlightServerId(votes = [], week = weekKey()) {
+  const counts = communityVoteCounts(votes, week);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] || "";
+}
+
+function publicCommunitySummary(state = {}) {
+  const servers = Array.isArray(state.servers) ? state.servers : [];
+  const votes = Array.isArray(state.votes) ? state.votes : [];
+  const reviews = Array.isArray(state.reviews) ? state.reviews : [];
+  const communityVotes = Array.isArray(state.communityVotes) ? state.communityVotes : [];
+  const week = weekKey();
+  const counts = communityVoteCounts(communityVotes, week);
+  const ranked = rankServers(servers, votes, reviews, communityVotes);
+  const serverById = new Map(ranked.map((server) => [server.id, server]));
+  const weekly = [...counts.entries()]
+    .map(([serverId, count]) => ({ server: serverById.get(serverId), votes: count }))
+    .filter((item) => item.server)
+    .sort((a, b) => b.votes - a.votes || (a.server.rank || 9999) - (b.server.rank || 9999))
+    .slice(0, 10);
+  return {
+    week,
+    highlightedServerId: communityHighlightServerId(communityVotes, week),
+    weekly,
+    leaderboards: {
+      topVoted: [...ranked].sort((a, b) => Number(b.votes || 0) - Number(a.votes || 0) || (a.rank || 9999) - (b.rank || 9999)).slice(0, 3),
+      mostPlayers: [...ranked].sort((a, b) => Number(b.playersOnline || 0) - Number(a.playersOnline || 0) || (a.rank || 9999) - (b.rank || 9999)).slice(0, 3),
+      bestReviewed: [...ranked].filter((server) => Number(server.reviewStats?.count || 0) > 0)
+        .sort((a, b) => Number(b.reviewStats?.average || 0) - Number(a.reviewStats?.average || 0) || Number(b.reviewStats?.count || 0) - Number(a.reviewStats?.count || 0))
+        .slice(0, 3)
+    }
+  };
+}
+
 function publicListImage(value = "", server = null, kind = "banner") {
   const image = clean(value);
   if (/^data:image\//i.test(image)) {
@@ -440,6 +573,21 @@ function cachePublicState(state) {
   } catch {
     // Public cache is only a speed/SEO fallback.
   }
+}
+
+function mergeStateAfterWrite(previousState = {}, result = {}) {
+  return publicClientState({
+    ...previousState,
+    ...result,
+    servers: result.servers || previousState.servers || [],
+    clients: result.clients || previousState.clients || [],
+    hosts: result.hosts || previousState.hosts || [],
+    votes: result.votes || previousState.votes || [],
+    reviews: result.reviews || previousState.reviews || [],
+    communityVotes: result.communityVotes || previousState.communityVotes || [],
+    community: result.community || previousState.community,
+    siteAnalytics: result.siteAnalytics || previousState.siteAnalytics || {}
+  }, { user: result.user || previousState.user || store.session?.user || null });
 }
 
 function planConfigForUser(user) {
@@ -473,13 +621,17 @@ function fallbackRequest(action, payload) {
 
   if (action === "state") {
     const detailServerId = clean(payload.serverId || payload.server || "");
+    const rankedServers = rankServers(db.servers, db.votes, db.reviews, db.communityVotes);
     return Promise.resolve({
-      servers: rankServers(db.servers, db.votes).map((server) => ({
+      servers: rankedServers.map((server) => ({
         ...server,
         analytics: publicAnalytics(server, { full: server.id === detailServerId })
       })),
       clients: db.clients,
       hosts: db.hosts,
+      reviews: detailServerId ? publicReviewsForServer(db.reviews, detailServerId) : publicReviews(db.reviews),
+      communityVotes: publicCommunityVotes(db.communityVotes),
+      community: publicCommunitySummary(db),
       siteAnalytics: publicSiteAnalytics(db.siteAnalytics),
       user: publicUser(user),
       votes: detailServerId ? db.votes.filter((vote) => vote.serverId === detailServerId && String(vote.createdAt || "").startsWith(new Date().toISOString().slice(0, 7))) : []
@@ -572,6 +724,8 @@ function fallbackRequest(action, payload) {
     if (server.ownerId !== user.id && !isAdmin(user)) return Promise.reject(new Error("You cannot delete that listing."));
     db.servers = db.servers.filter((item) => item.id !== payload.id);
     db.votes = db.votes.filter((vote) => vote.serverId !== payload.id);
+    db.reviews = db.reviews.filter((review) => review.serverId !== payload.id);
+    db.communityVotes = db.communityVotes.filter((vote) => vote.serverId !== payload.id);
     if (db.voteIps) delete db.voteIps[payload.id];
     save();
     return Promise.resolve({ ok: true });
@@ -594,6 +748,69 @@ function fallbackRequest(action, payload) {
     server.votes = Math.max(previousVoteCount + 1, db.votes.filter((item) => item.serverId === server.id).length);
     save();
     return Promise.resolve({ ok: true, vote, server: { ...server, analytics: publicAnalytics(server, { full: true }) } });
+  }
+  if (action === "submitReview") {
+    if (!user) return Promise.reject(new Error("Log in before reviewing a server."));
+    const server = db.servers.find((item) => item.id === payload.serverId);
+    if (!server) return Promise.reject(new Error("Listing not found."));
+    if (server.ownerId === user.id) return Promise.reject(new Error("Server owners cannot review their own listing."));
+    const rating = Math.round(Number(payload.rating || 0));
+    const comment = cleanText(payload.comment || "");
+    if (rating < 1 || rating > 5) return Promise.reject(new Error("Choose a rating from 1 to 5 stars."));
+    if (comment.length < 9 || comment.length > 100) return Promise.reject(new Error("Reviews need a comment between 9 and 100 characters."));
+    if (hasBlockedText(comment)) return Promise.reject(new Error("That review needs different wording."));
+    const now = new Date().toISOString();
+    const existing = db.reviews.find((item) => item.serverId === server.id && item.userId === user.id && item.hidden !== true);
+    const review = normalizeReview({
+      ...existing,
+      id: existing?.id || createId(),
+      serverId: server.id,
+      userId: user.id,
+      username: user.username,
+      rating,
+      comment,
+      createdAt: existing?.createdAt || now,
+      updatedAt: now
+    });
+    db.reviews = existing ? db.reviews.map((item) => (item.id === existing.id ? review : item)) : [...db.reviews, review];
+    save();
+    return Promise.resolve({ ok: true, review: publicReview(review), ...publicClientState(db, { user: publicUser(user) }) });
+  }
+  if (action === "replyReview") {
+    if (!user) return Promise.reject(new Error("Log in before replying."));
+    const review = db.reviews.find((item) => item.id === payload.reviewId && item.hidden !== true);
+    if (!review) return Promise.reject(new Error("Review not found."));
+    const server = db.servers.find((item) => item.id === review.serverId);
+    if (!server) return Promise.reject(new Error("Listing not found."));
+    if (server.ownerId !== user.id && !isAdmin(user)) return Promise.reject(new Error("Only the server owner can reply to reviews."));
+    const comment = cleanText(payload.comment || "");
+    if (comment.length < 2 || comment.length > 300) return Promise.reject(new Error("Replies must be between 2 and 300 characters."));
+    if (hasBlockedText(comment)) return Promise.reject(new Error("That reply needs different wording."));
+    review.ownerReply = { userId: user.id, username: user.username, comment, createdAt: new Date().toISOString() };
+    review.updatedAt = new Date().toISOString();
+    save();
+    return Promise.resolve({ ok: true, ...publicClientState(db, { user: publicUser(user) }) });
+  }
+  if (action === "deleteReview") {
+    if (!user || !isAdmin(user)) return Promise.reject(new Error("Admin access is required."));
+    const review = db.reviews.find((item) => item.id === payload.reviewId);
+    if (!review) return Promise.reject(new Error("Review not found."));
+    review.hidden = true;
+    review.hiddenAt = new Date().toISOString();
+    review.updatedAt = review.hiddenAt;
+    save();
+    return Promise.resolve({ ok: true, ...publicClientState(db, { user: publicUser(user) }) });
+  }
+  if (action === "communityVote") {
+    if (!user) return Promise.reject(new Error("Log in before voting for the weekly highlight."));
+    const server = db.servers.find((item) => item.id === payload.serverId);
+    if (!server) return Promise.reject(new Error("Listing not found."));
+    const week = weekKey();
+    if (db.communityVotes.some((item) => item.userId === user.id && item.week === week)) return Promise.reject(new Error("You already voted in this week's community highlight."));
+    const vote = { id: createId(), serverId: server.id, userId: user.id, username: user.username, week, createdAt: new Date().toISOString() };
+    db.communityVotes.push(vote);
+    save();
+    return Promise.resolve({ ok: true, communityVote: vote, ...publicClientState(db, { user: publicUser(user) }) });
   }
   if (action === "trackCopy") {
     const server = db.servers.find((item) => item.id === payload.serverId);
@@ -928,6 +1145,17 @@ function monthKey(date = new Date()) {
   return date.toISOString().slice(0, 7);
 }
 
+function weekKey(value = new Date().toISOString()) {
+  const parsed = new Date(value);
+  const source = Number.isFinite(parsed.getTime()) ? parsed : new Date();
+  const date = new Date(Date.UTC(source.getUTCFullYear(), source.getUTCMonth(), source.getUTCDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const week = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+
 function votesForServer(votes, serverId) {
   return votes.filter((vote) => vote.serverId === serverId);
 }
@@ -1009,15 +1237,31 @@ function voteLeaderboard(votes, serverId) {
     .slice(0, 10);
 }
 
-function scoreServer(server, votes = []) {
+function scoreServer(server, votes = [], reviews = [], communityVotes = []) {
   const voteCount = displayedVoteCount(server, votes);
-  return (server.playersOnline || 0) * CONFIG.ranking.playerWeight + voteCount * CONFIG.ranking.voteWeight + (server.sponsored ? CONFIG.ranking.sponsoredBoost : 0);
+  const stats = server.reviewStats || reviewStatsForServer(reviews, server.id);
+  const reviewBoost = Number(stats.average || 0) > 3.5
+    ? Number(stats.average || 0) * Number(CONFIG.ranking.reviewWeight || 0) + Math.min(Number(stats.count || 0), 50)
+    : 0;
+  const highlightBoost = (server.communityHighlighted || server.id === communityHighlightServerId(communityVotes))
+    ? Number(CONFIG.ranking.communityHighlightBoost || 0)
+    : 0;
+  return (server.playersOnline || 0) * CONFIG.ranking.playerWeight + voteCount * CONFIG.ranking.voteWeight + reviewBoost + highlightBoost + (server.sponsored ? CONFIG.ranking.sponsoredBoost : 0);
 }
 
-function rankServers(servers, votes = []) {
+function rankServers(servers, votes = [], reviews = [], communityVotes = []) {
+  const highlightedServerId = communityHighlightServerId(communityVotes);
+  const currentCommunityVotes = communityVoteCounts(communityVotes);
   return [...servers]
-    .map((server) => ({ ...server, votes: displayedVoteCount(server, votes), analytics: publicAnalytics(server, { full: !!server.analytics?.playerHistory || !!server.analytics?.ipCopyDaily }) }))
-    .sort((a, b) => scoreServer(b, votes) - scoreServer(a, votes))
+    .map((server) => ({
+      ...server,
+      votes: displayedVoteCount(server, votes),
+      reviewStats: server.reviewStats || reviewStatsForServer(reviews, server.id),
+      communityVotesThisWeek: currentCommunityVotes.get(server.id) || Number(server.communityVotesThisWeek || 0),
+      communityHighlighted: server.communityHighlighted || server.id === highlightedServerId,
+      analytics: publicAnalytics(server, { full: !!server.analytics?.playerHistory || !!server.analytics?.ipCopyDaily })
+    }))
+    .sort((a, b) => scoreServer(b, votes, reviews, communityVotes) - scoreServer(a, votes, reviews, communityVotes))
     .map((server, index) => ({ ...server, rank: index + 1 }));
 }
 
@@ -1031,7 +1275,7 @@ async function getState() {
   const detailServerId = ["server", "vote"].includes(page) ? (params.get("id") || params.get("server")) : "";
   const detailServerSlug = page === "server" ? serverSlugFromPath() : "";
   const stateParams = detailServerId ? { serverId: detailServerId } : detailServerSlug ? { serverSlug: detailServerSlug } : {};
-  if (page === "dashboard" || page === "admin") stateParams.fresh = "1";
+  if (page === "dashboard" || page === "admin" || page === "server" || page === "vote" || page === "community") stateParams.fresh = "1";
   const state = await request("state", stateParams, "GET");
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
@@ -1261,6 +1505,7 @@ function renderLayout() {
         <div class="nav-links">
           <a class="nav-link" data-route="home" href="${route("/")}">${escapeHtml(copy("nav.home", "Home"))}</a>
           ${serversDropdownMarkup()}
+          <a class="nav-link" data-route="community" href="${route("/community/")}">${escapeHtml(copy("nav.community", "Community"))}</a>
           ${sponsoredDropdownMarkup()}
           ${toolsDropdownMarkup()}
           <a class="nav-link hidden" data-auth="dashboard" data-route="dashboard" href="${route("/dashboard/")}">${escapeHtml(copy("nav.dashboard", "Dashboard"))}</a>
@@ -1641,7 +1886,7 @@ function directorySidebar(servers = [], siteAnalytics = {}) {
       <h2>Live Directory</h2>
       <div class="side-stat"><strong>${Number(online).toLocaleString()}</strong><span>servers online</span></div>
       <div class="side-stat"><strong>${Number(totalPlayers).toLocaleString()}</strong><span>players online</span></div>
-      <div class="side-stat"><strong data-site-visits>${websiteVisits.toLocaleString()}</strong><span>website visits</span></div>
+      <div class="side-stat"><strong data-site-visits>${websiteVisits.toLocaleString()}</strong><span>unique visits (30 days)</span></div>
       <a class="button primary side-button" href="${route("/login/")}">Submit a server</a>
     </article>
     <article class="side-card browse-card">
@@ -1713,7 +1958,9 @@ function serverCard(server) {
   const editionLabel = serverEditionLabel(server);
   const icon = serverIconUrl(server);
   const views = Number(server.analytics?.viewsLast30 || 0);
-  return `<article class="server-card ${server.sponsored ? "sponsored" : ""}" data-server-id="${escapeHtml(server.id)}">
+  const reviewStats = server.reviewStats || { average: 0, count: 0 };
+  const ratingText = reviewStats.count ? `${Number(reviewStats.average || 0).toFixed(1)} stars (${Number(reviewStats.count).toLocaleString()})` : "No reviews yet";
+  return `<article class="server-card ${server.sponsored ? "sponsored" : ""} ${server.communityHighlighted ? "community-highlighted" : ""}" data-server-id="${escapeHtml(server.id)}">
     <a class="server-card-link" href="${serverRoute(server)}" aria-label="Open ${escapeHtml(server.name)} listing"></a>
     <div class="rank-stack">
       <div class="rank">${server.sponsored ? `<span class="star">*</span>` : ""}#${server.rank || "-"}</div>
@@ -1721,11 +1968,14 @@ function serverCard(server) {
     </div>
     <div class="banner" style="${banner}" role="img" aria-label="${escapeHtml(server.name)} banner"></div>
     <div class="server-main">
-      <h3 class="server-title">${escapeHtml(server.name)} ${server.sponsored ? `<span class="pill">Sponsored</span>` : ""}</h3>
+      <h3 class="server-title">${escapeHtml(server.name)} ${server.sponsored ? `<span class="pill">Sponsored</span>` : ""}${server.communityHighlighted ? `<span class="pill highlight-pill">Community highlight</span>` : ""}</h3>
       <p class="server-ip">${escapeHtml(serverAddress(server))}</p>
       <p class="server-summary">${escapeHtml(descriptionSnippet(server.description || `${server.name} is a Minecraft server listed with tags, votes, player counts, and status.`))}</p>
       <div class="server-tags"><span class="pill">${escapeHtml(editionLabel)}</span>${(server.tags || []).map((tag) => `<a class="pill above-link" href="${route(tagPath(tag))}">${escapeHtml(tag)}</a>`).join("")}</div>
-      <div class="server-views">${views.toLocaleString()} unique views</div>
+      <div class="server-meta-row">
+        <span class="server-views">${views.toLocaleString()} unique views</span>
+        <span class="server-rating">${escapeHtml(ratingText)}</span>
+      </div>
     </div>
     <div class="stats">
       <span class="status"><span class="dot ${server.online ? "online" : ""}"></span>${server.online ? "Online" : "Offline"}</span>
@@ -1924,6 +2174,15 @@ function serverJsonLd(server) {
           serverStatus: server.online ? "Online" : "Offline",
           playersOnline: Number(server.playersOnline || 0),
           maximumPlayers: Number(server.playersMax || 0),
+          ...(Number(server.reviewStats?.count || 0) > 0 ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: Number(server.reviewStats.average || 0),
+              reviewCount: Number(server.reviewStats.count || 0),
+              bestRating: 5,
+              worstRating: 1
+            }
+          } : {}),
           keywords: tags.join(", "),
           inLanguage: "en"
         }
@@ -1935,7 +2194,8 @@ function serverJsonLd(server) {
           { "@type": "ListItem", position: 1, name: `Server IP: ${address || "Not listed"}` },
           { "@type": "ListItem", position: 2, name: `Status: ${server.online ? "Online" : "Offline"}` },
           { "@type": "ListItem", position: 3, name: `Players: ${Number(server.playersOnline || 0).toLocaleString()}${server.playersMax ? `/${Number(server.playersMax).toLocaleString()}` : ""}` },
-          { "@type": "ListItem", position: 4, name: `Tags: ${tags.join(", ") || "Minecraft server"}` }
+          { "@type": "ListItem", position: 4, name: `Rating: ${reviewSummaryText(server.reviewStats)}` },
+          { "@type": "ListItem", position: 5, name: `Tags: ${tags.join(", ") || "Minecraft server"}` }
         ]
       },
       {
@@ -2072,6 +2332,15 @@ function renderHome(state) {
       ${topServerSeoLinks(state.servers)}
     </section>
     <section class="section seo-section">
+      <h2 class="section-title">Reviews and Weekly Community Picks</h2>
+      <p class="section-copy">Player reviews, owner replies, weekly community highlight voting, and leaderboards add first-party context to listings. Instead of only showing copied server descriptions, Icon Listing helps players compare how active, reviewed, and supported each Minecraft server is.</p>
+      <div class="seo-link-grid">
+        <a class="seo-link" href="${route("/community/")}">Community highlight vote</a>
+        <a class="seo-link" href="${route("/servers/?sort=votes")}">Top voted Minecraft servers</a>
+        <a class="seo-link" href="${route("/servers/?sort=players")}">Most active Minecraft servers</a>
+      </div>
+    </section>
+    <section class="section seo-section">
       <h2 class="section-title">Browse Minecraft Servers by Gamemode</h2>
       <p class="section-copy">Find servers by the way you actually play: survival worlds, SMP communities, economy servers, PvP networks, Skyblock islands, prison progression, Bedrock support, and cross-play servers for friends on different editions.</p>
       <div class="server-tags">${popularTagLinks()}</div>
@@ -2182,6 +2451,126 @@ function renderServers(state) {
   setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: tag ? tagPath(tag) : "/servers/", initialTag: tag, loading: loadingListings });
 }
 
+function renderCommunity(state) {
+  const summary = state.community || publicCommunitySummary(state);
+  const highlighted = summary.highlightedServerId ? state.servers.find((server) => server.id === summary.highlightedServerId) : null;
+  const topCandidates = state.servers.slice(0, 8);
+  setSeoMeta({
+    ...defaultPageSeo("community"),
+    path: "/community/",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Minecraft Server Community",
+      description: "Weekly community voting and Minecraft server leaderboards for top voted, most active, and best reviewed servers.",
+      mainEntity: {
+        "@type": "ItemList",
+        itemListElement: topCandidates.slice(0, 10).map((server, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          url: serverRoute(server),
+          name: `${server.name} Minecraft server`
+        }))
+      }
+    }
+  });
+  $("#app").innerHTML = `<div class="page">
+    <section class="section community-hero">
+      <div>
+        <p class="eyebrow">Minecraft server community</p>
+        <h1 class="section-title">Weekly Minecraft Server Highlight</h1>
+        <p class="section-copy">Vote once each week for the Minecraft server the community should highlight. The winner appears above normal ranked listings but below paid sponsored servers, so players can discover active communities without hiding promoted placements.</p>
+      </div>
+      ${highlighted ? communitySpotlightMarkup(highlighted, summary) : `<div class="notice">No community highlight has been chosen this week yet.</div>`}
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Vote This Week</h2>
+          <p class="section-copy">Pick one server for week ${escapeHtml(summary.week || weekKey())}. Community votes reset weekly.</p>
+        </div>
+      </div>
+      <div class="community-vote-grid">
+        ${topCandidates.length ? topCandidates.map((server) => communityVoteCard(server, summary, state.user)).join("") : emptyNotice()}
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Community Leaderboards</h2>
+          <p class="section-copy">Compare top voted Minecraft servers, servers with the most players online, and the best reviewed listings.</p>
+        </div>
+      </div>
+      <div class="leaderboard-grid">
+        ${communityLeaderboardMarkup("Top voted server", summary.leaderboards?.topVoted || [])}
+        ${communityLeaderboardMarkup("Most player server", summary.leaderboards?.mostPlayers || [])}
+        ${communityLeaderboardMarkup("Best reviewed server", summary.leaderboards?.bestReviewed || [])}
+      </div>
+    </section>
+  </div>`;
+  bindCommunity(state);
+}
+
+function communitySpotlightMarkup(server, summary = {}) {
+  const votes = (summary.weekly || []).find((item) => item.server?.id === server.id)?.votes || server.communityVotesThisWeek || 0;
+  return `<article class="community-spotlight">
+    <div>
+      <span class="pill highlight-pill">Community highlight</span>
+      <h2>${escapeHtml(server.name)}</h2>
+      <p>${escapeHtml(descriptionSnippet(server.description, 130))}</p>
+      <div class="server-tags">${(server.tags || []).slice(0, 4).map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>
+    </div>
+    <div class="spotlight-stats">
+      <strong>${Number(votes || 0).toLocaleString()}</strong><span>weekly votes</span>
+      <a class="button primary" href="${serverRoute(server)}">View server</a>
+    </div>
+  </article>`;
+}
+
+function communityVoteCard(server, summary = {}, user = null) {
+  const votes = (summary.weekly || []).find((item) => item.server?.id === server.id)?.votes || server.communityVotesThisWeek || 0;
+  return `<article class="community-vote-card">
+    <div>
+      <strong>${escapeHtml(server.name)}</strong>
+      <span>${escapeHtml(serverAddress(server) || "Minecraft server")}</span>
+    </div>
+    <div class="community-vote-meta">
+      <span>${Number(votes || 0).toLocaleString()} weekly votes</span>
+      <span>${reviewSummaryText(server.reviewStats)}</span>
+    </div>
+    ${user ? `<button class="mini-button" type="button" data-community-vote="${escapeHtml(server.id)}">Vote weekly</button>` : `<a class="mini-button" href="${route("/login/")}">Log in to vote</a>`}
+  </article>`;
+}
+
+function communityLeaderboardMarkup(title, servers = []) {
+  return `<article class="leaderboard-card">
+    <h3>${escapeHtml(title)}</h3>
+    ${servers.length ? `<ol>${servers.slice(0, 3).map((server, index) => `<li>
+      <span>#${index + 1}</span>
+      <a href="${serverRoute(server)}">${escapeHtml(server.name)}</a>
+      <small>${Number(server.playersOnline || 0).toLocaleString()} players - ${Number(server.votes || 0).toLocaleString()} votes - ${reviewRatingLabel(server.reviewStats)}</small>
+    </li>`).join("")}</ol>` : `<p class="section-copy compact">No qualifying servers yet.</p>`}
+  </article>`;
+}
+
+function bindCommunity(state) {
+  $$("[data-community-vote]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const label = button.textContent;
+      setButtonLoading(button, "Voting...");
+      try {
+        const result = await request("communityVote", { serverId: button.dataset.communityVote });
+        toast("Weekly community vote counted.");
+        renderCommunity(mergeStateAfterWrite(state, result));
+      } catch (error) {
+        toast(publicRequestError("communityVote", error));
+      } finally {
+        setButtonLoading(button, label, false);
+      }
+    });
+  });
+}
+
 function renderServerDetail(state) {
   const server = findServerFromLocation(state.servers) || embeddedServerFallback();
   if (!server) {
@@ -2199,6 +2588,8 @@ function renderServerDetail(state) {
   const ip = serverAddress(server);
   const bedrockIp = bedrockAddress(server);
   const isBedrockRealm = server.edition === "bedrock" && server.bedrockType === "realm";
+  const reviews = publicReviewsForServer(state.reviews || [], server.id);
+  const reviewStats = server.reviewStats || reviewStatsForServer(reviews, server.id);
   setSeoMeta({
     title: serverSeoTitle(server),
     description: serverSeoDescription(server),
@@ -2224,6 +2615,7 @@ function renderServerDetail(state) {
       ${infoRow("Version", `<span class="pill">${escapeHtml(server.version || "Unknown")}</span>`)}
       ${infoRow("Rank", `#${server.rank || "-"}`)}
       ${infoRow("Votes", Number(server.votes || 0).toLocaleString())}
+      ${infoRow("Reviews", reviewSummaryText(reviewStats))}
       ${infoRow("Uptime", `${Number(server.uptimePercent || 0).toFixed(1)}%`)}
       ${infoRow("Last Ping", server.lastPingAt ? timeAgo(server.lastPingAt) : "Not pinged yet")}
       ${infoRow("Country", escapeHtml(server.country || "Unknown"))}
@@ -2236,6 +2628,7 @@ function renderServerDetail(state) {
         ${detailTabButton("banners", "Banners")}
         ${detailTabButton("analytics", "Analytics")}
         ${detailTabButton("trailer", "Trailer")}
+        ${detailTabButton("reviews", "Reviews")}
         ${canEdit ? detailTabButton("edit", "Edit") : ""}
       </div>
       <div class="detail-body detail-tab-panel active" data-panel="info">
@@ -2251,6 +2644,7 @@ function renderServerDetail(state) {
         <div class="quick-stats">
           <div class="mini-stat"><strong>${Number(server.playersOnline || 0).toLocaleString()}</strong><span>online now</span></div>
           <div class="mini-stat"><strong>${Number(server.votes || 0).toLocaleString()}</strong><span>votes</span></div>
+          <div class="mini-stat"><strong>${reviewRatingLabel(reviewStats)}</strong><span>${Number(reviewStats.count || 0).toLocaleString()} reviews</span></div>
           <div class="mini-stat"><strong>#${server.rank || "-"}</strong><span>rank</span></div>
         </div>
         <div class="description-card">
@@ -2283,6 +2677,10 @@ function renderServerDetail(state) {
         <h2 class="detail-heading">Trailer</h2>
         ${trailerEmbed(server.youtubeUrl)}
       </div>
+      <div class="detail-body detail-tab-panel" data-panel="reviews">
+        <h2 class="detail-heading">Community reviews</h2>
+        ${reviewPanelMarkup(server, state, reviews, reviewStats)}
+      </div>
       ${canEdit ? `<div class="detail-body detail-tab-panel" data-panel="edit">
         <h2 class="detail-heading">Edit listing</h2>
         <p class="section-copy">Open your dashboard to change the server name, tags, banner, description, Votifier, or links.</p>
@@ -2292,7 +2690,7 @@ function renderServerDetail(state) {
     </div>
     ${serverDetailSeoBlock(server)}
   </div>`;
-  bindServerDetail(server);
+  bindServerDetail(server, state);
   trackServerView(server);
 }
 
@@ -2308,6 +2706,69 @@ function serverDetailSeoBlock(server) {
   </section>`;
 }
 
+function reviewSummaryText(stats = {}) {
+  const count = Number(stats.count || 0);
+  if (!count) return "No reviews yet";
+  return `${Number(stats.average || 0).toFixed(1)}/5 from ${count.toLocaleString()} review${count === 1 ? "" : "s"}`;
+}
+
+function reviewRatingLabel(stats = {}) {
+  return Number(stats.count || 0) ? `${Number(stats.average || 0).toFixed(1)}/5` : "New";
+}
+
+function reviewStars(value = 0) {
+  const rating = Math.round(Number(value || 0));
+  return `<span class="review-stars" aria-label="${rating} out of 5 stars">${[1, 2, 3, 4, 5].map((star) => `<span class="${star <= rating ? "filled" : ""}">&#9733;</span>`).join("")}</span>`;
+}
+
+function reviewPanelMarkup(server, state, reviews = [], stats = {}) {
+  const user = state.user;
+  const canReview = !!user && user.id !== server.ownerId;
+  const ownReview = user ? reviews.find((review) => review.userId === user.id) : null;
+  return `<div class="review-summary-card">
+      <div>
+        <strong>${reviewRatingLabel(stats)}</strong>
+        <span>${Number(stats.count || 0).toLocaleString()} public review${Number(stats.count || 0) === 1 ? "" : "s"}</span>
+      </div>
+      <p>${escapeHtml(reviewHelpfulCopy(server, stats))}</p>
+    </div>
+    ${!user ? `<div class="notice compact">Log in to review this Minecraft server.</div>` : server.ownerId === user.id ? `<div class="notice compact">Server owners can reply to reviews, but cannot review their own listing.</div>` : ""}
+    ${canReview ? `<form class="review-form" data-review-form>
+      <label class="field"><span>Rating</span><select class="input" name="rating" required>
+        ${[5, 4, 3, 2, 1].map((value) => `<option value="${value}" ${ownReview?.rating === value ? "selected" : ""}>${value} star${value === 1 ? "" : "s"}</option>`).join("")}
+      </select></label>
+      <label class="field"><span>Comment</span><textarea class="input" name="comment" minlength="9" maxlength="100" required placeholder="Share what players should know.">${escapeHtml(ownReview?.comment || "")}</textarea></label>
+      <button class="button primary" type="submit">${ownReview ? "Update review" : "Post review"}</button>
+    </form>` : ""}
+    <div class="review-list">
+      ${reviews.length ? reviews.map((review) => reviewItemMarkup(review, server, user)).join("") : `<div class="empty-state compact"><h2>No reviews yet</h2><p>Reviews from real players will show here after moderation filters pass.</p></div>`}
+    </div>`;
+}
+
+function reviewHelpfulCopy(server, stats = {}) {
+  if (!Number(stats.count || 0)) return `${server.name} is waiting for player reviews. First-hand comments help make this listing more useful than a copied server description.`;
+  if (Number(stats.average || 0) > 3.5) return "Positive community reviews can help this server's placement while still showing the rating publicly for players.";
+  if (Number(stats.average || 0) < 3) return "This rating is shown publicly for transparency, but low averages do not boost placement.";
+  return "Reviews add player context to the listing and help visitors compare servers before joining.";
+}
+
+function reviewItemMarkup(review, server, user) {
+  const canReply = user && (server.ownerId === user.id || isAdmin(user));
+  const canRemove = user && isAdmin(user);
+  return `<article class="review-item" data-review-id="${escapeHtml(review.id)}">
+    <div class="review-item-head">
+      <div><strong>${escapeHtml(review.username || "Player")}</strong><span>${timeAgo(review.createdAt)}</span></div>
+      ${reviewStars(review.rating)}
+    </div>
+    <p>${escapeHtml(review.comment)}</p>
+    ${review.ownerReply ? `<div class="owner-reply"><strong>${escapeHtml(server.name)} replied</strong><p>${escapeHtml(review.ownerReply.comment)}</p></div>` : ""}
+    ${(canReply || canRemove) ? `<div class="row-actions review-actions">
+      ${canReply ? `<button class="mini-button" type="button" data-reply-review="${escapeHtml(review.id)}">${review.ownerReply ? "Edit reply" : "Reply"}</button>` : ""}
+      ${canRemove ? `<button class="mini-button danger" type="button" data-delete-review="${escapeHtml(review.id)}">Remove</button>` : ""}
+    </div>` : ""}
+  </article>`;
+}
+
 function infoRow(label, value) {
   return `<div class="info-row"><strong>${label}</strong><span>${value}</span></div>`;
 }
@@ -2316,7 +2777,7 @@ function detailTabButton(id, label, active = false) {
   return `<button class="tab ${active ? "active" : ""}" type="button" data-detail-tab="${id}">${label}</button>`;
 }
 
-function bindServerDetail(server) {
+function bindServerDetail(server, state = {}) {
   $$("[data-detail-tab]").forEach((button) => {
     button.addEventListener("click", () => {
       $$("[data-detail-tab]").forEach((node) => node.classList.toggle("active", node === button));
@@ -2326,6 +2787,51 @@ function bindServerDetail(server) {
   $("[data-copy-ip]")?.addEventListener("click", () => copyServerAddress(server, serverAddress(server)));
   $("[data-copy-bedrock]")?.addEventListener("click", () => copyServerAddress(server, bedrockAddress(server)));
   $("[data-copy-realm]")?.addEventListener("click", () => copyServerAddress(server, server.realmCode));
+  $("[data-review-form]")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = $("button[type='submit']", form);
+    const label = button.textContent;
+    setButtonLoading(button, "Saving...");
+    try {
+      const result = await request("submitReview", {
+        serverId: server.id,
+        rating: form.elements.rating.value,
+        comment: form.elements.comment.value
+      });
+      toast("Review saved.");
+      renderServerDetail(mergeStateAfterWrite(state, result));
+    } catch (error) {
+      toast(publicRequestError("submitReview", error));
+    } finally {
+      setButtonLoading(button, label, false);
+    }
+  });
+  $$("[data-reply-review]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const comment = window.prompt("Reply to this review", "");
+      if (comment === null) return;
+      try {
+        const result = await request("replyReview", { reviewId: button.dataset.replyReview, comment });
+        toast("Reply saved.");
+        renderServerDetail(mergeStateAfterWrite(state, result));
+      } catch (error) {
+        toast(publicRequestError("replyReview", error));
+      }
+    });
+  });
+  $$("[data-delete-review]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!window.confirm("Remove this review?")) return;
+      try {
+        const result = await request("deleteReview", { reviewId: button.dataset.deleteReview });
+        toast("Review removed.");
+        renderServerDetail(mergeStateAfterWrite(state, result));
+      } catch (error) {
+        toast(publicRequestError("deleteReview", error));
+      }
+    });
+  });
 }
 
 async function copyServerAddress(server, value) {
@@ -4676,6 +5182,7 @@ function renderCurrentPage(page, state) {
   else if (page === "servers") renderServers(state);
   else if (page === "server") renderServerDetail(state);
   else if (page === "vote") renderVotePage(state);
+  else if (page === "community") renderCommunity(state);
   else if (page === "sponsored") renderSponsored(state);
   else if (page === "sponsored-clients") renderClients(state);
   else if (page === "sponsored-hosts") renderHosts(state);

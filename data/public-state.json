@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-01T21:54:25.691Z",
+  "generatedAt": "2026-09-01T22:36:14.189Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -29,18 +29,18 @@
       ],
       "ownerName": "ItzKuroYT",
       "votes": 0,
-      "playersOnline": 4383,
-      "playersMax": 1492,
+      "playersOnline": 4404,
+      "playersMax": 1476,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 99.25925925925925,
+      "uptimePercent": 99.26470588235294,
       "sponsored": true,
       "createdAt": "2026-07-31T00:17:47.994Z",
       "updatedAt": "2026-08-17T04:51:02.034Z",
-      "lastPingAt": "2026-09-01T21:50:00.935Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:50:00.935Z",
-      "uptimeChecks": 135,
-      "uptimeSuccesses": 134,
+      "lastPingAt": "2026-09-01T21:55:10.655Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:10.655Z",
+      "uptimeChecks": 136,
+      "uptimeSuccesses": 135,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -51,7 +51,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "4bb119bc-7c4e-4815-88e7-9b4afbb8c379",
@@ -82,14 +88,14 @@
       "playersMax": 50,
       "version": "Paper 26.2",
       "online": true,
-      "uptimePercent": 99.42363112391931,
+      "uptimePercent": 99.42528735632183,
       "sponsored": false,
       "createdAt": "2026-07-07T13:08:06.265Z",
       "updatedAt": "2026-07-07T13:08:06.265Z",
-      "lastPingAt": "2026-09-01T21:50:00.069Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:50:00.069Z",
-      "uptimeChecks": 347,
-      "uptimeSuccesses": 345,
+      "lastPingAt": "2026-09-01T21:55:10.653Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:10.653Z",
+      "uptimeChecks": 348,
+      "uptimeSuccesses": 346,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -100,7 +106,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "6c9196be-ba02-4c10-829d-0c5a764c2217",
@@ -150,7 +162,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
@@ -181,14 +199,14 @@
       "playersMax": 333,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 98.23399558498896,
+      "uptimePercent": 98.23788546255507,
       "sponsored": false,
       "createdAt": "2026-07-01T05:09:11.571Z",
       "updatedAt": "2026-08-12T02:09:19.663Z",
-      "lastPingAt": "2026-09-01T21:49:58.376Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:49:58.376Z",
-      "uptimeChecks": 453,
-      "uptimeSuccesses": 445,
+      "lastPingAt": "2026-09-01T21:55:07.038Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:07.038Z",
+      "uptimeChecks": 454,
+      "uptimeSuccesses": 446,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -199,7 +217,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "e05bb489-241c-420c-8243-6427106b4476",
@@ -230,16 +254,16 @@
       "votes": 5,
       "playersOnline": 1,
       "playersMax": 100,
-      "version": "1.7.2-26.2",
+      "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 97.74305555555556,
+      "uptimePercent": 97.74696707105718,
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
       "updatedAt": "2026-07-09T07:59:28.615Z",
-      "lastPingAt": "2026-09-01T21:49:57.381Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:49:57.381Z",
-      "uptimeChecks": 576,
-      "uptimeSuccesses": 563,
+      "lastPingAt": "2026-09-01T21:55:05.224Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:05.224Z",
+      "uptimeChecks": 577,
+      "uptimeSuccesses": 564,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -250,7 +274,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
@@ -278,18 +308,18 @@
       ],
       "ownerName": "MaxFullCalypse",
       "votes": 0,
-      "playersOnline": 35,
-      "playersMax": 36,
-      "version": "1.7.2-26.2",
+      "playersOnline": 37,
+      "playersMax": 38,
+      "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 99.65928449744463,
+      "uptimePercent": 99.65986394557824,
       "sponsored": false,
       "createdAt": "2026-06-24T14:32:13.157Z",
       "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-09-01T21:50:00.857Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:50:00.857Z",
-      "uptimeChecks": 587,
-      "uptimeSuccesses": 585,
+      "lastPingAt": "2026-09-01T21:55:10.654Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:10.654Z",
+      "uptimeChecks": 588,
+      "uptimeSuccesses": 586,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -300,7 +330,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "09c0ac09-6b69-4826-b9be-930aaf01c10f",
@@ -349,7 +385,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "48c565ba-791e-4c42-9d79-60a90f5a2440",
@@ -378,14 +420,14 @@
       "playersMax": 100,
       "version": "Velocity 1.7.2-26.2",
       "online": true,
-      "uptimePercent": 99.0625,
+      "uptimePercent": 99.06542056074767,
       "sponsored": false,
       "createdAt": "2026-07-08T02:51:29.618Z",
       "updatedAt": "2026-07-08T02:51:29.618Z",
-      "lastPingAt": "2026-09-01T21:49:57.385Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:49:57.385Z",
-      "uptimeChecks": 320,
-      "uptimeSuccesses": 317,
+      "lastPingAt": "2026-09-01T21:55:05.227Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:05.227Z",
+      "uptimeChecks": 321,
+      "uptimeSuccesses": 318,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -396,7 +438,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "80a40c17-5ed1-48f3-9a0d-9f57ba052f27",
@@ -447,7 +495,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "f08ab5db-3b64-4766-bdf1-f1948c85be3b",
@@ -497,7 +551,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "e624d227-5bd0-45ce-9aea-270560258b62",
@@ -543,7 +603,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "b7954ebf-59a6-4ccd-aab0-0fce95a476e1",
@@ -593,7 +659,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "35649eb1-0ca0-4cd2-8a3c-c1a41ed2ee0d",
@@ -626,13 +698,13 @@
       "playersMax": 0,
       "version": "Unknown",
       "online": false,
-      "uptimePercent": 36.21399176954733,
+      "uptimePercent": 36.139630390143736,
       "sponsored": false,
       "createdAt": "2026-06-30T07:10:31.396Z",
       "updatedAt": "2026-07-03T21:44:22.763Z",
-      "lastPingAt": "2026-09-01T21:49:59.330Z",
+      "lastPingAt": "2026-09-01T21:55:08.846Z",
       "lastSuccessfulPingAt": "2026-07-08T23:53:03.705Z",
-      "uptimeChecks": 486,
+      "uptimeChecks": 487,
       "uptimeSuccesses": 176,
       "edition": "java",
       "bedrockType": "server",
@@ -644,14 +716,20 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "2923c780-368e-47b5-aac4-69da5d5fdb96",
       "name": "Idacraft.net",
       "javaHost": "idacraft.net",
       "javaPort": 25565,
-      "javaSrvResolved": true,
+      "javaSrvResolved": false,
       "javaStatusTarget": "idacraft.net",
       "crossPlay": false,
       "bedrockHost": "",
@@ -675,13 +753,13 @@
       "playersMax": 0,
       "version": "Unknown",
       "online": false,
-      "uptimePercent": 89.5104895104895,
+      "uptimePercent": 89.19860627177701,
       "sponsored": false,
       "createdAt": "2026-07-11T01:34:35.522Z",
       "updatedAt": "2026-07-11T01:34:35.523Z",
-      "lastPingAt": "2026-09-01T21:49:59.990Z",
+      "lastPingAt": "2026-09-01T21:55:10.652Z",
       "lastSuccessfulPingAt": "2026-08-30T21:16:35.936Z",
-      "uptimeChecks": 286,
+      "uptimeChecks": 287,
       "uptimeSuccesses": 256,
       "edition": "java",
       "bedrockType": "server",
@@ -693,7 +771,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "ea618e53-d6cc-4291-9822-8be484779eb3",
@@ -724,14 +808,14 @@
       "playersMax": 100,
       "version": "forge arclight/Trials 1.20.1",
       "online": true,
-      "uptimePercent": 99.15254237288136,
+      "uptimePercent": 99.15966386554622,
       "sponsored": false,
       "createdAt": "2026-08-04T21:24:59.018Z",
       "updatedAt": "2026-08-04T21:24:59.018Z",
-      "lastPingAt": "2026-09-01T21:49:57.649Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:49:57.649Z",
-      "uptimeChecks": 118,
-      "uptimeSuccesses": 117,
+      "lastPingAt": "2026-09-01T21:55:05.234Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:05.234Z",
+      "uptimeChecks": 119,
+      "uptimeSuccesses": 118,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -742,7 +826,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "8cc0d0b3-ab6f-4329-bd33-99bc188ba72b",
@@ -791,7 +881,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "213cc025-c8c7-4792-9af3-8a89964c5257",
@@ -816,7 +912,7 @@
       ],
       "ownerName": "AlfieAlfiecreasey",
       "votes": 0,
-      "playersOnline": 3,
+      "playersOnline": 1,
       "playersMax": 50,
       "version": "Paper 26.2",
       "online": true,
@@ -824,10 +920,10 @@
       "sponsored": false,
       "createdAt": "2026-08-31T22:13:24.965Z",
       "updatedAt": "2026-08-31T22:13:24.965Z",
-      "lastPingAt": "2026-09-01T21:49:59.905Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:49:59.905Z",
-      "uptimeChecks": 8,
-      "uptimeSuccesses": 8,
+      "lastPingAt": "2026-09-01T21:55:10.648Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:10.648Z",
+      "uptimeChecks": 9,
+      "uptimeSuccesses": 9,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -838,7 +934,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "eada511e-c7b9-43e8-8f1e-bcffcb21764d",
@@ -886,7 +988,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "ae73213d-e6d5-4614-961d-17582f0fb175",
@@ -919,14 +1027,14 @@
       "playersMax": 3000,
       "version": "Paper 1.21.11",
       "online": true,
-      "uptimePercent": 99.27797833935018,
+      "uptimePercent": 99.28057553956835,
       "sponsored": false,
       "createdAt": "2026-07-11T05:20:38.114Z",
       "updatedAt": "2026-08-02T21:43:26.761Z",
-      "lastPingAt": "2026-09-01T21:49:56.691Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:49:56.691Z",
-      "uptimeChecks": 277,
-      "uptimeSuccesses": 275,
+      "lastPingAt": "2026-09-01T21:55:05.216Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:05.216Z",
+      "uptimeChecks": 278,
+      "uptimeSuccesses": 276,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -937,7 +1045,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "f3f10c77-8974-490a-9c82-82cfdc443c82",
@@ -987,7 +1101,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "967335b0-0966-4cb7-b01d-796dd61b8b76",
@@ -1020,14 +1140,14 @@
       "playersMax": 200,
       "version": "Paper 1.21.11",
       "online": true,
-      "uptimePercent": 97.14285714285714,
+      "uptimePercent": 97.1563981042654,
       "sponsored": false,
       "createdAt": "2026-07-16T08:31:34.016Z",
       "updatedAt": "2026-07-16T08:31:34.016Z",
-      "lastPingAt": "2026-09-01T21:49:58.979Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:49:58.979Z",
-      "uptimeChecks": 210,
-      "uptimeSuccesses": 204,
+      "lastPingAt": "2026-09-01T21:55:07.040Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:07.040Z",
+      "uptimeChecks": 211,
+      "uptimeSuccesses": 205,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -1038,7 +1158,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "9487fa13-dfad-427e-b78e-0b29ee300181",
@@ -1065,13 +1191,13 @@
       "playersMax": 0,
       "version": "Bedrock",
       "online": false,
-      "uptimePercent": 6.912442396313365,
+      "uptimePercent": 6.8807339449541285,
       "sponsored": false,
       "createdAt": "2026-07-18T17:47:06.038Z",
       "updatedAt": "2026-07-18T17:47:06.038Z",
-      "lastPingAt": "2026-09-01T21:49:58.181Z",
+      "lastPingAt": "2026-09-01T21:55:07.037Z",
       "lastSuccessfulPingAt": "2026-07-21T09:35:31.877Z",
-      "uptimeChecks": 217,
+      "uptimeChecks": 218,
       "uptimeSuccesses": 15,
       "edition": "bedrock",
       "bedrockType": "server",
@@ -1083,7 +1209,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "ca09a8ba-817b-4124-aaf9-1586971ea7c8",
@@ -1128,7 +1260,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "e40433c6-68d0-4654-9744-cbc6d9f196dd",
@@ -1159,14 +1297,14 @@
       "playersMax": 20,
       "version": "26.2",
       "online": true,
-      "uptimePercent": 12.222222222222221,
+      "uptimePercent": 12.70718232044199,
       "sponsored": false,
       "createdAt": "2026-07-23T10:40:56.242Z",
       "updatedAt": "2026-07-24T08:58:17.242Z",
-      "lastPingAt": "2026-09-01T21:50:00.404Z",
-      "lastSuccessfulPingAt": "2026-09-01T21:50:00.404Z",
-      "uptimeChecks": 180,
-      "uptimeSuccesses": 22,
+      "lastPingAt": "2026-09-01T21:55:10.654Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:10.654Z",
+      "uptimeChecks": 181,
+      "uptimeSuccesses": 23,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -1177,7 +1315,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "900e18e4-fa2a-4ab9-a0db-f9998a9fc2f2",
@@ -1227,7 +1371,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "143f6350-32e3-494b-a57a-9228b7a34204",
@@ -1274,7 +1424,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "2eab34f9-9d08-40f6-8e18-0234ed73d4fa",
@@ -1302,17 +1458,17 @@
       "ownerName": "SiriApple",
       "votes": 0,
       "playersOnline": 0,
-      "playersMax": 0,
-      "version": "Unknown",
-      "online": false,
-      "uptimePercent": 3.787878787878788,
+      "playersMax": 1000,
+      "version": "Paper 1.21.11",
+      "online": true,
+      "uptimePercent": 4.511278195488721,
       "sponsored": false,
       "createdAt": "2026-08-01T01:46:07.018Z",
       "updatedAt": "2026-08-01T01:46:07.018Z",
-      "lastPingAt": "2026-09-01T21:49:57.290Z",
-      "lastSuccessfulPingAt": "2026-08-30T15:57:44.138Z",
-      "uptimeChecks": 132,
-      "uptimeSuccesses": 5,
+      "lastPingAt": "2026-09-01T21:55:05.219Z",
+      "lastSuccessfulPingAt": "2026-09-01T21:55:05.219Z",
+      "uptimeChecks": 133,
+      "uptimeSuccesses": 6,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -1323,7 +1479,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "cb42efd4-fbfd-47da-abdb-b153b7f07f9c",
@@ -1374,7 +1536,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "fe6b8e30-88fa-4e3e-9208-11b16d723184",
@@ -1425,7 +1593,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     },
     {
       "id": "f7f489b2-ae28-444d-9120-96befa9dcd7e",
@@ -1474,7 +1648,13 @@
         "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
-      }
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     }
   ],
   "clients": [
@@ -1522,6 +1702,352 @@
       "updatedAt": "2026-07-27T20:52:36.476Z"
     }
   ],
+  "reviews": [],
+  "communityVotes": [],
+  "community": {
+    "week": "2026-W36",
+    "highlightedServerId": "",
+    "weekly": [],
+    "leaderboards": {
+      "topVoted": [
+        {
+          "id": "4bb119bc-7c4e-4815-88e7-9b4afbb8c379",
+          "name": "CofferCraft",
+          "javaHost": "play.coffercraft.com",
+          "javaPort": 25565,
+          "javaSrvResolved": true,
+          "javaStatusTarget": "play.coffercraft.com",
+          "crossPlay": false,
+          "bedrockHost": "",
+          "bedrockPort": 19132,
+          "websiteUrl": "https://coffercraft.com",
+          "discordUrl": "https://discord.gg/dtUNWdb9M",
+          "youtubeUrl": "https://www.youtube.com/watch?v=xVKMD-MlAkQ&list=PLjFZ3HZNUkl7_LqDDgL8OzB788KHrH2x_",
+          "country": "United States",
+          "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CofferCraft&kind=banner",
+          "description": "CofferCraft is a fun and creative Minecraft server where players can build, explore, and hunt for hidden vaults full of treasure! Join epic events, claim land, earn rewards, and enjoy a welcoming community.",
+          "tags": [
+            "Survival",
+            "Economy",
+            "PvP",
+            "SMP",
+            "New"
+          ],
+          "ownerName": "AnderEv54",
+          "votes": 8,
+          "playersOnline": 0,
+          "playersMax": 50,
+          "version": "Paper 26.2",
+          "online": true,
+          "uptimePercent": 99.42528735632183,
+          "sponsored": false,
+          "createdAt": "2026-07-07T13:08:06.265Z",
+          "updatedAt": "2026-07-07T13:08:06.265Z",
+          "lastPingAt": "2026-09-01T21:55:10.653Z",
+          "lastSuccessfulPingAt": "2026-09-01T21:55:10.653Z",
+          "uptimeChecks": 348,
+          "uptimeSuccesses": 346,
+          "edition": "java",
+          "bedrockType": "server",
+          "realmCode": "",
+          "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CofferCraft&kind=icon",
+          "rank": 2,
+          "analytics": {
+            "viewsLast7": 0,
+            "viewsLast30": 0,
+            "ipCopiesLast7": 0,
+            "ipCopiesLast30": 0
+          },
+          "reviewStats": {
+            "average": 0,
+            "count": 0
+          },
+          "communityVotesThisWeek": 0,
+          "communityHighlighted": false
+        },
+        {
+          "id": "6c9196be-ba02-4c10-829d-0c5a764c2217",
+          "name": "Etherium SMP",
+          "javaHost": "etherium.minecraft.best",
+          "javaPort": 25565,
+          "javaSrvResolved": false,
+          "javaStatusTarget": "etherium.minecraft.best",
+          "crossPlay": false,
+          "bedrockHost": "",
+          "bedrockPort": 19132,
+          "websiteUrl": "https://etherium-app.com/store",
+          "discordUrl": "https://discord.gg/vkbkVbJAwC",
+          "youtubeUrl": "",
+          "country": "United States",
+          "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Etherium-SMP&kind=banner",
+          "description": "🌙 Welcome to Etherium\n\nEtherium is a fantasy Minecraft survival experience built around adventure, community, exploration, and creating your own story.\n\nClaim your own land and protect your builds with our land claiming and grief protection system, then build the home or kingdom you've always wanted. Want a little more excitement? Toggleable PvP lets you decide when you're ready for battle.\n\n💰 Complete quests, earn coins, and build your fortune.\n🛍️ Trade with players and explore the interactive marketplace.\n🌎 Use the RTP system to venture into a massive world and discover new places.\n🎉 Take part in giveaways, community events, and activities with other players.\n\nAnd this is only the beginning...\n\n📖 Custom lore and an evolving story are coming soon, bringing new adventures, mysteries, and reasons to explore the world of Etherium.",
+          "tags": [
+            "Survival",
+            "Factions",
+            "SMP",
+            "RPG",
+            "Vanilla",
+            "New"
+          ],
+          "ownerName": "ChloeMontalvo",
+          "votes": 6,
+          "playersOnline": 2,
+          "playersMax": 150,
+          "version": "Velocity 1.7.2-26.2",
+          "online": true,
+          "uptimePercent": 100,
+          "sponsored": false,
+          "createdAt": "2026-08-16T05:20:49.059Z",
+          "updatedAt": "2026-08-16T05:20:49.059Z",
+          "lastPingAt": "2026-09-01T21:49:57.418Z",
+          "lastSuccessfulPingAt": "2026-09-01T21:49:57.418Z",
+          "uptimeChecks": 97,
+          "uptimeSuccesses": 97,
+          "edition": "java",
+          "bedrockType": "server",
+          "realmCode": "",
+          "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Etherium-SMP&kind=icon",
+          "rank": 3,
+          "analytics": {
+            "viewsLast7": 0,
+            "viewsLast30": 0,
+            "ipCopiesLast7": 0,
+            "ipCopiesLast30": 0
+          },
+          "reviewStats": {
+            "average": 0,
+            "count": 0
+          },
+          "communityVotesThisWeek": 0,
+          "communityHighlighted": false
+        },
+        {
+          "id": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
+          "name": "Unbent Flames",
+          "javaHost": "unbent.xyz",
+          "javaPort": 25565,
+          "javaSrvResolved": true,
+          "javaStatusTarget": "unbent.xyz",
+          "crossPlay": true,
+          "bedrockHost": "bed.unbent.xyz",
+          "bedrockPort": 25597,
+          "websiteUrl": "https://unbent.buycraft.net",
+          "discordUrl": "https://discord.gg/EVfNrqp2JE",
+          "youtubeUrl": "https://youtu.be/WMOfc1_1PXc",
+          "country": "United States",
+          "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unbent-Flames&kind=banner",
+          "description": "🔥 UNBENT FLAMES 🔥 Where blocks fly, elements clash, and legends are born\n\n⚡️ NO MODS. NO LAUNCHERS. FULL MODPACK EXPERIENCE.\n\nExperience 1500+ custom items, tech trees, magic systems, and bending abilities—all vanilla Minecraft with our custom plugin ecosystem.\n\n🌟 WHAT SETS US APART\n\nBending Abilities – Master elemental powers unique to our server. Master water, fire, earth, air, and lightning manipulation in PvP and PvE.\n\nv26.2 Fresh Updates – New boss encounters, expanded quest system, enhanced world generation, and refined bending abilities keep the world alive.\n\nPlayer-Driven Development – Your suggestions shape our roadmap. Report a bug, suggest a feature, see it implemented. This isn't a static server.\n\n🎮 CORE FEATURES\n\n🏘️ Towny Warfare – Build nations, control territory, wage epic battles\n🚁 Movecraft Airships – Design and pilot massive flying vessels\n🪄 Magic & Tech Progression – Slimefun + ItemAdder: spells, machines, domination\n⚔️ Elite Bosses & Dungeons – Custom encounters with real stakes\n🎯 Guild Quests & Daily Challenges – Constant progression and rewards\n💼 Jobs Economy – Grind, earn, climb the leaderboards\n🐾 MyPets – Adventure with loyal companions\n🗺️ BlueMap – Live world view: http://map.unbent.xyz:25614\n\n📡 CONNECT NOW\n\nJava: unbent.xyz | Bedrock: bed.unbent.xyz:25597\nDiscord: https://discord.gg/EVfNrqp2JE\n\n⚔️ BUILD. BEND. CONQUER. Join Unbent Flames—shape your legend.",
+          "tags": [
+            "Economy",
+            "PvP",
+            "SMP",
+            "Towny",
+            "Cross-Play"
+          ],
+          "ownerName": "kadika333",
+          "votes": 6,
+          "playersOnline": 0,
+          "playersMax": 333,
+          "version": "Velocity 1.7.2-26.2",
+          "online": true,
+          "uptimePercent": 98.23788546255507,
+          "sponsored": false,
+          "createdAt": "2026-07-01T05:09:11.571Z",
+          "updatedAt": "2026-08-12T02:09:19.663Z",
+          "lastPingAt": "2026-09-01T21:55:07.038Z",
+          "lastSuccessfulPingAt": "2026-09-01T21:55:07.038Z",
+          "uptimeChecks": 454,
+          "uptimeSuccesses": 446,
+          "edition": "java",
+          "bedrockType": "server",
+          "realmCode": "",
+          "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unbent-Flames&kind=icon",
+          "rank": 4,
+          "analytics": {
+            "viewsLast7": 0,
+            "viewsLast30": 0,
+            "ipCopiesLast7": 0,
+            "ipCopiesLast30": 0
+          },
+          "reviewStats": {
+            "average": 0,
+            "count": 0
+          },
+          "communityVotesThisWeek": 0,
+          "communityHighlighted": false
+        }
+      ],
+      "mostPlayers": [
+        {
+          "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
+          "name": "IconSMP",
+          "javaHost": "IconMC.minehut.gg",
+          "javaPort": 25565,
+          "javaSrvResolved": false,
+          "javaStatusTarget": "IconMC.minehut.gg",
+          "crossPlay": true,
+          "bedrockHost": "bedrock.iconmc.minehut.com",
+          "bedrockPort": 19132,
+          "websiteUrl": "https://web.iconrealms.net/home/",
+          "discordUrl": "https://discord.gg/fMbfFW7PWX",
+          "youtubeUrl": "",
+          "country": "United States",
+          "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=IconSMP&kind=banner",
+          "description": "🌾 Icon SMP | Season 1\n\n⚔️ Strength SMP\n🏪 Custom Auction House\n👑 KOTH & Envoys\n👥 Teams\n🎁 Daily Rewards\n⏳ Playtime Rewards (/ptr)\n🛠️ Custom Crafts\n💰 EconomyShopGUI\n✨ And much more!\n\n🌐 play.IconMC.minehut.gg",
+          "tags": [
+            "Survival",
+            "Economy",
+            "PvP",
+            "SMP",
+            "Bedrock",
+            "Cross-Play",
+            "New"
+          ],
+          "ownerName": "ItzKuroYT",
+          "votes": 0,
+          "playersOnline": 4404,
+          "playersMax": 1476,
+          "version": "Velocity 1.7.2-26.2",
+          "online": true,
+          "uptimePercent": 99.26470588235294,
+          "sponsored": true,
+          "createdAt": "2026-07-31T00:17:47.994Z",
+          "updatedAt": "2026-08-17T04:51:02.034Z",
+          "lastPingAt": "2026-09-01T21:55:10.655Z",
+          "lastSuccessfulPingAt": "2026-09-01T21:55:10.655Z",
+          "uptimeChecks": 136,
+          "uptimeSuccesses": 135,
+          "edition": "java",
+          "bedrockType": "server",
+          "realmCode": "",
+          "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=IconSMP&kind=icon",
+          "rank": 1,
+          "analytics": {
+            "viewsLast7": 0,
+            "viewsLast30": 0,
+            "ipCopiesLast7": 0,
+            "ipCopiesLast30": 0
+          },
+          "reviewStats": {
+            "average": 0,
+            "count": 0
+          },
+          "communityVotesThisWeek": 0,
+          "communityHighlighted": false
+        },
+        {
+          "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
+          "name": "GTM - GTA-based minecraft server for Java",
+          "javaHost": "maxfullcalypse.gtm.network",
+          "javaPort": 25565,
+          "javaSrvResolved": false,
+          "javaStatusTarget": "maxfullcalypse.gtm.network",
+          "crossPlay": false,
+          "bedrockHost": "",
+          "bedrockPort": 19132,
+          "websiteUrl": "",
+          "discordUrl": "",
+          "youtubeUrl": "",
+          "country": "United States",
+          "bannerUrl": "https://i.imgur.com/xEuBBmu.png",
+          "description": "Grand Theft Minecart is the most played Grand Theft Auto server in Minecraft. We provide a completely custom gamemode, GTM, where you can use our 48 custom weapons from shotguns to snipers, all unique to GTM. Not only do we provide a variety of weapons, but also custom vehicles from cars to tanks, and even planes. You can become one of the richest criminals and own your own big penthouse apartment in our custom-built map. At GTM you can find a big community, with gangs and multiple languages. Our frequent, large updates can be enjoyed as we make the server even cooler and fun for everyone. ​\n\nGrand Theft Minecart is our oldest gamemode - hop into the city of MineSantos, loot chests full of awesome gear, and have fun with your friends. Be careful though, there are police roaming the streets, and they do not like murderers! As you rank up, gain access to more and more powerful weapons and vehicles, and purchase a wonderful apartment or house to store all your stuff. Join a Gang, or make your own, and become the Crime Lord of Los Santos. At Grand Theft Minecart the opportunities are limitless.\n\nYou can only join with original (paid) Minecraft Java Edition version 1.19.4 -> 26.2+",
+          "tags": [
+            "Survival",
+            "Economy",
+            "PvP",
+            "RPG",
+            "Farming",
+            "Minigames"
+          ],
+          "ownerName": "MaxFullCalypse",
+          "votes": 0,
+          "playersOnline": 37,
+          "playersMax": 38,
+          "version": "Velocity 1.7.2-26.2",
+          "online": true,
+          "uptimePercent": 99.65986394557824,
+          "sponsored": false,
+          "createdAt": "2026-06-24T14:32:13.157Z",
+          "updatedAt": "2026-06-24T14:32:13.157Z",
+          "lastPingAt": "2026-09-01T21:55:10.654Z",
+          "lastSuccessfulPingAt": "2026-09-01T21:55:10.654Z",
+          "uptimeChecks": 588,
+          "uptimeSuccesses": 586,
+          "edition": "java",
+          "bedrockType": "server",
+          "realmCode": "",
+          "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=GTM-GTA-based-minecraft-server-for-Java&kind=icon",
+          "rank": 6,
+          "analytics": {
+            "viewsLast7": 0,
+            "viewsLast30": 0,
+            "ipCopiesLast7": 0,
+            "ipCopiesLast30": 0
+          },
+          "reviewStats": {
+            "average": 0,
+            "count": 0
+          },
+          "communityVotesThisWeek": 0,
+          "communityHighlighted": false
+        },
+        {
+          "id": "48c565ba-791e-4c42-9d79-60a90f5a2440",
+          "name": "Timelords",
+          "javaHost": "timelordsinc.net",
+          "javaPort": 25565,
+          "javaSrvResolved": true,
+          "javaStatusTarget": "timelordsinc.net",
+          "crossPlay": true,
+          "bedrockHost": "bedrock.timelordsinc.net",
+          "bedrockPort": 19132,
+          "websiteUrl": "https://www.timelordsinc.net",
+          "discordUrl": "https://discord.timelordsinc.net",
+          "youtubeUrl": "",
+          "country": "United States",
+          "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Timelords&kind=banner",
+          "description": "An incremental RPG Minecraft server featuring custom mobs, mining progression, gear systems, and more.\n\nBecome the most powerful in a world like no other. Progress through the story of the game while unlocking unique abilities and items.\n\nThis server has completely custom features with engaging gameplay and user friendly interfaces.\n\nCome check out Minecraft's best incremental RPG game!",
+          "tags": [
+            "Prison",
+            "RPG",
+            "Farming"
+          ],
+          "ownerName": "BeatThis101",
+          "votes": 2,
+          "playersOnline": 9,
+          "playersMax": 100,
+          "version": "Velocity 1.7.2-26.2",
+          "online": true,
+          "uptimePercent": 99.06542056074767,
+          "sponsored": false,
+          "createdAt": "2026-07-08T02:51:29.618Z",
+          "updatedAt": "2026-07-08T02:51:29.618Z",
+          "lastPingAt": "2026-09-01T21:55:05.227Z",
+          "lastSuccessfulPingAt": "2026-09-01T21:55:05.227Z",
+          "uptimeChecks": 321,
+          "uptimeSuccesses": 318,
+          "edition": "java",
+          "bedrockType": "server",
+          "realmCode": "",
+          "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Timelords&kind=icon",
+          "rank": 8,
+          "analytics": {
+            "viewsLast7": 0,
+            "viewsLast30": 0,
+            "ipCopiesLast7": 0,
+            "ipCopiesLast30": 0
+          },
+          "reviewStats": {
+            "average": 0,
+            "count": 0
+          },
+          "communityVotesThisWeek": 0,
+          "communityHighlighted": false
+        }
+      ],
+      "bestReviewed": []
+    }
+  },
   "siteAnalytics": {
     "uniqueVisitsLast7": 0,
     "uniqueVisitsLast30": 0,
