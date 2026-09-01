@@ -11417,8 +11417,17 @@
   "communityVotes": [],
   "voteIps": {},
   "siteAnalytics": {
-    "siteVisitDaily": [],
-    "siteVisitVisitorDays": {}
+    "siteVisitDaily": [
+      {
+        "date": "2026-09-01",
+        "count": 1
+      }
+    ],
+    "siteVisitVisitorDays": {
+      "2026-09-01": [
+        "75cedf1fa71dc3e8"
+      ]
+    }
   },
   "deleted": {
     "users": {
