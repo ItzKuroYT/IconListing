@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-01T23:13:25.136Z",
+  "generatedAt": "2026-09-01T23:14:01.202Z",
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -60,6 +60,62 @@
       "communityHighlighted": false
     },
     {
+      "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
+      "name": "GTM - GTA-based minecraft server for Java",
+      "javaHost": "maxfullcalypse.gtm.network",
+      "javaPort": 25565,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "maxfullcalypse.gtm.network",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "https://i.imgur.com/xEuBBmu.png",
+      "description": "Grand Theft Minecart is the most played Grand Theft Auto server in Minecraft. We provide a completely custom gamemode, GTM, where you can use our 48 custom weapons from shotguns to snipers, all unique to GTM. Not only do we provide a variety of weapons, but also custom vehicles from cars to tanks, and even planes. You can become one of the richest criminals and own your own big penthouse apartment in our custom-built map. At GTM you can find a big community, with gangs and multiple languages. Our frequent, large updates can be enjoyed as we make the server even cooler and fun for everyone. ​\n\nGrand Theft Minecart is our oldest gamemode - hop into the city of MineSantos, loot chests full of awesome gear, and have fun with your friends. Be careful though, there are police roaming the streets, and they do not like murderers! As you rank up, gain access to more and more powerful weapons and vehicles, and purchase a wonderful apartment or house to store all your stuff. Join a Gang, or make your own, and become the Crime Lord of Los Santos. At Grand Theft Minecart the opportunities are limitless.\n\nYou can only join with original (paid) Minecraft Java Edition version 1.19.4 -> 26.2+",
+      "tags": [
+        "Survival",
+        "Economy",
+        "PvP",
+        "RPG",
+        "Farming",
+        "Minigames"
+      ],
+      "ownerName": "MaxFullCalypse",
+      "votes": 0,
+      "playersOnline": 34,
+      "playersMax": 35,
+      "version": "Velocity 1.7.2-26.2",
+      "online": true,
+      "uptimePercent": 99.66044142614601,
+      "sponsored": false,
+      "createdAt": "2026-06-24T14:32:13.157Z",
+      "updatedAt": "2026-06-24T14:32:13.157Z",
+      "lastPingAt": "2026-09-01T23:13:19.415Z",
+      "lastSuccessfulPingAt": "2026-09-01T23:13:19.415Z",
+      "uptimeChecks": 589,
+      "uptimeSuccesses": 587,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=GTM-GTA-based-minecraft-server-for-Java&kind=icon",
+      "rank": 2,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 1,
+      "communityHighlighted": true
+    },
+    {
       "id": "4bb119bc-7c4e-4815-88e7-9b4afbb8c379",
       "name": "CofferCraft",
       "javaHost": "play.coffercraft.com",
@@ -100,7 +156,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CofferCraft&kind=icon",
-      "rank": 2,
+      "rank": 3,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -156,7 +212,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Etherium-SMP&kind=icon",
-      "rank": 3,
+      "rank": 4,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -211,7 +267,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unbent-Flames&kind=icon",
-      "rank": 4,
+      "rank": 5,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -268,62 +324,6 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=IconGens&kind=icon",
-      "rank": 5,
-      "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
-      },
-      "reviewStats": {
-        "average": 0,
-        "count": 0
-      },
-      "communityVotesThisWeek": 0,
-      "communityHighlighted": false
-    },
-    {
-      "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
-      "name": "GTM - GTA-based minecraft server for Java",
-      "javaHost": "maxfullcalypse.gtm.network",
-      "javaPort": 25565,
-      "javaSrvResolved": false,
-      "javaStatusTarget": "maxfullcalypse.gtm.network",
-      "crossPlay": false,
-      "bedrockHost": "",
-      "bedrockPort": 19132,
-      "websiteUrl": "",
-      "discordUrl": "",
-      "youtubeUrl": "",
-      "country": "United States",
-      "bannerUrl": "https://i.imgur.com/xEuBBmu.png",
-      "description": "Grand Theft Minecart is the most played Grand Theft Auto server in Minecraft. We provide a completely custom gamemode, GTM, where you can use our 48 custom weapons from shotguns to snipers, all unique to GTM. Not only do we provide a variety of weapons, but also custom vehicles from cars to tanks, and even planes. You can become one of the richest criminals and own your own big penthouse apartment in our custom-built map. At GTM you can find a big community, with gangs and multiple languages. Our frequent, large updates can be enjoyed as we make the server even cooler and fun for everyone. ​\n\nGrand Theft Minecart is our oldest gamemode - hop into the city of MineSantos, loot chests full of awesome gear, and have fun with your friends. Be careful though, there are police roaming the streets, and they do not like murderers! As you rank up, gain access to more and more powerful weapons and vehicles, and purchase a wonderful apartment or house to store all your stuff. Join a Gang, or make your own, and become the Crime Lord of Los Santos. At Grand Theft Minecart the opportunities are limitless.\n\nYou can only join with original (paid) Minecraft Java Edition version 1.19.4 -> 26.2+",
-      "tags": [
-        "Survival",
-        "Economy",
-        "PvP",
-        "RPG",
-        "Farming",
-        "Minigames"
-      ],
-      "ownerName": "MaxFullCalypse",
-      "votes": 0,
-      "playersOnline": 34,
-      "playersMax": 35,
-      "version": "Velocity 1.7.2-26.2",
-      "online": true,
-      "uptimePercent": 99.66044142614601,
-      "sponsored": false,
-      "createdAt": "2026-06-24T14:32:13.157Z",
-      "updatedAt": "2026-06-24T14:32:13.157Z",
-      "lastPingAt": "2026-09-01T23:13:19.415Z",
-      "lastSuccessfulPingAt": "2026-09-01T23:13:19.415Z",
-      "uptimeChecks": 589,
-      "uptimeSuccesses": 587,
-      "edition": "java",
-      "bedrockType": "server",
-      "realmCode": "",
-      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=GTM-GTA-based-minecraft-server-for-Java&kind=icon",
       "rank": 6,
       "analytics": {
         "viewsLast7": 0,
@@ -1703,11 +1703,79 @@
     }
   ],
   "reviews": [],
-  "communityVotes": [],
+  "communityVotes": [
+    {
+      "id": "65a7fc00-f4bb-4da8-9c89-f384ea1c8662",
+      "serverId": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
+      "username": "ItzKuroYT",
+      "week": "2026-W36",
+      "createdAt": "2026-09-01T23:13:55.536Z"
+    }
+  ],
   "community": {
     "week": "2026-W36",
-    "highlightedServerId": "",
-    "weekly": [],
+    "highlightedServerId": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
+    "weekly": [
+      {
+        "server": {
+          "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
+          "name": "GTM - GTA-based minecraft server for Java",
+          "javaHost": "maxfullcalypse.gtm.network",
+          "javaPort": 25565,
+          "javaSrvResolved": false,
+          "javaStatusTarget": "maxfullcalypse.gtm.network",
+          "crossPlay": false,
+          "bedrockHost": "",
+          "bedrockPort": 19132,
+          "websiteUrl": "",
+          "discordUrl": "",
+          "youtubeUrl": "",
+          "country": "United States",
+          "bannerUrl": "https://i.imgur.com/xEuBBmu.png",
+          "description": "Grand Theft Minecart is the most played Grand Theft Auto server in Minecraft. We provide a completely custom gamemode, GTM, where you can use our 48 custom weapons from shotguns to snipers, all unique to GTM. Not only do we provide a variety of weapons, but also custom vehicles from cars to tanks, and even planes. You can become one of the richest criminals and own your own big penthouse apartment in our custom-built map. At GTM you can find a big community, with gangs and multiple languages. Our frequent, large updates can be enjoyed as we make the server even cooler and fun for everyone. ​\n\nGrand Theft Minecart is our oldest gamemode - hop into the city of MineSantos, loot chests full of awesome gear, and have fun with your friends. Be careful though, there are police roaming the streets, and they do not like murderers! As you rank up, gain access to more and more powerful weapons and vehicles, and purchase a wonderful apartment or house to store all your stuff. Join a Gang, or make your own, and become the Crime Lord of Los Santos. At Grand Theft Minecart the opportunities are limitless.\n\nYou can only join with original (paid) Minecraft Java Edition version 1.19.4 -> 26.2+",
+          "tags": [
+            "Survival",
+            "Economy",
+            "PvP",
+            "RPG",
+            "Farming",
+            "Minigames"
+          ],
+          "ownerName": "MaxFullCalypse",
+          "votes": 0,
+          "playersOnline": 34,
+          "playersMax": 35,
+          "version": "Velocity 1.7.2-26.2",
+          "online": true,
+          "uptimePercent": 99.66044142614601,
+          "sponsored": false,
+          "createdAt": "2026-06-24T14:32:13.157Z",
+          "updatedAt": "2026-06-24T14:32:13.157Z",
+          "lastPingAt": "2026-09-01T23:13:19.415Z",
+          "lastSuccessfulPingAt": "2026-09-01T23:13:19.415Z",
+          "uptimeChecks": 589,
+          "uptimeSuccesses": 587,
+          "edition": "java",
+          "bedrockType": "server",
+          "realmCode": "",
+          "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=GTM-GTA-based-minecraft-server-for-Java&kind=icon",
+          "rank": 2,
+          "analytics": {
+            "viewsLast7": 0,
+            "viewsLast30": 0,
+            "ipCopiesLast7": 0,
+            "ipCopiesLast30": 0
+          },
+          "reviewStats": {
+            "average": 0,
+            "count": 0
+          },
+          "communityVotesThisWeek": 1,
+          "communityHighlighted": true
+        },
+        "votes": 1
+      }
+    ],
     "leaderboards": {
       "topVoted": [
         {
@@ -1751,7 +1819,7 @@
           "bedrockType": "server",
           "realmCode": "",
           "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CofferCraft&kind=icon",
-          "rank": 2,
+          "rank": 3,
           "analytics": {
             "viewsLast7": 0,
             "viewsLast30": 0,
@@ -1807,7 +1875,7 @@
           "bedrockType": "server",
           "realmCode": "",
           "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Etherium-SMP&kind=icon",
-          "rank": 3,
+          "rank": 4,
           "analytics": {
             "viewsLast7": 0,
             "viewsLast30": 0,
@@ -1862,7 +1930,7 @@
           "bedrockType": "server",
           "realmCode": "",
           "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unbent-Flames&kind=icon",
-          "rank": 4,
+          "rank": 5,
           "analytics": {
             "viewsLast7": 0,
             "viewsLast30": 0,
@@ -1977,7 +2045,7 @@
           "bedrockType": "server",
           "realmCode": "",
           "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=GTM-GTA-based-minecraft-server-for-Java&kind=icon",
-          "rank": 6,
+          "rank": 2,
           "analytics": {
             "viewsLast7": 0,
             "viewsLast30": 0,
@@ -1988,8 +2056,8 @@
             "average": 0,
             "count": 0
           },
-          "communityVotesThisWeek": 0,
-          "communityHighlighted": false
+          "communityVotesThisWeek": 1,
+          "communityHighlighted": true
         },
         {
           "id": "48c565ba-791e-4c42-9d79-60a90f5a2440",
