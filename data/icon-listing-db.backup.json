@@ -693,11 +693,18 @@
           {
             "date": "2026-09-01",
             "count": 1
+          },
+          {
+            "date": "2026-09-02",
+            "count": 1
           }
         ],
         "viewVisitorDays": {
           "2026-09-01": [
             "75cedf1fa71dc3e8"
+          ],
+          "2026-09-02": [
+            "a8c43f7ed82ea261"
           ]
         },
         "playerHistory": [
