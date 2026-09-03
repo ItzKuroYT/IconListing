@@ -645,6 +645,23 @@
       "googleName": "Alfie Alfie creasey",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKoAEVQILZUDAj122TYz1xfS4bAFhL_n74BczYtA5WPv7zOqA=s96-c",
       "updatedAt": "2026-08-31T22:04:08.334Z"
+    },
+    {
+      "id": "30537d96-e97a-449b-935d-a75b6f7a3740",
+      "username": "JaxonBrackett",
+      "email": "jaxonbrackett280@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-09-03T03:29:32.028Z",
+      "termsAcceptedAt": "2026-09-03T03:29:32.028Z",
+      "googleLinkedAt": "2026-09-03T03:29:32.028Z",
+      "createdAt": "2026-09-03T03:29:32.028Z",
+      "banned": false,
+      "googleSub": "112429465381320842494",
+      "googleName": "Jaxon Brackett",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKv8eC0Ae9hcKRO_aKatNw_DM22VKLj2jLY4b_WGphKIevKhA=s96-c",
+      "updatedAt": "2026-09-03T03:29:32.028Z"
     }
   ],
   "servers": [
@@ -11563,6 +11580,57 @@
         "c603706aac6a012f",
         "197ab4674a0d5a62"
       ]
+    }
+  },
+  "billing": {
+    "currency": "usd",
+    "maxSponsors": 5,
+    "sale": {
+      "enabled": true,
+      "percentOff": 50,
+      "minPaidPriceCents": 500
+    },
+    "plans": {
+      "free": {
+        "name": "Free",
+        "price": "$0/mo",
+        "priceCents": 0,
+        "serverLimit": 2,
+        "sponsorCredits": 0,
+        "sponsorDurationDays": 0,
+        "sponsorDurationLabel": "No sponsor slot",
+        "description": "List up to 2 servers for free."
+      },
+      "premium": {
+        "name": "Premium",
+        "price": "$10/mo",
+        "priceCents": 1000,
+        "serverLimit": 4,
+        "sponsorCredits": 1,
+        "sponsorDurationDays": 14,
+        "sponsorDurationLabel": "1 sponsor for 14 days",
+        "description": "List up to 4 servers and sponsor one server for 2 weeks while this subscription is active."
+      },
+      "elite": {
+        "name": "Elite",
+        "price": "$18/mo",
+        "priceCents": 1800,
+        "serverLimit": 7,
+        "sponsorCredits": 1,
+        "sponsorDurationDays": 45,
+        "sponsorDurationLabel": "1 sponsor for 45 days",
+        "description": "List up to 7 servers and sponsor one server for 45 days while this subscription is active."
+      },
+      "iconic": {
+        "name": "Iconic",
+        "price": "$30/mo",
+        "priceCents": 3000,
+        "serverLimit": 12,
+        "sponsorCredits": 2,
+        "sponsorDurationDays": 90,
+        "sponsorDurationLabel": "2 sponsors for 90 days",
+        "description": "List up to 12 servers and sponsor two servers for 90 days while this subscription is active."
+      }
     }
   },
   "deleted": {
