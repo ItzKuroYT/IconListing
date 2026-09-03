@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-03T21:20:51.955Z",
+  "generatedAt": "2026-09-03T21:21:52.233Z",
   "servers": [
     {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
@@ -2219,11 +2219,11 @@
         "name": "Premium",
         "price": "$12/mo",
         "priceCents": 1200,
-        "serverLimit": 1,
+        "serverLimit": 3,
         "sponsorCredits": 1,
         "sponsorDurationDays": 14,
         "sponsorDurationLabel": "1 sponsor for 14 days",
-        "description": "List up to 4 servers and sponsor one server for 2 weeks while this subscription is active.",
+        "description": "List up to 3 servers and sponsor one server for 2 weeks while this subscription is active.",
         "effectivePriceCents": 600,
         "effectivePrice": "$6/mo",
         "saleActive": true
@@ -2232,11 +2232,11 @@
         "name": "Elite",
         "price": "$20/mo",
         "priceCents": 2000,
-        "serverLimit": 3,
+        "serverLimit": 4,
         "sponsorCredits": 1,
         "sponsorDurationDays": 45,
         "sponsorDurationLabel": "1 sponsor for 45 days",
-        "description": "List up to 7 servers and sponsor one server for 45 days while this subscription is active.",
+        "description": "List up to 4 servers and sponsor one server for 45 days while this subscription is active.",
         "effectivePriceCents": 1000,
         "effectivePrice": "$10/mo",
         "saleActive": true
@@ -2245,11 +2245,11 @@
         "name": "Iconic",
         "price": "$32/mo",
         "priceCents": 3200,
-        "serverLimit": 5,
+        "serverLimit": 6,
         "sponsorCredits": 2,
         "sponsorDurationDays": 90,
         "sponsorDurationLabel": "2 sponsors for 90 days",
-        "description": "List up to 12 servers and sponsor two servers for 90 days while this subscription is active.",
+        "description": "List up to 6 servers and sponsor two servers for 90 days while this subscription is active.",
         "effectivePriceCents": 1600,
         "effectivePrice": "$16/mo",
         "saleActive": true
