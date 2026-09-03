@@ -35,8 +35,8 @@ const DISCORD_WEBHOOK_TIMEOUT_MS = 2500;
 const MCSTATUS_TIMEOUT_MS = 1800;
 const PING_REFRESH_LIMIT = 24;
 const PING_REFRESH_CONCURRENCY = 8;
-const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
-const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "createCheckout", "stripeWebhook", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "createCheckout", "stripeWebhook", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage", "googleStart", "googleCallback"]);
 const loginFailures = new Map();
 
@@ -49,7 +49,8 @@ module.exports = async function handler(req, res) {
     requireAllowedMethod(action, req.method);
     enforceBrowserOrigin(req, action);
     requireDurableStorageForWrite(req, action);
-    const body = req.method === "GET" ? {} : await readBody(req);
+    const rawBody = action === "stripeWebhook" ? await readRawBody(req) : "";
+    const body = req.method === "GET" ? {} : action === "stripeWebhook" ? parseJsonBody(rawBody) : await readBody(req);
     if (action === "health") {
       return json(res, 200, healthPayload(req));
     }
@@ -100,6 +101,10 @@ module.exports = async function handler(req, res) {
       return finishGoogleOAuth(req, res, db);
     }
 
+    if (action === "stripeWebhook") {
+      return handleStripeWebhook(req, res, db, body, rawBody);
+    }
+
     if (action === "register") {
       requireFields(body, ["username", "email", "password"]);
       await requireTurnstile(req, body.turnstileToken);
@@ -127,7 +132,7 @@ module.exports = async function handler(req, res) {
       const emailDelivery = await sendEmailVerification(next, emailVerificationCode);
       return json(res, 200, writePayload({
         pendingVerification: true,
-        user: publicUser(next),
+        user: publicUser(next, db),
         verificationToken: signEmailVerificationToken(next),
         emailVerificationSent: emailDelivery.sent,
         emailVerificationMessage: emailDelivery.message
@@ -150,13 +155,13 @@ module.exports = async function handler(req, res) {
         const emailDelivery = await sendEmailVerification(next, emailVerificationCode);
         return json(res, 200, writePayload({
           pendingVerification: true,
-          user: publicUser(next),
+          user: publicUser(next, db),
           verificationToken: signEmailVerificationToken(next),
           emailVerificationSent: emailDelivery.sent,
           emailVerificationMessage: emailDelivery.message || "Verify your email before logging in."
         }));
       }
-      return json(res, 200, { user: publicUser(next), token: signToken(next) });
+      return json(res, 200, { user: publicUser(next, db), token: signToken(next) });
     }
 
     if (action === "saveServer") {
@@ -436,7 +441,7 @@ module.exports = async function handler(req, res) {
       await saveDb(db, { requireExistingUsers: [user.id], touchedUsers: [user.id], uniqueUserId: user.id });
       const emailDelivery = emailVerificationCode ? await sendEmailVerification(user, emailVerificationCode) : null;
       return json(res, 200, writePayload({
-        user: publicUser(user),
+        user: publicUser(user, db),
         token: signToken(user),
         emailVerificationSent: emailDelivery?.sent,
         emailVerificationMessage: emailDelivery?.message
@@ -457,13 +462,13 @@ module.exports = async function handler(req, res) {
       const persistedDb = await saveDb(db, { touchedUsers: [target.id], uniqueUserId: target.id });
       const persistedUser = persistedDb.users.find((item) => item.id === target.id || same(item.email, target.email)) || target;
       if (persistedUser.emailVerified !== true) throw httpError(500, "Email verification was not saved. Error: 67.");
-      return json(res, 200, writePayload({ ok: true, user: publicUser(persistedUser), token: signToken(persistedUser), message: "Email verified." }));
+      return json(res, 200, writePayload({ ok: true, user: publicUser(persistedUser, persistedDb), token: signToken(persistedUser), message: "Email verified." }));
     }
 
     if (action === "resendEmailVerification") {
       const target = emailVerificationTarget(req, db, body, user);
       if (target.emailVerified) {
-        return json(res, 200, writePayload({ ok: true, user: publicUser(target), token: signToken(target), message: "Email is already verified." }));
+        return json(res, 200, writePayload({ ok: true, user: publicUser(target, db), token: signToken(target), message: "Email is already verified." }));
       }
       enforceEmailVerificationCooldown(target);
       const emailVerificationCode = createEmailVerificationChallenge(target);
@@ -471,10 +476,27 @@ module.exports = async function handler(req, res) {
       const emailDelivery = await sendEmailVerification(target, emailVerificationCode);
       return json(res, 200, writePayload({
         ok: true,
-        user: publicUser(target),
+        user: publicUser(target, db),
         verificationToken: signEmailVerificationToken(target),
         sent: emailDelivery.sent,
         message: emailDelivery.message
+      }));
+    }
+
+    if (action === "createCheckout") {
+      requireLogin(user);
+      const planKey = normalizePlanKey(body.plan || body.planKey || "");
+      if (planKey === "free") throw httpError(400, "The free plan does not need checkout.");
+      const billing = billingSettings(db);
+      const plan = billing.plans[planKey];
+      if (!plan) throw httpError(400, "Select a valid plan.");
+      ensurePlanCanCheckout(db, user, plan);
+      const session = await createStripeCheckoutSession(req, user, planKey, plan, billing);
+      return json(res, 200, writePayload({
+        ok: true,
+        id: session.id,
+        url: session.url,
+        billing: publicBillingSettings(db)
       }));
     }
 
@@ -555,13 +577,18 @@ module.exports = async function handler(req, res) {
       requireAdmin(user);
       const id = body.value?.id;
       if (body.command === "listUsers") {
-        return json(res, 200, writePayload({ users: db.users.map(publicUser) }));
+        return json(res, 200, writePayload({ users: db.users.map((item) => publicUser(item, db)) }));
       }
       const saveOptions = {};
       let deletedServerPagePaths = [];
       if (body.command === "toggleSponsor") {
         const server = db.servers.find((item) => item.id === id);
         if (server) {
+          if (!server.sponsored && availableSponsorSlots(db) <= 0) throw httpError(409, "All sponsor slots are full right now.");
+          if (!server.sponsored) {
+            const owner = db.users.find((item) => item.id === server.ownerId);
+            if (owner && userHasActiveSponsor(db, owner)) throw httpError(409, "That owner already has an active sponsored listing.");
+          }
           server.sponsored = !server.sponsored;
           server.updatedAt = new Date().toISOString();
           saveOptions.touchedServers = [server.id];
@@ -612,6 +639,10 @@ module.exports = async function handler(req, res) {
         markDeleted(db, "hosts", [id]);
         saveOptions.deletedHosts = [id];
       }
+      if (body.command === "saveBilling") {
+        db.billing = normalizeBillingSettings(body.value || {});
+        saveOptions.touchedBilling = true;
+      }
       const persistedDb = await saveDb(db, saveOptions);
       await safeSyncServerStaticPages(persistedDb, {
         writeServerIds: saveOptions.touchedServers || [],
@@ -620,10 +651,11 @@ module.exports = async function handler(req, res) {
           saveOptions.touchedClients?.length ||
           saveOptions.deletedClients?.length ||
           saveOptions.touchedHosts?.length ||
-          saveOptions.deletedHosts?.length
+          saveOptions.deletedHosts?.length ||
+          saveOptions.touchedBilling
         )
       });
-      return json(res, 200, writePayload({ ...statePayload(persistedDb, user), users: persistedDb.users.map(publicUser) }));
+      return json(res, 200, writePayload({ ...statePayload(persistedDb, user), users: persistedDb.users.map((item) => publicUser(item, persistedDb)) }));
     }
 
     throw httpError(404, "Unknown action.");
@@ -638,12 +670,26 @@ async function readBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
   if (typeof req.body === "string") {
     if (Buffer.byteLength(req.body, "utf8") > MAX_BODY_BYTES) throw httpError(413, "Request body is too large.");
-    try {
-      return JSON.parse(req.body || "{}");
-    } catch {
-      throw httpError(400, "Request body must be valid JSON.");
-    }
+    return parseJsonBody(req.body);
   }
+  return parseJsonBody(await readRawBody(req));
+}
+
+async function readRawBody(req) {
+  if (Buffer.isBuffer(req.body)) {
+    if (req.body.length > MAX_BODY_BYTES) throw httpError(413, "Request body is too large.");
+    return req.body.toString("utf8");
+  }
+  if (typeof req.body === "string") {
+    if (Buffer.byteLength(req.body, "utf8") > MAX_BODY_BYTES) throw httpError(413, "Request body is too large.");
+    return req.body;
+  }
+  if (req.body && typeof req.body === "object") {
+    const raw = JSON.stringify(req.body);
+    if (Buffer.byteLength(raw, "utf8") > MAX_BODY_BYTES) throw httpError(413, "Request body is too large.");
+    return raw;
+  }
+  if (!req || typeof req[Symbol.asyncIterator] !== "function") return "";
   const chunks = [];
   let size = 0;
   for await (const chunk of req) {
@@ -651,8 +697,12 @@ async function readBody(req) {
     if (size > MAX_BODY_BYTES) throw httpError(413, "Request body is too large.");
     chunks.push(chunk);
   }
+  return Buffer.concat(chunks).toString("utf8");
+}
+
+function parseJsonBody(raw = "") {
   try {
-    return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+    return JSON.parse(String(raw || "{}") || "{}");
   } catch {
     throw httpError(400, "Request body must be valid JSON.");
   }
@@ -663,6 +713,7 @@ function actionFromRequest(req) {
   if (url.pathname.endsWith("/sitemap.xml")) return "sitemap";
   if (/^\/server\/[^/]+\/?$/i.test(url.pathname)) return "serverPage";
   if (/^\/api\/google-callback\/?$/i.test(url.pathname)) return "googleCallback";
+  if (/^\/api\/stripe-webhook\/?$/i.test(url.pathname)) return "stripeWebhook";
   return req.query?.action || url.searchParams.get("action") || "state";
 }
 
@@ -671,7 +722,7 @@ function applySecurityHeaders(req, res) {
   const allowOrigin = allowedOrigins().has(origin) ? origin : CONFIG.site.url;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Access-Control-Allow-Origin", allowOrigin);
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-IconListing-Token, X-Icon-Listing-Token");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-IconListing-Token, X-Icon-Listing-Token, Stripe-Signature");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.setHeader("Access-Control-Max-Age", "86400");
   res.setHeader("Vary", "Origin");
@@ -1227,7 +1278,7 @@ function apiOrigin(value = "") {
 }
 
 function freshDb() {
-  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], reviews: [], communityVotes: [], voteIps: {}, siteAnalytics: {}, deleted: { users: {}, servers: {}, clients: {}, hosts: {} } };
+  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], reviews: [], communityVotes: [], voteIps: {}, siteAnalytics: {}, billing: defaultBillingSettings(), deleted: { users: {}, servers: {}, clients: {}, hosts: {} } };
 }
 
 function migrateDb(db = freshDb()) {
@@ -1244,6 +1295,7 @@ function migrateDb(db = freshDb()) {
     communityVotes: Array.isArray(db.communityVotes) ? db.communityVotes.map(normalizeCommunityVote).filter(Boolean) : [],
     voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {},
     siteAnalytics: normalizeSiteAnalytics(db.siteAnalytics),
+    billing: normalizeBillingSettings(db.billing),
     deleted: normalizeDeleted(db.deleted)
   };
 }
@@ -1286,6 +1338,70 @@ function normalizeHost(host) {
     images: images.filter(Boolean).slice(0, 3),
     pricing: "paid"
   };
+}
+
+function defaultBillingSettings() {
+  return {
+    currency: clean(CONFIG.billing?.currency || "usd").toLowerCase() || "usd",
+    maxSponsors: Math.max(1, Number(CONFIG.billing?.maxSponsors || 5)),
+    sale: {
+      enabled: CONFIG.billing?.sale?.enabled !== false,
+      percentOff: clampNumber(CONFIG.billing?.sale?.percentOff, 0, 90, 50),
+      minPaidPriceCents: Math.max(500, Number(CONFIG.billing?.sale?.minPaidPriceCents || 500))
+    },
+    plans: normalizePlanCatalog(CONFIG.plans || {})
+  };
+}
+
+function normalizeBillingSettings(value = {}) {
+  const defaults = defaultBillingSettings();
+  const sale = value.sale || {};
+  return {
+    currency: clean(value.currency || defaults.currency).toLowerCase() || "usd",
+    maxSponsors: Math.max(1, Math.min(5, Number(value.maxSponsors || defaults.maxSponsors))),
+    sale: {
+      enabled: sale.enabled !== undefined ? sale.enabled === true : defaults.sale.enabled,
+      percentOff: clampNumber(sale.percentOff, 0, 90, defaults.sale.percentOff),
+      minPaidPriceCents: Math.max(500, Number(sale.minPaidPriceCents || defaults.sale.minPaidPriceCents))
+    },
+    plans: normalizePlanCatalog({ ...defaults.plans, ...(value.plans || {}) })
+  };
+}
+
+function normalizePlanCatalog(plans = {}) {
+  const result = {};
+  for (const [key, plan] of Object.entries(plans || {})) {
+    const cleanKey = normalizePlanKey(key);
+    result[cleanKey] = normalizeBillingPlan(cleanKey, plan);
+  }
+  return result;
+}
+
+function normalizeBillingPlan(key, plan = {}) {
+  const priceCents = key === "free" ? 0 : Math.max(500, Number(plan.priceCents || centsFromPrice(plan.price) || 500));
+  const sponsorCredits = Math.max(0, Math.min(2, Number(plan.sponsorCredits || 0)));
+  const sponsorDurationDays = sponsorCredits ? Math.max(1, Math.min(90, Number(plan.sponsorDurationDays || 14))) : 0;
+  return {
+    name: cleanText(plan.name || key),
+    price: key === "free" ? "$0/mo" : `$${(priceCents / 100).toFixed(priceCents % 100 ? 2 : 0)}/mo`,
+    priceCents,
+    serverLimit: Math.max(key === "free" ? 2 : 1, Math.min(25, Number(plan.serverLimit || (key === "free" ? 2 : 4)))),
+    sponsorCredits,
+    sponsorDurationDays,
+    sponsorDurationLabel: sponsorCredits ? `${sponsorCredits} sponsor${sponsorCredits === 1 ? "" : "s"} for ${sponsorDurationDays} days` : "No sponsor slot",
+    description: cleanText(plan.description || "")
+  };
+}
+
+function centsFromPrice(price = "") {
+  const match = String(price || "").match(/\$?\s*(\d+(?:\.\d{1,2})?)/);
+  return match ? Math.round(Number(match[1]) * 100) : 0;
+}
+
+function clampNumber(value, min, max, fallback) {
+  const next = Number(value);
+  if (!Number.isFinite(next)) return fallback;
+  return Math.min(max, Math.max(min, next));
 }
 
 function normalizeReview(review) {
@@ -1745,7 +1861,8 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
     reviews: mergeReviews(remote.reviews, next.reviews, deletedServers, ids.touchedReviews),
     communityVotes: mergeCommunityVotes(remote.communityVotes, next.communityVotes, deletedServers, ids.touchedCommunityVotes),
     voteIps: mergeVoteIps(remote.voteIps, next.voteIps, deletedServers),
-    siteAnalytics: mergeSiteAnalytics(remote.siteAnalytics, next.siteAnalytics)
+    siteAnalytics: mergeSiteAnalytics(remote.siteAnalytics, next.siteAnalytics),
+    billing: options.touchedBilling ? normalizeBillingSettings(next.billing) : normalizeBillingSettings(remote.billing || next.billing)
   };
   pruneVoteCooldowns(merged);
   ensureMergedWriteIsValid(merged, options);
@@ -2137,6 +2254,189 @@ function publicCommunitySummary(db) {
   };
 }
 
+function billingSettings(db = {}) {
+  return normalizeBillingSettings(db.billing || defaultBillingSettings());
+}
+
+function billingPlanCatalog(db = {}) {
+  return billingSettings(db).plans;
+}
+
+function publicBillingSettings(db = {}) {
+  const billing = billingSettings(db);
+  return {
+    currency: billing.currency,
+    maxSponsors: billing.maxSponsors,
+    activeSponsors: activeSponsoredServers(db).length,
+    availableSponsorSlots: availableSponsorSlots(db),
+    sale: billing.sale,
+    plans: Object.fromEntries(Object.entries(billing.plans || {}).map(([key, plan]) => [key, publicBillingPlan(key, plan, billing)]))
+  };
+}
+
+function publicBillingPlan(key, plan, billing) {
+  const effectivePriceCents = effectivePlanPriceCents(plan, billing);
+  return {
+    ...plan,
+    effectivePriceCents,
+    effectivePrice: priceLabel(effectivePriceCents, billing.currency),
+    saleActive: key !== "free" && Number(plan.priceCents || 0) > effectivePriceCents
+  };
+}
+
+function effectivePlanPriceCents(plan = {}, billing = defaultBillingSettings()) {
+  const base = Math.max(0, Number(plan.priceCents || centsFromPrice(plan.price) || 0));
+  if (!base) return 0;
+  const sale = billing.sale || {};
+  const discounted = sale.enabled ? Math.round(base * (100 - clampNumber(sale.percentOff, 0, 90, 0)) / 100) : base;
+  return Math.max(Number(sale.minPaidPriceCents || 500), discounted);
+}
+
+function priceLabel(cents = 0, currency = "usd") {
+  const symbol = String(currency || "usd").toLowerCase() === "usd" ? "$" : `${String(currency || "usd").toUpperCase()} `;
+  return cents ? `${symbol}${(Number(cents) / 100).toFixed(Number(cents) % 100 ? 2 : 0)}/mo` : "$0/mo";
+}
+
+function activeSponsoredServers(db = {}) {
+  return (db.servers || []).filter((server) => server?.sponsored === true);
+}
+
+function availableSponsorSlots(db = {}) {
+  const billing = billingSettings(db);
+  return Math.max(0, Number(billing.maxSponsors || 5) - activeSponsoredServers(db).length);
+}
+
+function userHasActiveSponsor(db = {}, user = null) {
+  return !!user && activeSponsoredServers(db).some((server) => server.ownerId === user.id);
+}
+
+function ensurePlanCanCheckout(db, user, plan) {
+  if (Number(plan.sponsorCredits || 0) <= 0) return;
+  if (availableSponsorSlots(db) <= 0) throw httpError(409, "All sponsor slots are full right now.");
+  if (userHasActiveSponsor(db, user)) throw httpError(409, "You already have an active sponsored listing.");
+}
+
+async function createStripeCheckoutSession(req, user, planKey, plan, billing) {
+  const secret = stripeSecretKey();
+  if (!secret) throw httpError(500, "Stripe checkout is not configured. Error: 67.");
+  const amount = effectivePlanPriceCents(plan, billing);
+  if (amount < 500) throw httpError(400, "Paid plans must be at least $5.00.");
+  const params = new URLSearchParams();
+  params.set("mode", "subscription");
+  params.set("success_url", siteUrl("/dashboard/?checkout=success"));
+  params.set("cancel_url", siteUrl("/sponsored/plans/?checkout=cancelled"));
+  params.set("client_reference_id", user.id);
+  if (user.email) params.set("customer_email", user.email);
+  params.set("line_items[0][quantity]", "1");
+  params.set("line_items[0][price_data][currency]", billing.currency);
+  params.set("line_items[0][price_data][unit_amount]", String(amount));
+  params.set("line_items[0][price_data][recurring][interval]", "month");
+  params.set("line_items[0][price_data][product_data][name]", `${CONFIG.site.name} ${plan.name}`);
+  params.set("line_items[0][price_data][product_data][description]", `${plan.serverLimit} listings, ${plan.sponsorCredits} sponsor credit${Number(plan.sponsorCredits || 0) === 1 ? "" : "s"}`);
+  params.set("metadata[userId]", user.id);
+  params.set("metadata[plan]", planKey);
+  params.set("metadata[priceCents]", String(amount));
+  params.set("subscription_data[metadata][userId]", user.id);
+  params.set("subscription_data[metadata][plan]", planKey);
+  params.set("subscription_data[metadata][priceCents]", String(amount));
+  const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: params
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.url) throw httpError(502, data.error?.message || "Stripe checkout could not be created.");
+  return data;
+}
+
+async function handleStripeWebhook(req, res, db, event, rawBody) {
+  verifyStripeWebhookSignature(req, rawBody);
+  const type = clean(event?.type);
+  const object = event?.data?.object || {};
+  let changedUserId = "";
+  if (type === "checkout.session.completed") {
+    changedUserId = applyStripeCheckoutSession(db, object);
+  }
+  if (type === "customer.subscription.updated" || type === "customer.subscription.deleted") {
+    changedUserId = applyStripeSubscriptionEvent(db, object, type);
+  }
+  if (changedUserId) {
+    await saveDb(db, { touchedUsers: [changedUserId], requireExistingUsers: [changedUserId] });
+  }
+  return json(res, 200, writePayload({ received: true }));
+}
+
+function applyStripeCheckoutSession(db, session = {}) {
+  const userId = clean(session.metadata?.userId || session.client_reference_id);
+  const user = db.users.find((item) => item.id === userId);
+  if (!user) return "";
+  const planKey = normalizePlanKey(session.metadata?.plan || "");
+  if (planKey === "free") return "";
+  user.plan = planKey;
+  user.subscriptionPlan = planKey;
+  user.stripeCustomerId = clean(session.customer || user.stripeCustomerId);
+  user.stripeSubscriptionId = clean(session.subscription || user.stripeSubscriptionId);
+  user.subscriptionStatus = "active";
+  user.planUpdatedAt = new Date().toISOString();
+  user.updatedAt = user.planUpdatedAt;
+  return user.id;
+}
+
+function applyStripeSubscriptionEvent(db, subscription = {}, type = "") {
+  const subscriptionId = clean(subscription.id);
+  const customerId = clean(subscription.customer);
+  const user = db.users.find((item) =>
+    (subscriptionId && item.stripeSubscriptionId === subscriptionId) ||
+    (customerId && item.stripeCustomerId === customerId) ||
+    (subscription.metadata?.userId && item.id === subscription.metadata.userId)
+  );
+  if (!user) return "";
+  const status = clean(subscription.status || (type === "customer.subscription.deleted" ? "canceled" : ""));
+  user.subscriptionStatus = status;
+  if (["canceled", "unpaid", "incomplete_expired"].includes(status) || type === "customer.subscription.deleted") {
+    user.plan = "free";
+    user.subscriptionPlan = "free";
+  } else if (status === "active" || status === "trialing") {
+    const planKey = normalizePlanKey(subscription.metadata?.plan || user.plan || "free");
+    user.plan = planKey;
+    user.subscriptionPlan = planKey;
+  }
+  user.updatedAt = new Date().toISOString();
+  return user.id;
+}
+
+function verifyStripeWebhookSignature(req, rawBody = "") {
+  const secret = stripeWebhookSecret();
+  if (!secret) {
+    if (isProductionRequest(req)) throw httpError(500, "Stripe webhook secret is not configured. Error: 67.");
+    return;
+  }
+  const header = clean(req.headers?.["stripe-signature"] || req.headers?.["Stripe-Signature"]);
+  const parts = header.split(",").map((part) => part.split("="));
+  const timestamp = parts.find(([key]) => key === "t")?.[1] || "";
+  const signatures = parts.filter(([key]) => key === "v1").map(([, value]) => value).filter(Boolean);
+  if (!timestamp || !signatures.length) throw httpError(400, "Stripe signature is missing.");
+  if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) throw httpError(400, "Stripe signature timestamp is stale.");
+  const expected = crypto.createHmac("sha256", secret).update(`${timestamp}.${rawBody}`).digest("hex");
+  const expectedBuffer = Buffer.from(expected, "hex");
+  const valid = signatures.some((signature) => {
+    const buffer = Buffer.from(signature, "hex");
+    return buffer.length === expectedBuffer.length && crypto.timingSafeEqual(buffer, expectedBuffer);
+  });
+  if (!valid) throw httpError(400, "Stripe signature could not be verified.");
+}
+
+function stripeSecretKey() {
+  return clean(process.env.STRIPE_SECRET_KEY);
+}
+
+function stripeWebhookSecret() {
+  return clean(process.env.STRIPE_WEBHOOK_SECRET);
+}
+
 function statePayload(db, user, options = {}) {
   const detailServerKey = clean(options.detailServerId || options.detailServerKey || "");
   const detailServer = detailServerKey ? findServerByKey(db.servers, detailServerKey) : null;
@@ -2150,7 +2450,8 @@ function statePayload(db, user, options = {}) {
     reviews: detailServerId ? publicReviewsForServer(db.reviews, detailServerId) : publicReviews(db.reviews),
     communityVotes: publicCommunityVotes(db.communityVotes),
     community: publicCommunitySummary(db),
-    user: publicUser(user),
+    billing: publicBillingSettings(db),
+    user: publicUser(user, db),
     siteAnalytics: publicSiteAnalytics(db.siteAnalytics)
   };
 }
@@ -2166,6 +2467,7 @@ function publicSnapshotPayload(db) {
     reviews: publicReviews(next.reviews),
     communityVotes: publicCommunityVotes(next.communityVotes),
     community: publicCommunitySummary(next),
+    billing: publicBillingSettings(next),
     siteAnalytics: publicSiteAnalytics(next.siteAnalytics)
   };
 }
@@ -3566,27 +3868,27 @@ function validateServer(server) {
 
 function enforceServerLimit(db, user) {
   if (!user || isAdmin(user)) return;
-  const limit = serverLimitForUser(user);
+  const limit = serverLimitForUser(user, db);
   const owned = (db.servers || []).filter((server) => server.ownerId === user.id).length;
   if (owned >= limit) {
-    throw httpError(403, `Your ${planConfigForUser(user).name} plan allows ${limit} server listings. Delete a listing or upgrade your plan to add another.`);
+    throw httpError(403, `Your ${planConfigForUser(user, db).name} plan allows ${limit} server listings. Delete a listing or upgrade your plan to add another.`);
   }
 }
 
-function planConfigForUser(user) {
-  const plans = CONFIG.plans || {};
-  const key = normalizePlanKey(user?.plan || user?.subscriptionPlan || "free");
+function planConfigForUser(user, db = {}) {
+  const plans = billingPlanCatalog(db);
+  const key = normalizePlanKey(user?.plan || user?.subscriptionPlan || "free", plans);
   return { key, ...(plans[key] || plans.free || { name: "Free", serverLimit: 2, sponsorCredits: 0, sponsorDurationDays: 0 }) };
 }
 
-function normalizePlanKey(value = "") {
+function normalizePlanKey(value = "", plans = CONFIG.plans || {}) {
   const key = String(value || "free").toLowerCase().replace(/[^a-z0-9_-]/g, "");
-  return CONFIG.plans?.[key] ? key : "free";
+  return plans?.[key] ? key : "free";
 }
 
-function serverLimitForUser(user) {
+function serverLimitForUser(user, db = {}) {
   if (isAdmin(user)) return 999;
-  return Math.max(0, Number(planConfigForUser(user).serverLimit || 2));
+  return Math.max(0, Number(planConfigForUser(user, db).serverLimit || 2));
 }
 
 function ensureUniqueUser(db, user, currentId = "") {
@@ -4334,18 +4636,21 @@ function userWithSessionClaims(user, session = {}) {
   return user;
 }
 
-function publicUser(user) {
+function publicUser(user, db = {}) {
   if (!user) return null;
-  const plan = planConfigForUser(user);
+  const plan = planConfigForUser(user, db);
   return {
     id: user.id,
     username: user.username,
     email: user.email,
     plan: plan.key,
     planName: plan.name,
-    serverLimit: serverLimitForUser(user),
+    serverLimit: serverLimitForUser(user, db),
     sponsorCredits: Number(plan.sponsorCredits || 0),
     sponsorDurationDays: Number(plan.sponsorDurationDays || 0),
+    stripeCustomerId: user.stripeCustomerId || "",
+    stripeSubscriptionId: user.stripeSubscriptionId || "",
+    subscriptionStatus: user.subscriptionStatus || "",
     emailOptIn: user.emailOptIn === true,
     emailVerified: user.emailVerified === true,
     emailVerificationPending: user.emailVerified !== true && !!user.emailVerification?.codeHash,
@@ -4505,4 +4810,10 @@ module.exports.__iconListingStatic = {
   staticServerPageEntries,
   staticTagPageEntries,
   tagSlug
+};
+
+module.exports.config = {
+  api: {
+    bodyParser: false
+  }
 };

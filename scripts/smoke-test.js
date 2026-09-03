@@ -1280,6 +1280,83 @@ async function main() {
     assert(adminUsers.code === 200 && adminUsers.json.users.some((item) => item.email === `smoke${suffix}@example.com`), "admin should be able to view created user emails through the API");
     assert(beforeUserListRead === afterUserListRead, "admin user email lookup should not write to shared storage");
 
+    const billingSave = await call("admin", {
+      command: "saveBilling",
+      value: {
+        currency: "usd",
+        maxSponsors: 5,
+        sale: { enabled: true, percentOff: 25, minPaidPriceCents: 500 },
+        plans: {
+          free: CONFIG.plans.free,
+          premium: { name: "Premium", priceCents: 1200, serverLimit: 4, sponsorCredits: 1, sponsorDurationDays: 14, description: "Smoke premium plan." },
+          elite: { name: "Elite", priceCents: 1800, serverLimit: 7, sponsorCredits: 1, sponsorDurationDays: 45, description: "Smoke elite plan." },
+          iconic: { name: "Iconic", priceCents: 3000, serverLimit: 12, sponsorCredits: 2, sponsorDurationDays: 90, description: "Smoke iconic plan." }
+        }
+      }
+    }, adminToken);
+    assert(billingSave.code === 200 && billingSave.json.billing.plans.premium.effectivePriceCents === 900, "admin billing changes should update public sale pricing");
+
+    const beforeSponsorCapDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const cappedDb = {
+      ...beforeSponsorCapDb,
+      servers: [
+        ...beforeSponsorCapDb.servers.map((server) => ({ ...server, sponsored: false })),
+        ...Array.from({ length: 5 }, (_, index) => ({
+          id: `cap-sponsored-${index}-${suffix}`,
+          name: `Cap Sponsored ${index}`,
+          ownerId: adminUser.id,
+          ownerName: adminUser.username,
+          javaHost: `cap-${index}.example.org`,
+          javaPort: 25565,
+          edition: "java",
+          country: "United States",
+          description: "Temporary sponsored cap listing used by the smoke test.",
+          tags: ["SMP"],
+          sponsored: true
+        }))
+      ]
+    };
+    await fs.writeFile(dbPath, JSON.stringify(cappedDb));
+    const cappedCheckout = await call("createCheckout", { plan: "premium" }, googleSession);
+    assert(cappedCheckout.code === 409, "checkout should be blocked when all sponsor slots are full");
+    await fs.writeFile(dbPath, JSON.stringify(beforeSponsorCapDb));
+
+    const stripeCalls = [];
+    const previousStripeFetch = global.fetch;
+    const previousStripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const previousStripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    process.env.STRIPE_SECRET_KEY = "sk_test_smoke";
+    delete process.env.STRIPE_WEBHOOK_SECRET;
+    global.fetch = async (url, options = {}) => {
+      if (String(url).includes("api.stripe.com/v1/checkout/sessions")) {
+        stripeCalls.push(new URLSearchParams(String(options.body || "")));
+        return { ok: true, json: async () => ({ id: `cs_test_${suffix}`, url: "https://checkout.stripe.com/c/pay/cs_test" }) };
+      }
+      return previousStripeFetch(url, options);
+    };
+    const checkout = await call("createCheckout", { plan: "premium" }, googleSession);
+    assert(checkout.code === 200 && checkout.json.url.includes("checkout.stripe.com"), "paid plans should create Stripe Checkout sessions");
+    assert(stripeCalls[0]?.get("line_items[0][price_data][unit_amount]") === "900", "Stripe Checkout should use the saved admin sale price");
+    const stripeWebhook = await callText("stripeWebhook", JSON.stringify({
+      type: "checkout.session.completed",
+      data: {
+        object: {
+          client_reference_id: googleStateRead.json.user.id,
+          customer: `cus_${suffix}`,
+          subscription: `sub_${suffix}`,
+          metadata: { userId: googleStateRead.json.user.id, plan: "premium", priceCents: "900" }
+        }
+      }
+    }), "POST");
+    assert(stripeWebhook.code === 200 && stripeWebhook.json.received, "Stripe checkout webhooks should be accepted");
+    const upgradedState = await call("state", {}, googleSession, "GET");
+    assert(upgradedState.json.user.plan === "premium" && upgradedState.json.user.serverLimit === 4, "Stripe webhook should upgrade the user plan");
+    global.fetch = previousStripeFetch;
+    if (previousStripeSecretKey === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousStripeSecretKey;
+    if (previousStripeWebhookSecret === undefined) delete process.env.STRIPE_WEBHOOK_SECRET;
+    else process.env.STRIPE_WEBHOOK_SECRET = previousStripeWebhookSecret;
+
     const clientDescription =
       "A sponsored client listing created by the smoke test to verify admins can save Minecraft client advertisements with a website download link, YouTube video, long description, two showcase images, version targeting, and paid/free metadata. This sentence keeps the description beyond the minimum length.";
     const clientSave = await call(
@@ -1487,7 +1564,7 @@ async function main() {
     if (deleteAccountPreviousResendFromEmail === undefined) delete process.env.RESEND_FROM_EMAIL;
     else process.env.RESEND_FROM_EMAIL = deleteAccountPreviousResendFromEmail;
 
-    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, dashboard ownership sync, reviews, community highlights, stale/mismatched ping refresh, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, sponsored clients, sponsored hosts.");
+    console.log("Smoke test passed: auth, Google OAuth, email verification, account deletion, API method/origin/body hardening, login throttle, empty state, profanity filter, host blacklist, Java/Bedrock/Realm listings, duplicate listing checks, duplicate vote plugin keys, dashboard ownership sync, reviews, community highlights, stale/mismatched ping refresh, backup/recovery fill, deletion tombstones, stale delete protection, multiple listings per account, sitemap XML, mcstatus fallback, Votifier, NuVotifier/AzuVotifier, IconListing vote plugin polling, voting cooldown, next-day voting, delivery-failure-safe voting, Stripe billing checkout, sponsored clients, sponsored hosts.");
   } finally {
     provider.close();
     tcpServers.forEach((server) => server.close());

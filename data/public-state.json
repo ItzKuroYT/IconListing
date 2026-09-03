@@ -1,6 +1,10 @@
 {
   "version": 2,
+<<<<<<< Updated upstream
   "generatedAt": "2026-09-03T01:37:37.293Z",
+=======
+  "generatedAt": "2026-09-03T01:43:58.483Z",
+>>>>>>> Stashed changes
   "servers": [
     {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
@@ -2187,6 +2191,71 @@
           "communityHighlighted": true
         }
       ]
+    }
+  },
+  "billing": {
+    "currency": "usd",
+    "maxSponsors": 5,
+    "activeSponsors": 1,
+    "availableSponsorSlots": 4,
+    "sale": {
+      "enabled": true,
+      "percentOff": 50,
+      "minPaidPriceCents": 500
+    },
+    "plans": {
+      "free": {
+        "name": "Free",
+        "price": "$0/mo",
+        "priceCents": 0,
+        "serverLimit": 2,
+        "sponsorCredits": 0,
+        "sponsorDurationDays": 0,
+        "sponsorDurationLabel": "No sponsor slot",
+        "description": "List up to 2 servers for free.",
+        "effectivePriceCents": 0,
+        "effectivePrice": "$0/mo",
+        "saleActive": false
+      },
+      "premium": {
+        "name": "Premium",
+        "price": "$10/mo",
+        "priceCents": 1000,
+        "serverLimit": 4,
+        "sponsorCredits": 1,
+        "sponsorDurationDays": 14,
+        "sponsorDurationLabel": "1 sponsor for 14 days",
+        "description": "List up to 4 servers and sponsor one server for 2 weeks while this subscription is active.",
+        "effectivePriceCents": 500,
+        "effectivePrice": "$5/mo",
+        "saleActive": true
+      },
+      "elite": {
+        "name": "Elite",
+        "price": "$18/mo",
+        "priceCents": 1800,
+        "serverLimit": 7,
+        "sponsorCredits": 1,
+        "sponsorDurationDays": 45,
+        "sponsorDurationLabel": "1 sponsor for 45 days",
+        "description": "List up to 7 servers and sponsor one server for 45 days while this subscription is active.",
+        "effectivePriceCents": 900,
+        "effectivePrice": "$9/mo",
+        "saleActive": true
+      },
+      "iconic": {
+        "name": "Iconic",
+        "price": "$30/mo",
+        "priceCents": 3000,
+        "serverLimit": 12,
+        "sponsorCredits": 2,
+        "sponsorDurationDays": 90,
+        "sponsorDurationLabel": "2 sponsors for 90 days",
+        "description": "List up to 12 servers and sponsor two servers for 90 days while this subscription is active.",
+        "effectivePriceCents": 1500,
+        "effectivePrice": "$15/mo",
+        "saleActive": true
+      }
     }
   },
   "siteAnalytics": {

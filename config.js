@@ -97,7 +97,7 @@ const IconListingConfig = {
       plans: {
         title: "Icon Listing Plans | Server Listing Limits",
         description:
-          "Compare Icon Listing plans for Minecraft server listing limits and sponsored placement durations. Stripe checkout is coming soon."
+          "Compare Icon Listing plans for Minecraft server listing limits, sponsored placement access, fair monthly pricing, and Stripe checkout."
       },
       motdBuilder: {
         title: "Minecraft MOTD Builder | Icon Listing",
@@ -146,7 +146,8 @@ const IconListingConfig = {
     free: {
       name: "Free",
       price: "$0/mo",
-      serverLimit: 1,
+      priceCents: 0,
+      serverLimit: 2,
       sponsorCredits: 0,
       sponsorDurationDays: 0,
       sponsorDurationLabel: "No sponsor slot",
@@ -154,30 +155,42 @@ const IconListingConfig = {
     },
     premium: {
       name: "Premium",
-      price: "$15/mo",
-      serverLimit: 3,
+      price: "$10/mo",
+      priceCents: 1000,
+      serverLimit: 4,
       sponsorCredits: 1,
       sponsorDurationDays: 14,
       sponsorDurationLabel: "1 sponsor for 2 weeks",
-      description: "Upload up to 5 servers and sponsor one server for 2 weeks while this subscription is active."
+      description: "List up to 4 servers and sponsor one server for 2 weeks while this subscription is active."
     },
     elite: {
       name: "Elite",
-      price: "$25/mo",
-      serverLimit: 5,
+      price: "$18/mo",
+      priceCents: 1800,
+      serverLimit: 7,
       sponsorCredits: 1,
-      sponsorDurationDays: 60,
-      sponsorDurationLabel: "1 sponsor for 2 months",
-      description: "Upload up to 10 servers and sponsor one server for 2 months while this subscription is active."
+      sponsorDurationDays: 45,
+      sponsorDurationLabel: "1 sponsor for 45 days",
+      description: "List up to 7 servers and sponsor one server for 45 days while this subscription is active."
     },
     iconic: {
       name: "Iconic",
-      price: "$40/mo",
-      serverLimit: 10,
+      price: "$30/mo",
+      priceCents: 3000,
+      serverLimit: 12,
       sponsorCredits: 2,
-      sponsorDurationDays: 150,
-      sponsorDurationLabel: "2 sponsors for 5 months",
-      description: "Upload up to 15 servers and sponsor two servers for 5 months while this subscription is active."
+      sponsorDurationDays: 90,
+      sponsorDurationLabel: "2 sponsors for 90 days",
+      description: "List up to 12 servers and sponsor two servers for 90 days while this subscription is active."
+    }
+  },
+  billing: {
+    currency: "usd",
+    maxSponsors: 5,
+    sale: {
+      enabled: true,
+      percentOff: 50,
+      minPaidPriceCents: 500
     }
   },
   ranking: {
@@ -192,9 +205,9 @@ const IconListingConfig = {
     bedrockPort: 19132
   },
   sponsorship: {
-    paypalRequired: true,
+    paypalRequired: false,
     applicationText:
-      "To apply for sponsorship, join the Discord server and submit an application. Sponsorships are paid and currently require PayPal.",
+      "Choose a sponsored plan to unlock paid placement access through secure Stripe checkout. Staff can still review and approve sponsor placement from the admin panel.",
     benefits: [
       "Top placement on the homepage.",
       "Top placement on matching tag pages.",
@@ -264,8 +277,8 @@ const IconListingConfig = {
     },
     plans: {
       title: "Plans",
-      body: "Choose the listing limit and sponsor access that fits your Minecraft community. Stripe checkout is coming soon.",
-      comingSoon: "Coming soon",
+      body: "Choose the listing limit and sponsor access that fits your Minecraft community. Checkout is handled securely by Stripe.",
+      checkoutButton: "Checkout with Stripe",
       currentPlan: "Current plan",
       serverLimitLabel: "server listings",
       sponsorLabel: "sponsor access"

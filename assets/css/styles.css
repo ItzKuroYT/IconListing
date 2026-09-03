@@ -2121,6 +2121,33 @@ main {
   box-shadow: inset 0 3px 0 rgba(236, 72, 153, .7);
 }
 
+.billing-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #121217;
+  color: var(--muted);
+}
+
+.billing-strip strong {
+  color: var(--text);
+}
+
+.sale-pill {
+  margin-left: auto;
+  padding: 4px 9px;
+  border: 1px solid rgba(34, 211, 238, .35);
+  border-radius: 999px;
+  color: #d9fffb;
+  background: rgba(34, 211, 238, .1);
+  font-size: .82rem;
+  font-weight: 800;
+}
+
 .plan-head {
   display: grid;
   gap: 8px;
@@ -2142,9 +2169,19 @@ main {
 }
 
 .plan-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
   font-size: 2rem;
   font-weight: 900;
   letter-spacing: 0;
+}
+
+.price-was {
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 800;
+  text-decoration: line-through;
 }
 
 .plan-card .feature-list {
@@ -2157,6 +2194,33 @@ main {
 
 .plan-card .button {
   margin-top: auto;
+}
+
+.admin-billing-form {
+  margin-top: 14px;
+}
+
+.billing-plan-editor {
+  display: grid;
+  gap: 12px;
+}
+
+.billing-plan-fields {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.billing-plan-fields legend {
+  padding: 0 6px;
+  font-weight: 900;
+}
+
+.textarea.compact {
+  min-height: 88px;
 }
 
 .rgb-page {

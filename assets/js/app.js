@@ -5,7 +5,7 @@ const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "createCheckout", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const TRUSTPILOT_REVIEW_URL = "https://www.trustpilot.com/review/minecraftlisting.org";
 let turnstileLoadPromise = null;
 const renderedTurnstileWidgets = new Map();
@@ -70,7 +70,7 @@ function clearLegacyLocalOverlays() {
 }
 
 function freshDb() {
-  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], reviews: [], communityVotes: [], voteIps: {}, siteAnalytics: {} };
+  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], reviews: [], communityVotes: [], voteIps: {}, siteAnalytics: {}, billing: defaultBillingSettings() };
 }
 
 function migrateDb(db) {
@@ -86,7 +86,8 @@ function migrateDb(db) {
     reviews: Array.isArray(db.reviews) ? db.reviews.map(normalizeReview).filter(Boolean) : [],
     communityVotes: Array.isArray(db.communityVotes) ? db.communityVotes.map(normalizeCommunityVote).filter(Boolean) : [],
     voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {},
-    siteAnalytics: normalizeSiteAnalytics(db.siteAnalytics)
+    siteAnalytics: normalizeSiteAnalytics(db.siteAnalytics),
+    billing: normalizeBillingSettings(db.billing)
   };
   store.fallbackDb = next;
   return next;
@@ -130,6 +131,127 @@ function normalizeHost(host) {
     images: images.filter(Boolean).slice(0, 3),
     pricing: "paid"
   };
+}
+
+function defaultBillingSettings() {
+  return {
+    currency: clean(CONFIG.billing?.currency || "usd").toLowerCase() || "usd",
+    maxSponsors: Math.max(1, Number(CONFIG.billing?.maxSponsors || 5)),
+    sale: {
+      enabled: CONFIG.billing?.sale?.enabled !== false,
+      percentOff: clampNumber(CONFIG.billing?.sale?.percentOff, 0, 90, 50),
+      minPaidPriceCents: Math.max(500, Number(CONFIG.billing?.sale?.minPaidPriceCents || 500))
+    },
+    plans: normalizePlanCatalog(CONFIG.plans || {})
+  };
+}
+
+function normalizeBillingSettings(value = {}) {
+  const defaults = defaultBillingSettings();
+  const sale = value.sale || {};
+  return {
+    currency: clean(value.currency || defaults.currency).toLowerCase() || "usd",
+    maxSponsors: Math.max(1, Math.min(5, Number(value.maxSponsors || defaults.maxSponsors))),
+    sale: {
+      enabled: sale.enabled !== undefined ? sale.enabled === true : defaults.sale.enabled,
+      percentOff: clampNumber(sale.percentOff, 0, 90, defaults.sale.percentOff),
+      minPaidPriceCents: Math.max(500, Number(sale.minPaidPriceCents || defaults.sale.minPaidPriceCents))
+    },
+    plans: normalizePlanCatalog({ ...defaults.plans, ...(value.plans || {}) })
+  };
+}
+
+function normalizePlanCatalog(plans = {}) {
+  const result = {};
+  for (const [key, plan] of Object.entries(plans || {})) {
+    const cleanKey = normalizePlanKey(key, plans);
+    result[cleanKey] = normalizeBillingPlan(cleanKey, plan);
+  }
+  return result;
+}
+
+function normalizeBillingPlan(key, plan = {}) {
+  const priceCents = key === "free" ? 0 : Math.max(500, Number(plan.priceCents || centsFromPrice(plan.price) || 500));
+  const sponsorCredits = Math.max(0, Math.min(2, Number(plan.sponsorCredits || 0)));
+  const sponsorDurationDays = sponsorCredits ? Math.max(1, Math.min(90, Number(plan.sponsorDurationDays || 14))) : 0;
+  return {
+    name: cleanText(plan.name || key),
+    price: key === "free" ? "$0/mo" : priceLabel(priceCents),
+    priceCents,
+    serverLimit: Math.max(key === "free" ? 2 : 1, Math.min(25, Number(plan.serverLimit || (key === "free" ? 2 : 4)))),
+    sponsorCredits,
+    sponsorDurationDays,
+    sponsorDurationLabel: sponsorCredits ? `${sponsorCredits} sponsor${sponsorCredits === 1 ? "" : "s"} for ${sponsorDurationDays} days` : "No sponsor slot",
+    description: cleanText(plan.description || "")
+  };
+}
+
+function billingSettings(state = {}) {
+  return normalizeBillingSettings(state.billing || defaultBillingSettings());
+}
+
+function billingPlanCatalog(state = {}) {
+  return billingSettings(state).plans;
+}
+
+function publicBillingSettings(state = {}) {
+  const billing = billingSettings(state);
+  return {
+    currency: billing.currency,
+    maxSponsors: billing.maxSponsors,
+    activeSponsors: activeSponsoredServers(state).length,
+    availableSponsorSlots: availableSponsorSlots(state),
+    sale: billing.sale,
+    plans: Object.fromEntries(Object.entries(billing.plans || {}).map(([key, plan]) => [key, publicBillingPlan(key, plan, billing)]))
+  };
+}
+
+function publicBillingPlan(key, plan, billing) {
+  const effectivePriceCents = effectivePlanPriceCents(plan, billing);
+  return {
+    ...plan,
+    effectivePriceCents,
+    effectivePrice: priceLabel(effectivePriceCents, billing.currency),
+    saleActive: key !== "free" && Number(plan.priceCents || 0) > effectivePriceCents
+  };
+}
+
+function effectivePlanPriceCents(plan = {}, billing = defaultBillingSettings()) {
+  const base = Math.max(0, Number(plan.priceCents || centsFromPrice(plan.price) || 0));
+  if (!base) return 0;
+  const sale = billing.sale || {};
+  const discounted = sale.enabled ? Math.round(base * (100 - clampNumber(sale.percentOff, 0, 90, 0)) / 100) : base;
+  return Math.max(Number(sale.minPaidPriceCents || 500), discounted);
+}
+
+function priceLabel(cents = 0, currency = "usd") {
+  const symbol = String(currency || "usd").toLowerCase() === "usd" ? "$" : `${String(currency || "usd").toUpperCase()} `;
+  return cents ? `${symbol}${(Number(cents) / 100).toFixed(Number(cents) % 100 ? 2 : 0)}/mo` : "$0/mo";
+}
+
+function centsFromPrice(price = "") {
+  const match = String(price || "").match(/\$?\s*(\d+(?:\.\d{1,2})?)/);
+  return match ? Math.round(Number(match[1]) * 100) : 0;
+}
+
+function clampNumber(value, min, max, fallback) {
+  const next = Number(value);
+  if (!Number.isFinite(next)) return fallback;
+  return Math.min(max, Math.max(min, next));
+}
+
+function activeSponsoredServers(state = {}) {
+  return (state.servers || []).filter((server) => server?.sponsored === true);
+}
+
+function availableSponsorSlots(state = {}) {
+  const billing = billingSettings(state);
+  return Math.max(0, Number(billing.maxSponsors || 5) - activeSponsoredServers(state).length);
+}
+
+function userHasActiveSponsor(state = {}) {
+  const user = state.user;
+  return !!user && activeSponsoredServers(state).some((server) => server.ownerId === user.id);
 }
 
 function normalizeReview(review) {
@@ -291,6 +413,7 @@ function publicApiMessage(action, status) {
   if (action === "vote" && status === 429) return "You can only vote once every 24 hours.";
   if (action === "vote") return "Vote could not be counted. Please try again.";
   if (action === "communityVote" && status === 409) return "You already voted in this week's community highlight.";
+  if (action === "createCheckout" && status === 409) return "Sponsor checkout is unavailable right now.";
   if (action === "submitReview" && status === 403) return "Server owners cannot review their own listing.";
   if (["submitReview", "replyReview", "deleteReview", "communityVote"].includes(action) && status === 404) return "That server or review could not be found.";
   if (status === 401) return "Log in again before doing that.";
@@ -389,18 +512,21 @@ async function request(action, payload = {}, method = "POST") {
   return fallbackRequest(action, payload);
 }
 
-function publicUser(user) {
+function publicUser(user, state = {}) {
   if (!user) return null;
-  const plan = planConfigForUser(user);
+  const plan = planConfigForUser(user, state);
   return {
     id: user.id,
     username: user.username,
     email: user.email,
     plan: plan.key,
     planName: plan.name,
-    serverLimit: serverLimitForUser(user),
+    serverLimit: serverLimitForUser(user, state),
     sponsorCredits: Number(plan.sponsorCredits || 0),
     sponsorDurationDays: Number(plan.sponsorDurationDays || 0),
+    stripeCustomerId: user.stripeCustomerId || "",
+    stripeSubscriptionId: user.stripeSubscriptionId || "",
+    subscriptionStatus: user.subscriptionStatus || "",
     emailOptIn: user.emailOptIn === true,
     emailVerified: user.emailVerified === true,
     emailVerificationPending: user.emailVerified !== true && (!!user.emailVerification?.codeHash || !!user.emailVerificationCode),
@@ -425,6 +551,7 @@ function publicClientState(state = {}, options = {}) {
     reviews,
     communityVotes: publicCommunityVotes(communityVotes),
     community: state.community || publicCommunitySummary({ servers, votes, reviews, communityVotes }),
+    billing: publicBillingSettings(state),
     siteAnalytics: publicSiteAnalytics(state.siteAnalytics || {}),
     user: options.user === undefined ? (store.session?.user || null) : options.user,
     apiHydrating: !!options.apiHydrating
@@ -586,24 +713,25 @@ function mergeStateAfterWrite(previousState = {}, result = {}) {
     reviews: result.reviews || previousState.reviews || [],
     communityVotes: result.communityVotes || previousState.communityVotes || [],
     community: result.community || previousState.community,
+    billing: result.billing || previousState.billing || defaultBillingSettings(),
     siteAnalytics: result.siteAnalytics || previousState.siteAnalytics || {}
   }, { user: result.user || previousState.user || store.session?.user || null });
 }
 
-function planConfigForUser(user) {
-  const plans = CONFIG.plans || {};
-  const key = normalizePlanKey(user?.plan || user?.subscriptionPlan || "free");
+function planConfigForUser(user, state = {}) {
+  const plans = billingPlanCatalog(state);
+  const key = normalizePlanKey(user?.plan || user?.subscriptionPlan || "free", plans);
   return { key, ...(plans[key] || plans.free || { name: "Free", serverLimit: 2, sponsorCredits: 0, sponsorDurationDays: 0 }) };
 }
 
-function normalizePlanKey(value = "") {
+function normalizePlanKey(value = "", plans = CONFIG.plans || {}) {
   const key = String(value || "free").toLowerCase().replace(/[^a-z0-9_-]/g, "");
-  return CONFIG.plans?.[key] ? key : "free";
+  return plans?.[key] ? key : "free";
 }
 
-function serverLimitForUser(user) {
+function serverLimitForUser(user, state = {}) {
   if (isAdmin(user)) return 999;
-  return Math.max(0, Number(planConfigForUser(user).serverLimit || 2));
+  return Math.max(0, Number(planConfigForUser(user, state).serverLimit || 2));
 }
 
 function fallbackUserFromSession() {
@@ -632,8 +760,9 @@ function fallbackRequest(action, payload) {
       reviews: detailServerId ? publicReviewsForServer(db.reviews, detailServerId) : publicReviews(db.reviews),
       communityVotes: publicCommunityVotes(db.communityVotes),
       community: publicCommunitySummary(db),
+      billing: publicBillingSettings(db),
       siteAnalytics: publicSiteAnalytics(db.siteAnalytics),
-      user: publicUser(user),
+      user: publicUser(user, db),
       votes: detailServerId ? db.votes.filter((vote) => vote.serverId === detailServerId && String(vote.createdAt || "").startsWith(new Date().toISOString().slice(0, 7))) : []
     });
   }
@@ -659,7 +788,7 @@ function fallbackRequest(action, payload) {
     };
     db.users.push(next);
     save();
-    return Promise.resolve({ pendingVerification: true, user: publicUser(next), verificationToken: `local-${next.id}`, emailVerificationMessage: "Local preview code is 000000." });
+    return Promise.resolve({ pendingVerification: true, user: publicUser(next, db), verificationToken: `local-${next.id}`, emailVerificationMessage: "Local preview code is 000000." });
   }
   if (action === "login") {
     const next = db.users.find((item) => (same(item.email, payload.login) || same(item.username, payload.login)) && item.password === payload.password && !item.banned);
@@ -667,13 +796,16 @@ function fallbackRequest(action, payload) {
     if (next.emailVerified !== true) {
       next.emailVerificationCode = "000000";
       save();
-      return Promise.resolve({ pendingVerification: true, user: publicUser(next), verificationToken: `local-${next.id}`, emailVerificationMessage: "Local preview code is 000000." });
+      return Promise.resolve({ pendingVerification: true, user: publicUser(next, db), verificationToken: `local-${next.id}`, emailVerificationMessage: "Local preview code is 000000." });
     }
-    store.session = { token: `local-${next.id}`, user: publicUser(next) };
-    return Promise.resolve({ user: publicUser(next), token: store.session.token });
+    store.session = { token: `local-${next.id}`, user: publicUser(next, db) };
+    return Promise.resolve({ user: publicUser(next, db), token: store.session.token });
   }
   if (action === "votifierToolTest" || action === "testVote") {
     return Promise.reject(new Error("Votifier testing needs the production API."));
+  }
+  if (action === "createCheckout") {
+    return Promise.reject(new Error("Stripe checkout needs the production API."));
   }
   if (action === "saveServer") {
     if (!user) return Promise.reject(new Error("Log in before adding a server."));
@@ -681,10 +813,10 @@ function fallbackRequest(action, payload) {
     const existing = db.servers.find((item) => item.id === server.id);
     if (existing && existing.ownerId !== user.id && !isAdmin(user)) return Promise.reject(new Error("You cannot edit that listing."));
     if (!existing) {
-      const limit = serverLimitForUser(user);
+      const limit = serverLimitForUser(user, db);
       const owned = db.servers.filter((item) => item.ownerId === user.id).length;
       if (!isAdmin(user) && owned >= limit) {
-        const plan = planConfigForUser(user);
+        const plan = planConfigForUser(user, db);
         return Promise.reject(new Error(`Your ${plan.name} plan allows ${limit} server listings. Delete a listing or upgrade your plan to add another.`));
       }
     }
@@ -774,7 +906,7 @@ function fallbackRequest(action, payload) {
     });
     db.reviews = existing ? db.reviews.map((item) => (item.id === existing.id ? review : item)) : [...db.reviews, review];
     save();
-    return Promise.resolve({ ok: true, review: publicReview(review), ...publicClientState(db, { user: publicUser(user) }) });
+    return Promise.resolve({ ok: true, review: publicReview(review), ...publicClientState(db, { user: publicUser(user, db) }) });
   }
   if (action === "replyReview") {
     if (!user) return Promise.reject(new Error("Log in before replying."));
@@ -789,7 +921,7 @@ function fallbackRequest(action, payload) {
     review.ownerReply = { userId: user.id, username: user.username, comment, createdAt: new Date().toISOString() };
     review.updatedAt = new Date().toISOString();
     save();
-    return Promise.resolve({ ok: true, ...publicClientState(db, { user: publicUser(user) }) });
+    return Promise.resolve({ ok: true, ...publicClientState(db, { user: publicUser(user, db) }) });
   }
   if (action === "deleteReview") {
     if (!user || !isAdmin(user)) return Promise.reject(new Error("Admin access is required."));
@@ -799,7 +931,7 @@ function fallbackRequest(action, payload) {
     review.hiddenAt = new Date().toISOString();
     review.updatedAt = review.hiddenAt;
     save();
-    return Promise.resolve({ ok: true, ...publicClientState(db, { user: publicUser(user) }) });
+    return Promise.resolve({ ok: true, ...publicClientState(db, { user: publicUser(user, db) }) });
   }
   if (action === "communityVote") {
     if (!user) return Promise.reject(new Error("Log in before voting for the weekly highlight."));
@@ -810,7 +942,7 @@ function fallbackRequest(action, payload) {
     const vote = { id: createId(), serverId: server.id, userId: user.id, username: user.username, week, createdAt: new Date().toISOString() };
     db.communityVotes.push(vote);
     save();
-    return Promise.resolve({ ok: true, communityVote: vote, ...publicClientState(db, { user: publicUser(user) }) });
+    return Promise.resolve({ ok: true, communityVote: vote, ...publicClientState(db, { user: publicUser(user, db) }) });
   }
   if (action === "trackCopy") {
     const server = db.servers.find((item) => item.id === payload.serverId);
@@ -848,13 +980,13 @@ function fallbackRequest(action, payload) {
       return Promise.reject(error);
     }
     save();
-    store.session = { ...store.session, user: publicUser(user) };
-    return Promise.resolve({ user: publicUser(user), token: store.session.token });
+    store.session = { ...store.session, user: publicUser(user, db) };
+    return Promise.resolve({ user: publicUser(user, db), token: store.session.token });
   }
   if (action === "verifyEmail") {
     const target = user || db.users.find((item) => `local-${item.id}` === payload.verificationToken);
     if (!target) return Promise.reject(new Error("Verification session expired. Log in or sign up again."));
-    if (target.emailVerified) return Promise.resolve({ ok: true, user: publicUser(target), token: store.session?.token || `local-${target.id}`, message: "Email is already verified." });
+    if (target.emailVerified) return Promise.resolve({ ok: true, user: publicUser(target, db), token: store.session?.token || `local-${target.id}`, message: "Email is already verified." });
     if (clean(payload.code).replace(/\s+/g, "") !== clean(target.emailVerificationCode || "000000")) {
       return Promise.reject(new Error("That verification code did not match."));
     }
@@ -862,16 +994,16 @@ function fallbackRequest(action, payload) {
     target.emailVerifiedAt = new Date().toISOString();
     delete target.emailVerificationCode;
     save();
-    store.session = { token: `local-${target.id}`, user: publicUser(target) };
-    return Promise.resolve({ ok: true, user: publicUser(target), token: store.session.token, message: "Email verified." });
+    store.session = { token: `local-${target.id}`, user: publicUser(target, db) };
+    return Promise.resolve({ ok: true, user: publicUser(target, db), token: store.session.token, message: "Email verified." });
   }
   if (action === "resendEmailVerification") {
     const target = user || db.users.find((item) => `local-${item.id}` === payload.verificationToken);
     if (!target) return Promise.reject(new Error("Verification session expired. Log in or sign up again."));
-    if (target.emailVerified) return Promise.resolve({ ok: true, user: publicUser(target), token: store.session?.token || `local-${target.id}`, message: "Email is already verified." });
+    if (target.emailVerified) return Promise.resolve({ ok: true, user: publicUser(target, db), token: store.session?.token || `local-${target.id}`, message: "Email is already verified." });
     target.emailVerificationCode = "000000";
     save();
-    return Promise.resolve({ ok: true, sent: false, user: publicUser(target), verificationToken: `local-${target.id}`, message: "Local preview code is 000000. Production sends this with Resend." });
+    return Promise.resolve({ ok: true, sent: false, user: publicUser(target, db), verificationToken: `local-${target.id}`, message: "Local preview code is 000000. Production sends this with Resend." });
   }
   if (action === "deleteAccount") {
     if (!user) return Promise.reject(new Error("Log in before deleting your account."));
@@ -925,8 +1057,11 @@ function fallbackRequest(action, payload) {
     if (payload.command === "deleteHost") {
       db.hosts = db.hosts.filter((item) => item.id !== id);
     }
+    if (payload.command === "saveBilling") {
+      db.billing = normalizeBillingSettings(payload.value || {});
+    }
     save();
-    return Promise.resolve({ users: db.users.map(publicUser), servers: rankServers(db.servers, db.votes), clients: db.clients, hosts: db.hosts });
+    return Promise.resolve({ users: db.users.map((item) => publicUser(item, db)), servers: rankServers(db.servers, db.votes), clients: db.clients, hosts: db.hosts, billing: publicBillingSettings(db) });
   }
   return Promise.reject(new Error("Unknown action."));
 }
@@ -3270,8 +3405,9 @@ function renderHosts(state) {
 }
 
 function renderPlans(state) {
-  const plans = Object.entries(CONFIG.plans || {}).filter(([key]) => key !== "free");
-  const currentPlan = normalizePlanKey(state.user?.plan || "free");
+  const billing = publicBillingSettings(state);
+  const plans = Object.entries(billing.plans || {}).filter(([key]) => key !== "free");
+  const currentPlan = normalizePlanKey(state.user?.plan || "free", billing.plans);
   setSeoMeta({
     ...defaultPageSeo("plans"),
     title: CONFIG.seo?.pages?.plans?.title || "Icon Listing Plans",
@@ -3286,19 +3422,31 @@ function renderPlans(state) {
           <p class="section-copy">${escapeHtml(copy("plans.body", "Choose the listing limit and sponsor access that fits your Minecraft community. Stripe checkout is coming soon."))}</p>
         </div>
       </div>
+      <div class="billing-strip">
+        <strong>${Number(billing.availableSponsorSlots || 0).toLocaleString()} of ${Number(billing.maxSponsors || 5).toLocaleString()}</strong>
+        <span>sponsor slots available</span>
+        ${billing.sale?.enabled ? `<span class="sale-pill">${Number(billing.sale.percentOff || 0).toLocaleString()}% off active</span>` : ""}
+      </div>
       <div class="plans-grid">
-        ${planCard("free", CONFIG.plans.free, currentPlan)}
-        ${plans.map(([key, plan]) => planCard(key, plan, currentPlan)).join("")}
+        ${planCard("free", billing.plans.free, currentPlan, state, billing)}
+        ${plans.map(([key, plan]) => planCard(key, plan, currentPlan, state, billing)).join("")}
       </div>
     </section>
   </div>`;
+  bindPlanCheckout(state);
 }
 
-function planCard(key, plan = {}, currentPlan = "free") {
+function planCard(key, plan = {}, currentPlan = "free", state = {}, billing = publicBillingSettings(state)) {
   const isCurrent = currentPlan === key;
   const sponsorLine = Number(plan.sponsorCredits || 0) > 0
     ? `${Number(plan.sponsorCredits).toLocaleString()}x ${escapeHtml(copy("plans.sponsorLabel", "sponsor access"))} - ${escapeHtml(plan.sponsorDurationLabel || "")}`
     : escapeHtml(plan.sponsorDurationLabel || "No sponsor slot");
+  const unavailable = planUnavailableReason(key, plan, state, billing);
+  const loginRequired = key !== "free" && !state.user;
+  const disabled = isCurrent || !!unavailable;
+  const buttonText = isCurrent
+    ? copy("plans.currentPlan", "Current plan")
+    : unavailable || (loginRequired ? "Log in to checkout" : copy("plans.checkoutButton", "Checkout with Stripe"));
   return `<article class="plan-card ${key === "elite" ? "featured" : ""}">
     <div class="plan-head">
       <div>
@@ -3307,14 +3455,41 @@ function planCard(key, plan = {}, currentPlan = "free") {
       </div>
       ${isCurrent ? `<span class="status-badge">${escapeHtml(copy("plans.currentPlan", "Current plan"))}</span>` : ""}
     </div>
-    <div class="plan-price">${escapeHtml(plan.price || "")}</div>
+    <div class="plan-price">
+      ${plan.saleActive ? `<span class="price-was">${escapeHtml(plan.price || "")}</span>` : ""}
+      <span>${escapeHtml(plan.effectivePrice || plan.price || "")}</span>
+    </div>
     <ul class="feature-list">
       <li>${Number(plan.serverLimit || 0).toLocaleString()} ${escapeHtml(copy("plans.serverLimitLabel", "server listings"))}</li>
       <li>${sponsorLine}</li>
-      <li>Stripe checkout not connected yet</li>
+      <li>${key === "free" ? "No payment required" : "Secure Stripe subscription checkout"}</li>
     </ul>
-    <button class="button primary" type="button" disabled>${escapeHtml(copy("plans.comingSoon", "Coming soon"))}</button>
+    ${loginRequired
+      ? `<a class="button primary" href="${route("/login/?next=/sponsored/plans/")}">${escapeHtml(buttonText)}</a>`
+      : `<button class="button primary" type="button" ${disabled ? "disabled" : `data-checkout-plan="${escapeHtml(key)}"`}>${escapeHtml(buttonText)}</button>`}
   </article>`;
+}
+
+function planUnavailableReason(key, plan, state = {}, billing = publicBillingSettings(state)) {
+  if (key === "free") return "";
+  if (Number(plan.sponsorCredits || 0) > 0 && Number(billing.availableSponsorSlots || 0) <= 0) return "Sponsor slots full";
+  if (Number(plan.sponsorCredits || 0) > 0 && userHasActiveSponsor(state)) return "Already sponsoring";
+  return "";
+}
+
+function bindPlanCheckout(state) {
+  $$("[data-checkout-plan]").forEach((button) => button.addEventListener("click", async () => {
+    const label = button.textContent;
+    try {
+      setButtonLoading(button, "Opening Stripe...");
+      const result = await request("createCheckout", { plan: button.dataset.checkoutPlan });
+      if (!result.url) throw new Error("Stripe checkout could not be opened.");
+      location.href = result.url;
+    } catch (error) {
+      toast(error.message);
+      setButtonLoading(button, label, false);
+    }
+  }));
 }
 
 function renderClientList(clients, selector = "#clientList", options = {}) {
@@ -4079,6 +4254,11 @@ function renderAdmin(state) {
           ${adminUserPanel(state.users)}
         </div>
         <div class="card admin-client-panel">
+          <h2>Billing</h2>
+          <p class="section-copy">Update Stripe checkout pricing, sale discounts, listing limits, and sponsor slot rules.</p>
+          ${adminBillingPanel(state)}
+        </div>
+        <div class="card admin-client-panel">
           <h2>${escapeHtml(copy("admin.sponsoredClientsTitle", "Sponsored Clients"))}</h2>
           <p class="section-copy">${escapeHtml(copy("admin.sponsoredClientsBody", "Create and edit sponsored Minecraft client listings."))}</p>
           ${adminClientPanel(state.clients)}
@@ -4121,6 +4301,95 @@ function renderAdmin(state) {
   bindAdminClientForms(state);
   bindAdminHostForms(state);
   bindAdminUserPanel(state);
+  bindAdminBillingForms(state);
+}
+
+function adminBillingPanel(state) {
+  const billing = publicBillingSettings(state);
+  const paidPlans = Object.entries(billing.plans || {}).filter(([key]) => key !== "free");
+  return `<form id="adminBillingForm" class="form admin-billing-form">
+    <div class="form-grid">
+      <div class="field"><label>Max sponsors</label><input class="input" name="maxSponsors" type="number" min="1" max="5" value="${escapeHtml(billing.maxSponsors || 5)}" required></div>
+      <div class="field"><label>Currency</label><input class="input" name="currency" value="${escapeHtml(billing.currency || "usd")}" maxlength="3" required></div>
+      <label class="check"><input name="saleEnabled" type="checkbox" ${billing.sale?.enabled ? "checked" : ""}> Sale active</label>
+      <div class="field"><label>Sale percent off</label><input class="input" name="salePercent" type="number" min="0" max="90" value="${escapeHtml(billing.sale?.percentOff || 0)}"></div>
+      <div class="field"><label>Minimum paid price</label><input class="input" name="minPaidPrice" type="number" min="5" step="0.01" value="${escapeHtml(((billing.sale?.minPaidPriceCents || 500) / 100).toFixed(2))}"></div>
+      <div class="field"><label>Free listing limit</label><input class="input" name="free_serverLimit" type="number" min="1" max="25" value="${escapeHtml(billing.plans?.free?.serverLimit || 2)}" required></div>
+    </div>
+    <div class="billing-plan-editor">
+      ${paidPlans.map(([key, plan]) => adminBillingPlanFields(key, plan)).join("")}
+    </div>
+    <div class="row-actions">
+      <button class="button primary" type="submit">Save billing</button>
+    </div>
+  </form>`;
+}
+
+function adminBillingPlanFields(key, plan) {
+  return `<fieldset class="billing-plan-fields">
+    <legend>${escapeHtml(plan.name || key)}</legend>
+    <input name="${escapeHtml(key)}_name" type="hidden" value="${escapeHtml(plan.name || key)}">
+    <div class="form-grid">
+      <div class="field"><label>Monthly price</label><input class="input" name="${escapeHtml(key)}_price" type="number" min="5" step="0.01" value="${escapeHtml(((plan.priceCents || 500) / 100).toFixed(2))}" required></div>
+      <div class="field"><label>Listing limit</label><input class="input" name="${escapeHtml(key)}_serverLimit" type="number" min="1" max="25" value="${escapeHtml(plan.serverLimit || 1)}" required></div>
+      <div class="field"><label>Sponsor credits</label><input class="input" name="${escapeHtml(key)}_sponsorCredits" type="number" min="0" max="2" value="${escapeHtml(plan.sponsorCredits || 0)}" required></div>
+      <div class="field"><label>Sponsor days</label><input class="input" name="${escapeHtml(key)}_sponsorDurationDays" type="number" min="0" max="90" value="${escapeHtml(plan.sponsorDurationDays || 0)}" required></div>
+    </div>
+    <div class="field"><label>Description</label><textarea class="textarea compact" name="${escapeHtml(key)}_description" required>${escapeHtml(plan.description || "")}</textarea></div>
+  </fieldset>`;
+}
+
+function bindAdminBillingForms(state) {
+  $("#adminBillingForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    try {
+      const result = await request("admin", { command: "saveBilling", value: billingFormValue(form, state) });
+      cachePublicState(result);
+      toast("Billing settings saved.");
+      renderAdmin({ ...state, ...result });
+    } catch (error) {
+      toast(error.message);
+    }
+  });
+}
+
+function billingFormValue(form, state) {
+  const existing = publicBillingSettings(state);
+  const plans = {
+    free: {
+      ...existing.plans.free,
+      serverLimit: Number(form.elements.free_serverLimit?.value || existing.plans.free?.serverLimit || 2)
+    }
+  };
+  for (const [key, plan] of Object.entries(existing.plans || {})) {
+    if (key === "free") continue;
+    plans[key] = {
+      ...plan,
+      name: form.elements[`${key}_name`]?.value || plan.name,
+      priceCents: dollarsToCents(form.elements[`${key}_price`]?.value, plan.priceCents || 500),
+      serverLimit: Number(form.elements[`${key}_serverLimit`]?.value || plan.serverLimit || 1),
+      sponsorCredits: Number(form.elements[`${key}_sponsorCredits`]?.value || plan.sponsorCredits || 0),
+      sponsorDurationDays: Number(form.elements[`${key}_sponsorDurationDays`]?.value || plan.sponsorDurationDays || 0),
+      description: form.elements[`${key}_description`]?.value || plan.description || ""
+    };
+  }
+  return {
+    currency: form.elements.currency?.value || existing.currency || "usd",
+    maxSponsors: Number(form.elements.maxSponsors?.value || existing.maxSponsors || 5),
+    sale: {
+      enabled: form.elements.saleEnabled?.checked === true,
+      percentOff: Number(form.elements.salePercent?.value || 0),
+      minPaidPriceCents: dollarsToCents(form.elements.minPaidPrice?.value, existing.sale?.minPaidPriceCents || 500)
+    },
+    plans
+  };
+}
+
+function dollarsToCents(value, fallback = 500) {
+  const dollars = Number(value);
+  if (!Number.isFinite(dollars)) return fallback;
+  return Math.round(dollars * 100);
 }
 
 function adminUserPanel(users) {

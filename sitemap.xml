@@ -2,283 +2,471 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://minecraftlisting.org/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored-clients/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored-hosts/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/community/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/sponsored/plans/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/motd-builder/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/votifier-tester/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/rgb-text-generator/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/tools/fonts-generator/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/help/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/contact/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/survival/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.863Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/factions/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/skyblock/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/creative/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/anarchy/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/oneblock/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/economy/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/pvp/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/pixelmon/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/lifesteal/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/kitpvp/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/cobblemon/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/smp/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/boxpvp/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/roleplay/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/earth/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/prison/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/rpg/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/towny/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/raiding/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/gens/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/farming/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/vanilla/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/minigames/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/bedwars/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/parkour/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/bedrock/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/cross-play/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/modded/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/whitelist/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/vote-rewards/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/new/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/old/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/servers/java/</loc>
+<<<<<<< Updated upstream
     <lastmod>2026-09-03T01:25:50.864Z</lastmod>
+=======
+    <lastmod>2026-09-03T01:43:58.478Z</lastmod>
+>>>>>>> Stashed changes
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
   </url>
@@ -301,14 +489,22 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/CofferCraft/</loc>
-    <lastmod>2026-07-07T13:08:06.265Z</lastmod>
+    <loc>https://minecraftlisting.org/server/GTM-GTA-based-minecraft-server-for-Java/</loc>
+    <lastmod>2026-06-24T14:32:13.157Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Etherium-SMP/</loc>
-    <lastmod>2026-08-16T05:20:49.059Z</lastmod>
+<<<<<<< Updated upstream
+=======
+    <loc>https://minecraftlisting.org/server/IconGens/</loc>
+    <lastmod>2026-07-09T07:59:28.615Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/CofferCraft/</loc>
+    <lastmod>2026-07-07T13:08:06.265Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -319,6 +515,13 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Etherium-SMP/</loc>
+    <lastmod>2026-08-16T05:20:49.059Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+>>>>>>> Stashed changes
     <loc>https://minecraftlisting.org/server/Meems-smp/</loc>
     <lastmod>2026-07-30T22:52:01.841Z</lastmod>
     <changefreq>daily</changefreq>
