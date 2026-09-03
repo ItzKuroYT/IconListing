@@ -11594,31 +11594,31 @@
         "name": "Premium",
         "price": "$12/mo",
         "priceCents": 1200,
-        "serverLimit": 1,
+        "serverLimit": 3,
         "sponsorCredits": 1,
         "sponsorDurationDays": 14,
         "sponsorDurationLabel": "1 sponsor for 14 days",
-        "description": "List up to 4 servers and sponsor one server for 2 weeks while this subscription is active."
+        "description": "List up to 3 servers and sponsor one server for 2 weeks while this subscription is active."
       },
       "elite": {
         "name": "Elite",
         "price": "$20/mo",
         "priceCents": 2000,
-        "serverLimit": 3,
+        "serverLimit": 4,
         "sponsorCredits": 1,
         "sponsorDurationDays": 45,
         "sponsorDurationLabel": "1 sponsor for 45 days",
-        "description": "List up to 7 servers and sponsor one server for 45 days while this subscription is active."
+        "description": "List up to 4 servers and sponsor one server for 45 days while this subscription is active."
       },
       "iconic": {
         "name": "Iconic",
         "price": "$32/mo",
         "priceCents": 3200,
-        "serverLimit": 5,
+        "serverLimit": 6,
         "sponsorCredits": 2,
         "sponsorDurationDays": 90,
         "sponsorDurationLabel": "2 sponsors for 90 days",
-        "description": "List up to 12 servers and sponsor two servers for 90 days while this subscription is active."
+        "description": "List up to 6 servers and sponsor two servers for 90 days while this subscription is active."
       }
     }
   },
