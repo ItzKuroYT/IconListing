@@ -1286,6 +1286,8 @@ async function main() {
         currency: "usd",
         stripeTaxCode: "txcd_10000000",
         stripeTaxBehavior: "exclusive",
+        stripePaymentMethodTypes: ["card", "paypal"],
+        stripeCustomPaymentMethodIds: ["cpmt_1UBOyUPMbP3VXc9bLkFHMDdw"],
         maxSponsors: 5,
         sale: { enabled: true, percentOff: 25, minPaidPriceCents: 500 },
         plans: {
@@ -1339,6 +1341,9 @@ async function main() {
     const checkout = await call("createCheckout", { plan: "premium" }, googleSession);
     assert(checkout.code === 200 && checkout.json.url.includes("checkout.stripe.com"), "paid plans should create Stripe Checkout sessions");
     assert(stripeCalls[0]?.get("line_items[0][price_data][unit_amount]") === "900", "Stripe Checkout should use the saved admin sale price");
+    assert(stripeCalls[0]?.get("payment_method_types[0]") === "card", "Stripe Checkout should include card payments");
+    assert(stripeCalls[0]?.get("payment_method_types[1]") === "paypal", "Stripe Checkout should include PayPal payments");
+    assert(stripeCalls[0]?.get("metadata[customPaymentMethodIds]") === "cpmt_1UBOyUPMbP3VXc9bLkFHMDdw", "Stripe Checkout metadata should preserve the custom PayPal method reference");
     assert(stripeCalls[0]?.get("line_items[0][price_data][product_data][tax_code]") === "txcd_10000000", "Stripe Checkout should include the product tax code");
     assert(stripeCalls[0]?.get("line_items[0][price_data][tax_behavior]") === "exclusive", "Stripe Checkout should include tax behavior");
     const stripeWebhook = await callText("stripeWebhook", JSON.stringify({

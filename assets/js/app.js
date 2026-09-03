@@ -165,6 +165,8 @@ function defaultBillingSettings() {
     currency: clean(CONFIG.billing?.currency || "usd").toLowerCase() || "usd",
     stripeTaxCode: clean(CONFIG.billing?.stripeTaxCode || "txcd_10000000"),
     stripeTaxBehavior: cleanStripeTaxBehavior(CONFIG.billing?.stripeTaxBehavior || "exclusive"),
+    stripePaymentMethodTypes: cleanStripePaymentMethodTypes(CONFIG.billing?.stripePaymentMethodTypes || ["card", "paypal"]),
+    stripeCustomPaymentMethodIds: cleanStripeCustomPaymentMethodIds(CONFIG.billing?.stripeCustomPaymentMethodIds || ["cpmt_1UBOyUPMbP3VXc9bLkFHMDdw"]),
     updatedAt: clean(CONFIG.billing?.updatedAt || ""),
     maxSponsors: Math.max(1, Number(CONFIG.billing?.maxSponsors || 5)),
     sale: {
@@ -183,6 +185,8 @@ function normalizeBillingSettings(value = {}) {
     currency: clean(value.currency || defaults.currency).toLowerCase() || "usd",
     stripeTaxCode: clean(value.stripeTaxCode || defaults.stripeTaxCode || "txcd_10000000"),
     stripeTaxBehavior: cleanStripeTaxBehavior(value.stripeTaxBehavior || defaults.stripeTaxBehavior || "exclusive"),
+    stripePaymentMethodTypes: cleanStripePaymentMethodTypes(value.stripePaymentMethodTypes || defaults.stripePaymentMethodTypes || ["card", "paypal"]),
+    stripeCustomPaymentMethodIds: cleanStripeCustomPaymentMethodIds(value.stripeCustomPaymentMethodIds || defaults.stripeCustomPaymentMethodIds || []),
     updatedAt: clean(value.updatedAt || defaults.updatedAt || ""),
     maxSponsors: Math.max(1, Math.min(5, Number(value.maxSponsors || defaults.maxSponsors))),
     sale: {
@@ -233,6 +237,8 @@ function publicBillingSettings(state = {}) {
     currency: billing.currency,
     stripeTaxCode: billing.stripeTaxCode,
     stripeTaxBehavior: billing.stripeTaxBehavior,
+    stripePaymentMethodTypes: billing.stripePaymentMethodTypes,
+    stripeCustomPaymentMethodIds: billing.stripeCustomPaymentMethodIds,
     maxSponsors: billing.maxSponsors,
     activeSponsors: activeSponsoredServers(state).length,
     availableSponsorSlots: availableSponsorSlots(state),
@@ -278,6 +284,18 @@ function clampNumber(value, min, max, fallback) {
 function cleanStripeTaxBehavior(value = "") {
   const next = clean(value).toLowerCase();
   return ["exclusive", "inclusive", "unspecified"].includes(next) ? next : "exclusive";
+}
+
+function cleanStripePaymentMethodTypes(value = []) {
+  const list = Array.isArray(value) ? value : String(value || "").split(/[,\s]+/);
+  const allowed = new Set(["card", "paypal"]);
+  const next = list.map((item) => clean(item).toLowerCase()).filter((item) => allowed.has(item));
+  return [...new Set(next.length ? next : ["card", "paypal"])];
+}
+
+function cleanStripeCustomPaymentMethodIds(value = []) {
+  const list = Array.isArray(value) ? value : String(value || "").split(/[,\s]+/);
+  return [...new Set(list.map(clean).filter((item) => /^cpmt_[A-Za-z0-9]+$/.test(item)))].slice(0, 5);
 }
 
 function activeSponsoredServers(state = {}) {
@@ -4367,6 +4385,9 @@ function adminBillingPanel(state) {
         <option value="inclusive" ${billing.stripeTaxBehavior === "inclusive" ? "selected" : ""}>Inclusive</option>
         <option value="unspecified" ${billing.stripeTaxBehavior === "unspecified" ? "selected" : ""}>Unspecified</option>
       </select></div>
+      <label class="check"><input name="stripeMethodCard" type="checkbox" ${(billing.stripePaymentMethodTypes || []).includes("card") ? "checked" : ""}> Card checkout</label>
+      <label class="check"><input name="stripeMethodPaypal" type="checkbox" ${(billing.stripePaymentMethodTypes || []).includes("paypal") ? "checked" : ""}> PayPal checkout</label>
+      <div class="field"><label>Custom PayPal method ID</label><input class="input" name="stripeCustomPaymentMethodIds" value="${escapeHtml((billing.stripeCustomPaymentMethodIds || []).join(", "))}"></div>
     </div>
     <div class="billing-plan-editor">
       ${paidPlans.map(([key, plan]) => adminBillingPlanFields(key, plan)).join("")}
@@ -4431,6 +4452,11 @@ function billingFormValue(form, state) {
     currency: form.elements.currency?.value || existing.currency || "usd",
     stripeTaxCode: form.elements.stripeTaxCode?.value || existing.stripeTaxCode || "txcd_10000000",
     stripeTaxBehavior: form.elements.stripeTaxBehavior?.value || existing.stripeTaxBehavior || "exclusive",
+    stripePaymentMethodTypes: [
+      form.elements.stripeMethodCard?.checked ? "card" : "",
+      form.elements.stripeMethodPaypal?.checked ? "paypal" : ""
+    ].filter(Boolean),
+    stripeCustomPaymentMethodIds: cleanStripeCustomPaymentMethodIds(form.elements.stripeCustomPaymentMethodIds?.value || existing.stripeCustomPaymentMethodIds || []),
     maxSponsors: Number(form.elements.maxSponsors?.value || existing.maxSponsors || 5),
     sale: {
       enabled: form.elements.saleEnabled?.checked === true,

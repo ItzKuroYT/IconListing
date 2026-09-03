@@ -1349,6 +1349,8 @@ function defaultBillingSettings() {
     currency: clean(CONFIG.billing?.currency || "usd").toLowerCase() || "usd",
     stripeTaxCode: clean(CONFIG.billing?.stripeTaxCode || "txcd_10000000"),
     stripeTaxBehavior: cleanStripeTaxBehavior(CONFIG.billing?.stripeTaxBehavior || "exclusive"),
+    stripePaymentMethodTypes: cleanStripePaymentMethodTypes(CONFIG.billing?.stripePaymentMethodTypes || ["card", "paypal"]),
+    stripeCustomPaymentMethodIds: cleanStripeCustomPaymentMethodIds(CONFIG.billing?.stripeCustomPaymentMethodIds || ["cpmt_1UBOyUPMbP3VXc9bLkFHMDdw"]),
     maxSponsors: Math.max(1, Number(CONFIG.billing?.maxSponsors || 5)),
     sale: {
       enabled: CONFIG.billing?.sale?.enabled !== false,
@@ -1366,6 +1368,8 @@ function normalizeBillingSettings(value = {}) {
     currency: clean(value.currency || defaults.currency).toLowerCase() || "usd",
     stripeTaxCode: clean(value.stripeTaxCode || defaults.stripeTaxCode || "txcd_10000000"),
     stripeTaxBehavior: cleanStripeTaxBehavior(value.stripeTaxBehavior || defaults.stripeTaxBehavior || "exclusive"),
+    stripePaymentMethodTypes: cleanStripePaymentMethodTypes(value.stripePaymentMethodTypes || defaults.stripePaymentMethodTypes || ["card", "paypal"]),
+    stripeCustomPaymentMethodIds: cleanStripeCustomPaymentMethodIds(value.stripeCustomPaymentMethodIds || defaults.stripeCustomPaymentMethodIds || []),
     updatedAt: clean(value.updatedAt || defaults.updatedAt || ""),
     maxSponsors: Math.max(1, Math.min(5, Number(value.maxSponsors || defaults.maxSponsors))),
     sale: {
@@ -1416,6 +1420,18 @@ function clampNumber(value, min, max, fallback) {
 function cleanStripeTaxBehavior(value = "") {
   const next = clean(value).toLowerCase();
   return ["exclusive", "inclusive", "unspecified"].includes(next) ? next : "exclusive";
+}
+
+function cleanStripePaymentMethodTypes(value = []) {
+  const list = Array.isArray(value) ? value : String(value || "").split(/[,\s]+/);
+  const allowed = new Set(["card", "paypal"]);
+  const next = list.map((item) => clean(item).toLowerCase()).filter((item) => allowed.has(item));
+  return [...new Set(next.length ? next : ["card", "paypal"])];
+}
+
+function cleanStripeCustomPaymentMethodIds(value = []) {
+  const list = Array.isArray(value) ? value : String(value || "").split(/[,\s]+/);
+  return [...new Set(list.map(clean).filter((item) => /^cpmt_[A-Za-z0-9]+$/.test(item)))].slice(0, 5);
 }
 
 function normalizeReview(review) {
@@ -2282,6 +2298,8 @@ function publicBillingSettings(db = {}) {
     currency: billing.currency,
     stripeTaxCode: billing.stripeTaxCode,
     stripeTaxBehavior: billing.stripeTaxBehavior,
+    stripePaymentMethodTypes: billing.stripePaymentMethodTypes,
+    stripeCustomPaymentMethodIds: billing.stripeCustomPaymentMethodIds,
     updatedAt: billing.updatedAt || "",
     maxSponsors: billing.maxSponsors,
     activeSponsors: activeSponsoredServers(db).length,
@@ -2340,6 +2358,9 @@ async function createStripeCheckoutSession(req, user, planKey, plan, billing) {
   if (amount < 500) throw httpError(400, "Paid plans must be at least $5.00.");
   const params = new URLSearchParams();
   params.set("mode", "subscription");
+  (billing.stripePaymentMethodTypes || ["card", "paypal"]).forEach((type, index) => {
+    params.set(`payment_method_types[${index}]`, type);
+  });
   params.set("success_url", siteUrl("/dashboard/?checkout=success"));
   params.set("cancel_url", siteUrl("/sponsored/plans/?checkout=cancelled"));
   params.set("client_reference_id", user.id);
@@ -2355,6 +2376,9 @@ async function createStripeCheckoutSession(req, user, planKey, plan, billing) {
   params.set("metadata[userId]", user.id);
   params.set("metadata[plan]", planKey);
   params.set("metadata[priceCents]", String(amount));
+  if ((billing.stripeCustomPaymentMethodIds || []).length) {
+    params.set("metadata[customPaymentMethodIds]", billing.stripeCustomPaymentMethodIds.join(","));
+  }
   params.set("subscription_data[metadata][userId]", user.id);
   params.set("subscription_data[metadata][plan]", planKey);
   params.set("subscription_data[metadata][priceCents]", String(amount));

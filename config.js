@@ -188,6 +188,8 @@ const IconListingConfig = {
     currency: "usd",
     stripeTaxCode: "txcd_10000000",
     stripeTaxBehavior: "exclusive",
+    stripePaymentMethodTypes: ["card", "paypal"],
+    stripeCustomPaymentMethodIds: ["cpmt_1UBOyUPMbP3VXc9bLkFHMDdw"],
     maxSponsors: 5,
     sale: {
       enabled: true,
