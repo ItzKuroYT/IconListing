@@ -44,8 +44,9 @@ module.exports = async function handler(req, res) {
   applySecurityHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
 
+  let action = "";
   try {
-    const action = actionFromRequest(req);
+    action = actionFromRequest(req);
     requireAllowedMethod(action, req.method);
     enforceBrowserOrigin(req, action);
     requireDurableStorageForWrite(req, action);
@@ -661,7 +662,7 @@ module.exports = async function handler(req, res) {
     throw httpError(404, "Unknown action.");
   } catch (error) {
     const status = error.status || 500;
-    const message = status >= 500 ? "This action is temporarily unavailable. Error: 67." : error.message || "Request failed.";
+    const message = checkoutErrorMessage(action, status, error) || (status >= 500 ? "This action is temporarily unavailable. Error: 67." : error.message || "Request failed.");
     return json(res, status, { error: message });
   }
 };
@@ -762,6 +763,8 @@ function healthPayload(req) {
     productionRequest: isProductionRequest(req),
     githubTokenConfigured: !!process.env.GITHUB_TOKEN,
     githubRepoConfigured: !!process.env.GITHUB_REPO,
+    stripeSecretConfigured: !!stripeSecretKey(),
+    stripeWebhookSecretConfigured: !!stripeWebhookSecret(),
     githubBranch: githubBranch(),
     githubDbPath: githubDbPath(),
     encryptedWrites: shouldEncryptStorage()
@@ -2318,7 +2321,7 @@ function ensurePlanCanCheckout(db, user, plan) {
 
 async function createStripeCheckoutSession(req, user, planKey, plan, billing) {
   const secret = stripeSecretKey();
-  if (!secret) throw httpError(500, "Stripe checkout is not configured. Error: 67.");
+  if (!secret) throw httpError(503, "Stripe checkout is not configured. Staff needs to add STRIPE_SECRET_KEY in Vercel.");
   const amount = effectivePlanPriceCents(plan, billing);
   if (amount < 500) throw httpError(400, "Paid plans must be at least $5.00.");
   const params = new URLSearchParams();
@@ -2339,16 +2342,25 @@ async function createStripeCheckoutSession(req, user, planKey, plan, billing) {
   params.set("subscription_data[metadata][userId]", user.id);
   params.set("subscription_data[metadata][plan]", planKey);
   params.set("subscription_data[metadata][priceCents]", String(amount));
-  const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${secret}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: params
-  });
+  let response;
+  try {
+    response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${secret}`,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: params
+    });
+  } catch (error) {
+    console.error("Stripe checkout request failed", { message: error?.message || String(error) });
+    throw httpError(502, "Stripe checkout could not be reached. Please try again in a minute.");
+  }
   const data = await response.json().catch(() => ({}));
-  if (!response.ok || !data.url) throw httpError(502, data.error?.message || "Stripe checkout could not be created.");
+  if (!response.ok || !data.url) {
+    console.error("Stripe checkout rejected", { status: response.status, message: data.error?.message || "No Stripe error message" });
+    throw httpError(502, "Stripe rejected checkout setup. Check the Stripe secret key, account mode, and enabled payment methods.");
+  }
   return data;
 }
 
@@ -2435,6 +2447,14 @@ function stripeSecretKey() {
 
 function stripeWebhookSecret() {
   return clean(process.env.STRIPE_WEBHOOK_SECRET);
+}
+
+function checkoutErrorMessage(action, status, error) {
+  if (action !== "createCheckout" || Number(status) < 500) return "";
+  const message = clean(error?.message);
+  if (/permanent storage|temporarily unavailable/i.test(message)) return "Checkout is not ready because account storage is not connected.";
+  if (!message || /error\s*:?\s*67/i.test(message)) return "";
+  return message;
 }
 
 function statePayload(db, user, options = {}) {

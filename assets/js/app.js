@@ -5,7 +5,7 @@ const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "createCheckout", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const TRUSTPILOT_REVIEW_URL = "https://www.trustpilot.com/review/minecraftlisting.org";
 let turnstileLoadPromise = null;
 const renderedTurnstileWidgets = new Map();
@@ -426,6 +426,7 @@ function publicApiMessage(action, status) {
 function publicRequestError(action, error) {
   if (action === "vote" && error?.status === 429) return "You can only vote once every 24 hours.";
   if (action === "vote") return error?.publicMessage || "Vote could not be counted. Please try again.";
+  if (action === "createCheckout" && error?.message && !isInternalApiMessage(error.message)) return error.message;
   if ([401, 403, 404, 409].includes(Number(error?.status))) return publicApiMessage(action, Number(error.status));
   if (Number(error?.status) >= 500 || isInternalApiMessage(error?.message) || isInternalApiMessage(error?.publicMessage)) return productionApiMessage();
   if (isNetworkAbort(error) || isNetworkAbort(error?.originalError)) return networkApiMessage();
