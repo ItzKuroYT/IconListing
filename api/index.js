@@ -642,6 +642,7 @@ module.exports = async function handler(req, res) {
       }
       if (body.command === "saveBilling") {
         db.billing = normalizeBillingSettings(body.value || {});
+        db.billing.updatedAt = new Date().toISOString();
         saveOptions.touchedBilling = true;
       }
       const persistedDb = await saveDb(db, saveOptions);
@@ -1365,6 +1366,7 @@ function normalizeBillingSettings(value = {}) {
     currency: clean(value.currency || defaults.currency).toLowerCase() || "usd",
     stripeTaxCode: clean(value.stripeTaxCode || defaults.stripeTaxCode || "txcd_10000000"),
     stripeTaxBehavior: cleanStripeTaxBehavior(value.stripeTaxBehavior || defaults.stripeTaxBehavior || "exclusive"),
+    updatedAt: clean(value.updatedAt || defaults.updatedAt || ""),
     maxSponsors: Math.max(1, Math.min(5, Number(value.maxSponsors || defaults.maxSponsors))),
     sale: {
       enabled: sale.enabled !== undefined ? sale.enabled === true : defaults.sale.enabled,
@@ -2280,6 +2282,7 @@ function publicBillingSettings(db = {}) {
     currency: billing.currency,
     stripeTaxCode: billing.stripeTaxCode,
     stripeTaxBehavior: billing.stripeTaxBehavior,
+    updatedAt: billing.updatedAt || "",
     maxSponsors: billing.maxSponsors,
     activeSponsors: activeSponsoredServers(db).length,
     availableSponsorSlots: availableSponsorSlots(db),

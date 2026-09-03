@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-03T21:22:04.903Z",
+  "generatedAt": "2026-09-03T21:26:19.950Z",
   "servers": [
     {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
@@ -2193,6 +2193,7 @@
     "currency": "usd",
     "stripeTaxCode": "txcd_10000000",
     "stripeTaxBehavior": "exclusive",
+    "updatedAt": "",
     "maxSponsors": 5,
     "activeSponsors": 0,
     "availableSponsorSlots": 5,

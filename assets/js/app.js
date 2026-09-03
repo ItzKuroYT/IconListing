@@ -58,6 +58,19 @@ const store = {
   set publicState(value) {
     if (value) sessionStorage.setItem("iconListingPublicState", JSON.stringify(value));
     else sessionStorage.removeItem("iconListingPublicState");
+  },
+  get billingOverride() {
+    try {
+      const saved = JSON.parse(localStorage.getItem("iconListingBillingOverride") || "null");
+      if (!saved?.billing || Date.now() - Number(saved.savedAt || 0) > 60 * 60 * 1000) return null;
+      return saved.billing;
+    } catch {
+      return null;
+    }
+  },
+  set billingOverride(value) {
+    if (value) localStorage.setItem("iconListingBillingOverride", JSON.stringify({ billing: value, savedAt: Date.now() }));
+    else localStorage.removeItem("iconListingBillingOverride");
   }
 };
 
@@ -67,6 +80,20 @@ function clearLegacyLocalOverlays() {
   } catch {
     // Some browsers block storage. Shared API state still works without it.
   }
+}
+
+function rememberBilling(billing) {
+  if (!billing) return;
+  const existing = store.billingOverride;
+  const existingTime = billingUpdatedTime(existing);
+  const nextTime = billingUpdatedTime(billing);
+  if (existingTime && (!nextTime || existingTime > nextTime)) return;
+  store.billingOverride = billing;
+}
+
+function billingUpdatedTime(billing) {
+  const time = new Date(billing?.updatedAt || 0).getTime();
+  return Number.isFinite(time) ? time : 0;
 }
 
 function freshDb() {
@@ -138,6 +165,7 @@ function defaultBillingSettings() {
     currency: clean(CONFIG.billing?.currency || "usd").toLowerCase() || "usd",
     stripeTaxCode: clean(CONFIG.billing?.stripeTaxCode || "txcd_10000000"),
     stripeTaxBehavior: cleanStripeTaxBehavior(CONFIG.billing?.stripeTaxBehavior || "exclusive"),
+    updatedAt: clean(CONFIG.billing?.updatedAt || ""),
     maxSponsors: Math.max(1, Number(CONFIG.billing?.maxSponsors || 5)),
     sale: {
       enabled: CONFIG.billing?.sale?.enabled !== false,
@@ -155,6 +183,7 @@ function normalizeBillingSettings(value = {}) {
     currency: clean(value.currency || defaults.currency).toLowerCase() || "usd",
     stripeTaxCode: clean(value.stripeTaxCode || defaults.stripeTaxCode || "txcd_10000000"),
     stripeTaxBehavior: cleanStripeTaxBehavior(value.stripeTaxBehavior || defaults.stripeTaxBehavior || "exclusive"),
+    updatedAt: clean(value.updatedAt || defaults.updatedAt || ""),
     maxSponsors: Math.max(1, Math.min(5, Number(value.maxSponsors || defaults.maxSponsors))),
     sale: {
       enabled: sale.enabled !== undefined ? sale.enabled === true : defaults.sale.enabled,
@@ -191,7 +220,7 @@ function normalizeBillingPlan(key, plan = {}) {
 }
 
 function billingSettings(state = {}) {
-  return normalizeBillingSettings(state.billing || defaultBillingSettings());
+  return normalizeBillingSettings(store.billingOverride || state.billing || defaultBillingSettings());
 }
 
 function billingPlanCatalog(state = {}) {
@@ -1073,6 +1102,7 @@ function fallbackRequest(action, payload) {
     }
     if (payload.command === "saveBilling") {
       db.billing = normalizeBillingSettings(payload.value || {});
+      db.billing.updatedAt = new Date().toISOString();
     }
     save();
     return Promise.resolve({ users: db.users.map((item) => publicUser(item, db)), servers: rankServers(db.servers, db.votes), clients: db.clients, hosts: db.hosts, billing: publicBillingSettings(db) });
@@ -1426,6 +1456,7 @@ async function getState() {
   const stateParams = detailServerId ? { serverId: detailServerId } : detailServerSlug ? { serverSlug: detailServerSlug } : {};
   if (page === "dashboard" || page === "admin" || page === "server" || page === "vote" || page === "community") stateParams.fresh = "1";
   const state = await request("state", stateParams, "GET");
+  rememberBilling(state.billing);
   sessionStorage.removeItem("iconListingBootRetries");
   if (state.user && store.session) store.session = { ...store.session, user: state.user };
   const next = mergeEmbeddedServerFallback({ ...state, votes: state.votes || [] });
@@ -4322,6 +4353,7 @@ function adminBillingPanel(state) {
   const billing = publicBillingSettings(state);
   const paidPlans = Object.entries(billing.plans || {}).filter(([key]) => key !== "free");
   return `<form id="adminBillingForm" class="form admin-billing-form">
+    ${billing.updatedAt ? `<p class="section-copy compact">Last updated ${escapeHtml(timeAgo(billing.updatedAt))}</p>` : ""}
     <div class="form-grid">
       <div class="field"><label>Max sponsors</label><input class="input" name="maxSponsors" type="number" min="1" max="5" value="${escapeHtml(billing.maxSponsors || 5)}" required></div>
       <div class="field"><label>Currency</label><input class="input" name="currency" value="${escapeHtml(billing.currency || "usd")}" maxlength="3" required></div>
@@ -4365,6 +4397,7 @@ function bindAdminBillingForms(state) {
     const form = event.currentTarget;
     try {
       const result = await request("admin", { command: "saveBilling", value: billingFormValue(form, state) });
+      rememberBilling(result.billing);
       cachePublicState(result);
       toast("Billing settings saved.");
       renderAdmin({ ...state, ...result });
