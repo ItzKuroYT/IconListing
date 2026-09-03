@@ -11530,7 +11530,7 @@
       },
       {
         "date": "2026-09-03",
-        "count": 9
+        "count": 10
       }
     ],
     "siteVisitVisitorDays": {
@@ -11566,7 +11566,8 @@
         "1fe6aa251b440fd2",
         "67cc25d9116b2cf8",
         "74d641ba1f0d0bef",
-        "fefbf118c8bce09e"
+        "fefbf118c8bce09e",
+        "59da0fb89f6e0f20"
       ]
     }
   },
@@ -11574,6 +11575,14 @@
     "currency": "usd",
     "stripeTaxCode": "txcd_10000000",
     "stripeTaxBehavior": "exclusive",
+    "stripePaymentMethodTypes": [
+      "card",
+      "paypal"
+    ],
+    "stripeCustomPaymentMethodIds": [
+      "cpmt_1UBOyUPMbP3VXc9bLkFHMDdw"
+    ],
+    "updatedAt": "",
     "maxSponsors": 5,
     "sale": {
       "enabled": true,
