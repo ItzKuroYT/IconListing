@@ -1,10 +1,6 @@
 {
   "version": 2,
-<<<<<<< Updated upstream
-  "generatedAt": "2026-09-03T21:07:58.866Z",
-=======
-  "generatedAt": "2026-09-03T21:15:30.208Z",
->>>>>>> Stashed changes
+  "generatedAt": "2026-09-03T21:17:21.111Z",
   "servers": [
     {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
@@ -2195,11 +2191,8 @@
   },
   "billing": {
     "currency": "usd",
-<<<<<<< Updated upstream
-=======
     "stripeTaxCode": "txcd_10000000",
     "stripeTaxBehavior": "exclusive",
->>>>>>> Stashed changes
     "maxSponsors": 5,
     "activeSponsors": 0,
     "availableSponsorSlots": 5,
@@ -2264,9 +2257,9 @@
     }
   },
   "siteAnalytics": {
-    "uniqueVisitsLast7": 26,
-    "uniqueVisitsLast30": 26,
-    "websiteVisitsLast7": 26,
-    "websiteVisitsLast30": 26
+    "uniqueVisitsLast7": 27,
+    "uniqueVisitsLast30": 27,
+    "websiteVisitsLast7": 27,
+    "websiteVisitsLast30": 27
   }
 }
