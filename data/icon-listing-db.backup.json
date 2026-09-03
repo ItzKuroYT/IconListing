@@ -11231,17 +11231,6 @@
       "pricing": "paid",
       "createdAt": "2026-07-11T01:04:47.824Z",
       "updatedAt": "2026-07-11T01:04:47.824Z"
-    },
-    {
-      "id": "34414ed6-a42f-4f3b-aece-a59b36beb84f",
-      "name": "alyrix cloud",
-      "url": "https://alyrixcloud.org",
-      "youtubeUrl": "",
-      "description": "Powerful Hosting Built to Perform\n\nLaunch your server with fast, reliable hosting designed for performance, stability, and growth.\n\nOur servers are powered by enterprise-grade NVMe storage and high-frequency Ryzen processors, delivering the speed and responsiveness needed for everything from small communities to demanding, high-traffic servers.\n\nWith plans starting at only $1.99 per month, you get powerful hardware, simple management, and dependable infrastructure without hidden fees or confusing pricing.\n\nWhy Choose Us?\nLightning-Fast Performance\n\nHigh-speed NVMe storage and powerful Ryzen processors help reduce lag, improve load times, and keep your server running smoothly.\n\n99.9% Uptime\n\nOur infrastructure is built with reliability in mind, using RAID protection and secure hardware systems to help keep your server online.\n\nAdvanced DDoS Protection\n\nYour server is protected by advanced Layer 3 and Layer 4 DDoS mitigation ranging from 100 Gbps to 1 Tbps, helping defend against large-scale attacks.\n\nExpert Support\n\nOur knowledgeable support team is available to help with setup, technical questions, and any issues you may experience.\n\nStrategic Locations\n\nChoose from locations across North America and Europe to provide lower latency and a smoother connection for your players.\n\nSimple, Transparent Pricing\n\nNo unnecessary complications. Choose the plan that fits your needs and get powerful, low-latency hosting at an affordable price.\n\nBuilt for power. Engineered to last.",
-      "images": [],
-      "pricing": "paid",
-      "createdAt": "2026-07-27T20:52:36.476Z",
-      "updatedAt": "2026-07-27T20:52:36.476Z"
     }
   ],
   "votes": [
@@ -11592,8 +11581,8 @@
       },
       "premium": {
         "name": "Premium",
-        "price": "$12/mo",
-        "priceCents": 1200,
+        "price": "$10/mo",
+        "priceCents": 1000,
         "serverLimit": 4,
         "sponsorCredits": 1,
         "sponsorDurationDays": 14,
@@ -11602,8 +11591,8 @@
       },
       "elite": {
         "name": "Elite",
-        "price": "$20/mo",
-        "priceCents": 2000,
+        "price": "$18/mo",
+        "priceCents": 1800,
         "serverLimit": 7,
         "sponsorCredits": 1,
         "sponsorDurationDays": 45,
@@ -11612,8 +11601,8 @@
       },
       "iconic": {
         "name": "Iconic",
-        "price": "$32/mo",
-        "priceCents": 3200,
+        "price": "$30/mo",
+        "priceCents": 3000,
         "serverLimit": 12,
         "sponsorCredits": 2,
         "sponsorDurationDays": 90,
@@ -11633,6 +11622,8 @@
       "d61794c2-b587-4fa6-ae50-8fcc206edb4f": "2026-07-16T01:57:32.326Z"
     },
     "clients": {},
-    "hosts": {}
+    "hosts": {
+      "34414ed6-a42f-4f3b-aece-a59b36beb84f": "2026-09-03T21:32:22.508Z"
+    }
   }
 }
