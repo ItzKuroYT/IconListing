@@ -1346,6 +1346,8 @@ function normalizeHost(host) {
 function defaultBillingSettings() {
   return {
     currency: clean(CONFIG.billing?.currency || "usd").toLowerCase() || "usd",
+    stripeTaxCode: clean(CONFIG.billing?.stripeTaxCode || "txcd_10000000"),
+    stripeTaxBehavior: cleanStripeTaxBehavior(CONFIG.billing?.stripeTaxBehavior || "exclusive"),
     maxSponsors: Math.max(1, Number(CONFIG.billing?.maxSponsors || 5)),
     sale: {
       enabled: CONFIG.billing?.sale?.enabled !== false,
@@ -1361,6 +1363,8 @@ function normalizeBillingSettings(value = {}) {
   const sale = value.sale || {};
   return {
     currency: clean(value.currency || defaults.currency).toLowerCase() || "usd",
+    stripeTaxCode: clean(value.stripeTaxCode || defaults.stripeTaxCode || "txcd_10000000"),
+    stripeTaxBehavior: cleanStripeTaxBehavior(value.stripeTaxBehavior || defaults.stripeTaxBehavior || "exclusive"),
     maxSponsors: Math.max(1, Math.min(5, Number(value.maxSponsors || defaults.maxSponsors))),
     sale: {
       enabled: sale.enabled !== undefined ? sale.enabled === true : defaults.sale.enabled,
@@ -1405,6 +1409,11 @@ function clampNumber(value, min, max, fallback) {
   const next = Number(value);
   if (!Number.isFinite(next)) return fallback;
   return Math.min(max, Math.max(min, next));
+}
+
+function cleanStripeTaxBehavior(value = "") {
+  const next = clean(value).toLowerCase();
+  return ["exclusive", "inclusive", "unspecified"].includes(next) ? next : "exclusive";
 }
 
 function normalizeReview(review) {
@@ -2269,6 +2278,8 @@ function publicBillingSettings(db = {}) {
   const billing = billingSettings(db);
   return {
     currency: billing.currency,
+    stripeTaxCode: billing.stripeTaxCode,
+    stripeTaxBehavior: billing.stripeTaxBehavior,
     maxSponsors: billing.maxSponsors,
     activeSponsors: activeSponsoredServers(db).length,
     availableSponsorSlots: availableSponsorSlots(db),
@@ -2334,8 +2345,10 @@ async function createStripeCheckoutSession(req, user, planKey, plan, billing) {
   params.set("line_items[0][price_data][currency]", billing.currency);
   params.set("line_items[0][price_data][unit_amount]", String(amount));
   params.set("line_items[0][price_data][recurring][interval]", "month");
+  params.set("line_items[0][price_data][tax_behavior]", billing.stripeTaxBehavior || "exclusive");
   params.set("line_items[0][price_data][product_data][name]", `${CONFIG.site.name} ${plan.name}`);
   params.set("line_items[0][price_data][product_data][description]", `${plan.serverLimit} listings, ${plan.sponsorCredits} sponsor credit${Number(plan.sponsorCredits || 0) === 1 ? "" : "s"}`);
+  params.set("line_items[0][price_data][product_data][tax_code]", billing.stripeTaxCode || "txcd_10000000");
   params.set("metadata[userId]", user.id);
   params.set("metadata[plan]", planKey);
   params.set("metadata[priceCents]", String(amount));

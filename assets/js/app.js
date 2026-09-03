@@ -136,6 +136,8 @@ function normalizeHost(host) {
 function defaultBillingSettings() {
   return {
     currency: clean(CONFIG.billing?.currency || "usd").toLowerCase() || "usd",
+    stripeTaxCode: clean(CONFIG.billing?.stripeTaxCode || "txcd_10000000"),
+    stripeTaxBehavior: cleanStripeTaxBehavior(CONFIG.billing?.stripeTaxBehavior || "exclusive"),
     maxSponsors: Math.max(1, Number(CONFIG.billing?.maxSponsors || 5)),
     sale: {
       enabled: CONFIG.billing?.sale?.enabled !== false,
@@ -151,6 +153,8 @@ function normalizeBillingSettings(value = {}) {
   const sale = value.sale || {};
   return {
     currency: clean(value.currency || defaults.currency).toLowerCase() || "usd",
+    stripeTaxCode: clean(value.stripeTaxCode || defaults.stripeTaxCode || "txcd_10000000"),
+    stripeTaxBehavior: cleanStripeTaxBehavior(value.stripeTaxBehavior || defaults.stripeTaxBehavior || "exclusive"),
     maxSponsors: Math.max(1, Math.min(5, Number(value.maxSponsors || defaults.maxSponsors))),
     sale: {
       enabled: sale.enabled !== undefined ? sale.enabled === true : defaults.sale.enabled,
@@ -198,6 +202,8 @@ function publicBillingSettings(state = {}) {
   const billing = billingSettings(state);
   return {
     currency: billing.currency,
+    stripeTaxCode: billing.stripeTaxCode,
+    stripeTaxBehavior: billing.stripeTaxBehavior,
     maxSponsors: billing.maxSponsors,
     activeSponsors: activeSponsoredServers(state).length,
     availableSponsorSlots: availableSponsorSlots(state),
@@ -238,6 +244,11 @@ function clampNumber(value, min, max, fallback) {
   const next = Number(value);
   if (!Number.isFinite(next)) return fallback;
   return Math.min(max, Math.max(min, next));
+}
+
+function cleanStripeTaxBehavior(value = "") {
+  const next = clean(value).toLowerCase();
+  return ["exclusive", "inclusive", "unspecified"].includes(next) ? next : "exclusive";
 }
 
 function activeSponsoredServers(state = {}) {
@@ -379,6 +390,7 @@ function isLocalFallbackAllowed() {
 function apiBasePaths() {
   const productionBase = CONFIG.api.productionBasePath || "";
   const sameOriginBase = CONFIG.api.basePath || "/api";
+  if (productionBase && location.protocol !== "file:" && !isLocalFallbackAllowed()) return [productionBase];
   return [...new Set([productionBase, sameOriginBase].filter(Boolean))];
 }
 
@@ -427,6 +439,7 @@ function publicRequestError(action, error) {
   if (action === "vote" && error?.status === 429) return "You can only vote once every 24 hours.";
   if (action === "vote") return error?.publicMessage || "Vote could not be counted. Please try again.";
   if (action === "createCheckout" && error?.message && !isInternalApiMessage(error.message)) return error.message;
+  if (action === "admin" && error?.message && !isInternalApiMessage(error.message)) return error.message;
   if ([401, 403, 404, 409].includes(Number(error?.status))) return publicApiMessage(action, Number(error.status));
   if (Number(error?.status) >= 500 || isInternalApiMessage(error?.message) || isInternalApiMessage(error?.publicMessage)) return productionApiMessage();
   if (isNetworkAbort(error) || isNetworkAbort(error?.originalError)) return networkApiMessage();
@@ -4316,6 +4329,12 @@ function adminBillingPanel(state) {
       <div class="field"><label>Sale percent off</label><input class="input" name="salePercent" type="number" min="0" max="90" value="${escapeHtml(billing.sale?.percentOff || 0)}"></div>
       <div class="field"><label>Minimum paid price</label><input class="input" name="minPaidPrice" type="number" min="5" step="0.01" value="${escapeHtml(((billing.sale?.minPaidPriceCents || 500) / 100).toFixed(2))}"></div>
       <div class="field"><label>Free listing limit</label><input class="input" name="free_serverLimit" type="number" min="1" max="25" value="${escapeHtml(billing.plans?.free?.serverLimit || 2)}" required></div>
+      <div class="field"><label>Stripe tax code</label><input class="input" name="stripeTaxCode" value="${escapeHtml(billing.stripeTaxCode || "txcd_10000000")}" required></div>
+      <div class="field"><label>Stripe tax behavior</label><select class="select" name="stripeTaxBehavior">
+        <option value="exclusive" ${billing.stripeTaxBehavior === "exclusive" ? "selected" : ""}>Exclusive</option>
+        <option value="inclusive" ${billing.stripeTaxBehavior === "inclusive" ? "selected" : ""}>Inclusive</option>
+        <option value="unspecified" ${billing.stripeTaxBehavior === "unspecified" ? "selected" : ""}>Unspecified</option>
+      </select></div>
     </div>
     <div class="billing-plan-editor">
       ${paidPlans.map(([key, plan]) => adminBillingPlanFields(key, plan)).join("")}
@@ -4377,6 +4396,8 @@ function billingFormValue(form, state) {
   }
   return {
     currency: form.elements.currency?.value || existing.currency || "usd",
+    stripeTaxCode: form.elements.stripeTaxCode?.value || existing.stripeTaxCode || "txcd_10000000",
+    stripeTaxBehavior: form.elements.stripeTaxBehavior?.value || existing.stripeTaxBehavior || "exclusive",
     maxSponsors: Number(form.elements.maxSponsors?.value || existing.maxSponsors || 5),
     sale: {
       enabled: form.elements.saleEnabled?.checked === true,

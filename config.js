@@ -186,6 +186,8 @@ const IconListingConfig = {
   },
   billing: {
     currency: "usd",
+    stripeTaxCode: "txcd_10000000",
+    stripeTaxBehavior: "exclusive",
     maxSponsors: 5,
     sale: {
       enabled: true,
