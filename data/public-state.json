@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-03T21:19:46.693Z",
+  "generatedAt": "2026-09-03T21:20:51.955Z",
   "servers": [
     {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
@@ -2217,41 +2217,41 @@
       },
       "premium": {
         "name": "Premium",
-        "price": "$10/mo",
-        "priceCents": 1000,
-        "serverLimit": 4,
+        "price": "$12/mo",
+        "priceCents": 1200,
+        "serverLimit": 1,
         "sponsorCredits": 1,
         "sponsorDurationDays": 14,
         "sponsorDurationLabel": "1 sponsor for 14 days",
         "description": "List up to 4 servers and sponsor one server for 2 weeks while this subscription is active.",
-        "effectivePriceCents": 500,
-        "effectivePrice": "$5/mo",
+        "effectivePriceCents": 600,
+        "effectivePrice": "$6/mo",
         "saleActive": true
       },
       "elite": {
         "name": "Elite",
-        "price": "$18/mo",
-        "priceCents": 1800,
-        "serverLimit": 7,
+        "price": "$20/mo",
+        "priceCents": 2000,
+        "serverLimit": 3,
         "sponsorCredits": 1,
         "sponsorDurationDays": 45,
         "sponsorDurationLabel": "1 sponsor for 45 days",
         "description": "List up to 7 servers and sponsor one server for 45 days while this subscription is active.",
-        "effectivePriceCents": 900,
-        "effectivePrice": "$9/mo",
+        "effectivePriceCents": 1000,
+        "effectivePrice": "$10/mo",
         "saleActive": true
       },
       "iconic": {
         "name": "Iconic",
-        "price": "$30/mo",
-        "priceCents": 3000,
-        "serverLimit": 12,
+        "price": "$32/mo",
+        "priceCents": 3200,
+        "serverLimit": 5,
         "sponsorCredits": 2,
         "sponsorDurationDays": 90,
         "sponsorDurationLabel": "2 sponsors for 90 days",
         "description": "List up to 12 servers and sponsor two servers for 90 days while this subscription is active.",
-        "effectivePriceCents": 1500,
-        "effectivePrice": "$15/mo",
+        "effectivePriceCents": 1600,
+        "effectivePrice": "$16/mo",
         "saleActive": true
       }
     }
