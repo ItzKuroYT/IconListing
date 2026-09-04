@@ -1706,6 +1706,7 @@ function renderLayout() {
           <a class="nav-link" data-route="community" href="${route("/community/")}">${escapeHtml(copy("nav.community", "Community"))}</a>
           ${sponsoredDropdownMarkup()}
           ${toolsDropdownMarkup()}
+          <a class="nav-link" href="https://minestore.org" target="_blank" rel="noopener">Server resources</a>
           <a class="nav-link hidden" data-auth="dashboard" data-route="dashboard" href="${route("/dashboard/")}">${escapeHtml(copy("nav.dashboard", "Dashboard"))}</a>
           <a class="nav-link hidden" data-auth="admin" data-route="admin" href="${route("/admin/")}">${escapeHtml(copy("nav.admin", "Admin"))}</a>
           <a class="nav-link" data-auth="login" data-route="login" href="${route("/login/")}">${escapeHtml(copy("nav.login", "Login"))}</a>
@@ -1717,6 +1718,7 @@ function renderLayout() {
       <div class="footer-inner">
         <div><strong>${CONFIG.site.owner}</strong> | ${CONFIG.site.footerNotice}</div>
         <div class="footer-links">
+          <a href="https://minestore.org" target="_blank" rel="noopener">Server resources</a>
           <a class="footer-review-link" href="${TRUSTPILOT_REVIEW_URL}" target="_blank" rel="noopener">Review</a>
           <a href="${route("/terms/")}">Terms</a>
           <a href="${route("/privacy/")}">Privacy</a>
