@@ -11197,6 +11197,68 @@
       "uptimeSuccesses": 44,
       "iconUrl": "",
       "iconListingVoteQueue": []
+    },
+    {
+      "id": "94cacdf0-f3f6-4d05-8c6e-1b1efa167972",
+      "name": "TopHatSMP",
+      "edition": "bedrock",
+      "javaHost": "",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "realm",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "x9dBsJGH6UzyFCY",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_0b525f8ceebaf4d3e8ce9c29074ff7d48d2b",
+      "websiteUrl": "https://tophatsmp.lovable.app/",
+      "discordUrl": "https://discord.com/invite/qGzKPqHBBm",
+      "youtubeUrl": "https://www.youtube.com/@TopHat-SMP",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "TopHatSMP is a Survival Smp that is barely modded. There are only 2 rules and they are: Do not Hack and Do not spam chat. TopHatSMP is on Bedrock Realms only. There is a Discord and Website and a full admin team that is nice and willing to help.",
+      "tags": [
+        "Survival",
+        "Anarchy",
+        "SMP",
+        "Bedrock",
+        "Modded"
+      ],
+      "ownerId": "8ece8eb4-a435-461f-9b88-f19314dfd0dc",
+      "ownerName": "NoahZavala",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Bedrock Realm",
+      "online": false,
+      "uptimePercent": 0,
+      "sponsored": false,
+      "createdAt": "2026-09-05T01:44:31.736Z",
+      "updatedAt": "2026-09-05T01:44:31.736Z",
+      "lastPingAt": "2026-09-05T01:44:31.744Z",
+      "lastPingAttemptAt": "2026-09-05T01:44:31.744Z",
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-09-05T01:44:31.744Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          }
+        ]
+      },
+      "uptimeChecks": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
     }
   ],
   "clients": [
