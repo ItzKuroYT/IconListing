@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-05T01:40:00.677Z",
+  "generatedAt": "2026-09-05T01:44:38.385Z",
   "servers": [
     {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
@@ -1643,6 +1643,57 @@
       "realmCode": "",
       "iconUrl": "",
       "rank": 30,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
+      "id": "94cacdf0-f3f6-4d05-8c6e-1b1efa167972",
+      "name": "TopHatSMP",
+      "javaHost": "",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "https://tophatsmp.lovable.app/",
+      "discordUrl": "https://discord.com/invite/qGzKPqHBBm",
+      "youtubeUrl": "https://www.youtube.com/@TopHat-SMP",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "TopHatSMP is a Survival Smp that is barely modded. There are only 2 rules and they are: Do not Hack and Do not spam chat. TopHatSMP is on Bedrock Realms only. There is a Discord and Website and a full admin team that is nice and willing to help.",
+      "tags": [
+        "Survival",
+        "Anarchy",
+        "SMP",
+        "Bedrock",
+        "Modded"
+      ],
+      "ownerName": "NoahZavala",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Bedrock Realm",
+      "online": false,
+      "uptimePercent": 0,
+      "sponsored": false,
+      "createdAt": "2026-09-05T01:44:31.736Z",
+      "updatedAt": "2026-09-05T01:44:31.736Z",
+      "lastPingAt": "2026-09-05T01:44:31.744Z",
+      "uptimeChecks": 1,
+      "edition": "bedrock",
+      "bedrockType": "realm",
+      "realmCode": "x9dBsJGH6UzyFCY",
+      "iconUrl": "",
+      "rank": 31,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
