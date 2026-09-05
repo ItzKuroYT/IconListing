@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-05T01:53:35.756Z",
+  "generatedAt": "2026-09-05T01:54:13.505Z",
   "servers": [
     {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
@@ -864,9 +864,9 @@
       "uptimePercent": 0,
       "sponsored": false,
       "createdAt": "2026-09-05T01:44:31.736Z",
-      "updatedAt": "2026-09-05T01:44:31.736Z",
-      "lastPingAt": "2026-09-05T01:52:12.394Z",
-      "uptimeChecks": 2,
+      "updatedAt": "2026-09-05T01:54:07.602Z",
+      "lastPingAt": "2026-09-05T01:54:07.602Z",
+      "uptimeChecks": 3,
       "edition": "bedrock",
       "bedrockType": "realm",
       "realmCode": "x9dBsJGH6UzyFCY",
