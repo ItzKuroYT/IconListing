@@ -11245,9 +11245,90 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-09-05",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-09-05": [
+            "01d2f473819535ac"
+          ]
+        },
         "playerHistory": [
+          {
+            "createdAt": "2026-09-05T01:44:31.744Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:52:12.394Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:44:31.744Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:52:12.394Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:44:31.744Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:52:12.394Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:44:31.744Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:52:12.394Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:44:31.744Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:52:12.394Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:44:31.744Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:52:12.394Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
           {
             "createdAt": "2026-09-05T01:44:31.744Z",
             "playersOnline": 0,
@@ -11572,10 +11653,10 @@
       "createdAt": "2026-08-19T22:15:42.953Z"
     },
     {
-      "id": "5cca0637-a082-4cad-823f-e547c9c2a190",
+      "id": "fa8ff5d3-7751-49cc-9580-6f2ee7b2a5a8",
       "serverId": "94cacdf0-f3f6-4d05-8c6e-1b1efa167972",
       "minecraftUsername": "MrDoge5609",
-      "createdAt": "2026-09-05T01:53:05.411Z"
+      "createdAt": "2026-09-05T01:53:07.243Z"
     }
   ],
   "reviews": [
@@ -11605,8 +11686,8 @@
   ],
   "voteIps": {
     "94cacdf0-f3f6-4d05-8c6e-1b1efa167972": {
-      "visitor:16e82fd8e17d24002ea798986f0aab1a77dd7c5d4587a61801edf9c0a1a2675c": "2026-09-05T01:53:05.411Z",
-      "name:mrdoge5609": "2026-09-05T01:53:05.411Z"
+      "visitor:16e82fd8e17d24002ea798986f0aab1a77dd7c5d4587a61801edf9c0a1a2675c": "2026-09-05T01:53:07.243Z",
+      "name:mrdoge5609": "2026-09-05T01:53:07.243Z"
     }
   },
   "siteAnalytics": {
