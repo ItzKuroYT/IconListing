@@ -11249,12 +11249,13 @@
         "viewDaily": [
           {
             "date": "2026-09-05",
-            "count": 1
+            "count": 2
           }
         ],
         "viewVisitorDays": {
           "2026-09-05": [
-            "01d2f473819535ac"
+            "01d2f473819535ac",
+            "75cedf1fa71dc3e8"
           ]
         },
         "playerHistory": [
