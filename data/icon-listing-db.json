@@ -11227,7 +11227,8 @@
         "Anarchy",
         "SMP",
         "Bedrock",
-        "Modded"
+        "Modded",
+        "New"
       ],
       "ownerId": "8ece8eb4-a435-461f-9b88-f19314dfd0dc",
       "ownerName": "NoahZavala",
@@ -11239,9 +11240,9 @@
       "uptimePercent": 0,
       "sponsored": false,
       "createdAt": "2026-09-05T01:44:31.736Z",
-      "updatedAt": "2026-09-05T01:54:07.602Z",
-      "lastPingAt": "2026-09-05T01:54:07.602Z",
-      "lastPingAttemptAt": "2026-09-05T01:54:07.602Z",
+      "updatedAt": "2026-09-05T01:54:11.862Z",
+      "lastPingAt": "2026-09-05T01:54:11.862Z",
+      "lastPingAttemptAt": "2026-09-05T01:54:11.862Z",
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
@@ -11291,7 +11292,31 @@
             "online": false
           },
           {
-            "createdAt": "2026-09-05T01:54:07.602Z",
+            "createdAt": "2026-09-05T01:52:12.394Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:44:31.744Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:52:12.394Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:44:31.744Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          },
+          {
+            "createdAt": "2026-09-05T01:54:11.862Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
