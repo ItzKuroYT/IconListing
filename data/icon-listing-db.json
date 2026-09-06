@@ -11884,12 +11884,7 @@
       "createdAt": "2026-09-01T23:13:55.536Z"
     }
   ],
-  "voteIps": {
-    "94cacdf0-f3f6-4d05-8c6e-1b1efa167972": {
-      "visitor:16e82fd8e17d24002ea798986f0aab1a77dd7c5d4587a61801edf9c0a1a2675c": "2026-09-05T01:53:05.411Z",
-      "name:mrdoge5609": "2026-09-05T01:53:05.411Z"
-    }
-  },
+  "voteIps": {},
   "siteAnalytics": {
     "siteVisitDaily": [
       {
@@ -11914,7 +11909,7 @@
       },
       {
         "date": "2026-09-06",
-        "count": 1
+        "count": 2
       }
     ],
     "siteVisitVisitorDays": {
@@ -11970,7 +11965,8 @@
         "ef3f2ebcb77f0324"
       ],
       "2026-09-06": [
-        "75cedf1fa71dc3e8"
+        "75cedf1fa71dc3e8",
+        "6db859cefd78773c"
       ]
     }
   },
