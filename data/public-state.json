@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-06T03:08:25.625Z",
+  "generatedAt": "2026-09-06T03:11:01.681Z",
   "servers": [
     {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
@@ -887,6 +887,61 @@
       "communityHighlighted": false
     },
     {
+      "id": "515c75a0-df0d-4a34-ba07-cae095876c19",
+      "name": "HARDCORE | 3 lives",
+      "javaHost": "hardcore.pulsedmc.net",
+      "javaPort": 25565,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "hardcore.pulsedmc.net",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "https://pulsedmc.net",
+      "discordUrl": "https://discord.gg/t8RZjp7Dbn",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "☠️ HARDCORE — THREE LIVES. ONE CHANCE.\n\nThink normal Hardcore is unforgiving? Try surviving when the entire server is trying to outlive you.\n\nWelcome to Hardcore, a survival server where every decision matters. You only get 3 lives—lose them all, and your run is over.\n\n⚔️ FEATURES\n❤️ 3-Life Hardcore System — Death actually matters\n🩸 Deadly PvP — Fight, raid, betray, or form alliances\n🗡️ Custom Combat & Weapons — More ways to take down your enemies\n🧬 Origins — Choose unique abilities and build around your playstyle\n👹 Custom Mobs — The world isn't your only enemy\n💀 Golden Heads — Turn victories into an advantage\n🌦️ Custom Seasons — Survive a world that changes around you\n🔊 Proximity Voice Chat — Hear friends... or enemies approaching\n⚡ Instant Restock — Keep the action moving\n🧱 Anti-Dupe & Exploit Protection — Survival stays fair\n\nBuild a base. Make allies. Hunt your enemies. Protect your lives.\n\nYou have 3 chances.\nHow long will you survive?\n\n🌐 IP: hardcore.pulsedmc.net",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP",
+        "Modded",
+        "New"
+      ],
+      "ownerName": "ItzKuroYT",
+      "votes": 0,
+      "playersOnline": 4,
+      "playersMax": 20,
+      "version": "Paper 26.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-09-06T03:10:55.229Z",
+      "updatedAt": "2026-09-06T03:10:55.230Z",
+      "lastPingAt": "2026-09-06T03:10:56.038Z",
+      "lastSuccessfulPingAt": "2026-09-06T03:10:56.038Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "",
+      "rank": 17,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
       "id": "cb42efd4-fbfd-47da-abdb-b153b7f07f9c",
       "name": "Mobcraft SMP",
       "javaHost": "survival.mobcraft.org",
@@ -929,7 +984,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Mobcraft-SMP&kind=icon",
-      "rank": 17,
+      "rank": 18,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -982,7 +1037,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 18,
+      "rank": 19,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1036,7 +1091,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 19,
+      "rank": 20,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1093,7 +1148,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PulsedMC-Hosting-FREE&kind=icon",
-      "rank": 20,
+      "rank": 21,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1149,7 +1204,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 21,
+      "rank": 22,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1206,7 +1261,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
-      "rank": 22,
+      "rank": 23,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1257,7 +1312,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 23,
+      "rank": 24,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1308,7 +1363,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 24,
+      "rank": 25,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1363,7 +1418,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 25,
+      "rank": 26,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1419,7 +1474,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 26,
+      "rank": 27,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1472,7 +1527,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=LimboMC&kind=icon",
-      "rank": 27,
+      "rank": 28,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1527,7 +1582,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Tancraft&kind=icon",
-      "rank": 28,
+      "rank": 29,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1582,7 +1637,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 29,
+      "rank": 30,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1639,7 +1694,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Futurelands&kind=icon",
-      "rank": 30,
+      "rank": 31,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1694,7 +1749,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 31,
+      "rank": 32,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
