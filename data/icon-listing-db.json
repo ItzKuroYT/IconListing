@@ -11558,6 +11558,72 @@
       "uptimeChecks": 10,
       "iconUrl": "",
       "iconListingVoteQueue": []
+    },
+    {
+      "id": "515c75a0-df0d-4a34-ba07-cae095876c19",
+      "name": "HARDCORE | 3 lives",
+      "edition": "java",
+      "javaHost": "hardcore.pulsedmc.net",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_3c542c84c55a603c935d109533f9956b904d",
+      "websiteUrl": "https://pulsedmc.net",
+      "discordUrl": "https://discord.gg/t8RZjp7Dbn",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "☠️ HARDCORE — THREE LIVES. ONE CHANCE.\n\nThink normal Hardcore is unforgiving? Try surviving when the entire server is trying to outlive you.\n\nWelcome to Hardcore, a survival server where every decision matters. You only get 3 lives—lose them all, and your run is over.\n\n⚔️ FEATURES\n❤️ 3-Life Hardcore System — Death actually matters\n🩸 Deadly PvP — Fight, raid, betray, or form alliances\n🗡️ Custom Combat & Weapons — More ways to take down your enemies\n🧬 Origins — Choose unique abilities and build around your playstyle\n👹 Custom Mobs — The world isn't your only enemy\n💀 Golden Heads — Turn victories into an advantage\n🌦️ Custom Seasons — Survive a world that changes around you\n🔊 Proximity Voice Chat — Hear friends... or enemies approaching\n⚡ Instant Restock — Keep the action moving\n🧱 Anti-Dupe & Exploit Protection — Survival stays fair\n\nBuild a base. Make allies. Hunt your enemies. Protect your lives.\n\nYou have 3 chances.\nHow long will you survive?\n\n🌐 IP: hardcore.pulsedmc.net",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP",
+        "Modded",
+        "New"
+      ],
+      "ownerId": "e2ca26eb-348a-41c8-8a32-c4a7edacbaf8",
+      "ownerName": "ItzKuroYT",
+      "votes": 0,
+      "playersOnline": 4,
+      "playersMax": 20,
+      "version": "Paper 26.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-09-06T03:10:55.229Z",
+      "updatedAt": "2026-09-06T03:10:55.230Z",
+      "lastPingAt": "2026-09-06T03:10:56.038Z",
+      "lastPingAttemptAt": "2026-09-06T03:10:56.038Z",
+      "javaStatusTarget": "hardcore.pulsedmc.net",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-09-06T03:10:56.038Z",
+            "playersOnline": 4,
+            "playersMax": 20,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-09-06T03:10:56.038Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": []
     }
   ],
   "clients": [
