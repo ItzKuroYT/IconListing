@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-07T20:46:11.483Z",
+  "generatedAt": "2026-09-07T20:46:15.564Z",
   "servers": [
     {
       "id": "e05bb489-241c-420c-8243-6427106b4476",
@@ -259,9 +259,9 @@
       "uptimePercent": 98.44054580896686,
       "sponsored": false,
       "createdAt": "2026-07-01T05:09:11.571Z",
-      "updatedAt": "2026-09-07T20:45:58.806Z",
-      "lastPingAt": "2026-09-07T20:45:58.910Z",
-      "lastSuccessfulPingAt": "2026-09-07T20:45:58.910Z",
+      "updatedAt": "2026-09-07T20:46:08.423Z",
+      "lastPingAt": "2026-09-07T20:46:08.456Z",
+      "lastSuccessfulPingAt": "2026-09-07T20:46:08.456Z",
       "uptimeChecks": 513,
       "uptimeSuccesses": 505,
       "edition": "java",
@@ -1916,9 +1916,9 @@
           "uptimePercent": 98.44054580896686,
           "sponsored": false,
           "createdAt": "2026-07-01T05:09:11.571Z",
-          "updatedAt": "2026-09-07T20:45:58.806Z",
-          "lastPingAt": "2026-09-07T20:45:58.910Z",
-          "lastSuccessfulPingAt": "2026-09-07T20:45:58.910Z",
+          "updatedAt": "2026-09-07T20:46:08.423Z",
+          "lastPingAt": "2026-09-07T20:46:08.456Z",
+          "lastSuccessfulPingAt": "2026-09-07T20:46:08.456Z",
           "uptimeChecks": 513,
           "uptimeSuccesses": 505,
           "edition": "java",
