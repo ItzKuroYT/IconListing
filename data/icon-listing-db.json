@@ -645,6 +645,23 @@
       "googleName": "Alfie Alfie creasey",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKoAEVQILZUDAj122TYz1xfS4bAFhL_n74BczYtA5WPv7zOqA=s96-c",
       "updatedAt": "2026-08-31T22:04:08.334Z"
+    },
+    {
+      "id": "0a10ce31-9a1a-4a0d-8d4e-592688fd1be7",
+      "username": "JaydenHale",
+      "email": "jaydenhale1999@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-09-08T03:39:56.352Z",
+      "termsAcceptedAt": "2026-09-08T03:39:56.352Z",
+      "googleLinkedAt": "2026-09-08T03:39:56.352Z",
+      "createdAt": "2026-09-08T03:39:56.352Z",
+      "banned": false,
+      "googleSub": "115177209011555741053",
+      "googleName": "Jayden Hale",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJAqNOKR44NvWt4TNTB6UG0aSbz3bp66dhOcHxLfi0_EOUqZQ=s96-c",
+      "updatedAt": "2026-09-08T03:39:56.352Z"
     }
   ],
   "servers": [
