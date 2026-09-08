@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-08T22:08:40.995Z",
+  "generatedAt": "2026-09-08T22:13:33.937Z",
   "servers": [
     {
       "id": "e05bb489-241c-420c-8243-6427106b4476",
@@ -1750,6 +1750,62 @@
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=HARDCORE-3-lives&kind=icon",
       "rank": 32,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
+      "id": "125bf68e-02e4-457e-bc6b-02cb986f4644",
+      "name": "Hardline Vanilla Anarchy",
+      "javaHost": "hardlinevanilla.com",
+      "javaPort": 25565,
+      "javaSrvResolved": true,
+      "javaStatusTarget": "hardlinevanilla.com",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/X4WX4HZDw",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Hardline-Vanilla-Anarchy&kind=banner",
+      "description": "★ HARDLINE VANILLA ★The map launched TODAY.Coordinates 0, 0 is a pristine, untouched vanilla landscape. No lava casts. No obsidian traps. No ruined craters. Every resource vein and ancient city around spawn is completely up for grabs. Get a massive head start on Day One of a brand-new anarchy timeline.Most anarchy servers are ruined by hack clients. We wanted the raw, brutal freedom of true anarchy, but played entirely on a vanilla client. Hack clients are strictly blocked. Your actual survival skills, base stealth, and vanilla PvP abilities determine who dominates the map.This server features absolute, 100% zero moderation. No admins watching your back. No chat filters. No land claims. No staff intervention. The wilderness is yours to shape, conquer, or destroy.⚔ SERVER FEATURES:Fresh World: Pristine launch map. Secure your base coordinates early.Zero Moderation: Griefing, raiding, and complex betrayals are 100% legal.Strictly No P2W: No gameplay advantages sold. Optional support is cosmetic-only.Pure Vanilla [1.26+]: No /home, no /tpa, and no spawn protection.Unreportable Chat: Secure profiles disabled. Chat signatures stripped automatically.",
+      "tags": [
+        "Survival",
+        "PvP",
+        "Roleplay",
+        "RPG",
+        "Vanilla",
+        "New"
+      ],
+      "ownerName": "HardlineVanilla",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 100,
+      "version": "Purpur 26.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-09-08T22:13:26.441Z",
+      "updatedAt": "2026-09-08T22:13:26.441Z",
+      "lastPingAt": "2026-09-08T22:13:27.009Z",
+      "lastSuccessfulPingAt": "2026-09-08T22:13:27.009Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Hardline-Vanilla-Anarchy&kind=icon",
+      "rank": 33,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
