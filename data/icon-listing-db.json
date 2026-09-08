@@ -662,6 +662,23 @@
       "googleName": "Jayden Hale",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJAqNOKR44NvWt4TNTB6UG0aSbz3bp66dhOcHxLfi0_EOUqZQ=s96-c",
       "updatedAt": "2026-09-08T03:39:56.352Z"
+    },
+    {
+      "id": "1983455b-f88a-4046-aa34-c7b0a3dd1891",
+      "username": "HardlineVanilla",
+      "email": "hardlinevanilla@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-09-08T22:03:45.540Z",
+      "termsAcceptedAt": "2026-09-08T22:03:45.540Z",
+      "googleLinkedAt": "2026-09-08T22:03:45.540Z",
+      "createdAt": "2026-09-08T22:03:45.540Z",
+      "banned": false,
+      "googleSub": "102679470425188101638",
+      "googleName": "Hardline Vanilla",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJqoXZiWq9099diDLhSyHP8MnS-yPYWvtPVMtICZwn4rgBv2Q=s96-c",
+      "updatedAt": "2026-09-08T22:03:45.540Z"
     }
   ],
   "servers": [
