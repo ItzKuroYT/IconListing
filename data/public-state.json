@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-08T03:45:26.484Z",
+  "generatedAt": "2026-09-08T03:45:38.846Z",
   "servers": [
     {
       "id": "e05bb489-241c-420c-8243-6427106b4476",
@@ -887,59 +887,6 @@
       "communityHighlighted": false
     },
     {
-      "id": "36c22702-dd2c-492a-a2c0-06c73b778b6d",
-      "name": "Ntm",
-      "javaHost": "23.230.3.84:25566",
-      "javaPort": 25565,
-      "javaSrvResolved": false,
-      "javaStatusTarget": "23.230.3.84:25566",
-      "crossPlay": false,
-      "bedrockHost": "",
-      "bedrockPort": 19132,
-      "websiteUrl": "",
-      "discordUrl": "https://discord.gg/met5jAjcQv",
-      "youtubeUrl": "",
-      "country": "United States",
-      "bannerUrl": "",
-      "description": "╔══════════════════════╗\n　☢️ N T M ☢️\n　HBM NUCLEAR TECH\n╚══════════════════════╝\n\n⚛️ 1.7.10 • 📦 MODRINTH\n🏭 TECH • ☢️ NUCLEAR • ⚔️ SURVIVAL\n\n🤝 JOIN A TEAM • JOIN A FACTION\n🏴 OR CREATE YOUR OWN\n\n👥 SMALL COMMUNITY • GROWING SERVER",
-      "tags": [
-        "Survival",
-        "Modded",
-        "New"
-      ],
-      "ownerName": "JaydenHale",
-      "votes": 0,
-      "playersOnline": 2,
-      "playersMax": 20,
-      "version": "1.7.10",
-      "online": true,
-      "uptimePercent": 100,
-      "sponsored": false,
-      "createdAt": "2026-09-08T03:45:17.668Z",
-      "updatedAt": "2026-09-08T03:45:17.668Z",
-      "lastPingAt": "2026-09-08T03:45:19.473Z",
-      "lastSuccessfulPingAt": "2026-09-08T03:45:19.473Z",
-      "uptimeChecks": 1,
-      "uptimeSuccesses": 1,
-      "edition": "java",
-      "bedrockType": "server",
-      "realmCode": "",
-      "iconUrl": "",
-      "rank": 17,
-      "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
-      },
-      "reviewStats": {
-        "average": 0,
-        "count": 0
-      },
-      "communityVotesThisWeek": 0,
-      "communityHighlighted": false
-    },
-    {
       "id": "cb42efd4-fbfd-47da-abdb-b153b7f07f9c",
       "name": "Mobcraft SMP",
       "javaHost": "survival.mobcraft.org",
@@ -982,7 +929,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Mobcraft-SMP&kind=icon",
-      "rank": 18,
+      "rank": 17,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1036,7 +983,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 19,
+      "rank": 18,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1093,7 +1040,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PulsedMC-Hosting-FREE&kind=icon",
-      "rank": 20,
+      "rank": 19,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1149,7 +1096,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 21,
+      "rank": 20,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1206,7 +1153,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
-      "rank": 22,
+      "rank": 21,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1257,7 +1204,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 23,
+      "rank": 22,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1308,7 +1255,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 24,
+      "rank": 23,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1363,7 +1310,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 25,
+      "rank": 24,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1419,7 +1366,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 26,
+      "rank": 25,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1472,7 +1419,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=LimboMC&kind=icon",
-      "rank": 27,
+      "rank": 26,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1527,7 +1474,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Tancraft&kind=icon",
-      "rank": 28,
+      "rank": 27,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1582,7 +1529,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 29,
+      "rank": 28,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1639,7 +1586,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Futurelands&kind=icon",
-      "rank": 30,
+      "rank": 29,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1694,7 +1641,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 31,
+      "rank": 30,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1747,7 +1694,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 32,
+      "rank": 31,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1802,6 +1749,57 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=HARDCORE-3-lives&kind=icon",
+      "rank": 32,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
+      "id": "16ab9443-dbe6-4d08-84f6-b3a6fcbb6d97",
+      "name": "Ntm",
+      "javaHost": "23.230.3.84:25566",
+      "javaPort": 25565,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "23.230.3.84:25566",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/met5jAjcQv",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "╔══════════════════════╗\n　☢️ N T M ☢️\n　HBM NUCLEAR TECH\n╚══════════════════════╝\n\n⚛️ 1.7.10 • 📦 MODRINTH\n🏭 TECH • ☢️ NUCLEAR • ⚔️ SURVIVAL\n\n🤝 JOIN A TEAM • JOIN A FACTION\n🏴 OR CREATE YOUR OWN\n\n👥 SMALL COMMUNITY • GROWING SERVER",
+      "tags": [
+        "Survival",
+        "Modded",
+        "New"
+      ],
+      "ownerName": "JaydenHale",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 0,
+      "sponsored": false,
+      "createdAt": "2026-09-08T03:45:32.876Z",
+      "updatedAt": "2026-09-08T03:45:32.876Z",
+      "lastPingAt": "2026-09-08T03:45:32.945Z",
+      "uptimeChecks": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "",
       "rank": 33,
       "analytics": {
         "viewsLast7": 0,
