@@ -662,23 +662,6 @@
       "googleName": "Jayden Hale",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJAqNOKR44NvWt4TNTB6UG0aSbz3bp66dhOcHxLfi0_EOUqZQ=s96-c",
       "updatedAt": "2026-09-08T03:39:56.352Z"
-    },
-    {
-      "id": "1983455b-f88a-4046-aa34-c7b0a3dd1891",
-      "username": "HardlineVanilla",
-      "email": "hardlinevanilla@gmail.com",
-      "passwordHash": "",
-      "emailOptIn": false,
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-09-08T22:03:45.540Z",
-      "termsAcceptedAt": "2026-09-08T22:03:45.540Z",
-      "googleLinkedAt": "2026-09-08T22:03:45.540Z",
-      "createdAt": "2026-09-08T22:03:45.540Z",
-      "banned": false,
-      "googleSub": "102679470425188101638",
-      "googleName": "Hardline Vanilla",
-      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJqoXZiWq9099diDLhSyHP8MnS-yPYWvtPVMtICZwn4rgBv2Q=s96-c",
-      "updatedAt": "2026-09-08T22:03:45.540Z"
     }
   ],
   "servers": [
@@ -12342,7 +12325,7 @@
       },
       {
         "date": "2026-09-08",
-        "count": 5
+        "count": 6
       }
     ],
     "siteVisitVisitorDays": {
@@ -12417,7 +12400,8 @@
         "24b307c8cfca1cdd",
         "d8e72528741ebe44",
         "197b00b3b6de7fbd",
-        "855b92495ab3f678"
+        "855b92495ab3f678",
+        "9096feefe6a525b6"
       ]
     }
   },
