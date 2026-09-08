@@ -11968,7 +11968,7 @@
       "iconListingVoteQueue": []
     },
     {
-      "id": "36c22702-dd2c-492a-a2c0-06c73b778b6d",
+      "id": "16ab9443-dbe6-4d08-84f6-b3a6fcbb6d97",
       "name": "Ntm",
       "edition": "java",
       "javaHost": "23.230.3.84:25566",
@@ -11999,16 +11999,16 @@
       "ownerId": "0a10ce31-9a1a-4a0d-8d4e-592688fd1be7",
       "ownerName": "JaydenHale",
       "votes": 0,
-      "playersOnline": 2,
-      "playersMax": 20,
-      "version": "1.7.10",
-      "online": true,
-      "uptimePercent": 100,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 0,
       "sponsored": false,
-      "createdAt": "2026-09-08T03:45:17.668Z",
-      "updatedAt": "2026-09-08T03:45:17.668Z",
-      "lastPingAt": "2026-09-08T03:45:19.473Z",
-      "lastPingAttemptAt": "2026-09-08T03:45:19.473Z",
+      "createdAt": "2026-09-08T03:45:32.876Z",
+      "updatedAt": "2026-09-08T03:45:32.876Z",
+      "lastPingAt": "2026-09-08T03:45:32.945Z",
+      "lastPingAttemptAt": "2026-09-08T03:45:32.945Z",
       "javaStatusTarget": "23.230.3.84:25566",
       "javaSrvResolved": false,
       "analytics": {
@@ -12018,16 +12018,14 @@
         "viewVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-09-08T03:45:19.473Z",
-            "playersOnline": 2,
-            "playersMax": 20,
-            "online": true
+            "createdAt": "2026-09-08T03:45:32.945Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-09-08T03:45:19.473Z",
       "uptimeChecks": 1,
-      "uptimeSuccesses": 1,
       "iconUrl": "",
       "iconListingVoteQueue": []
     }
