@@ -679,6 +679,23 @@
       "googleName": "Hardline Vanilla",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJqoXZiWq9099diDLhSyHP8MnS-yPYWvtPVMtICZwn4rgBv2Q=s96-c",
       "updatedAt": "2026-09-08T22:03:45.540Z"
+    },
+    {
+      "id": "f2048a0c-c9fc-4ed0-8c2e-44f8c8c3c4da",
+      "username": "Shurimano",
+      "email": "ukmapping40@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-09-09T01:51:46.900Z",
+      "termsAcceptedAt": "2026-09-09T01:51:46.900Z",
+      "googleLinkedAt": "2026-09-09T01:51:46.900Z",
+      "createdAt": "2026-09-09T01:51:46.900Z",
+      "banned": false,
+      "googleSub": "103335892531716861495",
+      "googleName": "Shurimano",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKTHACLldt1dig-9emVyGyTl8Pnk2EZs_j0kTTTVTnZz5QkjDiG=s96-c",
+      "updatedAt": "2026-09-09T01:51:46.900Z"
     }
   ],
   "servers": [
