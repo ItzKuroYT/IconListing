@@ -3622,18 +3622,11 @@
           {
             "date": "2026-09-02",
             "count": 1
-          },
-          {
-            "date": "2026-09-11",
-            "count": 1
           }
         ],
         "viewVisitorDays": {
           "2026-09-02": [
             "e2cf854144e0229f"
-          ],
-          "2026-09-11": [
-            "e9fa2da1259f4ab6"
           ]
         },
         "playerHistory": [
@@ -12420,7 +12413,7 @@
       },
       {
         "date": "2026-09-11",
-        "count": 7
+        "count": 8
       }
     ],
     "siteVisitVisitorDays": {
@@ -12520,7 +12513,8 @@
         "8ee415c7ade7edc7",
         "2226b83583f848e6",
         "f30db184355341e7",
-        "32dc5e0e323122cc"
+        "32dc5e0e323122cc",
+        "e9fa2da1259f4ab6"
       ]
     }
   },
