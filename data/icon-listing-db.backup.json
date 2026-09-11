@@ -5373,8 +5373,17 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-09-11",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-09-11": [
+            "d00c2312eef279ed"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-08-31T23:15:58.831Z",
@@ -6409,8 +6418,17 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-09-11",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-09-11": [
+            "d00c2312eef279ed"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-08-31T23:16:00.796Z",
@@ -11375,18 +11393,11 @@
           {
             "date": "2026-09-05",
             "count": 1
-          },
-          {
-            "date": "2026-09-11",
-            "count": 1
           }
         ],
         "viewVisitorDays": {
           "2026-09-05": [
             "01d2f473819535ac"
-          ],
-          "2026-09-11": [
-            "32dc5e0e323122cc"
           ]
         },
         "playerHistory": [
