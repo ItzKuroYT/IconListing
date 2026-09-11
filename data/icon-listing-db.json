@@ -1100,8 +1100,17 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-09-11",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-09-11": [
+            "315c09dd6410bcc4"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-09-01T21:54:20.113Z",
@@ -8878,18 +8887,11 @@
           {
             "date": "2026-09-02",
             "count": 1
-          },
-          {
-            "date": "2026-09-11",
-            "count": 1
           }
         ],
         "viewVisitorDays": {
           "2026-09-02": [
             "1c3877dcf1a31a59"
-          ],
-          "2026-09-11": [
-            "f042344157438349"
           ]
         },
         "playerHistory": [
