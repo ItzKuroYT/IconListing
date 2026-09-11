@@ -7811,8 +7811,17 @@
             "27f05e375b90bc70"
           ]
         },
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-09-11",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-09-11": [
+            "784cbf410e08bd79"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-08-31T09:56:44.621Z",
