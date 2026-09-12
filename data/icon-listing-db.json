@@ -679,6 +679,23 @@
       "googleName": "Hardline Vanilla",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJqoXZiWq9099diDLhSyHP8MnS-yPYWvtPVMtICZwn4rgBv2Q=s96-c",
       "updatedAt": "2026-09-08T22:03:45.540Z"
+    },
+    {
+      "id": "d523a5c8-97c7-4e61-b100-53759dcfe268",
+      "username": "GoogleUser",
+      "email": "lejand141211@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-09-12T06:30:27.191Z",
+      "termsAcceptedAt": "2026-09-12T06:30:27.191Z",
+      "googleLinkedAt": "2026-09-12T06:30:27.191Z",
+      "createdAt": "2026-09-12T06:30:27.191Z",
+      "banned": false,
+      "googleSub": "106534447817785583613",
+      "googleName": "르재낭",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocL75pTIm6RK76tm5vcBiBw70LhVyBXUzfcYxBQnw9uPBFM-khFy=s96-c",
+      "updatedAt": "2026-09-12T06:30:27.191Z"
     }
   ],
   "servers": [
