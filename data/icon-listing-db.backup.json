@@ -681,21 +681,21 @@
       "updatedAt": "2026-09-08T22:03:45.540Z"
     },
     {
-      "id": "38b83459-3b4c-45ec-aff1-0cffd6e6b1ae",
+      "id": "9595e815-fef3-4592-8da8-74d834778a7e",
       "username": "MaxwellPellot",
       "email": "sigmalobster82@gmail.com",
       "passwordHash": "",
       "emailOptIn": false,
       "emailVerified": true,
-      "emailVerifiedAt": "2026-09-17T01:18:26.813Z",
-      "termsAcceptedAt": "2026-09-17T01:18:26.813Z",
-      "googleLinkedAt": "2026-09-17T01:18:26.813Z",
-      "createdAt": "2026-09-17T01:18:26.813Z",
+      "emailVerifiedAt": "2026-09-17T01:17:58.440Z",
+      "termsAcceptedAt": "2026-09-17T01:17:58.440Z",
+      "googleLinkedAt": "2026-09-17T01:17:58.440Z",
+      "createdAt": "2026-09-17T01:17:58.440Z",
       "banned": false,
       "googleSub": "114914593684203470755",
       "googleName": "Maxwell Pellot",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocL_5rvbckZ64wN6EH798A1zEOozI_MNi14XbY1XYMkg2YdERc07=s96-c",
-      "updatedAt": "2026-09-17T01:18:26.813Z"
+      "updatedAt": "2026-09-17T01:17:58.440Z"
     }
   ],
   "servers": [
