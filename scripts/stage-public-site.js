@@ -3,9 +3,9 @@ const path = require("path");
 
 const root = path.resolve(__dirname, "..");
 const output = path.join(root, "_site");
-const directories = new Set(["assets", "admin", "community", "contact", "dashboard", "download", "guides", "help", "home", "login", "privacy", "server", "servers", "sponsored", "sponsored-clients", "sponsored-hosts", "terms", "tools", "vote"]);
+const directories = new Set(["assets", "admin", "community", "contact", "dashboard", "download", "guides", "help", "home", "incoming", "login", "privacy", "server", "servers", "sponsored", "sponsored-clients", "sponsored-hosts", "terms", "tools", "vote"]);
 const rootFiles = new Set(["index.html", "404.html", "config.js", "ads.txt", "robots.txt", "sitemap.xml", "BingSiteAuth.xml", "CNAME", ".nojekyll", "logo.png"]);
-const assetExtensions = new Set([".html", ".css", ".js", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".svg", ".woff", ".woff2", ".ttf", ".mp4", ".webm", ".jar", ".zip", ".pdf"]);
+const assetExtensions = new Set([".html", ".css", ".js", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".svg", ".woff", ".woff2", ".ttf", ".mp3", ".mp4", ".webm", ".jar", ".zip", ".pdf"]);
 
 async function copyPublicDirectory(source, destination) {
   await fs.mkdir(destination, { recursive: true });

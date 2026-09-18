@@ -12,6 +12,7 @@ const mime = {
   ".jpeg": "image/jpeg",
   ".png": "image/png",
   ".gif": "image/gif",
+  ".mp3": "audio/mpeg",
   ".json": "application/json; charset=utf-8"
 };
 

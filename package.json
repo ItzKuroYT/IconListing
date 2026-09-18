@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vercel dev",
     "static": "node dev-server.js",
-    "check": "node -c api/index.js && node -c assets/js/app.js && node -c assets/js/ads.js && node -c dev-server.js && node -c scripts/generate-server-pages.js && node -c scripts/editorial-pages.js && node -c scripts/refresh-shell-assets.js && node -c scripts/stage-public-site.js",
+    "check": "node -c api/index.js && node -c assets/js/app.js && node -c assets/js/ads.js && node -c assets/js/incoming.js && node -c dev-server.js && node -c scripts/generate-server-pages.js && node -c scripts/editorial-pages.js && node -c scripts/refresh-shell-assets.js && node -c scripts/stage-public-site.js",
     "generate:server-pages": "node scripts/generate-server-pages.js",
     "smoke": "node scripts/smoke-test.js"
   },
