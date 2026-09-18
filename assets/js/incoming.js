@@ -25,6 +25,7 @@
   document.body.dataset.page = validViews.has(requestedView) ? requestedView : "home";
 
   const prefersReducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const introHoldMs = 3000;
   let navigating = false;
 
   function transitionMarkup() {
@@ -52,7 +53,7 @@
     let playing = false;
 
     const start = () => {
-      if (playing || Date.now() - startedAt >= 5000) return;
+      if (playing || Date.now() - startedAt >= introHoldMs) return;
       const elapsedSeconds = (Date.now() - startedAt) / 1000;
       try {
         const duration = Number.isFinite(audio.duration) ? audio.duration : 30;
@@ -68,14 +69,14 @@
 
     const fade = window.setInterval(() => {
       const elapsed = Date.now() - startedAt;
-      if (elapsed < 4200) return;
-      audio.volume = Math.max(0, .32 * (5000 - elapsed) / 800);
+      if (elapsed < 2400) return;
+      audio.volume = Math.max(0, .32 * (introHoldMs - elapsed) / 600);
     }, 50);
     window.setTimeout(() => {
       window.clearInterval(fade);
       audio.pause();
       audio.currentTime = 0;
-    }, 5000);
+    }, introHoldMs);
   }
 
   function revealPage() {
@@ -84,8 +85,8 @@
     overlay.classList.add("is-covered");
     document.body.appendChild(overlay);
     playIntroAudio();
-    window.setTimeout(() => overlay.classList.add("is-revealing"), 5000);
-    window.setTimeout(() => overlay.remove(), 5580);
+    window.setTimeout(() => overlay.classList.add("is-revealing"), introHoldMs);
+    window.setTimeout(() => overlay.remove(), introHoldMs + 580);
   }
 
   function previewDestination(url) {
