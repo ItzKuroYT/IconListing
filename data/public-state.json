@@ -1,11 +1,7 @@
 {
   "version": 2,
-<<<<<<< Updated upstream
-  "generatedAt": "2026-09-18T20:58:57.090Z",
-=======
   "generatedAt": "2026-09-18T20:59:03.623Z",
   "campaigns": [],
->>>>>>> Stashed changes
   "servers": [
     {
       "id": "7dd4fd47-e5db-43cf-97de-61e97a15edf1",
@@ -153,13 +149,8 @@
       "sponsored": false,
       "createdAt": "2026-07-07T13:08:06.265Z",
       "updatedAt": "2026-07-07T13:08:06.265Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.029Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:52.029Z",
-=======
       "lastPingAt": "2026-09-18T20:56:56.203Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:56.203Z",
->>>>>>> Stashed changes
       "uptimeChecks": 475,
       "uptimeSuccesses": 473,
       "edition": "java",
@@ -213,13 +204,8 @@
       "sponsored": false,
       "createdAt": "2026-07-01T05:09:11.571Z",
       "updatedAt": "2026-09-07T20:46:08.423Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:51.788Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:51.788Z",
-=======
       "lastPingAt": "2026-09-18T20:56:54.693Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:54.693Z",
->>>>>>> Stashed changes
       "uptimeChecks": 580,
       "uptimeSuccesses": 572,
       "edition": "java",
@@ -331,13 +317,8 @@
       "sponsored": false,
       "createdAt": "2026-06-24T23:07:18.215Z",
       "updatedAt": "2026-07-09T07:59:28.615Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.193Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:52.193Z",
-=======
       "lastPingAt": "2026-09-18T20:56:58.732Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:58.732Z",
->>>>>>> Stashed changes
       "uptimeChecks": 701,
       "uptimeSuccesses": 687,
       "edition": "java",
@@ -391,13 +372,8 @@
       "sponsored": false,
       "createdAt": "2026-07-30T22:52:01.841Z",
       "updatedAt": "2026-07-30T22:52:01.841Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:51.774Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:51.774Z",
-=======
       "lastPingAt": "2026-09-18T20:56:54.370Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:54.370Z",
->>>>>>> Stashed changes
       "uptimeChecks": 286,
       "uptimeSuccesses": 286,
       "edition": "java",
@@ -562,11 +538,7 @@
       "sponsored": false,
       "createdAt": "2026-07-11T16:55:27.628Z",
       "updatedAt": "2026-07-11T16:55:27.628Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:51.771Z",
-=======
       "lastPingAt": "2026-09-18T20:56:54.180Z",
->>>>>>> Stashed changes
       "lastSuccessfulPingAt": "2026-08-16T07:28:45.095Z",
       "uptimeChecks": 417,
       "uptimeSuccesses": 171,
@@ -620,11 +592,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T19:52:18.582Z",
       "updatedAt": "2026-06-24T19:52:18.582Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.153Z",
-=======
       "lastPingAt": "2026-09-18T20:56:56.153Z",
->>>>>>> Stashed changes
       "uptimeChecks": 705,
       "edition": "java",
       "bedrockType": "server",
@@ -678,11 +646,7 @@
       "sponsored": false,
       "createdAt": "2026-06-24T22:19:40.168Z",
       "updatedAt": "2026-06-24T22:20:23.472Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:51.989Z",
-=======
       "lastPingAt": "2026-09-18T20:56:55.205Z",
->>>>>>> Stashed changes
       "lastSuccessfulPingAt": "2026-07-31T00:19:33.470Z",
       "uptimeChecks": 709,
       "uptimeSuccesses": 360,
@@ -794,11 +758,7 @@
       "sponsored": false,
       "createdAt": "2026-07-11T01:34:35.522Z",
       "updatedAt": "2026-07-11T01:34:35.523Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:51.773Z",
-=======
       "lastPingAt": "2026-09-18T20:56:54.191Z",
->>>>>>> Stashed changes
       "lastSuccessfulPingAt": "2026-08-30T21:16:35.936Z",
       "uptimeChecks": 413,
       "uptimeSuccesses": 256,
@@ -853,13 +813,8 @@
       "sponsored": false,
       "createdAt": "2026-08-04T21:24:59.018Z",
       "updatedAt": "2026-08-04T21:24:59.018Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.017Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:52.017Z",
-=======
       "lastPingAt": "2026-09-18T20:56:57.579Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:57.579Z",
->>>>>>> Stashed changes
       "uptimeChecks": 231,
       "uptimeSuccesses": 228,
       "edition": "java",
@@ -912,11 +867,7 @@
       "sponsored": false,
       "createdAt": "2026-09-05T01:44:31.736Z",
       "updatedAt": "2026-09-05T01:54:11.862Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.171Z",
-=======
       "lastPingAt": "2026-09-18T20:56:57.757Z",
->>>>>>> Stashed changes
       "uptimeChecks": 91,
       "edition": "bedrock",
       "bedrockType": "realm",
@@ -1022,13 +973,8 @@
       "sponsored": false,
       "createdAt": "2026-07-31T15:16:27.026Z",
       "updatedAt": "2026-07-31T15:16:27.026Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.211Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:52.211Z",
-=======
       "lastPingAt": "2026-09-18T20:56:57.932Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:57.932Z",
->>>>>>> Stashed changes
       "uptimeChecks": 182,
       "uptimeSuccesses": 120,
       "edition": "java",
@@ -1084,13 +1030,8 @@
       "sponsored": false,
       "createdAt": "2026-07-31T22:23:53.982Z",
       "updatedAt": "2026-07-31T22:23:53.982Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.029Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:52.029Z",
-=======
       "lastPingAt": "2026-09-18T20:56:56.010Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:56.010Z",
->>>>>>> Stashed changes
       "uptimeChecks": 283,
       "uptimeSuccesses": 283,
       "edition": "java",
@@ -1143,11 +1084,7 @@
       "sponsored": false,
       "createdAt": "2026-06-30T15:54:50.226Z",
       "updatedAt": "2026-06-30T15:54:50.226Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.169Z",
-=======
       "lastPingAt": "2026-09-18T20:56:56.118Z",
->>>>>>> Stashed changes
       "lastSuccessfulPingAt": "2026-09-15T16:51:06.093Z",
       "uptimeChecks": 623,
       "uptimeSuccesses": 608,
@@ -1260,11 +1197,7 @@
       "sponsored": false,
       "createdAt": "2026-07-15T19:12:21.727Z",
       "updatedAt": "2026-07-15T19:12:21.727Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.014Z",
-=======
       "lastPingAt": "2026-09-18T20:56:57.754Z",
->>>>>>> Stashed changes
       "lastSuccessfulPingAt": "2026-08-28T19:33:13.623Z",
       "uptimeChecks": 281,
       "uptimeSuccesses": 85,
@@ -1321,13 +1254,8 @@
       "sponsored": false,
       "createdAt": "2026-07-16T08:31:34.016Z",
       "updatedAt": "2026-07-16T08:31:34.016Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.551Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:52.551Z",
-=======
       "lastPingAt": "2026-09-18T20:56:58.542Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:58.542Z",
->>>>>>> Stashed changes
       "uptimeChecks": 336,
       "uptimeSuccesses": 330,
       "edition": "java",
@@ -1377,11 +1305,7 @@
       "sponsored": false,
       "createdAt": "2026-07-18T17:47:06.038Z",
       "updatedAt": "2026-07-18T17:47:06.038Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:51.756Z",
-=======
       "lastPingAt": "2026-09-18T20:56:54.176Z",
->>>>>>> Stashed changes
       "lastSuccessfulPingAt": "2026-07-21T09:35:31.877Z",
       "uptimeChecks": 346,
       "uptimeSuccesses": 15,
@@ -1434,11 +1358,7 @@
       "sponsored": false,
       "createdAt": "2026-07-22T23:58:48.996Z",
       "updatedAt": "2026-07-23T00:21:45.419Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:51.758Z",
-=======
       "lastPingAt": "2026-09-18T20:56:55.951Z",
->>>>>>> Stashed changes
       "uptimeChecks": 300,
       "edition": "java",
       "bedrockType": "server",
@@ -1547,13 +1467,8 @@
       "sponsored": false,
       "createdAt": "2026-07-28T01:53:56.492Z",
       "updatedAt": "2026-07-28T01:53:56.492Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.207Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:52.207Z",
-=======
       "lastPingAt": "2026-09-18T20:56:58.775Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:58.775Z",
->>>>>>> Stashed changes
       "uptimeChecks": 260,
       "uptimeSuccesses": 258,
       "edition": "java",
@@ -1601,13 +1516,13 @@
       "playersMax": 0,
       "version": "Unknown",
       "online": false,
-      "uptimePercent": 90.36144578313254,
+      "uptimePercent": 90.7258064516129,
       "sponsored": false,
       "createdAt": "2026-07-30T00:38:55.936Z",
       "updatedAt": "2026-07-30T00:42:38.461Z",
-      "lastPingAt": "2026-09-18T20:58:52.210Z",
+      "lastPingAt": "2026-09-18T20:25:23.742Z",
       "lastSuccessfulPingAt": "2026-09-09T08:52:18.557Z",
-      "uptimeChecks": 249,
+      "uptimeChecks": 248,
       "uptimeSuccesses": 225,
       "edition": "java",
       "bedrockType": "server",
@@ -1660,11 +1575,7 @@
       "sponsored": false,
       "createdAt": "2026-08-01T01:46:07.018Z",
       "updatedAt": "2026-08-01T01:46:07.018Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.192Z",
-=======
       "lastPingAt": "2026-09-18T20:56:58.629Z",
->>>>>>> Stashed changes
       "lastSuccessfulPingAt": "2026-09-01T21:55:05.219Z",
       "uptimeChecks": 255,
       "uptimeSuccesses": 6,
@@ -1721,11 +1632,7 @@
       "sponsored": false,
       "createdAt": "2026-08-04T19:32:15.223Z",
       "updatedAt": "2026-08-04T19:32:15.223Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.013Z",
-=======
       "lastPingAt": "2026-09-18T20:56:57.640Z",
->>>>>>> Stashed changes
       "lastSuccessfulPingAt": "2026-08-20T04:29:28.794Z",
       "uptimeChecks": 134,
       "uptimeSuccesses": 56,
@@ -1780,13 +1687,8 @@
       "sponsored": false,
       "createdAt": "2026-08-13T23:16:54.317Z",
       "updatedAt": "2026-08-13T23:16:54.317Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:51.770Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:51.770Z",
-=======
       "lastPingAt": "2026-09-18T20:56:55.631Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:55.631Z",
->>>>>>> Stashed changes
       "uptimeChecks": 233,
       "uptimeSuccesses": 231,
       "edition": "java",
@@ -1838,11 +1740,7 @@
       "sponsored": false,
       "createdAt": "2026-08-31T22:13:24.965Z",
       "updatedAt": "2026-08-31T22:13:24.965Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.035Z",
-=======
       "lastPingAt": "2026-09-18T20:56:56.149Z",
->>>>>>> Stashed changes
       "lastSuccessfulPingAt": "2026-09-18T08:39:26.448Z",
       "uptimeChecks": 137,
       "uptimeSuccesses": 83,
@@ -1897,13 +1795,8 @@
       "sponsored": false,
       "createdAt": "2026-09-06T03:10:55.229Z",
       "updatedAt": "2026-09-06T03:10:55.230Z",
-<<<<<<< Updated upstream
-      "lastPingAt": "2026-09-18T20:58:52.194Z",
-      "lastSuccessfulPingAt": "2026-09-18T20:58:52.194Z",
-=======
       "lastPingAt": "2026-09-18T20:56:57.923Z",
       "lastSuccessfulPingAt": "2026-09-18T20:56:57.923Z",
->>>>>>> Stashed changes
       "uptimeChecks": 79,
       "uptimeSuccesses": 79,
       "edition": "java",
@@ -2023,13 +1916,8 @@
           "sponsored": false,
           "createdAt": "2026-07-07T13:08:06.265Z",
           "updatedAt": "2026-07-07T13:08:06.265Z",
-<<<<<<< Updated upstream
-          "lastPingAt": "2026-09-18T20:58:52.029Z",
-          "lastSuccessfulPingAt": "2026-09-18T20:58:52.029Z",
-=======
           "lastPingAt": "2026-09-18T20:56:56.203Z",
           "lastSuccessfulPingAt": "2026-09-18T20:56:56.203Z",
->>>>>>> Stashed changes
           "uptimeChecks": 475,
           "uptimeSuccesses": 473,
           "edition": "java",
@@ -2083,13 +1971,8 @@
           "sponsored": false,
           "createdAt": "2026-07-01T05:09:11.571Z",
           "updatedAt": "2026-09-07T20:46:08.423Z",
-<<<<<<< Updated upstream
-          "lastPingAt": "2026-09-18T20:58:51.788Z",
-          "lastSuccessfulPingAt": "2026-09-18T20:58:51.788Z",
-=======
           "lastPingAt": "2026-09-18T20:56:54.693Z",
           "lastSuccessfulPingAt": "2026-09-18T20:56:54.693Z",
->>>>>>> Stashed changes
           "uptimeChecks": 580,
           "uptimeSuccesses": 572,
           "edition": "java",
@@ -2420,11 +2303,11 @@
         "name": "Free",
         "price": "$0/mo",
         "priceCents": 0,
-        "serverLimit": 2,
+        "serverLimit": 1,
         "sponsorCredits": 0,
         "sponsorDurationDays": 0,
         "sponsorDurationLabel": "No sponsor slot",
-        "description": "List up to 2 servers for free.",
+        "description": "List one server for free.",
         "effectivePriceCents": 0,
         "effectivePrice": "$0/mo",
         "saleActive": false
