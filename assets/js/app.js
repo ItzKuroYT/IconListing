@@ -215,7 +215,7 @@ function normalizeBillingPlan(key, plan = {}) {
     name: cleanText(plan.name || key),
     price: key === "free" ? "$0/mo" : priceLabel(priceCents),
     priceCents,
-    serverLimit: Math.max(key === "free" ? 2 : 1, Math.min(25, Number(plan.serverLimit || (key === "free" ? 2 : 4)))),
+    serverLimit: Math.round(clampNumber(plan.serverLimit, 1, 25, key === "free" ? 1 : 4)),
     sponsorCredits,
     sponsorDurationDays,
     sponsorDurationLabel: sponsorCredits ? `${sponsorCredits} sponsor${sponsorCredits === 1 ? "" : "s"} for ${sponsorDurationDays} days` : "No sponsor slot",
@@ -224,7 +224,9 @@ function normalizeBillingPlan(key, plan = {}) {
 }
 
 function billingSettings(state = {}) {
-  return normalizeBillingSettings(store.billingOverride || state.billing || defaultBillingSettings());
+  const cached = store.billingOverride;
+  const billing = billingUpdatedTime(state.billing) >= billingUpdatedTime(cached) ? (state.billing || cached) : cached;
+  return normalizeBillingSettings(billing || defaultBillingSettings());
 }
 
 function billingPlanCatalog(state = {}) {
@@ -234,6 +236,7 @@ function billingPlanCatalog(state = {}) {
 function publicBillingSettings(state = {}) {
   const billing = billingSettings(state);
   return {
+    updatedAt: billing.updatedAt,
     currency: billing.currency,
     stripeTaxCode: billing.stripeTaxCode,
     stripeTaxBehavior: billing.stripeTaxBehavior,
@@ -599,12 +602,13 @@ function publicUser(user, state = {}) {
 }
 
 function publicClientState(state = {}, options = {}) {
-  const servers = Array.isArray(state.servers) ? state.servers.map(publicClientServer) : [];
+  const servers = Array.isArray(state.servers) ? state.servers.filter((server) => !["suspended", "pending"].includes(server.moderationStatus)).map(publicClientServer) : [];
   const votes = Array.isArray(state.votes) ? state.votes : [];
   const reviews = Array.isArray(state.reviews) ? state.reviews.map(normalizeReview).filter(Boolean).filter((review) => review.hidden !== true) : [];
   const communityVotes = Array.isArray(state.communityVotes) ? state.communityVotes.map(normalizeCommunityVote).filter(Boolean) : [];
   return {
     users: [],
+    campaigns: Array.isArray(state.campaigns) ? state.campaigns.filter((item) => item.active && !item.deleted) : [],
     servers: rankServers(servers, votes, reviews, communityVotes),
     clients: (Array.isArray(state.clients) ? state.clients : []).map(normalizeClient),
     hosts: (Array.isArray(state.hosts) ? state.hosts : []).map(normalizeHost),
@@ -1472,6 +1476,7 @@ async function getState() {
   const detailServerId = ["server", "vote"].includes(page) ? (params.get("id") || params.get("server")) : "";
   const detailServerSlug = page === "server" ? serverSlugFromPath() : "";
   const stateParams = detailServerId ? { serverId: detailServerId } : detailServerSlug ? { serverSlug: detailServerSlug } : {};
+  if (["admin", "dashboard", "plans"].includes(page)) stateParams.scope = "account";
   if (page === "dashboard" || page === "admin" || page === "server" || page === "vote" || page === "community") stateParams.fresh = "1";
   const state = await request("state", stateParams, "GET");
   rememberBilling(state.billing);
@@ -1581,7 +1586,8 @@ function setSeoMeta(options = {}) {
   const keywords = [...new Set([...(seo.keywords || []), ...(options.keywords || [])].filter(Boolean))].join(", ");
   document.title = title;
   upsertMeta("name", "description", description);
-  upsertMeta("name", "robots", "index, follow, max-image-preview:large");
+  const privatePage = ["admin", "dashboard", "login", "vote"].includes(document.body.dataset.page);
+  upsertMeta("name", "robots", privatePage || location.search ? "noindex, follow" : "index, follow, max-image-preview:large");
   upsertMeta("name", "keywords", keywords);
   upsertMeta("name", "application-name", CONFIG.site.name);
   upsertMeta("name", "theme-color", CONFIG.theme?.colors?.purple || "#8b5cf6");
@@ -2848,7 +2854,8 @@ function renderServerDetail(state) {
           <div class="mini-stat"><strong>#${server.rank || "-"}</strong><span>rank</span></div>
         </div>
         <div class="description-card">
-          <h3>About this server</h3>
+          ${server.directoryNotes ? `<h3>Directory notes</h3><p>${escapeHtml(server.directoryNotes)}</p>` : ""}
+          <h3>About this server</h3><p class="muted">Description supplied by the server owner.</p>
           <div class="description-text">${escapeHtml(server.description)}</div>
         </div>
         <a class="button vote-wide" href="${route(`/vote/?server=${encodeURIComponent(server.id)}`)}">Vote for ${escapeHtml(server.name)}</a>
@@ -3296,6 +3303,7 @@ function renderVotePage(state) {
       }
       if (result.servers) cachePublicState(result);
       toast("Vote counted. Thanks for supporting this server.");
+      showSiteCampaign({ ...state, ...result });
       renderVotePage(state);
     } catch (error) {
       toast(publicRequestError("vote", error));
@@ -3915,6 +3923,7 @@ function renderDashboard(state) {
         <div>
           <h2 class="server-title">${escapeHtml(server.name)}</h2>
           <p class="server-ip">${escapeHtml(serverAddress(server))}</p>
+          ${["suspended", "pending"].includes(server.moderationStatus) ? `<p class="notice"><strong>${server.moderationStatus === "pending" ? "Awaiting admin review" : "Changes required"}</strong><br>${escapeHtml(server.moderationReason || "Edit and resubmit this listing for review.")}</p>` : ""}
         </div>
         <div class="row-actions">
           <a class="button" href="${serverRoute(server)}">View</a>
@@ -3956,6 +3965,7 @@ function serverFormMarkup(server = {}) {
   return `<form id="serverForm" class="card form">
     <input type="hidden" id="serverId" value="${escapeHtml(server.id || "")}">
     <h2 class="section-title">${server.id ? "Edit Server" : "Add Server"}</h2>
+    ${["suspended", "pending"].includes(server.moderationStatus) ? `<p class="notice">${escapeHtml(server.moderationReason || "Changes required.")} Your saved changes will go to an admin before this listing becomes public again.</p>` : ""}
     <div class="form-grid">
       <div class="field"><label>Server Name</label><input id="serverName" class="input" value="${escapeHtml(server.name || "")}" required></div>
       <div class="field"><label>Country</label><select id="serverCountry" class="select" required>${CONFIG.countries.map((country) => `<option ${country === server.country ? "selected" : ""}>${country}</option>`).join("")}</select></div>
@@ -4013,6 +4023,7 @@ function serverFormMarkup(server = {}) {
     </div>
     <div class="field"><label>Banner Upload</label><input id="bannerUpload" class="input" type="file" accept="image/png,image/gif,image/jpeg"></div>
     <div class="field"><label>Description</label><textarea id="description" class="textarea" minlength="${CONFIG.limits.descriptionMinLength}" required>${escapeHtml(server.description || "")}</textarea></div>
+    ${document.body.dataset.page === "admin" ? `<div class="field"><label for="directoryNotes">Public directory notes (staff commentary)</label><textarea id="directoryNotes" class="textarea" maxlength="3000">${escapeHtml(server.directoryNotes || "")}</textarea></div>` : ""}
     <div class="field"><label>Tags</label><div id="tagPicker" class="tag-picker">${ALL_TAGS.map((tag) => `<button type="button" class="tag-choice ${(server.tags || []).includes(tag) ? "selected" : ""}" data-tag="${tag}">${tag}</button>`).join("")}</div></div>
     <button class="button primary" type="submit">Save Listing</button>
   </form>`;
@@ -4232,14 +4243,16 @@ async function submitServerForm(event) {
         country: $("#serverCountry").value,
         bannerUrl: $("#bannerUrl").value,
         description: $("#description").value,
+        ...($("#directoryNotes") ? { directoryNotes: $("#directoryNotes").value } : {}),
         tags: selectedTags
       }
     });
-    toast("Listing saved to shared storage.");
+    toast(result.server?.moderationStatus === "pending" ? "Changes submitted for admin review. Your listing stays hidden until approved." : "Listing saved to shared storage.");
     if (Array.isArray(result.servers) && result.user) {
       syncAuthUi(result.user);
       cachePublicState(result);
-      renderDashboard({ ...result, votes: result.votes || [] });
+      if (document.body.dataset.page === "admin") renderAdmin({ ...result, votes: result.votes || [] });
+      else renderDashboard({ ...result, votes: result.votes || [] });
     } else {
       boot();
     }
@@ -4310,13 +4323,17 @@ function renderAdmin(state) {
       <div class="section-head"><div><h1 class="section-title">${escapeHtml(copy("admin.title", "Admin Panel"))}</h1><p class="section-copy">${escapeHtml(copy("admin.body", "Manage servers, sponsorships, clients, users, and bans."))}</p></div></div>
       <div class="grid two">
         <div class="card"><h2>${escapeHtml(copy("admin.serverListingsTitle", "Server Listings"))}</h2><div class="dashboard-list">${state.servers.length ? state.servers.map((server) => `<div class="dash-item">
-          <div class="rank">#${server.rank}</div><div><strong>${escapeHtml(server.name)}</strong><p class="server-ip">${escapeHtml(serverAddress(server))}</p></div>
-          <div class="row-actions"><button class="button" data-admin="toggleSponsor" data-id="${server.id}">${server.sponsored ? "Unsponsor" : "Sponsor"}</button><button class="button danger" data-delete="${server.id}">Delete</button></div>
+          <div class="rank">${server.rank ? `#${server.rank}` : "--"}</div><div><strong>${escapeHtml(server.name)}</strong><p class="server-ip">${escapeHtml(serverAddress(server))}</p><p>${escapeHtml(server.moderationStatus || "published")}</p>${server.moderationReason ? `<p>${escapeHtml(server.moderationReason)}</p>` : ""}</div>
+          <div class="row-actions"><button class="button" data-admin-edit="${escapeHtml(server.id)}">Edit</button><button class="button" data-admin="suspendServer" data-id="${server.id}">Suspend / request edits</button>${server.moderationStatus === "pending" ? `<button class="button primary" data-admin="approveServer" data-id="${server.id}">Approve resubmission</button>` : ""}<button class="button" data-admin="toggleSponsor" data-id="${server.id}">${server.sponsored ? "Unsponsor" : "Sponsor"}</button><button class="button danger" data-delete="${server.id}">Delete</button></div>
         </div>`).join("") : emptyNotice()}</div></div>
         <div class="card admin-client-panel">
           <h2>User Accounts</h2>
           <p class="section-copy">Load account emails from the admin API when you need to contact users.</p>
           ${adminUserPanel(state.users)}
+        </div>
+        <div class="card admin-client-panel">
+          <h2>Video campaigns</h2>
+          ${adminCampaignPanel(state)}
         </div>
         <div class="card admin-client-panel">
           <h2>Billing</h2>
@@ -4336,11 +4353,26 @@ function renderAdmin(state) {
       </div>
     </section>
   </div>`;
+  $("#app .page").insertAdjacentHTML("beforeend", '<section id="adminServerEditor" class="section hidden"></section>');
+  $$("[data-admin-edit]").forEach((button) => button.addEventListener("click", () => {
+    const server = state.servers.find((item) => item.id === button.dataset.adminEdit);
+    const panel = $("#adminServerEditor");
+    panel.innerHTML = serverFormMarkup(server);
+    panel.classList.remove("hidden");
+    bindServerForm();
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }));
+  bindCampaignForms(state);
   $$("[data-admin]").forEach((button) => button.addEventListener("click", async () => {
     const label = button.textContent;
     try {
+      let reason = "";
+      if (button.dataset.admin === "suspendServer") {
+        reason = prompt("What must the owner fix before resubmitting?");
+        if (reason === null) return;
+      }
       setButtonLoading(button, "Saving...");
-      const result = await request("admin", { command: button.dataset.admin, value: { id: button.dataset.id } });
+      const result = await request("admin", { command: button.dataset.admin, value: { id: button.dataset.id, reason } });
       state = result.servers ? { ...state, ...result, votes: result.votes || state.votes || [] } : { ...state, users: result.users || state.users };
       if (result.servers) cachePublicState(result);
       toast("Admin change saved.");
@@ -4380,7 +4412,7 @@ function adminBillingPanel(state) {
       <label class="check"><input name="saleEnabled" type="checkbox" ${billing.sale?.enabled ? "checked" : ""}> Sale active</label>
       <div class="field"><label>Sale percent off</label><input class="input" name="salePercent" type="number" min="0" max="90" value="${escapeHtml(billing.sale?.percentOff || 0)}"></div>
       <div class="field"><label>Minimum paid price</label><input class="input" name="minPaidPrice" type="number" min="5" step="0.01" value="${escapeHtml(((billing.sale?.minPaidPriceCents || 500) / 100).toFixed(2))}"></div>
-      <div class="field"><label>Free listing limit</label><input class="input" name="free_serverLimit" type="number" min="1" max="25" value="${escapeHtml(billing.plans?.free?.serverLimit || 2)}" required></div>
+      <div class="field"><label>Free listing limit</label><input class="input" name="free_serverLimit" type="number" min="1" max="25" value="${escapeHtml(billing.plans?.free?.serverLimit || 1)}" required></div>
       <div class="field"><label>Stripe tax code</label><input class="input" name="stripeTaxCode" value="${escapeHtml(billing.stripeTaxCode || "txcd_10000000")}" required></div>
       <div class="field"><label>Stripe tax behavior</label><select class="select" name="stripeTaxBehavior">
         <option value="exclusive" ${billing.stripeTaxBehavior === "exclusive" ? "selected" : ""}>Exclusive</option>
@@ -4398,6 +4430,68 @@ function adminBillingPanel(state) {
       <button class="button primary" type="submit">Save billing</button>
     </div>
   </form>`;
+}
+
+function adminCampaignPanel(state) {
+  return `<div class="dashboard-list">${(state.campaigns || []).filter((item) => !item.deleted).map((item) => `<div class="campaign-row"><div><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.creator)} · ${item.active ? "Active" : "Paused"}</p></div><div class="row-actions"><button type="button" class="button" data-campaign-edit="${escapeHtml(item.id)}">Edit</button><button type="button" class="button danger" data-campaign-delete="${escapeHtml(item.id)}">Delete</button></div></div>`).join("")}</div>
+    <form id="campaignForm" class="form"><input type="hidden" name="id">
+      <div class="field"><label>Ad title</label><input name="title" class="input" maxlength="100" required></div>
+      <div class="field"><label>Creator / advertiser</label><input name="creator" class="input" maxlength="100" required></div>
+      <div class="field"><label>Destination URL</label><input name="url" type="url" class="input" placeholder="https://" required></div>
+      <div class="field"><label>Hosted video URL</label><input name="videoUrl" type="url" class="input" placeholder="https://"></div>
+      <div class="field"><label>Or upload MP4 / WebM (up to 1 MB)</label><input name="videoFile" type="file" accept="video/mp4,video/webm"></div>
+      <label class="check"><input name="active" type="checkbox" checked> Campaign active</label>
+      <div class="row-actions"><button type="submit" class="button primary">Save campaign</button><button type="reset" class="button">New campaign</button></div><p role="status" id="campaignStatus"></p>
+    </form>`;
+}
+
+function bindCampaignForms(state) {
+  const form = $("#campaignForm");
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = form.querySelector('[type="submit"]');
+    try {
+      setButtonLoading(button, "Saving...");
+      const fields = form.elements;
+      const file = fields.videoFile.files[0];
+      if (file && file.size > 1024 * 1024) throw new Error("Video uploads must be 1 MB or smaller. Use a hosted video URL for a larger video.");
+      const value = Object.fromEntries(["id", "title", "creator", "url", "videoUrl"].map((key) => [key, fields.namedItem(key).value]));
+      value.active = fields.active.checked;
+      if (file) value.videoData = await fileToDataUrl(file);
+      const result = await request("admin", { command: "saveCampaign", value });
+      cachePublicState(result); renderAdmin({ ...state, ...result }); toast("Campaign saved.");
+    } catch (error) { $("#campaignStatus").textContent = error.message; }
+    finally { setButtonLoading(button, "Save campaign", false); }
+  });
+  form?.addEventListener("reset", () => { form.elements.namedItem("id").value = ""; });
+  $$("[data-campaign-edit]").forEach((button) => button.addEventListener("click", () => {
+    const campaign = state.campaigns.find((item) => item.id === button.dataset.campaignEdit);
+    for (const key of ["id", "title", "creator", "url", "videoUrl"]) form.elements.namedItem(key).value = campaign[key] || "";
+    form.elements.active.checked = campaign.active; form.elements.videoFile.value = ""; form.scrollIntoView({ behavior: "smooth", block: "center" });
+  }));
+  $$("[data-campaign-delete]").forEach((button) => button.addEventListener("click", async () => {
+    if (!confirm("Delete this campaign?")) return;
+    try { const result = await request("admin", { command: "deleteCampaign", value: { id: button.dataset.campaignDelete } }); cachePublicState(result); renderAdmin({ ...state, ...result }); }
+    catch (error) { toast(error.message); }
+  }));
+}
+
+let campaignShownThisPage = false;
+function showSiteCampaign(state) {
+  if (campaignShownThisPage || state.apiHydrating || ["admin", "dashboard", "login", "plans", "privacy", "terms"].includes(document.body.dataset.page)) return;
+  const campaigns = (state.campaigns || []).filter((item) => item.active && !item.deleted && /^https:\/\//i.test(item.videoUrl) && /^https:\/\//i.test(item.url));
+  if (!campaigns.length) return;
+  let index = 0;
+  try { if (Date.now() < Number(localStorage.getItem("iconCampaignDismissedUntil") || 0)) return; index = Number(sessionStorage.getItem("iconCampaignIndex") || 0) % campaigns.length; sessionStorage.setItem("iconCampaignIndex", String(index + 1)); } catch {}
+  campaignShownThisPage = true;
+  const campaign = campaigns[index];
+  const panel = document.createElement("aside");
+  panel.id = "siteCampaign"; panel.className = "site-campaign"; panel.setAttribute("aria-label", "Advertisement");
+  panel.innerHTML = `<div class="campaign-heading"><span>Advertisement</span><button class="campaign-close" type="button" aria-label="Close advertisement">&#215;</button></div><video muted playsinline controls preload="metadata" src="${escapeHtml(campaign.videoUrl)}"></video><a class="campaign-destination" href="${escapeHtml(campaign.url)}" target="_blank" rel="sponsored noopener noreferrer"><strong>${escapeHtml(campaign.title)}</strong><span>${escapeHtml(campaign.creator)}</span></a>`;
+  document.body.appendChild(panel);
+  const video = panel.querySelector("video"); video.muted = true; video.play().catch(() => {});
+  panel.querySelector("button").addEventListener("click", () => { video.pause(); panel.remove(); try { localStorage.setItem("iconCampaignDismissedUntil", String(Date.now() + 30 * 60 * 1000)); } catch {} });
+  video.addEventListener("error", () => panel.remove(), { once: true }); video.addEventListener("ended", () => panel.remove(), { once: true });
 }
 
 function adminBillingPlanFields(key, plan) {
@@ -4418,7 +4512,9 @@ function bindAdminBillingForms(state) {
   $("#adminBillingForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
+    const button = form.querySelector('[type="submit"]');
     try {
+      setButtonLoading(button, "Saving...");
       const result = await request("admin", { command: "saveBilling", value: billingFormValue(form, state) });
       rememberBilling(result.billing);
       cachePublicState(result);
@@ -4426,7 +4522,7 @@ function bindAdminBillingForms(state) {
       renderAdmin({ ...state, ...result });
     } catch (error) {
       toast(error.message);
-    }
+    } finally { setButtonLoading(button, "Save billing", false); }
   });
 }
 
@@ -4435,7 +4531,8 @@ function billingFormValue(form, state) {
   const plans = {
     free: {
       ...existing.plans.free,
-      serverLimit: Number(form.elements.free_serverLimit?.value || existing.plans.free?.serverLimit || 2)
+      serverLimit: Number(form.elements.free_serverLimit?.value || existing.plans.free?.serverLimit || 1),
+      description: `List up to ${Number(form.elements.free_serverLimit?.value || 1)} server listings for free.`
     }
   };
   for (const [key, plan] of Object.entries(existing.plans || {})) {
@@ -5530,6 +5627,7 @@ function renderAccountLoading(page) {
 }
 
 function renderCurrentPage(page, state) {
+  if (!["admin", "dashboard"].includes(page)) state = { ...state, servers: (state.servers || []).filter((server) => !["suspended", "pending"].includes(server.moderationStatus)) };
   if (page === "home") renderHome(state);
   else if (page === "servers") renderServers(state);
   else if (page === "server") renderServerDetail(state);
@@ -5547,6 +5645,7 @@ function renderCurrentPage(page, state) {
   else if (page === "dashboard") renderDashboard(state);
   else if (page === "admin") renderAdmin(state);
   else renderStatic(page);
+  if (!["vote", "guide", "guides"].includes(page)) showSiteCampaign(state);
 }
 
 function showBootFailure(page, error, seoFallbackHtml = "") {

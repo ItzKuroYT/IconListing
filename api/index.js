@@ -69,6 +69,8 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === "serverPage") {
+      const found = findServerByKey(db.servers.filter(isListingPublic), serverKeyFromRequest(req));
+      if (!found) return html(res, 404, serverNotFoundHtml());
       return html(res, 200, serverPageHtml(db, req));
     }
 
@@ -77,7 +79,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === "state") {
-      const changedServerIds = await refreshPings(db);
+      const changedServerIds = queryValue(req, "scope") === "account" ? [] : await refreshPings(db);
       let responseDb = db;
       const shouldRepairVerifiedSession = !!user?.fromVerifiedSession;
       if (changedServerIds.length || shouldRepairVerifiedSession) {
@@ -178,7 +180,8 @@ module.exports = async function handler(req, res) {
         ...server,
         id: server.id || createId(),
         ownerId: existing?.ownerId || user.id,
-        ownerName: user.username,
+        ownerName: existing?.ownerName || user.username,
+        moderationStatus: existing && !isListingPublic(existing) ? (isAdmin(user) ? existing.moderationStatus : "pending") : "published",
         votes: existing?.votes || 0,
         playersOnline: existing?.playersOnline || 0,
         playersMax: existing?.playersMax || 0,
@@ -190,6 +193,10 @@ module.exports = async function handler(req, res) {
         updatedAt: new Date().toISOString()
       };
       if (next.iconListingPluginEnabled && !next.iconListingVoteKey) next.iconListingVoteKey = createUniqueVoteKey(db, next.id);
+      if (isAdmin(user) && body.server.directoryNotes !== undefined) {
+        next.directoryNotes = cleanText(body.server.directoryNotes).slice(0, 3000);
+        next.directoryReviewedAt = new Date().toISOString();
+      }
       ensureUniqueVoteKey(db, next, existing?.id || next.id);
       await updatePing(next);
       db.servers = existing ? db.servers.map((item) => (item.id === existing.id ? next : item)) : [...db.servers, next];
@@ -203,7 +210,8 @@ module.exports = async function handler(req, res) {
       const verifiedDb = await verifyPersistedServer(next.id, persistedDb);
       await safeSyncServerStaticPages(persistedDb, {
         writeServerIds: [persistedServer.id],
-        deletePagePaths: previousServerPagePath && previousServerPagePath !== serverStaticPagePath(persistedServer) ? [previousServerPagePath] : []
+        syncPublicState: true,
+        deletePagePaths: previousServerPagePath && (!isListingPublic(persistedServer) || previousServerPagePath !== serverStaticPagePath(persistedServer)) ? [previousServerPagePath] : []
       });
       if (!existing) await safeNotifyServerCreated(persistedServer);
       return json(res, 200, writePayload({
@@ -265,7 +273,7 @@ module.exports = async function handler(req, res) {
 
     if (action === "vote") {
       const server = db.servers.find((item) => item.id === body.serverId);
-      if (!server) throw httpError(404, "Listing not found.");
+      if (!server || !isListingPublic(server)) throw httpError(404, "Listing not found.");
       const minecraftUsername = cleanText(body.minecraftUsername || "");
       if (!/^[A-Za-z0-9_]{3,16}$/.test(minecraftUsername)) throw httpError(400, "Enter a valid Minecraft username.");
       enforceVoteCooldown(db, server.id, minecraftUsername, req);
@@ -298,7 +306,7 @@ module.exports = async function handler(req, res) {
       requireLogin(user);
       requireFields(body, ["serverId", "rating", "comment"]);
       const server = db.servers.find((item) => item.id === body.serverId);
-      if (!server) throw httpError(404, "Listing not found.");
+      if (!server || !isListingPublic(server)) throw httpError(404, "Listing not found.");
       if (server.ownerId === user.id) throw httpError(403, "Server owners cannot review their own listing.");
       const rating = Math.round(Number(body.rating || 0));
       const comment = cleanText(body.comment || "");
@@ -373,7 +381,7 @@ module.exports = async function handler(req, res) {
       requireLogin(user);
       requireFields(body, ["serverId"]);
       const server = db.servers.find((item) => item.id === body.serverId);
-      if (!server) throw httpError(404, "Listing not found.");
+      if (!server || !isListingPublic(server)) throw httpError(404, "Listing not found.");
       const week = weekKey();
       if (db.communityVotes.some((item) => item.userId === user.id && item.week === week)) {
         throw httpError(409, "You already voted in this week's community highlight.");
@@ -582,6 +590,49 @@ module.exports = async function handler(req, res) {
       }
       const saveOptions = {};
       let deletedServerPagePaths = [];
+      if (["suspendServer", "approveServer"].includes(body.command)) {
+        const server = db.servers.find((item) => item.id === id);
+        if (!server) throw httpError(404, "Listing not found.");
+        if (body.command === "approveServer" && server.moderationStatus !== "pending") throw httpError(409, "The owner must edit and resubmit this listing first.");
+        const reason = cleanText(body.value?.reason || "").slice(0, 500);
+        if (body.command === "suspendServer" && reason.length < 9) throw httpError(400, "Explain what the owner needs to fix (at least 9 characters).");
+        server.moderationStatus = body.command === "approveServer" ? "published" : "suspended";
+        server.moderationReason = body.command === "approveServer" ? "" : reason;
+        server.moderatedAt = new Date().toISOString();
+        server.updatedAt = server.moderatedAt;
+        saveOptions.touchedServers = [id];
+        saveOptions.requireExistingServers = [id];
+        if (!isListingPublic(server)) deletedServerPagePaths = [serverStaticPagePath(server)];
+      }
+      if (body.command === "saveCampaign") {
+        const value = validateCampaign(body.value || {});
+        const existing = db.campaigns.find((item) => item.id === value.id);
+        if (value.id && !existing) throw httpError(404, "Campaign not found.");
+        const campaign = { ...value, id: existing?.id || createId(), updatedAt: new Date().toISOString() };
+        if (body.value.videoData) {
+          const match = String(body.value.videoData).match(/^data:video\/(mp4|webm);base64,([A-Za-z0-9+/=]+)$/);
+          if (!match) throw httpError(400, "Upload an MP4 or WebM video.");
+          const bytes = Buffer.from(match[2], "base64");
+          if (bytes.length > 1024 * 1024 || bytes.length < 12) throw httpError(400, "Video uploads must be 1 MB or smaller. Use a hosted HTTPS video URL for larger videos.");
+          const validHeader = match[1] === "mp4" ? bytes.toString("ascii", 4, 8) === "ftyp" : bytes.subarray(0, 4).toString("hex") === "1a45dfa3";
+          if (!validHeader) throw httpError(400, "That file is not a supported video.");
+          if (!hasGithubStorage()) throw httpError(503, "Connect GitHub storage to upload campaign videos, or use a hosted video URL.");
+          const filePath = `assets/campaigns/${crypto.createHash("sha256").update(bytes).digest("hex")}.${match[1]}`;
+          await writeGithubTextFile(filePath, bytes, `Upload campaign video ${campaign.id}`);
+          campaign.videoUrl = siteUrl(`/${filePath}`);
+        }
+        if (!campaign.videoUrl) throw httpError(400, "Add a video file or an HTTPS video URL.");
+        db.campaigns = [...db.campaigns.filter((item) => item.id !== campaign.id), campaign];
+        saveOptions.touchedCampaigns = [campaign.id];
+      }
+      if (body.command === "deleteCampaign") {
+        const campaign = db.campaigns.find((item) => item.id === id);
+        if (!campaign) throw httpError(404, "Campaign not found.");
+        campaign.deleted = true;
+        campaign.active = false;
+        campaign.updatedAt = new Date().toISOString();
+        saveOptions.touchedCampaigns = [id];
+      }
       if (body.command === "toggleSponsor") {
         const server = db.servers.find((item) => item.id === id);
         if (server) {
@@ -641,6 +692,7 @@ module.exports = async function handler(req, res) {
         saveOptions.deletedHosts = [id];
       }
       if (body.command === "saveBilling") {
+        validateBillingInput(body.value || {});
         db.billing = normalizeBillingSettings(body.value || {});
         db.billing.updatedAt = new Date().toISOString();
         saveOptions.touchedBilling = true;
@@ -649,12 +701,13 @@ module.exports = async function handler(req, res) {
       await safeSyncServerStaticPages(persistedDb, {
         writeServerIds: saveOptions.touchedServers || [],
         deletePagePaths: deletedServerPagePaths,
+        syncRouteFiles: !!(saveOptions.touchedServers?.length || deletedServerPagePaths.length),
         syncPublicState: !!(
           saveOptions.touchedClients?.length ||
           saveOptions.deletedClients?.length ||
           saveOptions.touchedHosts?.length ||
           saveOptions.deletedHosts?.length ||
-          saveOptions.touchedBilling
+          saveOptions.touchedBilling || saveOptions.touchedCampaigns?.length || saveOptions.touchedServers?.length
         )
       });
       return json(res, 200, writePayload({ ...statePayload(persistedDb, user), users: persistedDb.users.map((item) => publicUser(item, persistedDb)) }));
@@ -1282,7 +1335,7 @@ function apiOrigin(value = "") {
 }
 
 function freshDb() {
-  return { version: 2, users: [], servers: [], clients: [], hosts: [], votes: [], reviews: [], communityVotes: [], voteIps: {}, siteAnalytics: {}, billing: defaultBillingSettings(), deleted: { users: {}, servers: {}, clients: {}, hosts: {} } };
+  return { version: 2, users: [], servers: [], clients: [], hosts: [], campaigns: [], votes: [], reviews: [], communityVotes: [], voteIps: {}, siteAnalytics: {}, billing: defaultBillingSettings(), deleted: { users: {}, servers: {}, clients: {}, hosts: {} } };
 }
 
 function migrateDb(db = freshDb()) {
@@ -1290,6 +1343,7 @@ function migrateDb(db = freshDb()) {
     ...freshDb(),
     ...db,
     version: 2,
+    campaigns: Array.isArray(db.campaigns) ? db.campaigns : [],
     users: Array.isArray(db.users) ? db.users : [],
     servers: Array.isArray(db.servers) ? db.servers.filter((server) => !String(server.id || "").startsWith("seed-")).map(normalizeServer) : [],
     clients: Array.isArray(db.clients) ? db.clients.filter((client) => !String(client.id || "").startsWith("client-")).map(normalizeClient) : [],
@@ -1299,7 +1353,10 @@ function migrateDb(db = freshDb()) {
     communityVotes: Array.isArray(db.communityVotes) ? db.communityVotes.map(normalizeCommunityVote).filter(Boolean) : [],
     voteIps: db.voteIps && !Array.isArray(db.voteIps) ? db.voteIps : {},
     siteAnalytics: normalizeSiteAnalytics(db.siteAnalytics),
-    billing: normalizeBillingSettings(db.billing),
+    billing: normalizeBillingSettings(db.billing?.updatedAt ? db.billing : {
+      ...db.billing,
+      plans: { ...db.billing?.plans, free: { ...db.billing?.plans?.free, serverLimit: CONFIG.plans.free.serverLimit, description: CONFIG.plans.free.description } }
+    }),
     deleted: normalizeDeleted(db.deleted)
   };
 }
@@ -1320,6 +1377,25 @@ function normalizeServer(server) {
     iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
     analytics: normalizeAnalytics(server.analytics)
   };
+}
+
+function isListingPublic(server) {
+  return !["suspended", "pending"].includes(server.moderationStatus);
+}
+
+function validateCampaign(value) {
+  const safeUrl = (input, optional = false) => {
+    if (optional && !input) return "";
+    try {
+      const url = new URL(input);
+      if (url.protocol !== "https:" || url.username || url.password) throw new Error();
+      return url.href;
+    } catch { throw httpError(400, "Campaign links must be valid HTTPS URLs."); }
+  };
+  const title = cleanText(value.title || "").slice(0, 100);
+  const creator = cleanText(value.creator || "").slice(0, 100);
+  if (!title || !creator || hasBlockedText(title + " " + creator)) throw httpError(400, "Enter an allowed campaign title and creator.");
+  return { id: clean(value.id || ""), title, creator, url: safeUrl(value.url), videoUrl: safeUrl(value.videoUrl, true), active: value.active === true };
 }
 
 function normalizeClient(client) {
@@ -1381,6 +1457,23 @@ function normalizeBillingSettings(value = {}) {
   };
 }
 
+function validateBillingInput(value) {
+  const inRange = (number, min, max, label) => {
+    if (!Number.isFinite(Number(number)) || Number(number) < min || Number(number) > max) throw httpError(400, `${label} must be between ${min} and ${max}.`);
+  };
+  if (!/^[a-z]{3}$/i.test(value.currency || "")) throw httpError(400, "Use a three-letter currency code.");
+  inRange(value.maxSponsors, 1, 5, "Maximum sponsors");
+  inRange(value.sale?.percentOff, 0, 90, "Discount");
+  inRange(value.sale?.minPaidPriceCents, 500, 100000, "Minimum price in cents");
+  for (const [key, plan] of Object.entries(value.plans || {})) {
+    inRange(plan.serverLimit, 1, 25, `${key} listing limit`);
+    inRange(plan.sponsorCredits, 0, 2, `${key} sponsor credits`);
+    inRange(plan.sponsorDurationDays, plan.sponsorCredits ? 1 : 0, 90, `${key} sponsor duration`);
+    if (key !== "free") inRange(plan.priceCents, 500, 100000, `${key} price in cents`);
+    if (![plan.serverLimit, plan.sponsorCredits, plan.sponsorDurationDays, plan.priceCents].every((number) => Number.isInteger(Number(number)))) throw httpError(400, "Listing limits, credits, days, and price cents must be whole numbers.");
+  }
+}
+
 function normalizePlanCatalog(plans = {}) {
   const result = {};
   for (const [key, plan] of Object.entries(plans || {})) {
@@ -1398,7 +1491,7 @@ function normalizeBillingPlan(key, plan = {}) {
     name: cleanText(plan.name || key),
     price: key === "free" ? "$0/mo" : `$${(priceCents / 100).toFixed(priceCents % 100 ? 2 : 0)}/mo`,
     priceCents,
-    serverLimit: Math.max(key === "free" ? 2 : 1, Math.min(25, Number(plan.serverLimit || (key === "free" ? 2 : 4)))),
+    serverLimit: Math.round(clampNumber(plan.serverLimit, 1, 25, key === "free" ? 1 : 4)),
     sponsorCredits,
     sponsorDurationDays,
     sponsorDurationLabel: sponsorCredits ? `${sponsorCredits} sponsor${sponsorCredits === 1 ? "" : "s"} for ${sponsorDurationDays} days` : "No sponsor slot",
@@ -1599,6 +1692,7 @@ function mergeRecoveryDb(primaryDb, recoveryDb) {
     votes: mergeVotesWithRecovery(primary.votes, recovery.votes, servers, deleted.servers),
     reviews: mergeReviewsWithRecovery(primary.reviews, recovery.reviews, servers, deleted.servers),
     communityVotes: mergeCommunityVotesWithRecovery(primary.communityVotes, recovery.communityVotes, servers, deleted.servers),
+    campaigns: mergeById(recovery.campaigns, primary.campaigns, new Set(), new Set(primary.campaigns.map((item) => item.id))),
     voteIps: pruneDeletedVoteIps(mergeVoteIps(recovery.voteIps, primary.voteIps), deleted.servers),
     siteAnalytics: mergeSiteAnalytics(primary.siteAnalytics, recovery.siteAnalytics)
   });
@@ -1830,7 +1924,7 @@ async function writeGithubTextFile(filePath, content, message, attempt = 0) {
   const existing = await readGithubFile(filePath, { bypassCache: true });
   const body = {
     message,
-    content: Buffer.from(String(content || "")).toString("base64"),
+    content: (Buffer.isBuffer(content) ? content : Buffer.from(String(content || ""))).toString("base64"),
     branch: githubBranch()
   };
   if (existing.sha) body.sha = existing.sha;
@@ -1890,6 +1984,7 @@ function mergeDbForWrite(remoteDb, nextDb, options = {}) {
     votes: mergeVotes(remote.votes, next.votes, deletedServers, ids.touchedVotes, ids.touchedServers),
     reviews: mergeReviews(remote.reviews, next.reviews, deletedServers, ids.touchedReviews),
     communityVotes: mergeCommunityVotes(remote.communityVotes, next.communityVotes, deletedServers, ids.touchedCommunityVotes),
+    campaigns: mergeById(remote.campaigns, next.campaigns, new Set(), new Set(options.touchedCampaigns || [])),
     voteIps: mergeVoteIps(remote.voteIps, next.voteIps, deletedServers),
     siteAnalytics: mergeSiteAnalytics(remote.siteAnalytics, next.siteAnalytics),
     billing: options.touchedBilling ? normalizeBillingSettings(next.billing) : normalizeBillingSettings(remote.billing || next.billing)
@@ -2503,7 +2598,8 @@ function statePayload(db, user, options = {}) {
   const detailServerId = detailServer?.id || detailServerKey;
   const rankedServers = rankServers(db.servers, db.votes, db.reviews, db.communityVotes);
   return {
-    servers: rankedServers.map((server) => publicServer(server, user, { fullAnalytics: server.id === detailServerId })),
+    servers: [...rankedServers, ...db.servers.filter((server) => !isListingPublic(server) && user && (server.ownerId === user.id || isAdmin(user)))].map((server) => publicServer(server, user, { fullAnalytics: server.id === detailServerId })),
+    campaigns: db.campaigns.filter((item) => !item.deleted && (isAdmin(user) || item.active)),
     clients: db.clients,
     hosts: db.hosts,
     votes: detailServerId ? publicVotesForServer(db.votes, detailServerId) : [],
@@ -2521,6 +2617,7 @@ function publicSnapshotPayload(db) {
   return {
     version: 2,
     generatedAt: new Date().toISOString(),
+    campaigns: next.campaigns.filter((item) => !item.deleted && item.active),
     servers: rankServers(next.servers, next.votes, next.reviews, next.communityVotes).map(publicSnapshotServer),
     clients: next.clients.map(publicSnapshotClient),
     hosts: next.hosts.map(publicSnapshotHost),
@@ -2543,7 +2640,8 @@ function publicSnapshotServer(server) {
     "bannerUrl", "description", "tags", "ownerName", "votes", "playersOnline", "playersMax",
     "version", "online", "uptimePercent", "sponsored", "createdAt", "updatedAt", "lastPingAt",
     "lastSuccessfulPingAt", "uptimeChecks", "uptimeSuccesses", "edition", "bedrockType",
-    "realmCode", "iconUrl", "rank", "analytics", "reviewStats", "communityVotesThisWeek", "communityHighlighted"
+    "realmCode", "iconUrl", "rank", "analytics", "reviewStats", "communityVotesThisWeek", "communityHighlighted",
+    "directoryNotes", "directoryReviewedAt"
   ];
   const next = {};
   for (const key of allowed) {
@@ -2659,7 +2757,8 @@ function sitemapXml(db) {
     { loc: siteUrl("/help/"), priority: "0.4", changefreq: "monthly" },
     { loc: siteUrl("/contact/"), priority: "0.4", changefreq: "monthly" }
   ];
-  const tagUrls = [...new Set([...CONFIG.gamemodes, ...CONFIG.generalTags, "Java"])].map((tag) => ({
+  const publicServers = rankServers(db.servers, db.votes, db.reviews, db.communityVotes);
+  const tagUrls = [...new Set([...CONFIG.gamemodes, ...CONFIG.generalTags, "Java"])].filter((tag) => publicServers.some((server) => serverMatchesTag(server, tag))).map((tag) => ({
     loc: siteUrl(tagPath(tag)),
     priority: "0.75",
     changefreq: "daily"
@@ -2670,12 +2769,13 @@ function sitemapXml(db) {
     changefreq: "daily",
     lastmod: server.updatedAt || server.createdAt || server.lastPingAt || now
   }));
-  const urls = [...staticUrls, ...tagUrls, ...serverUrls];
+  const guideUrls = ["", "choosing-a-minecraft-server/", "advertise-your-minecraft-server/", "how-rankings-work/"].map((slug) => ({ loc: siteUrl(`/guides/${slug}`), changefreq: "monthly", priority: "0.6" }));
+  const urls = [...staticUrls, ...guideUrls, ...tagUrls, ...serverUrls];
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(sitemapUrlEntry).join("\n")}\n</urlset>`;
 }
 
 function sitemapUrlEntry(item) {
-  return `  <url>\n    <loc>${escapeXml(item.loc)}</loc>\n    <lastmod>${escapeXml(item.lastmod || new Date().toISOString())}</lastmod>\n    <changefreq>${escapeXml(item.changefreq || "weekly")}</changefreq>\n    <priority>${escapeXml(item.priority || "0.5")}</priority>\n  </url>`;
+  return `  <url>\n    <loc>${escapeXml(item.loc)}</loc>${item.lastmod ? `\n    <lastmod>${escapeXml(item.lastmod)}</lastmod>` : ""}\n    <changefreq>${escapeXml(item.changefreq || "weekly")}</changefreq>\n    <priority>${escapeXml(item.priority || "0.5")}</priority>\n  </url>`;
 }
 
 function serverPageHtml(db, req) {
@@ -2819,7 +2919,8 @@ function serverStaticFallbackMarkup(server) {
               <div class="mini-stat"><strong>#${display.rank || "-"}</strong><span>rank</span></div>
             </div>
             <div class="description-card">
-              <h3>About this server</h3>
+              ${display.directoryNotes ? `<h3>Directory notes</h3><p>${escapeHtml(display.directoryNotes)}</p>` : ""}
+              <h3>About this server</h3><p class="muted">Description supplied by the server owner.</p>
               <div class="description-text">${description}</div>
             </div>
             <a class="button vote-wide" href="${escapeHtmlAttr(`/vote/?server=${encodeURIComponent(display.id)}`)}">Vote for ${escapeHtml(display.name)}</a>
@@ -2858,10 +2959,14 @@ function serverStaticFallbackMarkup(server) {
       ${staticServerSeoBlock(display)}`;
 }
 
+function serverMatchesTag(server, tag) {
+  return (server.tags || []).includes(tag) || (tag === "Java" && server.edition !== "bedrock") || (tag === "Bedrock" && (server.edition === "bedrock" || server.crossPlay)) || (tag === "Cross-Play" && server.crossPlay);
+}
+
 function tagPageHtmlForTag(db, tag) {
   const cleanTag = tagBySlug(tag) || tag;
   const ranked = rankServers(db.servers, db.votes, db.reviews, db.communityVotes);
-  const taggedServers = ranked.filter((server) => (server.tags || []).includes(cleanTag) || staticServerEditionLabel(server).toLowerCase().includes(String(cleanTag).toLowerCase()));
+  const taggedServers = ranked.filter((server) => serverMatchesTag(server, cleanTag));
   const title = trimSeo(`${cleanTag} Minecraft Servers | ${CONFIG.site.name}`, 59);
   const description = trimSeo(`Browse ${cleanTag} Minecraft servers by rank, votes, live players, status, IP, and tags. Find active ${cleanTag} communities and vote for favorites.`, 158);
   const canonical = siteUrl(tagPath(cleanTag));
@@ -2917,6 +3022,7 @@ function tagPageHtmlForTag(db, tag) {
     bodyTitle: `${cleanTag} Minecraft Servers`,
     bodyCopy: description,
     bodyHtml: tagStaticFallbackMarkup(cleanTag, taggedServers),
+    noindex: taggedServers.length === 0,
     page: "servers"
   });
 }
@@ -3067,6 +3173,7 @@ function serverNotFoundHtml() {
   const title = `Server Not Found | ${CONFIG.site.name}`;
   const description = "This Minecraft server listing could not be found. Browse active Minecraft servers by players, votes, tags, and status.";
   return appHtml({
+    noindex: true,
     title,
     description,
     canonical: siteUrl("/server/"),
@@ -3086,6 +3193,21 @@ function staticServerPageEntries(db) {
   }));
 }
 
+function staticDirectoryPageEntries(db) {
+  const next = migrateDb(db);
+  const servers = rankServers(next.servers, next.votes, next.reviews, next.communityVotes);
+  return ["home", "servers"].map((page) => {
+    const shown = page === "home" ? servers.slice(0, 10) : servers;
+    const title = page === "home" ? "Minecraft Servers | Icon Listing" : "Minecraft Server List | Java, Bedrock & SMP";
+    const description = "Compare Minecraft communities by edition, gamemode, player activity, votes, and reviews. Find connection details and choose a server that fits how you play.";
+    const pathname = page === "home" ? "/" : "/servers/";
+    const bodyHtml = `<section class="section"><h1 class="section-title">Minecraft server list</h1><p class="section-copy">${description}</p><div class="server-tags">${staticCategoryLinks("")}</div></section>
+      <section class="section"><h2 class="section-title">${page === "home" ? "Discover communities" : "Server directory"}</h2><div class="server-list">${shown.map((server) => `<article class="card"><h3><a href="${serverPath(server)}">${escapeHtml(server.name)}</a>${server.sponsored ? " <small>Sponsored</small>" : ""}</h3><p>${escapeHtml(publicServerAddress(server))} - ${escapeHtml(staticServerEditionLabel(server))}</p><p>${escapeHtml((server.tags || []).join(", "))}</p><p>${escapeHtml(trimSeo(server.description || "", 180))}</p><p>${Number(server.votes || 0)} votes · ${escapeHtml(staticReviewSummaryText(server))}</p><a href="${serverPath(server)}">View connection details and reviews</a></article>`).join("") || '<p>No published servers yet.</p>'}</div><p><a class="button" href="/servers/">Browse all servers</a></p></section>
+      <section class="section"><h2 class="section-title">Choose a server with confidence</h2><p class="section-copy">Check edition support, claims, PvP rules, and reset policies before building. Player counts are status snapshots, not a guarantee of availability. Sponsored placement is labelled.</p><div class="seo-link-grid"><a class="seo-link" href="/guides/choosing-a-minecraft-server/">Choosing a server</a><a class="seo-link" href="/guides/how-rankings-work/">How rankings work</a><a class="seo-link" href="/guides/advertise-your-minecraft-server/">Improve your listing</a></div></section>`;
+    return { filePath: page === "home" ? "index.html" : "servers/index.html", html: appHtml({ title, description, canonical: siteUrl(pathname), image: siteUrl(CONFIG.site.iconPath), page, bodyHtml, jsonLd: { "@context": "https://schema.org", "@type": "CollectionPage", name: title, url: siteUrl(pathname), mainEntity: { "@type": "ItemList", itemListElement: shown.map((server, index) => ({ "@type": "ListItem", position: index + 1, name: server.name, url: siteUrl(serverPath(server)) })) } } }) };
+  });
+}
+
 function staticTagPageEntries(db) {
   const next = migrateDb(db);
   return [...new Set([...CONFIG.gamemodes, ...CONFIG.generalTags, "Java"])].map((tag) => ({
@@ -3098,6 +3220,7 @@ function staticTagPageEntries(db) {
 function fallback404Html() {
   const description = "Icon Listing is loading this Minecraft server page. If the listing exists, it will appear after the shared server data loads.";
   return appHtml({
+    noindex: true,
     title: `Minecraft Server Listing | ${CONFIG.site.name}`,
     description,
     canonical: siteUrl("/server/"),
@@ -3182,7 +3305,7 @@ async function syncServerStaticPages(db, options = {}) {
   }
 }
 
-function appHtml({ title, description, canonical, image, type = "website", keywords = "", jsonLd = null, bootData = null, bodyTitle = "Icon Listing", bodyCopy = "", bodyHtml = "", page = "server" }) {
+function appHtml({ title, description, canonical, image, type = "website", keywords = "", jsonLd = null, bootData = null, bodyTitle = "Icon Listing", bodyCopy = "", bodyHtml = "", page = "server", noindex = false }) {
   const safeTitle = escapeHtmlAttr(trimSeo(title, 59));
   const safeDescription = escapeHtmlAttr(trimSeo(description, 158));
   const safeCanonical = escapeHtmlAttr(canonical);
@@ -3195,8 +3318,7 @@ function appHtml({ title, description, canonical, image, type = "website", keywo
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${safeTitle}</title>
     <meta name="description" content="${safeDescription}">
-    <meta name="robots" content="index, follow, max-image-preview:large">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157143725251440" crossorigin="anonymous"></script>
+    <meta name="robots" content="${noindex ? "noindex, follow" : "index, follow, max-image-preview:large"}">
     <meta name="google-adsense-account" content="ca-pub-5157143725251440">
     <meta name="keywords" content="${safeKeywords}">
     <link rel="canonical" href="${safeCanonical}">
@@ -3216,6 +3338,7 @@ function appHtml({ title, description, canonical, image, type = "website", keywo
     <link rel="icon" type="image/png" href="/assets/icon.png">
     <link rel="stylesheet" href="/assets/css/styles.css?v=20260713-server-detail-snapshot">
     <script src="/config.js?v=20260713-server-detail-snapshot"></script>
+    <script src="/assets/js/ads.js?v=20260917-directory" defer></script>
     <script src="/assets/js/app.js?v=20260713-server-detail-snapshot" defer></script>
   </head>
   <body data-page="${escapeHtmlAttr(page)}">
@@ -3920,6 +4043,10 @@ function validateServer(server) {
   if (hasBlockedText(server.name) || hasBlockedText(server.description)) throw httpError(400, "Please remove blocked words from the listing.");
   if (next.iconListingVoteKey && !isValidVoteKey(next.iconListingVoteKey)) throw httpError(400, "IconListing vote key must be 12-96 characters using letters, numbers, dots, dashes, underscores, or colons.");
   if (next.description.length < CONFIG.limits.descriptionMinLength) throw httpError(400, `Description must be at least ${CONFIG.limits.descriptionMinLength} characters.`);
+  if (/(.)\1{29,}/u.test(next.description)) throw httpError(400, "Remove repeated filler characters and describe your server's gameplay and rules.");
+  for (const key of ["websiteUrl", "discordUrl", "youtubeUrl"]) {
+    if (next[key] && !/^https?:\/\//i.test(next[key])) throw httpError(400, "Website, Discord, and trailer links must use HTTP or HTTPS.");
+  }
   if (next.tags.length < CONFIG.limits.tagsMin || next.tags.length > CONFIG.limits.tagsMax) throw httpError(400, `Select ${CONFIG.limits.tagsMin} to ${CONFIG.limits.tagsMax} tags.`);
   if (!CONFIG.countries.includes(next.country)) throw httpError(400, "Select a valid country.");
   if (isBlockedServerHost(next.javaHost) || isBlockedServerHost(next.bedrockHost)) throw httpError(400, "FalixSrv and Aternos servers are not allowed on this listing site.");
@@ -4175,6 +4302,7 @@ function publicServer(server, user = null, options = {}) {
   }
   delete next.iconListingVoteQueue;
   if (!canSeePrivate) {
+    delete next.moderationReason;
     delete next.votifierToken;
     delete next.iconListingVoteKey;
   }
@@ -4601,6 +4729,7 @@ function rankServers(servers, votes = [], reviews = [], communityVotes = []) {
   const highlightedServerId = communityHighlightServerId(communityVotes);
   const currentCommunityVotes = communityVoteCounts(communityVotes);
   return [...servers]
+    .filter(isListingPublic)
     .map((server) => ({
       ...server,
       votes: displayedVoteCount(server, votes),
@@ -4863,6 +4992,7 @@ function html(res, status, body) {
 }
 
 module.exports.__iconListingStatic = {
+  staticDirectoryPageEntries,
   fallback404Html,
   publicSnapshotPayload,
   sitemapXml,

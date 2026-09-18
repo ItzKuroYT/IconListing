@@ -21,10 +21,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate public pages
+        run: node scripts/generate-server-pages.js
+
+      - name: Stage public files only
+        run: node scripts/stage-public-site.js
+
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
   deploy:
     needs: build

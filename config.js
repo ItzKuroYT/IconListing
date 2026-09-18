@@ -147,11 +147,11 @@ const IconListingConfig = {
       name: "Free",
       price: "$0/mo",
       priceCents: 0,
-      serverLimit: 2,
+      serverLimit: 1,
       sponsorCredits: 0,
       sponsorDurationDays: 0,
       sponsorDurationLabel: "No sponsor slot",
-      description: "List up to 2 servers for free."
+      description: "List one server for free."
     },
     premium: {
       name: "Premium",
@@ -196,6 +196,15 @@ const IconListingConfig = {
       percentOff: 50,
       minPaidPriceCents: 500
     }
+  },
+  adsense: {
+    enabled: true,
+    reviewedPaths: [
+      "/guides/",
+      "/guides/choosing-a-minecraft-server/",
+      "/guides/advertise-your-minecraft-server/",
+      "/guides/how-rankings-work/"
+    ]
   },
   ranking: {
     playerWeight: 1,
