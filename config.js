@@ -199,12 +199,16 @@ const IconListingConfig = {
   },
   adsense: {
     enabled: true,
-    // Google ads are limited to original editorial pages reviewed for publisher value.
+    // Google ads are limited to original editorial and interactive tool pages.
     reviewedPaths: [
       "/guides/",
       "/guides/choosing-a-minecraft-server/",
       "/guides/advertise-your-minecraft-server/",
-      "/guides/how-rankings-work/"
+      "/guides/how-rankings-work/",
+      "/tools/votifier-tester/",
+      "/tools/motd-builder/",
+      "/tools/rgb-text-generator/",
+      "/tools/fonts-generator/"
     ]
   },
   ranking: {
