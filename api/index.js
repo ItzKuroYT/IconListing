@@ -707,12 +707,8 @@ module.exports = async function handler(req, res) {
           saveOptions.deletedClients?.length ||
           saveOptions.touchedHosts?.length ||
           saveOptions.deletedHosts?.length ||
-<<<<<<< Updated upstream
-          saveOptions.touchedBilling || saveOptions.touchedCampaigns?.length || saveOptions.touchedServers?.length
-=======
           saveOptions.touchedBilling
           || saveOptions.touchedCampaigns?.length || saveOptions.touchedServers?.length
->>>>>>> Stashed changes
         )
       });
       return json(res, 200, writePayload({ ...statePayload(persistedDb, user), users: persistedDb.users.map((item) => publicUser(item, persistedDb)) }));
@@ -2810,11 +2806,7 @@ function sitemapXml(db) {
     changefreq: "daily",
     lastmod: server.updatedAt || server.createdAt || server.lastPingAt || now
   }));
-<<<<<<< Updated upstream
-  const guideUrls = ["", "choosing-a-minecraft-server/", "advertise-your-minecraft-server/", "how-rankings-work/"].map((slug) => ({ loc: siteUrl(`/guides/${slug}`), changefreq: "monthly", priority: "0.6" }));
-=======
   const guideUrls = ["", ...require("../scripts/editorial-pages.js").guides.map((guide) => guide.slug + "/")].map((slug) => ({ loc: siteUrl(`/guides/${slug}`), changefreq: "monthly", priority: "0.6" }));
->>>>>>> Stashed changes
   const urls = [...staticUrls, ...guideUrls, ...tagUrls, ...serverUrls];
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(sitemapUrlEntry).join("\n")}\n</urlset>`;
 }

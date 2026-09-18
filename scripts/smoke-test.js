@@ -1280,29 +1280,6 @@ async function main() {
     assert(adminUsers.code === 200 && adminUsers.json.users.some((item) => item.email === `smoke${suffix}@example.com`), "admin should be able to view created user emails through the API");
     assert(beforeUserListRead === afterUserListRead, "admin user email lookup should not write to shared storage");
 
-<<<<<<< Updated upstream
-    const suspended = await call("admin", { command: "suspendServer", value: { id: saved.json.server.id, reason: "Please correct the connection details." } }, adminToken);
-    assert(suspended.code === 200, "admin suspension should save");
-    const publicSuspended = await call("state", { scope: "account" }, "", "GET");
-    assert(!publicSuspended.json.servers.some((item) => item.id === saved.json.server.id), "suspended listings must leave public rankings");
-    const ownerSuspended = await call("state", { scope: "account" }, login.json.token, "GET");
-    assert(ownerSuspended.json.servers.find((item) => item.id === saved.json.server.id)?.moderationStatus === "suspended", "owners retain suspended listings");
-    const hiddenPage = await callPath(`/server/${saved.json.server.name.replace(/\s+/g, "-")}/`);
-    assert(hiddenPage.code === 404 && hiddenPage.body.includes("noindex, follow"), "suspended pages must return a noindex 404");
-    const resubmitted = await call("saveServer", { server: saved.json.server }, login.json.token);
-    assert(resubmitted.code === 200 && resubmitted.json.server.moderationStatus === "pending", "owner edits enter admin review");
-    const approved = await call("admin", { command: "approveServer", value: { id: saved.json.server.id } }, adminToken);
-    assert(approved.code === 200 && approved.json.servers.some((item) => item.id === saved.json.server.id), "admin can approve resubmission");
-
-    const campaign = { title: "Test campaign", creator: "Example creator", url: "https://example.com", videoUrl: "https://example.com/video.mp4", active: true };
-    const badCampaign = await call("admin", { command: "saveCampaign", value: { ...campaign, url: "javascript:alert(1)" } }, adminToken);
-    assert(badCampaign.code === 400, "campaign links reject unsafe protocols");
-    const createdCampaign = await call("admin", { command: "saveCampaign", value: campaign }, adminToken);
-    assert(createdCampaign.code === 200 && createdCampaign.json.campaigns.length === 1, "campaign creation should persist");
-    const campaignId = createdCampaign.json.campaigns[0].id;
-    const deletedCampaign = await call("admin", { command: "deleteCampaign", value: { id: campaignId } }, adminToken);
-    assert(deletedCampaign.code === 200 && !deletedCampaign.json.campaigns.length, "campaign deletion should remove it from public state");
-=======
     const unauthorizedSuspend = await call("admin", { command: "suspendServer", value: { id: saved.json.server.id, reason: "Please correct the connection details." } }, login.json.token);
     assert(unauthorizedSuspend.code === 403, "only admins may suspend listings");
     const suspended = await call("admin", { command: "suspendServer", value: { id: saved.json.server.id, reason: "Please correct the connection details." } }, adminToken);
@@ -1344,7 +1321,6 @@ async function main() {
     assert(deletedCampaign.code === 200 && !deletedCampaign.json.campaigns.length, "campaign deletion should remove it from admin and public state");
     const campaignBackup = JSON.parse(await fs.readFile(backupPath, "utf8"));
     assert(campaignBackup.campaigns.find((item) => item.id === campaignId)?.deleted, "campaign deletion must survive backup recovery");
->>>>>>> Stashed changes
 
     const billingSave = await call("admin", {
       command: "saveBilling",
@@ -1365,9 +1341,6 @@ async function main() {
       }
     }, adminToken);
     assert(billingSave.code === 200 && billingSave.json.billing.plans.premium.effectivePriceCents === 900, "admin billing changes should update public sale pricing");
-<<<<<<< Updated upstream
-    assert(billingSave.json.billing.plans.free.serverLimit === 1, "billing supports a one-listing free plan");
-=======
     assert(billingSave.json.billing.plans.free.serverLimit === 1, "free plans must support a one-listing limit");
     const freshBilling = await call("state", { fresh: "1", scope: "account" }, "", "GET");
     assert(freshBilling.json.billing.updatedAt === billingSave.json.billing.updatedAt && freshBilling.json.billing.plans.premium.effectivePriceCents === 900, "new sessions must see saved billing prices and revision");
@@ -1375,7 +1348,6 @@ async function main() {
     const zeroPerks = await call("admin", { command: "saveBilling", value: noSponsorPlan }, adminToken);
     assert(zeroPerks.code === 200 && zeroPerks.json.billing.plans.premium.sponsorCredits === 0 && zeroPerks.json.billing.plans.premium.serverLimit === 3 && zeroPerks.json.billing.plans.premium.effectivePriceCents === 1200, "zero perks, changed limits, and disabled discounts must save");
     await call("admin", { command: "saveBilling", value: billingSave.json.billing }, adminToken);
->>>>>>> Stashed changes
 
     const beforeSponsorCapDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
     const cappedDb = {
