@@ -1,8 +1,13 @@
 (() => {
   const config = window.ICON_LISTING_CONFIG?.adsense;
   const pathname = location.pathname.replace(/\/?$/, "/");
+<<<<<<< Updated upstream
   if (!config?.enabled || !config.reviewedPaths?.includes(pathname) || location.search) return;
   if (document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]')) return;
+=======
+  // Only publisher-reviewed editorial pages may load Google ads.
+  if (!config?.enabled || !config.reviewedPaths?.includes(pathname) || location.search) return;
+>>>>>>> Stashed changes
   const script = document.createElement("script");
   script.async = true;
   script.crossOrigin = "anonymous";

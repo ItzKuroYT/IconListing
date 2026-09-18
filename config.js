@@ -199,6 +199,10 @@ const IconListingConfig = {
   },
   adsense: {
     enabled: true,
+<<<<<<< Updated upstream
+=======
+    // Google ads are limited to original editorial pages reviewed for publisher value.
+>>>>>>> Stashed changes
     reviewedPaths: [
       "/guides/",
       "/guides/choosing-a-minecraft-server/",

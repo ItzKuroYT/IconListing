@@ -26,7 +26,11 @@ jobs:
         with:
           node-version: 22
 
+<<<<<<< Updated upstream
       - name: Generate public pages
+=======
+      - name: Generate directory and editorial pages
+>>>>>>> Stashed changes
         run: node scripts/generate-server-pages.js
 
       - name: Stage public files only

@@ -2754,10 +2754,18 @@ main {
 .editorial-page h1 { font-size: 2rem; line-height: 1.2; }
 .editorial-page p { line-height: 1.75; }
 .editorial-page a { color: #d4b8ef; }
+<<<<<<< Updated upstream
+=======
+.tool-directory-links { border-top: 1px solid var(--border); margin-top: 32px; }
+>>>>>>> Stashed changes
 .campaign-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .site-campaign { position: fixed; right: 16px; bottom: 16px; width: min(320px, calc(100vw - 32px)); background: #171719; color: #f7f7fb; border: 1px solid #585060; border-radius: 6px; overflow: hidden; z-index: 40; box-shadow: 0 4px 20px #0006; }
 .campaign-heading { display: flex; align-items: center; justify-content: space-between; padding-left: 12px; min-height: 44px; font-size: .8rem; }
 .campaign-close { width: 44px; height: 44px; border: 0; background: transparent; color: inherit; font-size: 1.6rem; cursor: pointer; }
+<<<<<<< Updated upstream
+=======
+.campaign-close:hover, .campaign-close:focus-visible { background: #44324e; }
+>>>>>>> Stashed changes
 .site-campaign video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; object-fit: contain; }
 .campaign-destination { display: grid; gap: 4px; padding: 10px 12px; color: inherit; overflow-wrap: anywhere; }
 .campaign-destination span { font-size: .8rem; color: #bbb9c1; }
@@ -2766,4 +2774,8 @@ main {
 body[data-page="admin"] .grid.two { align-items: start; }
 body[data-page="admin"] .dash-item { grid-template-columns: 44px minmax(0, 1fr); border-bottom: 1px solid var(--border); padding: 12px 0; }
 body[data-page="admin"] .dash-item .row-actions { grid-column: 1 / -1; justify-content: flex-start; flex-wrap: wrap; }
+<<<<<<< Updated upstream
+=======
+body[data-page="admin"] .server-ip { overflow-wrap: anywhere; }
+>>>>>>> Stashed changes
 @media (max-width: 600px) { .site-campaign { width: 248px; right: 8px; bottom: 8px; } .editorial-page h1 { font-size: 1.7rem; } }

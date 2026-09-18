@@ -1477,7 +1477,11 @@ async function getState() {
   const detailServerSlug = page === "server" ? serverSlugFromPath() : "";
   const stateParams = detailServerId ? { serverId: detailServerId } : detailServerSlug ? { serverSlug: detailServerSlug } : {};
   if (["admin", "dashboard", "plans"].includes(page)) stateParams.scope = "account";
+<<<<<<< Updated upstream
   if (page === "dashboard" || page === "admin" || page === "server" || page === "vote" || page === "community") stateParams.fresh = "1";
+=======
+  if (["dashboard", "admin", "server", "vote", "community", "plans"].includes(page)) stateParams.fresh = "1";
+>>>>>>> Stashed changes
   const state = await request("state", stateParams, "GET");
   rememberBilling(state.billing);
   sessionStorage.removeItem("iconListingBootRetries");
@@ -2533,13 +2537,14 @@ function renderHome(state) {
       </div>
     </section>
     <section class="section seo-section">
-      <h2 class="section-title">Best Minecraft Servers and Top Rankings</h2>
-      <p class="section-copy">Icon Listing is a Minecraft server list for players searching for the best Minecraft servers, top Minecraft servers, active SMP communities, PvP networks, Survival worlds, Bedrock servers, Java servers, and cross-play servers. Rankings use live player counts, votes, status, tags, and listing quality so players can compare servers before joining.</p>
+      <h2 class="section-title">Find a community that fits</h2>
+      <p class="section-copy">Start with your edition and preferred gamemode. Then compare rules, activity, and feedback. A server's place in the list reflects votes, reported players, reviews, and labelled promotional placement; it is not a staff endorsement.</p>
+      <div class="seo-link-grid"><a class="seo-link" href="${route("/guides/choosing-a-minecraft-server/")}">Choosing a server</a><a class="seo-link" href="${route("/guides/how-rankings-work/")}">How rankings work</a></div>
       ${topServerSeoLinks(state.servers)}
     </section>
     <section class="section seo-section">
       <h2 class="section-title">Reviews and Weekly Community Picks</h2>
-      <p class="section-copy">Player reviews, owner replies, weekly community highlight voting, and leaderboards add first-party context to listings. Instead of only showing copied server descriptions, Icon Listing helps players compare how active, reviewed, and supported each Minecraft server is.</p>
+      <p class="section-copy">Read player feedback and owner replies alongside the listing. The weekly community poll gives players another way to support a server; a poll win is separate from daily votes and paid sponsorship.</p>
       <div class="seo-link-grid">
         <a class="seo-link" href="${route("/community/")}">Community highlight vote</a>
         <a class="seo-link" href="${route("/servers/?sort=votes")}">Top voted Minecraft servers</a>
@@ -2555,10 +2560,6 @@ function renderHome(state) {
       <h2 class="section-title">Advertise a Minecraft Server for Free</h2>
       <p class="section-copy">Server owners can use Icon Listing as free Minecraft advertising. Create a listing with your server IP, banner, formatted description, trailer, Discord invite, website, tags, vote page, and status details so players can discover your community from search and from the server directory.</p>
       <div class="seo-link-grid">${searchIntentLinks()}</div>
-    </section>
-    <section class="section seo-section">
-      <h2 class="section-title">Popular Minecraft Server Searches</h2>
-      <p class="section-copy">Players often search for top 10 Minecraft servers, active SMP servers, survival servers with land claims, Skyblock servers with economies, Lifesteal servers with PvP, Prison servers with progression, Factions servers, and Bedrock or cross-play servers they can join with friends. Icon Listing keeps those searches connected to real listings with status, votes, descriptions, and server details.</p>
     </section>
     <section class="section seo-section">
       <h2 class="section-title">How Icon Listing Helps Players Choose</h2>
@@ -2580,6 +2581,7 @@ function renderHome(state) {
 
 function renderServers(state) {
   const tag = tagFromPath() || new URLSearchParams(location.search).get("tag") || "";
+  const matchingServers = tag ? state.servers.filter((server) => (server.tags || []).includes(tag) || (tag === "Java" && server.edition !== "bedrock") || (tag === "Bedrock" && (server.edition === "bedrock" || server.crossPlay))) : state.servers;
   const loadingListings = !!state.apiHydrating && !state.servers.length;
   const listTitle = tag ? `${tag} Minecraft Servers` : "Best Minecraft Server List";
   setSeoMeta({
@@ -2605,7 +2607,7 @@ function renderServers(state) {
           "@type": "ItemList",
           name: tag ? `${tag} Minecraft Servers` : "Minecraft Servers",
           url: absoluteUrl(tag ? tagPath(tag) : "/servers/"),
-          itemListElement: state.servers.slice(0, 20).map((server, index) => ({
+          itemListElement: matchingServers.slice(0, 20).map((server, index) => ({
             "@type": "ListItem",
             position: index + 1,
             url: absoluteUrl(serverPath(server)),
@@ -2625,26 +2627,7 @@ function renderServers(state) {
         </div>
       </div>
       ${toolbarMarkup(tag)}
-      <section class="seo-section">
-        <h2 class="section-title">${tag ? `Find ${escapeHtml(tag)} Minecraft Servers` : "Find the Right Minecraft Server"}</h2>
-        <p class="section-copy">${tag ? `Compare ${escapeHtml(tag)} servers by activity, votes, tags, descriptions, and status. Open a listing to view the server IP, details, trailer, banners, and vote page.` : "Use search, tags, and sorting to compare Minecraft servers by activity, votes, newest listings, and gamemode. Every listing links to a detail page with server information and voting."}</p>
-        <div class="server-tags">${popularTagLinks()}</div>
-      </section>
-      <section class="seo-section">
-        <h2 class="section-title">${tag ? `Top ${escapeHtml(tag)} Minecraft Servers` : "Top 10 Minecraft Servers"}</h2>
-        <p class="section-copy">${tag ? `The best ${escapeHtml(tag)} Minecraft servers usually have active players, clear descriptions, stable uptime, and vote activity. Use the list below to compare ${escapeHtml(tag)} communities before joining.` : "Looking for the best Minecraft servers? Compare the top 10 Minecraft servers by live players, votes, rank, tags, status, server IP, and descriptions before joining a new community."}</p>
-        ${topServerSeoLinks(tag ? state.servers.filter((server) => (server.tags || []).includes(tag)) : state.servers)}
-      </section>
-      <section class="seo-section">
-        <h2 class="section-title">Minecraft Server Advertising</h2>
-        <p class="section-copy">Icon Listing helps server owners advertise Minecraft servers with a dedicated listing page, clean server URL, vote button, tags, banners, descriptions, trailers, Discord links, website links, and search-friendly details. Start with a free listing, then use sponsored placements when you want extra visibility.</p>
-        <div class="seo-link-grid">${searchIntentLinks()}</div>
-      </section>
-      <section class="seo-section">
-        <h2 class="section-title">Compare Minecraft Servers Before Joining</h2>
-        <p class="section-copy">A useful Minecraft server list should show more than a name. Icon Listing lets players compare server IPs, online status, player counts, votes, tags, formatted descriptions, banners, trailers, and owner links so they can pick a community that matches how they play.</p>
-        ${faqMarkup(SERVER_LIST_FAQS)}
-      </section>
+      <div class="server-tags">${popularTagLinks()}</div>
       <div class="directory-layout">
         <div>
           <div id="serverList" class="server-list"></div>
@@ -2652,9 +2635,15 @@ function renderServers(state) {
         </div>
         ${directorySidebar(state.servers, state.siteAnalytics)}
       </div>
+      <section class="section seo-section">
+        <h2 class="section-title">Before you join</h2>
+        <p class="section-copy">Match your edition first, then check the server's rules on PvP, claims, resets, and purchases. A busy server is not always the right fit. Status is the latest available check, not a guarantee that you can connect right now.</p>
+        <div class="seo-link-grid"><a class="seo-link" href="${route("/guides/choosing-a-minecraft-server/")}">Choosing a Minecraft server</a><a class="seo-link" href="${route("/guides/how-rankings-work/")}">How rankings work</a><a class="seo-link" href="${route("/guides/advertise-your-minecraft-server/")}">Improve your server listing</a></div>
+      </section>
     </section>
   </div>`;
   setupFilters(state.servers, { pagerSelector: "#serverPager", basePath: tag ? tagPath(tag) : "/servers/", initialTag: tag, loading: loadingListings });
+  if (!state.apiHydrating && tag && !matchingServers.length) upsertMeta("name", "robots", "noindex, follow");
 }
 
 function renderCommunity(state) {
@@ -4434,6 +4423,7 @@ function adminBillingPanel(state) {
 
 function adminCampaignPanel(state) {
   return `<div class="dashboard-list">${(state.campaigns || []).filter((item) => !item.deleted).map((item) => `<div class="campaign-row"><div><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.creator)} · ${item.active ? "Active" : "Paused"}</p></div><div class="row-actions"><button type="button" class="button" data-campaign-edit="${escapeHtml(item.id)}">Edit</button><button type="button" class="button danger" data-campaign-delete="${escapeHtml(item.id)}">Delete</button></div></div>`).join("")}</div>
+<<<<<<< Updated upstream
     <form id="campaignForm" class="form"><input type="hidden" name="id">
       <div class="field"><label>Ad title</label><input name="title" class="input" maxlength="100" required></div>
       <div class="field"><label>Creator / advertiser</label><input name="creator" class="input" maxlength="100" required></div>
@@ -4442,6 +4432,18 @@ function adminCampaignPanel(state) {
       <div class="field"><label>Or upload MP4 / WebM (up to 1 MB)</label><input name="videoFile" type="file" accept="video/mp4,video/webm"></div>
       <label class="check"><input name="active" type="checkbox" checked> Campaign active</label>
       <div class="row-actions"><button type="submit" class="button primary">Save campaign</button><button type="reset" class="button">New campaign</button></div><p role="status" id="campaignStatus"></p>
+=======
+    <form id="campaignForm" class="form">
+      <input type="hidden" name="id">
+      <div class="field"><label for="campaignTitle">Ad title</label><input id="campaignTitle" name="title" class="input" maxlength="100" required></div>
+      <div class="field"><label for="campaignCreator">Creator / advertiser</label><input id="campaignCreator" name="creator" class="input" maxlength="100" required></div>
+      <div class="field"><label for="campaignUrl">Destination URL</label><input id="campaignUrl" name="url" type="url" class="input" placeholder="https://" required></div>
+      <div class="field"><label for="campaignVideo">Hosted video URL</label><input id="campaignVideo" name="videoUrl" type="url" class="input" placeholder="https://"></div>
+      <div class="field"><label for="campaignUpload">Or upload MP4 / WebM (up to 1 MB)</label><input id="campaignUpload" name="videoFile" type="file" accept="video/mp4,video/webm"></div>
+      <label class="check"><input name="active" type="checkbox" checked> Campaign active</label>
+      <div class="row-actions"><button type="submit" class="button primary">Save campaign</button><button type="reset" class="button">New campaign</button></div>
+      <p role="status" id="campaignStatus"></p>
+>>>>>>> Stashed changes
     </form>`;
 }
 
@@ -4450,6 +4452,10 @@ function bindCampaignForms(state) {
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const button = form.querySelector('[type="submit"]');
+<<<<<<< Updated upstream
+=======
+    const status = $("#campaignStatus");
+>>>>>>> Stashed changes
     try {
       setButtonLoading(button, "Saving...");
       const fields = form.elements;
@@ -4459,20 +4465,41 @@ function bindCampaignForms(state) {
       value.active = fields.active.checked;
       if (file) value.videoData = await fileToDataUrl(file);
       const result = await request("admin", { command: "saveCampaign", value });
+<<<<<<< Updated upstream
       cachePublicState(result); renderAdmin({ ...state, ...result }); toast("Campaign saved.");
     } catch (error) { $("#campaignStatus").textContent = error.message; }
+=======
+      cachePublicState(result);
+      renderAdmin({ ...state, ...result });
+      toast("Campaign saved. Uploaded videos appear after the static site deploys.");
+    } catch (error) { status.textContent = error.message; }
+>>>>>>> Stashed changes
     finally { setButtonLoading(button, "Save campaign", false); }
   });
   form?.addEventListener("reset", () => { form.elements.namedItem("id").value = ""; });
   $$("[data-campaign-edit]").forEach((button) => button.addEventListener("click", () => {
     const campaign = state.campaigns.find((item) => item.id === button.dataset.campaignEdit);
     for (const key of ["id", "title", "creator", "url", "videoUrl"]) form.elements.namedItem(key).value = campaign[key] || "";
+<<<<<<< Updated upstream
     form.elements.active.checked = campaign.active; form.elements.videoFile.value = ""; form.scrollIntoView({ behavior: "smooth", block: "center" });
   }));
   $$("[data-campaign-delete]").forEach((button) => button.addEventListener("click", async () => {
     if (!confirm("Delete this campaign?")) return;
     try { const result = await request("admin", { command: "deleteCampaign", value: { id: button.dataset.campaignDelete } }); cachePublicState(result); renderAdmin({ ...state, ...result }); }
     catch (error) { toast(error.message); }
+=======
+    form.elements.active.checked = campaign.active;
+    form.elements.videoFile.value = "";
+    form.scrollIntoView({ behavior: "smooth", block: "center" });
+  }));
+  $$("[data-campaign-delete]").forEach((button) => button.addEventListener("click", async () => {
+    if (!confirm("Delete this campaign?")) return;
+    try {
+      const result = await request("admin", { command: "deleteCampaign", value: { id: button.dataset.campaignDelete } });
+      cachePublicState(result);
+      renderAdmin({ ...state, ...result });
+    } catch (error) { toast(error.message); }
+>>>>>>> Stashed changes
   }));
 }
 
@@ -4482,6 +4509,7 @@ function showSiteCampaign(state) {
   const campaigns = (state.campaigns || []).filter((item) => item.active && !item.deleted && /^https:\/\//i.test(item.videoUrl) && /^https:\/\//i.test(item.url));
   if (!campaigns.length) return;
   let index = 0;
+<<<<<<< Updated upstream
   try { if (Date.now() < Number(localStorage.getItem("iconCampaignDismissedUntil") || 0)) return; index = Number(sessionStorage.getItem("iconCampaignIndex") || 0) % campaigns.length; sessionStorage.setItem("iconCampaignIndex", String(index + 1)); } catch {}
   campaignShownThisPage = true;
   const campaign = campaigns[index];
@@ -4492,6 +4520,32 @@ function showSiteCampaign(state) {
   const video = panel.querySelector("video"); video.muted = true; video.play().catch(() => {});
   panel.querySelector("button").addEventListener("click", () => { video.pause(); panel.remove(); try { localStorage.setItem("iconCampaignDismissedUntil", String(Date.now() + 30 * 60 * 1000)); } catch {} });
   video.addEventListener("error", () => panel.remove(), { once: true }); video.addEventListener("ended", () => panel.remove(), { once: true });
+=======
+  try {
+    if (Date.now() < Number(localStorage.getItem("iconCampaignDismissedUntil") || 0)) return;
+    index = Number(sessionStorage.getItem("iconCampaignIndex") || 0) % campaigns.length;
+    sessionStorage.setItem("iconCampaignIndex", String(index + 1));
+  } catch { /* Storage can be unavailable in private browsing. */ }
+  campaignShownThisPage = true;
+  $("#siteCampaign")?.remove();
+  const campaign = campaigns[index];
+  const panel = document.createElement("aside");
+  panel.id = "siteCampaign";
+  panel.className = "site-campaign";
+  panel.setAttribute("aria-label", "Advertisement");
+  panel.innerHTML = `<div class="campaign-heading"><span>Advertisement</span><button class="campaign-close" type="button" aria-label="Close advertisement" title="Close advertisement">&#215;</button></div><video muted playsinline controls preload="metadata" src="${escapeHtml(campaign.videoUrl)}"></video><a class="campaign-destination" href="${escapeHtml(campaign.url)}" target="_blank" rel="sponsored noopener noreferrer"><strong>${escapeHtml(campaign.title)}</strong><span>${escapeHtml(campaign.creator)}</span></a>`;
+  document.body.appendChild(panel);
+  const video = panel.querySelector("video");
+  video.muted = true;
+  video.play().catch(() => {});
+  panel.querySelector("button").addEventListener("click", () => {
+    video.pause();
+    panel.remove();
+    try { localStorage.setItem("iconCampaignDismissedUntil", String(Date.now() + 30 * 60 * 1000)); } catch {}
+  });
+  video.addEventListener("error", () => panel.remove(), { once: true });
+  video.addEventListener("ended", () => panel.remove(), { once: true });
+>>>>>>> Stashed changes
 }
 
 function adminBillingPlanFields(key, plan) {
@@ -5645,7 +5699,17 @@ function renderCurrentPage(page, state) {
   else if (page === "dashboard") renderDashboard(state);
   else if (page === "admin") renderAdmin(state);
   else renderStatic(page);
+<<<<<<< Updated upstream
   if (!["vote", "guide", "guides"].includes(page)) showSiteCampaign(state);
+=======
+  if (["motd-builder", "votifier-tester", "rgb-text-generator", "fonts-generator"].includes(page)) renderToolDirectoryLinks(state);
+  if (!["vote", "guide", "guides"].includes(page)) showSiteCampaign(state);
+}
+
+function renderToolDirectoryLinks(state) {
+  const servers = (state.servers || []).filter((server) => server.online).slice(0, 3);
+  $("#app .page")?.insertAdjacentHTML("beforeend", `<section class="section tool-directory-links"><h2 class="section-title">Find your next Minecraft community</h2><p class="section-copy">Browse by edition and gamemode, or put your server's new look on its listing.</p><div class="seo-link-grid"><a class="seo-link" href="${route("/servers/")}">Browse server list</a><a class="seo-link" href="${route("/dashboard/")}">Add or update your server</a><a class="seo-link" href="${route("/guides/advertise-your-minecraft-server/")}">Listing guide</a></div>${servers.length ? `<ul>${servers.map((server) => `<li><a href="${serverRoute(server)}">${escapeHtml(server.name)}</a> <span class="muted">${escapeHtml((server.tags || []).slice(0, 3).join(", "))}</span></li>`).join("")}</ul>` : ""}</section>`);
+>>>>>>> Stashed changes
 }
 
 function showBootFailure(page, error, seoFallbackHtml = "") {

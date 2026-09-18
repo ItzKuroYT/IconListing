@@ -707,7 +707,12 @@ module.exports = async function handler(req, res) {
           saveOptions.deletedClients?.length ||
           saveOptions.touchedHosts?.length ||
           saveOptions.deletedHosts?.length ||
+<<<<<<< Updated upstream
           saveOptions.touchedBilling || saveOptions.touchedCampaigns?.length || saveOptions.touchedServers?.length
+=======
+          saveOptions.touchedBilling
+          || saveOptions.touchedCampaigns?.length || saveOptions.touchedServers?.length
+>>>>>>> Stashed changes
         )
       });
       return json(res, 200, writePayload({ ...statePayload(persistedDb, user), users: persistedDb.users.map((item) => publicUser(item, persistedDb)) }));
@@ -1513,6 +1518,42 @@ function clampNumber(value, min, max, fallback) {
 function cleanStripeTaxBehavior(value = "") {
   const next = clean(value).toLowerCase();
   return ["exclusive", "inclusive", "unspecified"].includes(next) ? next : "exclusive";
+}
+
+function validateBillingInput(value) {
+  const inRange = (number, min, max, label) => {
+    if (!Number.isFinite(Number(number)) || Number(number) < min || Number(number) > max) throw httpError(400, `${label} must be between ${min} and ${max}.`);
+  };
+  if (!/^[a-z]{3}$/i.test(value.currency || "")) throw httpError(400, "Use a three-letter currency code.");
+  inRange(value.maxSponsors, 1, 5, "Maximum sponsors");
+  inRange(value.sale?.percentOff, 0, 90, "Discount");
+  inRange(value.sale?.minPaidPriceCents, 500, 100000, "Minimum price in cents");
+  for (const [key, plan] of Object.entries(value.plans || {})) {
+    inRange(plan.serverLimit, 1, 25, `${key} listing limit`);
+    inRange(plan.sponsorCredits, 0, 2, `${key} sponsor credits`);
+    inRange(plan.sponsorDurationDays, plan.sponsorCredits ? 1 : 0, 90, `${key} sponsor duration`);
+    if (key !== "free") inRange(plan.priceCents, 500, 100000, `${key} price in cents`);
+    if (![plan.serverLimit, plan.sponsorCredits, plan.sponsorDurationDays, plan.priceCents].every((number) => Number.isInteger(Number(number)))) throw httpError(400, "Listing limits, credits, days, and price cents must be whole numbers.");
+  }
+}
+
+function isListingPublic(server) {
+  return !["suspended", "pending"].includes(server.moderationStatus);
+}
+
+function validateCampaign(value) {
+  const safeUrl = (input, optional = false) => {
+    if (optional && !input) return "";
+    try {
+      const url = new URL(input);
+      if (url.protocol !== "https:" || url.username || url.password) throw new Error();
+      return url.href;
+    } catch { throw httpError(400, "Campaign links must be valid HTTPS URLs."); }
+  };
+  const title = cleanText(value.title || "").slice(0, 100);
+  const creator = cleanText(value.creator || "").slice(0, 100);
+  if (!title || !creator || hasBlockedText(title + " " + creator)) throw httpError(400, "Enter an allowed campaign title and creator.");
+  return { id: clean(value.id || ""), title, creator, url: safeUrl(value.url), videoUrl: safeUrl(value.videoUrl, true), active: value.active === true };
 }
 
 function cleanStripePaymentMethodTypes(value = []) {
@@ -2769,7 +2810,11 @@ function sitemapXml(db) {
     changefreq: "daily",
     lastmod: server.updatedAt || server.createdAt || server.lastPingAt || now
   }));
+<<<<<<< Updated upstream
   const guideUrls = ["", "choosing-a-minecraft-server/", "advertise-your-minecraft-server/", "how-rankings-work/"].map((slug) => ({ loc: siteUrl(`/guides/${slug}`), changefreq: "monthly", priority: "0.6" }));
+=======
+  const guideUrls = ["", ...require("../scripts/editorial-pages.js").guides.map((guide) => guide.slug + "/")].map((slug) => ({ loc: siteUrl(`/guides/${slug}`), changefreq: "monthly", priority: "0.6" }));
+>>>>>>> Stashed changes
   const urls = [...staticUrls, ...guideUrls, ...tagUrls, ...serverUrls];
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(sitemapUrlEntry).join("\n")}\n</urlset>`;
 }
@@ -3128,13 +3173,9 @@ function staticReviewSummarySentence(server) {
 
 function staticSearchIntentLinks() {
   const links = [
-    ["Best Minecraft Servers", "/servers/"],
-    ["Top Minecraft Servers", "/servers/"],
-    ["Top 10 Minecraft Servers", "/servers/"],
     ["Minecraft Server List", "/servers/"],
-    ["Minecraft Listing", "/servers/"],
-    ["Advertise Minecraft Server", "/login/"],
-    ["Free Minecraft Advertising", "/login/"],
+    ["Choose a Server", "/guides/choosing-a-minecraft-server/"],
+    ["Improve Your Listing", "/guides/advertise-your-minecraft-server/"],
     ["Java Minecraft Servers", tagPath("Java")],
     ["Bedrock Minecraft Servers", tagPath("Bedrock")],
     ["Crossplay Minecraft Servers", tagPath("Cross-Play")]
@@ -3215,6 +3256,21 @@ function staticTagPageEntries(db) {
     filePath: tagStaticPagePath(tag),
     html: tagPageHtmlForTag(next, tag)
   }));
+}
+
+function staticDirectoryPageEntries(db) {
+  const next = migrateDb(db);
+  const servers = rankServers(next.servers, next.votes, next.reviews, next.communityVotes);
+  return ["home", "servers"].map((page) => {
+    const shown = page === "home" ? servers.slice(0, 10) : servers;
+    const title = page === "home" ? "Minecraft Servers | Icon Listing" : "Minecraft Server List | Java, Bedrock & SMP";
+    const description = "Compare Minecraft communities by edition, gamemode, player activity, votes, and reviews. Find connection details and choose a server that fits how you play.";
+    const pathname = page === "home" ? "/" : "/servers/";
+    const bodyHtml = `<section class="section"><h1 class="section-title">Minecraft server list</h1><p class="section-copy">${description}</p><div class="server-tags">${staticCategoryLinks("")}</div></section>
+      <section class="section"><h2 class="section-title">${page === "home" ? "Discover communities" : "Server directory"}</h2><div class="server-list">${shown.map((server) => `<article class="card"><h3><a href="${serverPath(server)}">${escapeHtml(server.name)}</a>${server.sponsored ? " <small>Sponsored</small>" : ""}</h3><p>${escapeHtml(publicServerAddress(server))} - ${escapeHtml(staticServerEditionLabel(server))}</p><p>${escapeHtml((server.tags || []).join(", "))}</p><p>${escapeHtml(trimSeo(server.description || "", 180))}</p><p>${Number(server.votes || 0)} votes · ${escapeHtml(staticReviewSummaryText(server))}</p><a href="${serverPath(server)}">View connection details and reviews</a></article>`).join("") || '<p>No published servers yet.</p>'}</div><p><a class="button" href="/servers/">Browse all servers</a></p></section>
+      <section class="section"><h2 class="section-title">Choose a server with confidence</h2><p class="section-copy">Check edition support, claims, PvP rules, and reset policies before building. Player counts are status snapshots, not a guarantee of availability. Sponsored placement is labelled.</p><div class="seo-link-grid">${staticSearchIntentLinks()}<a class="seo-link" href="/guides/how-rankings-work/">How rankings work</a></div></section>`;
+    return { filePath: page === "home" ? "index.html" : "servers/index.html", html: appHtml({ title, description, canonical: siteUrl(pathname), image: siteUrl(CONFIG.site.iconPath), page, bodyHtml, jsonLd: { "@context": "https://schema.org", "@type": "CollectionPage", name: title, url: siteUrl(pathname), mainEntity: { "@type": "ItemList", itemListElement: shown.map((server, index) => ({ "@type": "ListItem", position: index + 1, name: server.name, url: siteUrl(serverPath(server)) })) } } }) };
+  });
 }
 
 function fallback404Html() {
