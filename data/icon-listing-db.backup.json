@@ -696,23 +696,6 @@
       "googleName": "Maxwell Pellot",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocL_5rvbckZ64wN6EH798A1zEOozI_MNi14XbY1XYMkg2YdERc07=s96-c",
       "updatedAt": "2026-09-17T01:18:20.031Z"
-    },
-    {
-      "id": "66f24553-80cc-462b-a855-8ad5d207c0c3",
-      "username": "DavidHillyardDJ",
-      "email": "davidhillyard147@gmail.com",
-      "passwordHash": "",
-      "emailOptIn": false,
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-09-19T08:00:27.066Z",
-      "termsAcceptedAt": "2026-09-19T08:00:27.066Z",
-      "googleLinkedAt": "2026-09-19T08:00:27.066Z",
-      "createdAt": "2026-09-19T08:00:27.066Z",
-      "banned": false,
-      "googleSub": "108118633654336381870",
-      "googleName": "David Hillyard DJ",
-      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocLs484r3AcV-83zKPt7-1Z6O1OWonL2o6bCrHKz-gUoFDpreVA=s96-c",
-      "updatedAt": "2026-09-19T08:00:27.066Z"
     }
   ],
   "servers": [
@@ -12914,7 +12897,7 @@
       },
       {
         "date": "2026-09-19",
-        "count": 1
+        "count": 2
       }
     ],
     "siteVisitVisitorDays": {
@@ -13071,7 +13054,8 @@
         "2120fea93e332c72"
       ],
       "2026-09-19": [
-        "75544cad1646483b"
+        "75544cad1646483b",
+        "4e34c03963e45aba"
       ]
     }
   },
