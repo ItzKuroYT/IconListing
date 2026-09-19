@@ -2450,6 +2450,7 @@ function billingPlanCatalog(db = {}) {
 function publicBillingSettings(db = {}) {
   const billing = billingSettings(db);
   return {
+    sponsorSelfService: true,
     currency: billing.currency,
     stripeTaxCode: billing.stripeTaxCode,
     stripeTaxBehavior: billing.stripeTaxBehavior,
@@ -3467,11 +3468,11 @@ function appHtml({ title, description, canonical, image, type = "website", keywo
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     ${bootData ? `<script>window.__ICON_LISTING_BOOT__=${escapeScriptJson(bootData)};</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260918-billing">
-    <script src="/config.js?v=20260918-billing"></script>
-    <script src="/assets/js/incoming.js?v=20260918-billing" defer></script>
-    <script src="/assets/js/ads.js?v=20260918-billing" defer></script>
-    <script src="/assets/js/app.js?v=20260918-billing" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260918-billing2">
+    <script src="/config.js?v=20260918-billing2"></script>
+    <script src="/assets/js/incoming.js?v=20260918-billing2" defer></script>
+    <script src="/assets/js/ads.js?v=20260918-billing2" defer></script>
+    <script src="/assets/js/app.js?v=20260918-billing2" defer></script>
   </head>
   <body data-page="${escapeHtmlAttr(page)}">
     <main class="page seo-fallback">

@@ -185,6 +185,7 @@ function normalizeBillingSettings(value = {}) {
   const defaults = defaultBillingSettings();
   const sale = value.sale || {};
   return {
+    sponsorSelfService: value.sponsorSelfService === true,
     currency: clean(value.currency || defaults.currency).toLowerCase() || "usd",
     stripeTaxCode: clean(value.stripeTaxCode || defaults.stripeTaxCode || "txcd_10000000"),
     stripeTaxBehavior: cleanStripeTaxBehavior(value.stripeTaxBehavior || defaults.stripeTaxBehavior || "exclusive"),
@@ -239,6 +240,7 @@ function billingPlanCatalog(state = {}) {
 function publicBillingSettings(state = {}) {
   const billing = billingSettings(state);
   return {
+    sponsorSelfService: billing.sponsorSelfService === true,
     updatedAt: billing.updatedAt,
     currency: billing.currency,
     stripeTaxCode: billing.stripeTaxCode,
@@ -3919,6 +3921,7 @@ function renderDashboard(state) {
   const limitLabel = limit >= 999 ? "Unlimited" : `${mine.length}/${limit}`;
   const addDisabled = limit < 999 && mine.length >= limit;
   const sponsorAllowance = Number(state.user.sponsorCredits || 0);
+  const sponsorSelfService = publicBillingSettings(state).sponsorSelfService === true;
   const activeMine = mine.filter(isSponsorActive);
   const sponsorLabel = sponsorAllowance ? `${activeMine.length}/${sponsorAllowance}` : "Not included";
   $("#app").innerHTML = `<div class="page">
@@ -3956,7 +3959,7 @@ function renderDashboard(state) {
         <div class="row-actions">
           <a class="button" href="${serverRoute(server)}">View</a>
           <button class="button" data-edit="${escapeHtml(server.id)}">Edit</button>
-          ${sponsorAllowance > 0 ? sponsorDashboardButton(server, activeMine.length, sponsorAllowance, state) : ""}
+          ${sponsorSelfService && sponsorAllowance > 0 ? sponsorDashboardButton(server, activeMine.length, sponsorAllowance, state) : ""}
           <button class="button danger" data-delete="${escapeHtml(server.id)}">Delete</button>
         </div>
       </article>`).join("") : emptyNotice()}</div>

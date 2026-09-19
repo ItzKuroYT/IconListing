@@ -1341,6 +1341,7 @@ async function main() {
       }
     }, adminToken);
     assert(billingSave.code === 200 && billingSave.json.billing.plans.premium.effectivePriceCents === 900, "admin billing changes should update public sale pricing");
+    assert(billingSave.json.billing.sponsorSelfService === true, "new APIs should advertise owner sponsor controls to compatible frontends");
     assert(billingSave.json.billing.plans.free.serverLimit === 1, "free plans must support a one-listing limit");
     const freshBilling = await call("state", { fresh: "1", scope: "account" }, "", "GET");
     assert(freshBilling.json.billing.updatedAt === billingSave.json.billing.updatedAt && freshBilling.json.billing.plans.premium.effectivePriceCents === 900, "new sessions must see saved billing prices and revision");
