@@ -96,6 +96,11 @@
     <priority>0.75</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/servers/skyblock/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/servers/anarchy/</loc>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
@@ -317,18 +322,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
-    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Fallen-Realm/</loc>
-    <lastmod>2026-09-17T01:49:06.908Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/Mobcraft-SMP/</loc>
     <lastmod>2026-07-31T22:23:53.982Z</lastmod>
     <changefreq>daily</changefreq>
@@ -389,6 +382,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
+    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/GreenBeanSMP/</loc>
     <lastmod>2026-08-01T01:46:07.018Z</lastmod>
     <changefreq>daily</changefreq>
@@ -415,6 +414,18 @@
   <url>
     <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
     <lastmod>2026-09-06T03:10:55.230Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Fallen-Realm/</loc>
+    <lastmod>2026-09-17T01:49:06.908Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/FluxCraftATM10TTS/</loc>
+    <lastmod>2026-09-19T08:02:21.780Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
