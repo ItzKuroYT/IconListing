@@ -35,8 +35,8 @@ const DISCORD_WEBHOOK_TIMEOUT_MS = 2500;
 const MCSTATUS_TIMEOUT_MS = 1800;
 const PING_REFRESH_LIMIT = 24;
 const PING_REFRESH_CONCURRENCY = 8;
-const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "createCheckout", "stripeWebhook", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
-const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "createCheckout", "stripeWebhook", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const WRITE_ACTIONS = new Set(["register", "login", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "createCheckout", "setSponsor", "stripeWebhook", "trackCopy", "trackServerView", "trackSiteVisit", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "testVote", "votifierToolTest", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_WRITE_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "createCheckout", "setSponsor", "stripeWebhook", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const READ_ACTIONS = new Set(["state", "sitemap", "health", "serverPage", "serverImage", "googleStart", "googleCallback"]);
 const loginFailures = new Map();
 
@@ -509,6 +509,40 @@ module.exports = async function handler(req, res) {
       }));
     }
 
+    if (action === "setSponsor") {
+      requireLogin(user);
+      requireFields(body, ["id"]);
+      const server = db.servers.find((item) => item.id === body.id);
+      if (!server) throw httpError(404, "Listing not found.");
+      if (server.ownerId !== user.id && !isAdmin(user)) throw httpError(403, "You cannot sponsor that listing.");
+      const enabled = body.enabled !== false;
+      if (enabled) {
+        if (!isListingPublic(server)) throw httpError(409, "Publish this listing before sponsoring it.");
+        const plan = planConfigForUser(user, db);
+        const allowance = Number(plan.sponsorCredits || 0);
+        if (!isAdmin(user) && allowance <= 0) throw httpError(403, "Your current plan does not include a sponsor slot.");
+        const activeOwned = activeSponsoredServers(db).filter((item) => item.ownerId === user.id && item.id !== server.id).length;
+        if (!isAdmin(user) && activeOwned >= allowance) throw httpError(409, "All sponsor slots included with your plan are already in use.");
+        if (!isSponsorActive(server) && availableSponsorSlots(db) <= 0) throw httpError(409, "All site sponsor slots are full right now.");
+        const now = new Date();
+        const durationDays = Math.max(1, Number(plan.sponsorDurationDays || 1));
+        server.sponsored = true;
+        server.sponsorSource = isAdmin(user) ? "admin" : "plan";
+        server.sponsoredStartedAt = now.toISOString();
+        server.sponsoredUntil = isAdmin(user) ? "" : new Date(now.getTime() + durationDays * 86400000).toISOString();
+      } else {
+        server.sponsored = false;
+        server.sponsorSource = "";
+        server.sponsoredStartedAt = "";
+        server.sponsoredUntil = "";
+      }
+      server.updatedAt = new Date().toISOString();
+      const persistedDb = await saveDb(db, { touchedServers: [server.id], requireExistingServers: [server.id] });
+      await safeSyncServerStaticPages(persistedDb, { writeServerIds: [server.id], syncRouteFiles: false, syncPublicState: true });
+      const persistedServer = persistedDb.servers.find((item) => item.id === server.id);
+      return json(res, 200, writePayload({ ...statePayload(persistedDb, user), server: publicServer(persistedServer, user) }));
+    }
+
     if (action === "deleteAccount") {
       requireLogin(user);
       if (user.fromTokenSnapshot) throw httpError(409, "Refresh and try again before deleting your account.");
@@ -641,7 +675,10 @@ module.exports = async function handler(req, res) {
             const owner = db.users.find((item) => item.id === server.ownerId);
             if (owner && userHasActiveSponsor(db, owner)) throw httpError(409, "That owner already has an active sponsored listing.");
           }
-          server.sponsored = !server.sponsored;
+          server.sponsored = !isSponsorActive(server);
+          server.sponsorSource = server.sponsored ? "admin" : "";
+          server.sponsoredStartedAt = server.sponsored ? new Date().toISOString() : "";
+          server.sponsoredUntil = "";
           server.updatedAt = new Date().toISOString();
           saveOptions.touchedServers = [server.id];
           saveOptions.requireExistingServers = [server.id];
@@ -1365,6 +1402,7 @@ function migrateDb(db = freshDb()) {
 function normalizeServer(server) {
   const edition = ["java", "bedrock"].includes(server.edition) ? server.edition : "java";
   const bedrockType = ["server", "realm"].includes(server.bedrockType) ? server.bedrockType : "server";
+  const sponsoredUntil = clean(server.sponsoredUntil || "");
   return {
     ...server,
     edition,
@@ -1376,6 +1414,8 @@ function normalizeServer(server) {
     iconListingPluginEnabled: !!server.iconListingPluginEnabled,
     iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey || ""),
     iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
+    sponsored: server.sponsored === true && (!sponsoredUntil || new Date(sponsoredUntil).getTime() > Date.now()),
+    sponsoredUntil,
     analytics: normalizeAnalytics(server.analytics)
   };
 }
@@ -1514,23 +1554,6 @@ function clampNumber(value, min, max, fallback) {
 function cleanStripeTaxBehavior(value = "") {
   const next = clean(value).toLowerCase();
   return ["exclusive", "inclusive", "unspecified"].includes(next) ? next : "exclusive";
-}
-
-function validateBillingInput(value) {
-  const inRange = (number, min, max, label) => {
-    if (!Number.isFinite(Number(number)) || Number(number) < min || Number(number) > max) throw httpError(400, `${label} must be between ${min} and ${max}.`);
-  };
-  if (!/^[a-z]{3}$/i.test(value.currency || "")) throw httpError(400, "Use a three-letter currency code.");
-  inRange(value.maxSponsors, 1, 5, "Maximum sponsors");
-  inRange(value.sale?.percentOff, 0, 90, "Discount");
-  inRange(value.sale?.minPaidPriceCents, 500, 100000, "Minimum price in cents");
-  for (const [key, plan] of Object.entries(value.plans || {})) {
-    inRange(plan.serverLimit, 1, 25, `${key} listing limit`);
-    inRange(plan.sponsorCredits, 0, 2, `${key} sponsor credits`);
-    inRange(plan.sponsorDurationDays, plan.sponsorCredits ? 1 : 0, 90, `${key} sponsor duration`);
-    if (key !== "free") inRange(plan.priceCents, 500, 100000, `${key} price in cents`);
-    if (![plan.serverLimit, plan.sponsorCredits, plan.sponsorDurationDays, plan.priceCents].every((number) => Number.isInteger(Number(number)))) throw httpError(400, "Listing limits, credits, days, and price cents must be whole numbers.");
-  }
 }
 
 function isListingPublic(server) {
@@ -2465,7 +2488,15 @@ function priceLabel(cents = 0, currency = "usd") {
 }
 
 function activeSponsoredServers(db = {}) {
-  return (db.servers || []).filter((server) => server?.sponsored === true);
+  return (db.servers || []).filter(isSponsorActive);
+}
+
+function isSponsorActive(server) {
+  if (server?.sponsored !== true) return false;
+  const until = clean(server.sponsoredUntil || "");
+  if (!until) return true;
+  const expiresAt = new Date(until).getTime();
+  return Number.isFinite(expiresAt) && expiresAt > Date.now();
 }
 
 function availableSponsorSlots(db = {}) {
@@ -2478,6 +2509,9 @@ function userHasActiveSponsor(db = {}, user = null) {
 }
 
 function ensurePlanCanCheckout(db, user, plan) {
+  if (user?.stripeSubscriptionId && ["active", "trialing", "past_due"].includes(clean(user.subscriptionStatus))) {
+    throw httpError(409, "You already have an active paid plan. Contact support before switching plans so you are not billed twice.");
+  }
   if (Number(plan.sponsorCredits || 0) <= 0) return;
   if (availableSponsorSlots(db) <= 0) throw httpError(409, "All sponsor slots are full right now.");
   if (userHasActiveSponsor(db, user)) throw httpError(409, "You already have an active sponsored listing.");
@@ -2490,13 +2524,11 @@ async function createStripeCheckoutSession(req, user, planKey, plan, billing) {
   if (amount < 500) throw httpError(400, "Paid plans must be at least $5.00.");
   const params = new URLSearchParams();
   params.set("mode", "subscription");
-  (billing.stripePaymentMethodTypes || ["card", "paypal"]).forEach((type, index) => {
-    params.set(`payment_method_types[${index}]`, type);
-  });
   params.set("success_url", siteUrl("/dashboard/?checkout=success"));
   params.set("cancel_url", siteUrl("/sponsored/plans/?checkout=cancelled"));
   params.set("client_reference_id", user.id);
-  if (user.email) params.set("customer_email", user.email);
+  if (user.stripeCustomerId) params.set("customer", user.stripeCustomerId);
+  else if (user.email) params.set("customer_email", user.email);
   params.set("line_items[0][quantity]", "1");
   params.set("line_items[0][price_data][currency]", billing.currency);
   params.set("line_items[0][price_data][unit_amount]", String(amount));
@@ -2514,26 +2546,53 @@ async function createStripeCheckoutSession(req, user, planKey, plan, billing) {
   params.set("subscription_data[metadata][userId]", user.id);
   params.set("subscription_data[metadata][plan]", planKey);
   params.set("subscription_data[metadata][priceCents]", String(amount));
+  const configuredMethods = cleanStripePaymentMethodTypes(billing.stripePaymentMethodTypes || ["card", "paypal"]);
   let response;
+  let data;
   try {
-    response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${secret}`,
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: params
-    });
+    ({ response, data } = await postStripeCheckoutSession(secret, params, configuredMethods, user, planKey, amount));
+    if (!response.ok && shouldRetryStripeWithCard(data, configuredMethods)) {
+      console.warn("Stripe checkout retrying without unavailable payment methods", { message: stripeErrorMessage(data) });
+      ({ response, data } = await postStripeCheckoutSession(secret, params, ["card"], user, planKey, amount));
+    }
   } catch (error) {
     console.error("Stripe checkout request failed", { message: error?.message || String(error) });
     throw httpError(502, "Stripe checkout could not be reached. Please try again in a minute.");
   }
-  const data = await response.json().catch(() => ({}));
   if (!response.ok || !data.url) {
-    console.error("Stripe checkout rejected", { status: response.status, message: data.error?.message || "No Stripe error message" });
-    throw httpError(502, "Stripe rejected checkout setup. Check the Stripe secret key, account mode, and enabled payment methods.");
+    const reason = stripeErrorMessage(data);
+    console.error("Stripe checkout rejected", { status: response.status, message: reason || "No Stripe error message" });
+    throw httpError(502, reason ? `Stripe could not create checkout: ${reason}` : "Stripe rejected checkout setup. Check the Stripe account and payment-method settings.");
   }
   return data;
+}
+
+async function postStripeCheckoutSession(secret, baseParams, paymentMethods, user, planKey, amount) {
+  const params = new URLSearchParams(baseParams);
+  paymentMethods.forEach((type, index) => params.set(`payment_method_types[${index}]`, type));
+  const idempotencySource = `${user.id}:${planKey}:${amount}:${paymentMethods.join(",")}:${Math.floor(Date.now() / 60000)}`;
+  const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Idempotency-Key": crypto.createHash("sha256").update(idempotencySource).digest("hex")
+    },
+    body: params
+  });
+  const data = await response.json().catch(() => ({}));
+  return { response, data };
+}
+
+function stripeErrorMessage(data = {}) {
+  return cleanText(data?.error?.message || "").replace(/sk_(?:test|live)_[A-Za-z0-9]+/g, "[redacted]").slice(0, 240);
+}
+
+function shouldRetryStripeWithCard(data, paymentMethods = []) {
+  if (!paymentMethods.includes("card") || paymentMethods.length <= 1) return false;
+  const message = stripeErrorMessage(data);
+  const parameter = clean(data?.error?.param || "");
+  return /payment_method|paypal|not.*(?:available|enabled|supported)|invalid.*method/i.test(`${parameter} ${message}`);
 }
 
 async function handleStripeWebhook(req, res, db, event, rawBody) {
@@ -2541,14 +2600,25 @@ async function handleStripeWebhook(req, res, db, event, rawBody) {
   const type = clean(event?.type);
   const object = event?.data?.object || {};
   let changedUserId = "";
+  let changedServerIds = [];
   if (type === "checkout.session.completed") {
     changedUserId = applyStripeCheckoutSession(db, object);
   }
   if (type === "customer.subscription.updated" || type === "customer.subscription.deleted") {
-    changedUserId = applyStripeSubscriptionEvent(db, object, type);
+    const result = applyStripeSubscriptionEvent(db, object, type);
+    changedUserId = result.userId;
+    changedServerIds = result.serverIds;
   }
-  if (changedUserId) {
-    await saveDb(db, { touchedUsers: [changedUserId], requireExistingUsers: [changedUserId] });
+  if (changedUserId || changedServerIds.length) {
+    const persistedDb = await saveDb(db, {
+      touchedUsers: changedUserId ? [changedUserId] : [],
+      requireExistingUsers: changedUserId ? [changedUserId] : [],
+      touchedServers: changedServerIds,
+      requireExistingServers: changedServerIds
+    });
+    if (changedServerIds.length) {
+      await safeSyncServerStaticPages(persistedDb, { writeServerIds: changedServerIds, syncRouteFiles: false, syncPublicState: true });
+    }
   }
   return json(res, 200, writePayload({ received: true }));
 }
@@ -2577,19 +2647,32 @@ function applyStripeSubscriptionEvent(db, subscription = {}, type = "") {
     (customerId && item.stripeCustomerId === customerId) ||
     (subscription.metadata?.userId && item.id === subscription.metadata.userId)
   );
-  if (!user) return "";
+  if (!user) return { userId: "", serverIds: [] };
   const status = clean(subscription.status || (type === "customer.subscription.deleted" ? "canceled" : ""));
   user.subscriptionStatus = status;
+  let serverIds = [];
   if (["canceled", "unpaid", "incomplete_expired"].includes(status) || type === "customer.subscription.deleted") {
     user.plan = "free";
     user.subscriptionPlan = "free";
+    serverIds = deactivateUserSponsors(db, user.id);
   } else if (status === "active" || status === "trialing") {
     const planKey = normalizePlanKey(subscription.metadata?.plan || user.plan || "free");
     user.plan = planKey;
     user.subscriptionPlan = planKey;
   }
   user.updatedAt = new Date().toISOString();
-  return user.id;
+  return { userId: user.id, serverIds };
+}
+
+function deactivateUserSponsors(db, userId) {
+  const now = new Date().toISOString();
+  return (db.servers || []).filter((server) => server.ownerId === userId && isSponsorActive(server)).map((server) => {
+    server.sponsored = false;
+    server.sponsorSource = "";
+    server.sponsoredUntil = "";
+    server.updatedAt = now;
+    return server.id;
+  });
 }
 
 function verifyStripeWebhookSignature(req, rawBody = "") {
@@ -3384,11 +3467,11 @@ function appHtml({ title, description, canonical, image, type = "website", keywo
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     ${bootData ? `<script>window.__ICON_LISTING_BOOT__=${escapeScriptJson(bootData)};</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260918-motion">
-    <script src="/config.js?v=20260918-motion"></script>
-    <script src="/assets/js/incoming.js?v=20260918-motion" defer></script>
-    <script src="/assets/js/ads.js?v=20260918-motion" defer></script>
-    <script src="/assets/js/app.js?v=20260918-motion" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260918-billing">
+    <script src="/config.js?v=20260918-billing"></script>
+    <script src="/assets/js/incoming.js?v=20260918-billing" defer></script>
+    <script src="/assets/js/ads.js?v=20260918-billing" defer></script>
+    <script src="/assets/js/app.js?v=20260918-billing" defer></script>
   </head>
   <body data-page="${escapeHtmlAttr(page)}">
     <main class="page seo-fallback">

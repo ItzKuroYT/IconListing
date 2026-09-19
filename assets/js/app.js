@@ -5,7 +5,7 @@ const ALL_TAGS = [...CONFIG.gamemodes, ...CONFIG.generalTags];
 const ANALYTICS_DAYS = 30;
 const PLAYER_HISTORY_LIMIT = 48;
 const COPY_HASHES_PER_DAY_LIMIT = 120;
-const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
+const DURABLE_CLIENT_ACTIONS = new Set(["register", "saveServer", "deleteServer", "syncDashboard", "vote", "submitReview", "replyReview", "deleteReview", "communityVote", "setSponsor", "accountUpdate", "deleteAccount", "verifyEmail", "resendEmailVerification", "pluginPoll", "testPluginVote", "admin"]);
 const TRUSTPILOT_REVIEW_URL = "https://www.trustpilot.com/review/minecraftlisting.org";
 let turnstileLoadPromise = null;
 const renderedTurnstileWidgets = new Map();
@@ -123,6 +123,7 @@ function migrateDb(db) {
 function normalizeServer(server) {
   const edition = ["java", "bedrock"].includes(server.edition) ? server.edition : "java";
   const bedrockType = ["server", "realm"].includes(server.bedrockType) ? server.bedrockType : "server";
+  const sponsoredUntil = clean(server.sponsoredUntil || "");
   return {
     ...server,
     edition,
@@ -134,6 +135,8 @@ function normalizeServer(server) {
     iconListingPluginEnabled: !!server.iconListingPluginEnabled,
     iconListingVoteKey: cleanVoteKey(server.iconListingVoteKey || ""),
     iconListingVoteQueue: normalizeIconListingVoteQueue(server.iconListingVoteQueue),
+    sponsored: server.sponsored === true && (!sponsoredUntil || new Date(sponsoredUntil).getTime() > Date.now()),
+    sponsoredUntil,
     analytics: normalizeAnalytics(server.analytics)
   };
 }
@@ -302,7 +305,15 @@ function cleanStripeCustomPaymentMethodIds(value = []) {
 }
 
 function activeSponsoredServers(state = {}) {
-  return (state.servers || []).filter((server) => server?.sponsored === true);
+  return (state.servers || []).filter(isSponsorActive);
+}
+
+function isSponsorActive(server) {
+  if (server?.sponsored !== true) return false;
+  const until = clean(server.sponsoredUntil || "");
+  if (!until) return true;
+  const expiresAt = new Date(until).getTime();
+  return Number.isFinite(expiresAt) && expiresAt > Date.now();
 }
 
 function availableSponsorSlots(state = {}) {
@@ -871,6 +882,30 @@ function fallbackRequest(action, payload) {
   }
   if (action === "createCheckout") {
     return Promise.reject(new Error("Stripe checkout needs the production API."));
+  }
+  if (action === "setSponsor") {
+    if (!user) return Promise.reject(new Error("Log in before sponsoring a listing."));
+    const server = db.servers.find((item) => item.id === payload.id);
+    if (!server) return Promise.reject(new Error("Listing not found."));
+    if (server.ownerId !== user.id && !isAdmin(user)) return Promise.reject(new Error("You cannot sponsor that listing."));
+    const enabled = payload.enabled !== false;
+    if (enabled) {
+      const plan = planConfigForUser(user, db);
+      if (!isAdmin(user) && Number(plan.sponsorCredits || 0) <= 0) return Promise.reject(new Error("Your current plan does not include a sponsor slot."));
+      const now = new Date();
+      server.sponsored = true;
+      server.sponsorSource = isAdmin(user) ? "admin" : "plan";
+      server.sponsoredStartedAt = now.toISOString();
+      server.sponsoredUntil = isAdmin(user) ? "" : new Date(now.getTime() + Number(plan.sponsorDurationDays || 1) * 86400000).toISOString();
+    } else {
+      server.sponsored = false;
+      server.sponsorSource = "";
+      server.sponsoredStartedAt = "";
+      server.sponsoredUntil = "";
+    }
+    server.updatedAt = new Date().toISOString();
+    save();
+    return Promise.resolve({ ...db, user: publicUser(user, db), server });
   }
   if (action === "saveServer") {
     if (!user) return Promise.reject(new Error("Log in before adding a server."));
@@ -3883,6 +3918,9 @@ function renderDashboard(state) {
   const limit = Number(state.user.serverLimit || serverLimitForUser(state.user));
   const limitLabel = limit >= 999 ? "Unlimited" : `${mine.length}/${limit}`;
   const addDisabled = limit < 999 && mine.length >= limit;
+  const sponsorAllowance = Number(state.user.sponsorCredits || 0);
+  const activeMine = mine.filter(isSponsorActive);
+  const sponsorLabel = sponsorAllowance ? `${activeMine.length}/${sponsorAllowance}` : "Not included";
   $("#app").innerHTML = `<div class="page">
     <section class="section">
       <div class="section-head">
@@ -3901,6 +3939,10 @@ function renderDashboard(state) {
           <span class="eyebrow">Listing slots</span>
           <strong>${escapeHtml(limitLabel)}</strong>
         </div>
+        <div>
+          <span class="eyebrow">Sponsor slots</span>
+          <strong>${escapeHtml(sponsorLabel)}</strong>
+        </div>
         <a class="button" href="${route("/sponsored/plans/")}">${escapeHtml(copy("dashboard.plansButton", "Plans"))}</a>
       </div>
       <div class="dashboard-list">${mine.length ? mine.map((server) => `<article class="card dash-item">
@@ -3908,11 +3950,13 @@ function renderDashboard(state) {
         <div>
           <h2 class="server-title">${escapeHtml(server.name)}</h2>
           <p class="server-ip">${escapeHtml(serverAddress(server))}</p>
+          ${isSponsorActive(server) ? `<p class="fine-print">Sponsored${server.sponsoredUntil ? ` until ${escapeHtml(new Date(server.sponsoredUntil).toLocaleDateString())}` : ""}</p>` : ""}
           ${["suspended", "pending"].includes(server.moderationStatus) ? `<p class="notice"><strong>${server.moderationStatus === "pending" ? "Awaiting admin review" : "Changes required"}</strong><br>${escapeHtml(server.moderationReason || "Edit and resubmit this listing for review.")}</p>` : ""}
         </div>
         <div class="row-actions">
           <a class="button" href="${serverRoute(server)}">View</a>
           <button class="button" data-edit="${escapeHtml(server.id)}">Edit</button>
+          ${sponsorAllowance > 0 ? sponsorDashboardButton(server, activeMine.length, sponsorAllowance, state) : ""}
           <button class="button danger" data-delete="${escapeHtml(server.id)}">Delete</button>
         </div>
       </article>`).join("") : emptyNotice()}</div>
@@ -3926,6 +3970,13 @@ function renderDashboard(state) {
     <section id="settingsPanel" class="section hidden">${settingsMarkup(state.user)}</section>
   </div>`;
   bindDashboard(state);
+}
+
+function sponsorDashboardButton(server, activeCount, allowance, state) {
+  const active = isSponsorActive(server);
+  const unavailable = !active && (activeCount >= allowance || availableSponsorSlots(state) <= 0 || ["suspended", "pending"].includes(server.moderationStatus));
+  const label = active ? "End sponsor" : unavailable ? "Sponsor unavailable" : "Sponsor listing";
+  return `<button class="button ${active ? "" : "primary"}" data-sponsor="${escapeHtml(server.id)}" data-sponsor-enabled="${active ? "false" : "true"}" ${unavailable ? "disabled" : ""}>${escapeHtml(label)}</button>`;
 }
 
 function emailVerificationPanel(user) {
@@ -4051,6 +4102,22 @@ function bindDashboard(state) {
       $("#serverFormPanel").classList.remove("hidden");
       $("#settingsPanel").classList.add("hidden");
       bindDashboard(state);
+    });
+  });
+  $$("[data-sponsor]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const enabled = button.dataset.sponsorEnabled === "true";
+      setButtonLoading(button, enabled ? "Sponsoring..." : "Updating...");
+      try {
+        const result = await request("setSponsor", { id: button.dataset.sponsor, enabled });
+        state = { ...state, ...result, votes: result.votes || state.votes || [] };
+        if (result.servers) cachePublicState(result);
+        toast(enabled ? "Listing is now sponsored." : "Sponsorship removed.");
+        renderDashboard(state);
+      } catch (error) {
+        toast(error.message);
+        setButtonLoading(button, enabled ? "Sponsor listing" : "End sponsor", false);
+      }
     });
   });
   $$("[data-delete]").forEach((button) => {
@@ -4406,7 +4473,7 @@ function adminBillingPanel(state) {
       </select></div>
       <label class="check"><input name="stripeMethodCard" type="checkbox" ${(billing.stripePaymentMethodTypes || []).includes("card") ? "checked" : ""}> Card checkout</label>
       <label class="check"><input name="stripeMethodPaypal" type="checkbox" ${(billing.stripePaymentMethodTypes || []).includes("paypal") ? "checked" : ""}> PayPal checkout</label>
-      <div class="field"><label>Custom PayPal method ID</label><input class="input" name="stripeCustomPaymentMethodIds" value="${escapeHtml((billing.stripeCustomPaymentMethodIds || []).join(", "))}"></div>
+      <div class="field"><label>External payment method reference</label><input class="input" name="stripeCustomPaymentMethodIds" value="${escapeHtml((billing.stripeCustomPaymentMethodIds || []).join(", "))}"><p class="fine-print">Stored for external payment records only. Hosted Stripe Checkout uses the Card and PayPal options above.</p></div>
     </div>
     <div class="billing-plan-editor">
       ${paidPlans.map(([key, plan]) => adminBillingPlanFields(key, plan)).join("")}

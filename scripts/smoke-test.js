@@ -1375,6 +1375,7 @@ async function main() {
     await fs.writeFile(dbPath, JSON.stringify(beforeSponsorCapDb));
 
     const stripeCalls = [];
+    let rejectPaypalOnce = true;
     const previousStripeFetch = global.fetch;
     const previousStripeSecretKey = process.env.STRIPE_SECRET_KEY;
     const previousStripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -1382,19 +1383,26 @@ async function main() {
     delete process.env.STRIPE_WEBHOOK_SECRET;
     global.fetch = async (url, options = {}) => {
       if (String(url).includes("api.stripe.com/v1/checkout/sessions")) {
-        stripeCalls.push(new URLSearchParams(String(options.body || "")));
-        return { ok: true, json: async () => ({ id: `cs_test_${suffix}`, url: "https://checkout.stripe.com/c/pay/cs_test" }) };
+        const params = new URLSearchParams(String(options.body || ""));
+        stripeCalls.push({ params, headers: options.headers || {} });
+        if (rejectPaypalOnce && params.get("payment_method_types[1]") === "paypal") {
+          rejectPaypalOnce = false;
+          return { ok: false, status: 400, json: async () => ({ error: { param: "payment_method_types", message: "PayPal is not enabled for this account." } }) };
+        }
+        return { ok: true, status: 200, json: async () => ({ id: `cs_test_${suffix}`, url: "https://checkout.stripe.com/c/pay/cs_test" }) };
       }
       return previousStripeFetch(url, options);
     };
     const checkout = await call("createCheckout", { plan: "premium" }, googleSession);
     assert(checkout.code === 200 && checkout.json.url.includes("checkout.stripe.com"), "paid plans should create Stripe Checkout sessions");
-    assert(stripeCalls[0]?.get("line_items[0][price_data][unit_amount]") === "900", "Stripe Checkout should use the saved admin sale price");
-    assert(stripeCalls[0]?.get("payment_method_types[0]") === "card", "Stripe Checkout should include card payments");
-    assert(stripeCalls[0]?.get("payment_method_types[1]") === "paypal", "Stripe Checkout should include PayPal payments");
-    assert(stripeCalls[0]?.get("metadata[customPaymentMethodIds]") === "cpmt_1UBOyUPMbP3VXc9bLkFHMDdw", "Stripe Checkout metadata should preserve the custom PayPal method reference");
-    assert(stripeCalls[0]?.get("line_items[0][price_data][product_data][tax_code]") === "txcd_10000000", "Stripe Checkout should include the product tax code");
-    assert(stripeCalls[0]?.get("line_items[0][price_data][tax_behavior]") === "exclusive", "Stripe Checkout should include tax behavior");
+    assert(stripeCalls[0]?.params.get("line_items[0][price_data][unit_amount]") === "900", "Stripe Checkout should use the saved admin sale price");
+    assert(stripeCalls[0]?.params.get("payment_method_types[0]") === "card", "Stripe Checkout should include card payments");
+    assert(stripeCalls[0]?.params.get("payment_method_types[1]") === "paypal", "Stripe Checkout should try configured PayPal payments");
+    assert(stripeCalls[1]?.params.get("payment_method_types[0]") === "card" && !stripeCalls[1]?.params.get("payment_method_types[1]"), "Stripe Checkout should retry with card when PayPal is unavailable");
+    assert(stripeCalls[0]?.headers["Idempotency-Key"] && stripeCalls[0].headers["Idempotency-Key"] !== stripeCalls[1]?.headers["Idempotency-Key"], "Stripe Checkout attempts should be idempotent without reusing keys across different parameters");
+    assert(stripeCalls[0]?.params.get("metadata[customPaymentMethodIds]") === "cpmt_1UBOyUPMbP3VXc9bLkFHMDdw", "Stripe Checkout metadata should preserve the external payment method reference");
+    assert(stripeCalls[0]?.params.get("line_items[0][price_data][product_data][tax_code]") === "txcd_10000000", "Stripe Checkout should include the product tax code");
+    assert(stripeCalls[0]?.params.get("line_items[0][price_data][tax_behavior]") === "exclusive", "Stripe Checkout should include tax behavior");
     const stripeWebhook = await callText("stripeWebhook", JSON.stringify({
       type: "checkout.session.completed",
       data: {
@@ -1409,6 +1417,45 @@ async function main() {
     assert(stripeWebhook.code === 200 && stripeWebhook.json.received, "Stripe checkout webhooks should be accepted");
     const upgradedState = await call("state", {}, googleSession, "GET");
     assert(upgradedState.json.user.plan === "premium" && upgradedState.json.user.serverLimit === 4, "Stripe webhook should upgrade the user plan");
+
+    const ownerUpgrade = await callText("stripeWebhook", JSON.stringify({
+      type: "checkout.session.completed",
+      data: {
+        object: {
+          client_reference_id: login.json.user.id,
+          customer: `cus_owner_${suffix}`,
+          subscription: `sub_owner_${suffix}`,
+          metadata: { userId: login.json.user.id, plan: "premium", priceCents: "900" }
+        }
+      }
+    }), "POST");
+    assert(ownerUpgrade.code === 200, "the listing owner plan upgrade should be accepted");
+    const sponsorActivated = await call("setSponsor", { id: saved.json.server.id, enabled: true }, login.json.token);
+    const activeListing = sponsorActivated.json.servers.find((item) => item.id === saved.json.server.id);
+    assert(sponsorActivated.code === 200 && activeListing?.sponsored && new Date(activeListing.sponsoredUntil).getTime() > Date.now(), "paid owners should be able to activate a timed sponsorship");
+    const ownerCancellation = await callText("stripeWebhook", JSON.stringify({
+      type: "customer.subscription.deleted",
+      data: {
+        object: {
+          id: `sub_owner_${suffix}`,
+          customer: `cus_owner_${suffix}`,
+          status: "canceled",
+          metadata: { userId: login.json.user.id, plan: "premium" }
+        }
+      }
+    }), "POST");
+    assert(ownerCancellation.code === 200, "subscription cancellation should be accepted");
+    const cancelledState = await call("state", { scope: "account" }, login.json.token, "GET");
+    assert(cancelledState.json.user.plan === "free" && cancelledState.json.servers.find((item) => item.id === saved.json.server.id)?.sponsored === false, "subscription cancellation should remove plan sponsorships");
+    const restoredPlanDb = JSON.parse(await fs.readFile(dbPath, "utf8"));
+    const restoredPlanUser = restoredPlanDb.users.find((item) => item.id === login.json.user.id);
+    restoredPlanUser.plan = "iconic";
+    restoredPlanUser.subscriptionPlan = "iconic";
+    restoredPlanUser.subscriptionStatus = "active";
+    restoredPlanUser.stripeSubscriptionId = "";
+    restoredPlanUser.stripeCustomerId = "";
+    await fs.writeFile(dbPath, JSON.stringify(restoredPlanDb));
+    await fs.writeFile(backupPath, JSON.stringify(restoredPlanDb));
     global.fetch = previousStripeFetch;
     if (previousStripeSecretKey === undefined) delete process.env.STRIPE_SECRET_KEY;
     else process.env.STRIPE_SECRET_KEY = previousStripeSecretKey;
