@@ -1,4 +1,5 @@
 (() => {
+  const isPreviewRoute = location.pathname.replace(/\/+$/, "/") === "/incoming/";
   const viewRoutes = new Map([
     ["/", "home"],
     ["/home/", "home"],
@@ -20,9 +21,12 @@
     ["/privacy/", "privacy"],
     ["/terms/", "terms"]
   ]);
-  const requestedView = new URLSearchParams(location.search).get("view") || "home";
-  const validViews = new Set(viewRoutes.values());
-  document.body.dataset.page = validViews.has(requestedView) ? requestedView : "home";
+  document.body.classList.add("site-motion");
+  if (isPreviewRoute) {
+    const requestedView = new URLSearchParams(location.search).get("view") || "home";
+    const validViews = new Set(viewRoutes.values());
+    document.body.dataset.page = validViews.has(requestedView) ? requestedView : "home";
+  }
 
   const prefersReducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const introHoldMs = 3000;
@@ -90,6 +94,7 @@
   }
 
   function previewDestination(url) {
+    if (!isPreviewRoute) return url.href;
     let view = viewRoutes.get(url.pathname);
     if (!view && url.pathname.startsWith("/servers/")) view = "servers";
     if (!view) return url.href;
@@ -110,6 +115,65 @@
     window.setTimeout(() => { location.href = destination; }, 370);
   }
 
+  function enhanceFooter() {
+    const footer = document.querySelector(".footer, .site-footer");
+    if (!footer || footer.classList.contains("incoming-footer")) return;
+    const config = window.ICON_LISTING_CONFIG?.site || {};
+    const reviewUrl = footer.querySelector(".footer-review-link")?.href || "https://www.trustpilot.com/review/minecraftlisting.org";
+    const year = new Date().getFullYear();
+    const footerWordmark = [..."ICONLISTING"].map((letter, index) => `<span style="--letter-index:${index}">${letter}</span>`).join("");
+    footer.classList.add("incoming-footer");
+    footer.innerHTML = `<div class="incoming-footer-inner">
+      <div class="incoming-footer-main">
+        <section class="incoming-footer-brand" aria-labelledby="incomingFooterBrand">
+          <a id="incomingFooterBrand" class="incoming-footer-logo" href="/">
+            <img src="${config.iconPath || "/assets/icon.png"}" alt="">
+            <span>Icon Listing</span>
+          </a>
+          <p>A curated Minecraft server directory built to help communities get discovered and players find somewhere worth joining.</p>
+          <p class="incoming-footer-note">Not affiliated with Mojang or Microsoft.</p>
+        </section>
+        <nav class="incoming-footer-column" aria-label="Discover">
+          <h2>Discover</h2>
+          <a href="/servers/">Minecraft servers</a>
+          <a href="/community/">Community</a>
+          <a href="/sponsored/">Featured servers</a>
+          <a href="https://minestore.org" target="_blank" rel="noopener">Server resources</a>
+        </nav>
+        <nav class="incoming-footer-column" aria-label="For server owners">
+          <h2>For owners</h2>
+          <a href="/dashboard/">Add a server</a>
+          <a href="/sponsored/plans/">Plans and pricing</a>
+          <a href="/guides/advertise-your-minecraft-server/">Listing guide</a>
+          <a href="${reviewUrl}" target="_blank" rel="noopener">Review Icon Listing</a>
+        </nav>
+        <nav class="incoming-footer-column" aria-label="Company and legal">
+          <h2>Company</h2>
+          <a href="/help/">Help center</a>
+          <a href="${config.discordUrl || "https://discord.gg/HFyUfk458c"}" target="_blank" rel="noopener">Discord</a>
+          <a href="/contact/">Contact</a>
+          <a href="/privacy/">Privacy policy</a>
+        </nav>
+      </div>
+      <div class="incoming-footer-bottom">
+        <span>&copy; ${year} IconRealms. All rights reserved.</span>
+        <div><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/contact/">Contact</a></div>
+      </div>
+      <div class="incoming-footer-wordmark" aria-hidden="true">${footerWordmark}</div>
+    </div>`;
+    const wordmark = footer.querySelector(".incoming-footer-wordmark");
+    if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+      wordmark.classList.add("is-visible");
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      wordmark.classList.add("is-visible");
+      observer.disconnect();
+    }, { threshold: .18, rootMargin: "0px 0px -4% 0px" });
+    observer.observe(wordmark);
+  }
+
   document.addEventListener("click", (event) => {
     const link = event.target.closest("a[href]");
     if (!link || navigating || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -120,5 +184,8 @@
     coverAndNavigate(previewDestination(url));
   });
 
-  document.addEventListener("DOMContentLoaded", () => requestAnimationFrame(revealPage));
+  document.addEventListener("DOMContentLoaded", () => requestAnimationFrame(() => {
+    enhanceFooter();
+    revealPage();
+  }));
 })();

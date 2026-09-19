@@ -3384,10 +3384,11 @@ function appHtml({ title, description, canonical, image, type = "website", keywo
     ${jsonLd ? `<script id="seo-jsonld" type="application/ld+json">${escapeScriptJson(jsonLd)}</script>` : ""}
     ${bootData ? `<script>window.__ICON_LISTING_BOOT__=${escapeScriptJson(bootData)};</script>` : ""}
     <link rel="icon" type="image/png" href="/assets/icon.png">
-    <link rel="stylesheet" href="/assets/css/styles.css?v=20260713-server-detail-snapshot">
-    <script src="/config.js?v=20260713-server-detail-snapshot"></script>
-    <script src="/assets/js/ads.js?v=20260917-directory" defer></script>
-    <script src="/assets/js/app.js?v=20260713-server-detail-snapshot" defer></script>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=20260918-motion">
+    <script src="/config.js?v=20260918-motion"></script>
+    <script src="/assets/js/incoming.js?v=20260918-motion" defer></script>
+    <script src="/assets/js/ads.js?v=20260918-motion" defer></script>
+    <script src="/assets/js/app.js?v=20260918-motion" defer></script>
   </head>
   <body data-page="${escapeHtmlAttr(page)}">
     <main class="page seo-fallback">
