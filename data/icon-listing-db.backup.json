@@ -12493,6 +12493,72 @@
       "iconUrl": "",
       "iconListingVoteQueue": [],
       "sponsoredUntil": ""
+    },
+    {
+      "id": "a63da348-a2b0-4e50-a0ab-0e562b8c4d34",
+      "name": "FluxCraftATM10TTS",
+      "edition": "java",
+      "javaHost": "198.244.201.116:25585",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_1c2c55f6ea89a57d615c44067544db986ccf",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/ACBUQc7wegv",
+      "youtubeUrl": "",
+      "country": "United Kingdom",
+      "bannerUrl": "",
+      "description": "Looking for the ultimate modded Skyblock experience? Join us on [FluxCraftATM10TTS], a community-focused ATM10TTS server built for smooth performance, zero lag, and endless automation! \n\nWhether you're an automation genius rushing the ATM Star or a casual player building a beautiful floating island, we have a spot for you.\n\n✨ SERVER FEATURES:\n• 🛠️ Latest ATM10TTS Version – Fully updated with 300+ mods, tech, magic, and quests.\n• ⚡ Optimized Performance – High-end hardware with 24/7 uptime and minimal lag.\n• 🏝️ Individual Sky Islands – Claim your own space or team up with friends.\n• 💼 Player Economy & Shops – Trade resources and build your financial empire.\n• 👥 Friendly Community – Active staff and a welcoming atmosphere for all playstyles.",
+      "tags": [
+        "Survival",
+        "Skyblock",
+        "Modded"
+      ],
+      "ownerId": "66f24553-80cc-462b-a855-8ad5d207c0c3",
+      "ownerName": "DavidHillyardDJ",
+      "moderationStatus": "published",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 50,
+      "version": "1.21.1",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-09-19T08:02:21.780Z",
+      "updatedAt": "2026-09-19T08:02:21.780Z",
+      "lastPingAt": "2026-09-19T08:02:22.314Z",
+      "lastPingAttemptAt": "2026-09-19T08:02:22.314Z",
+      "javaStatusTarget": "198.244.201.116:25585",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-09-19T08:02:22.314Z",
+            "playersOnline": 0,
+            "playersMax": 50,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-09-19T08:02:22.314Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": [],
+      "sponsoredUntil": ""
     }
   ],
   "clients": [
