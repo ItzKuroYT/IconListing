@@ -12555,9 +12555,24 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-09-20",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-09-20": [
+            "35cd679ede2ab47d"
+          ]
+        },
         "playerHistory": [
+          {
+            "createdAt": "2026-09-20T17:32:39.866Z",
+            "playersOnline": 1,
+            "playersMax": 25,
+            "online": true
+          },
           {
             "createdAt": "2026-09-20T17:32:39.866Z",
             "playersOnline": 1,
