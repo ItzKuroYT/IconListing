@@ -696,6 +696,25 @@
       "googleName": "Maxwell Pellot",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocL_5rvbckZ64wN6EH798A1zEOozI_MNi14XbY1XYMkg2YdERc07=s96-c",
       "updatedAt": "2026-09-17T01:18:20.031Z"
+    },
+    {
+      "id": "2aea50a0-0393-4fcb-9a67-d844db4069fe",
+      "username": "MrFoxynator",
+      "email": "timvandeneede@outlook.com",
+      "passwordHash": "679881b27c4b8f30fe8e1eaf728e4656:afd1919bd8c4d94d1f40068b7e8b95be751c2f757a3c3892ad46aabbff9f837c",
+      "emailOptIn": false,
+      "emailOptInAt": "",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-09-20T17:26:50.304Z",
+      "banned": false,
+      "createdAt": "2026-09-20T17:26:50.304Z",
+      "emailVerification": {
+        "codeHash": "2c4f44df91b1e56bf9ea656f9df796c0ef52428829585d6a7b5910c3c3de1f58",
+        "createdAt": "2026-09-20T17:26:50.304Z",
+        "expiresAt": "2026-09-20T17:41:50.304Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
