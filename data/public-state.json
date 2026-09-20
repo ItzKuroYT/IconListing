@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-20T17:26:14.857Z",
+  "generatedAt": "2026-09-20T17:32:45.478Z",
   "campaigns": [],
   "servers": [
     {
@@ -831,6 +831,58 @@
       "communityHighlighted": false
     },
     {
+      "id": "5dfae4a0-1f21-4ec5-90e0-e98ca539cec5",
+      "name": "WanderLand",
+      "javaHost": "nicely-cod.tun.ply.gg",
+      "javaPort": 25565,
+      "javaSrvResolved": true,
+      "javaStatusTarget": "nicely-cod.tun.ply.gg",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/ucQaVKVaVx",
+      "youtubeUrl": "",
+      "country": "Belgium",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=WanderLand&kind=banner",
+      "description": "🌍 Welcome to WanderLand!\n\nWanderLand is a brand-new survival server where adventure, creativity and community come together. Whether you enjoy building, exploring, surviving with friends or creating your own place in the world, everyone is welcome!\n\nOur goal is to build a friendly and active community where every player has a voice. We actively listen to suggestions and feedback, allowing our community to help shape the future of WanderLand.\n\nThe server is only a few days old, so some features are still being configured and improved. We are constantly working on the server, fixing issues and adding new content. By joining now, you can experience WanderLand from the very beginning and become an important part of its development.\n\n✨ Fresh survival world  \n🏡 Protect your land, chests and belongings  \n🗺️ Interactive online world map  \n🗳️ Voting rewards  \n⚔️ Fair survival gameplay  \n👥 Friendly and growing community  \n💬 Suggestions and feedback are welcome  \n🔧 Frequent updates and improvements  \n🎮 Premium and cracked players are welcome  \n\nCracked players must use a unique username that is not already registered to an official Minecraft account. If an official account already owns the username, our Velocity proxy may reserve or block it for security reasons.\n\nWanderLand is still growing, and that makes now the perfect time to join. Claim your land, build your home, invite your friends and help us create an amazing community together.\n\n🌱 A new world. A growing community. An adventure shaped by you.",
+      "tags": [
+        "Survival",
+        "New"
+      ],
+      "ownerName": "MrFoxynator",
+      "votes": 0,
+      "playersOnline": 1,
+      "playersMax": 25,
+      "version": "Velocity 1.7.2-26.3",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-09-20T17:32:38.060Z",
+      "updatedAt": "2026-09-20T17:32:38.060Z",
+      "lastPingAt": "2026-09-20T17:32:39.866Z",
+      "lastSuccessfulPingAt": "2026-09-20T17:32:39.866Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=WanderLand&kind=icon",
+      "rank": 16,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
       "id": "eada511e-c7b9-43e8-8f1e-bcffcb21764d",
       "name": "Calamity SMP",
       "javaHost": "162.245.187.170",
@@ -870,7 +922,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 16,
+      "rank": 17,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 2,
@@ -927,7 +979,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PulsedMC-Hosting-FREE&kind=icon",
-      "rank": 17,
+      "rank": 18,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -983,7 +1035,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 18,
+      "rank": 19,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1040,7 +1092,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
-      "rank": 19,
+      "rank": 20,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1091,7 +1143,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 20,
+      "rank": 21,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1142,7 +1194,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 21,
+      "rank": 22,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1197,7 +1249,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 22,
+      "rank": 23,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1253,7 +1305,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 23,
+      "rank": 24,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1306,7 +1358,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=LimboMC&kind=icon",
-      "rank": 24,
+      "rank": 25,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1363,7 +1415,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=IconSMP&kind=icon",
-      "rank": 25,
+      "rank": 26,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1418,7 +1470,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Tancraft&kind=icon",
-      "rank": 26,
+      "rank": 27,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1473,7 +1525,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 27,
+      "rank": 28,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1530,7 +1582,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Mobcraft-SMP&kind=icon",
-      "rank": 28,
+      "rank": 29,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1587,7 +1639,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Futurelands&kind=icon",
-      "rank": 29,
+      "rank": 30,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 2,
@@ -1642,7 +1694,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 30,
+      "rank": 31,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1695,7 +1747,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 31,
+      "rank": 32,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1750,7 +1802,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=HARDCORE-3-lives&kind=icon",
-      "rank": 32,
+      "rank": 33,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1803,7 +1855,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 33,
+      "rank": 34,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2105,6 +2157,58 @@
           "communityHighlighted": false
         },
         {
+          "id": "5dfae4a0-1f21-4ec5-90e0-e98ca539cec5",
+          "name": "WanderLand",
+          "javaHost": "nicely-cod.tun.ply.gg",
+          "javaPort": 25565,
+          "javaSrvResolved": true,
+          "javaStatusTarget": "nicely-cod.tun.ply.gg",
+          "crossPlay": false,
+          "bedrockHost": "",
+          "bedrockPort": 19132,
+          "websiteUrl": "",
+          "discordUrl": "https://discord.gg/ucQaVKVaVx",
+          "youtubeUrl": "",
+          "country": "Belgium",
+          "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=WanderLand&kind=banner",
+          "description": "🌍 Welcome to WanderLand!\n\nWanderLand is a brand-new survival server where adventure, creativity and community come together. Whether you enjoy building, exploring, surviving with friends or creating your own place in the world, everyone is welcome!\n\nOur goal is to build a friendly and active community where every player has a voice. We actively listen to suggestions and feedback, allowing our community to help shape the future of WanderLand.\n\nThe server is only a few days old, so some features are still being configured and improved. We are constantly working on the server, fixing issues and adding new content. By joining now, you can experience WanderLand from the very beginning and become an important part of its development.\n\n✨ Fresh survival world  \n🏡 Protect your land, chests and belongings  \n🗺️ Interactive online world map  \n🗳️ Voting rewards  \n⚔️ Fair survival gameplay  \n👥 Friendly and growing community  \n💬 Suggestions and feedback are welcome  \n🔧 Frequent updates and improvements  \n🎮 Premium and cracked players are welcome  \n\nCracked players must use a unique username that is not already registered to an official Minecraft account. If an official account already owns the username, our Velocity proxy may reserve or block it for security reasons.\n\nWanderLand is still growing, and that makes now the perfect time to join. Claim your land, build your home, invite your friends and help us create an amazing community together.\n\n🌱 A new world. A growing community. An adventure shaped by you.",
+          "tags": [
+            "Survival",
+            "New"
+          ],
+          "ownerName": "MrFoxynator",
+          "votes": 0,
+          "playersOnline": 1,
+          "playersMax": 25,
+          "version": "Velocity 1.7.2-26.3",
+          "online": true,
+          "uptimePercent": 100,
+          "sponsored": false,
+          "createdAt": "2026-09-20T17:32:38.060Z",
+          "updatedAt": "2026-09-20T17:32:38.060Z",
+          "lastPingAt": "2026-09-20T17:32:39.866Z",
+          "lastSuccessfulPingAt": "2026-09-20T17:32:39.866Z",
+          "uptimeChecks": 1,
+          "uptimeSuccesses": 1,
+          "edition": "java",
+          "bedrockType": "server",
+          "realmCode": "",
+          "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=WanderLand&kind=icon",
+          "rank": 16,
+          "analytics": {
+            "viewsLast7": 0,
+            "viewsLast30": 0,
+            "ipCopiesLast7": 0,
+            "ipCopiesLast30": 0
+          },
+          "reviewStats": {
+            "average": 0,
+            "count": 0
+          },
+          "communityVotesThisWeek": 0,
+          "communityHighlighted": false
+        },
+        {
           "id": "4bb119bc-7c4e-4815-88e7-9b4afbb8c379",
           "name": "CofferCraft",
           "javaHost": "play.coffercraft.com",
@@ -2155,62 +2259,6 @@
           "reviewStats": {
             "average": 0,
             "count": 0
-          },
-          "communityVotesThisWeek": 0,
-          "communityHighlighted": false
-        },
-        {
-          "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
-          "name": "GTM - GTA-based minecraft server for Java",
-          "javaHost": "maxfullcalypse.gtm.network",
-          "javaPort": 25565,
-          "javaSrvResolved": false,
-          "javaStatusTarget": "maxfullcalypse.gtm.network",
-          "crossPlay": false,
-          "bedrockHost": "",
-          "bedrockPort": 19132,
-          "websiteUrl": "",
-          "discordUrl": "",
-          "youtubeUrl": "",
-          "country": "United States",
-          "bannerUrl": "https://i.imgur.com/xEuBBmu.png",
-          "description": "Grand Theft Minecart is the most played Grand Theft Auto server in Minecraft. We provide a completely custom gamemode, GTM, where you can use our 48 custom weapons from shotguns to snipers, all unique to GTM. Not only do we provide a variety of weapons, but also custom vehicles from cars to tanks, and even planes. You can become one of the richest criminals and own your own big penthouse apartment in our custom-built map. At GTM you can find a big community, with gangs and multiple languages. Our frequent, large updates can be enjoyed as we make the server even cooler and fun for everyone. ​\n\nGrand Theft Minecart is our oldest gamemode - hop into the city of MineSantos, loot chests full of awesome gear, and have fun with your friends. Be careful though, there are police roaming the streets, and they do not like murderers! As you rank up, gain access to more and more powerful weapons and vehicles, and purchase a wonderful apartment or house to store all your stuff. Join a Gang, or make your own, and become the Crime Lord of Los Santos. At Grand Theft Minecart the opportunities are limitless.\n\nYou can only join with original (paid) Minecraft Java Edition version 1.19.4 -> 26.2+",
-          "tags": [
-            "Survival",
-            "Economy",
-            "PvP",
-            "RPG",
-            "Farming",
-            "Minigames"
-          ],
-          "ownerName": "MaxFullCalypse",
-          "votes": 0,
-          "playersOnline": 0,
-          "playersMax": 0,
-          "version": "Unknown",
-          "online": false,
-          "uptimePercent": 99.5850622406639,
-          "sponsored": false,
-          "createdAt": "2026-06-24T14:32:13.157Z",
-          "updatedAt": "2026-06-24T14:32:13.157Z",
-          "lastPingAt": "2026-09-20T17:26:08.350Z",
-          "lastSuccessfulPingAt": "2026-09-20T14:19:13.361Z",
-          "uptimeChecks": 723,
-          "uptimeSuccesses": 720,
-          "edition": "java",
-          "bedrockType": "server",
-          "realmCode": "",
-          "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=GTM-GTA-based-minecraft-server-for-Java&kind=icon",
-          "rank": 2,
-          "analytics": {
-            "viewsLast7": 1,
-            "viewsLast30": 5,
-            "ipCopiesLast7": 0,
-            "ipCopiesLast30": 0
-          },
-          "reviewStats": {
-            "average": 5,
-            "count": 1
           },
           "communityVotesThisWeek": 0,
           "communityHighlighted": false
