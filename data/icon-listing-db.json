@@ -12886,7 +12886,7 @@
       "youtubeUrl": "",
       "country": "United Kingdom",
       "bannerUrl": "",
-      "description": "Project Permanence is a mature, friendly UK Vanilla+ survival community built for players who want a world worth keeping. There are no scheduled wipes, no whitelist, and no pay-to-win.\n\nOur custom plugins deepen normal survival with interactive fishing, smithing, ranching and animal lineage, cooking, farming, archaeology, exploration, collections, skills, quests, claims, player stalls, and a player-driven economy. Progress comes from playing, trading, building, and being part of the community. No paid rank skips progression, no bought netherite, and no cash-shop advantage.\n\nAdult-paced and drama-free. Younger players are welcome under the same respectful rules. Java 26.2 with Bedrock cross-play. Discord is optional.",
+      "description": "Project Permanence is a friendly, mature Vanilla+ economy SMP for players who want a lasting survival world with more depth.\n\nThe heart of the server is still Minecraft. Build, explore, trade and progress at your own pace. Our custom systems expand familiar survival activities without turning the server into a modpack or minigame network. An interactive /menu hub and in-game guide keep everything easy to find.\n\nFishing includes a hands-on catch mechanic, 50 discoverable species, habitat clues, personal records, a Fishmonger market and customisable rods. Smithing turns the anvil into an interactive forge where well-timed hammer strikes improve equipment from Unforged through to Masterwork. Ranching gives livestock traits, generations, family lines, productive value and limited lifespans, making selective breeding genuinely worthwhile.\n\nThe wider economy connects seasonal farming, cooking, fishing, ranching and smithing. Grow custom crops, prepare meals, breed valuable livestock, forge equipment and sell your work to specialist buyers in town. Four passive progression Paths, Angler, Farmer, Rancher and Cook, reward the activities you already enjoy, while Collections record long-term discoveries across the world.\n\nLand claims protect what you build, the community is adult-paced and respectful, and there are no scheduled world wipes. There is also no pay-to-win progression. Your equipment, money and achievements come from playing.\n\nWhether you enjoy building a permanent home, running a farm, mastering a profession or relaxing with other survival players, there is room to make the world your own.\n\nWe are based in the United Kingdom, welcome players from anywhere, support Bedrock cross-play, and have no whitelist.",
       "tags": [
         "Survival",
         "Economy",
@@ -12898,16 +12898,16 @@
       "ownerName": "JoeXeoano",
       "moderationStatus": "published",
       "votes": 0,
-      "playersOnline": 6,
+      "playersOnline": 8,
       "playersMax": 40,
       "version": "Purpur 26.2",
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-09-22T11:42:30.076Z",
-      "updatedAt": "2026-09-22T11:42:30.076Z",
-      "lastPingAt": "2026-09-22T16:36:34.060Z",
-      "lastPingAttemptAt": "2026-09-22T16:36:34.060Z",
+      "updatedAt": "2026-09-22T19:54:48.235Z",
+      "lastPingAt": "2026-09-22T19:54:49.517Z",
+      "lastPingAttemptAt": "2026-09-22T19:54:49.517Z",
       "iconUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAM1ElEQVR4Xs1a+VcUSRLmb9kVUXyzO7Nv9+1bZ9YDEDl1HEUFRnEUmsNzQc5GBHVm9M088EARL6Tvxnnu7l8YmxHVUUR9nVXdOr/sD9+rzMiIyIgvI7OyGhpyxQwVi3kqlQpULBeCp+sXCjl5CsqBzLZVPwLVqdijD/XNT23nS8G49tGX9WP92XZom4BQv5yL6DdgkGigASBQjxPBYLGfK+7KNHGW5fPZKv8W1o7bPn82HpRpfDZeRUhA0qQox4RRl/sq8wWLer6xON/WJ0J1fcn6ZEKAz5kvKBusOlQdq6tyK8M++mOwnSXV5ycJcbo2WQsdlwqwiuhAxzBgnExtMZF6Ye2QPCUcY8Qq9M2rvmzy1r8QgMkgMHEfARZxbNsx9K3tOD2VJRFVKyYlUZ+sHyEgyUHSGOr5grcr6AsWSfGN2eBVhrrWxvq0PqxNSIAvqDhgciqzk8Tpxs2DslqLgn59tvX0wzPAApPxJWb7+rSOra5NBoNBu7jFsHGgXO2Sxi3qI6COy4gd01MbfSGQLPWje5vlfFFBX1r6Ppna2vHwombiVJKsXhUBuIp64ODkGKBNyMrthDi5b544oC32rUz9Wdgx1Wd5A5YbroxvUivXCTAQ+/SRhTIN2sp8sDo2NtQJ86jo+XRZRwhQZwgsK22XYhyqDiaCyUbm9IyrTlzgFnEVqvDJdb6QABuAJcAaMGwp+ZxiInYiC5wHk0A/nwqdx+cP29GPIUjOBmf7fLhgddgEQ18VPV9C1jeOx9mgHYLHrJ2Nj2HJV1lkC/AzzrkFJm/76M/KfFDSsJ0EXCRsczyYB/rWfoN+iqIjhC8AfiIZ1t5OZsdryRF8ToRtiAl9YKI4hk/ZAkwCO/QZIhGWXUweWY/4yReoVCi6ZDLuEK2Q7tos1zE+XNGuXmjiSIDt47gQwMlrFeiAJuaDEmAT903GUJ3t0kdqPjbgcJ4OtPfT/rZ+afNzf0vl6cb3ubbaKbRvyU2aG5NFPR3TZ4QAH5AADEYnYlkk+VKWmtsGqbllgBq/OUH3t3Zo6U2Rll4V6O7rAt15naeZ9S2ac1h4/p4mn25T5/hyQI6z2XfkPDW19NHNtXeOmH7KFUrhfEiGjxAfkBQhgH8TVEdooHKbuCaq+si84tSV63Sw/walltfo+s/rtPgyR7PPtuhfq29ocu2ttKefvqcbj17S7SdblN7Iy/P4lTlqOnqOBmYf0enJB9Q38zCsDJ1P4jJz6fx4VqAN6gsBuPpIhCXAjqOenYjHvmj/njpHFuhh5iMtu9WfefqO5twqX3+4Qdd/fScrO/bjBo0/fEPTT9668be0/O436r7qquDYoCMjSzdW31Lb8LxUBftF8uPgixFtYgnAUlYZytmh7VtWub//qNvXrQOyiryaow/WqWM0TZ0Td+j4WJqOOXIY3J5bfy9Vwbi/9YFu/LJJRy9PU9vInJS/rQCtREwSE0xCbAWoc7vHtK8yWxE+vWCCQqDrLkIH2s7SPlfSnASXdhVaz9Px1AL1XlumW6ubNPXkjVTM1ON3wZYYXZQK0DcVzmXJ8MEukl3EkIBcLhM5BHFlLSks18msI/u0BDGyxTLlSjvytLCy/W2OIJdkeyotZwSDCZh95rbN8yx1uG3wp9YzNDB8PbxdYjxxwLPCjoUEoFHEQSUR7dtVVye6CpYsJML6sIFkP3ykvf88SY1H+qjVVcLttffuTNiSM0MPyp7xtFRQ79BVrz+M19fXp13sughIgiYbRwCOa9kJAe7tky1k3Rbop5XXJVp5+4GGlp/JtuADkQmYfPxaqoCJaDx8lk5dGCfdXj5oRegTyWBYeUiAvgo/BbYUuW/bmnz40VT5ZcbaZ/I5WdWFFxkaSK/S5fsvqM0dkntb+Gw4T7fWtum2I2Jo8VeadiTwAXrIvVabWgfD+ay/kNjK/HZB7NxITPgxZJ2wkW+/aFvH7SQqt1Bfaq+yv7R9K4nyxejC0pp71aXp6OAkNbrV5/G9R85S9/gKdYwv0tDdVbkwcfvQwC1HzkAkeY1ZgckjUWgXXoSsEJWVMVxFn50yrhNz2wb41/YzNONWd8FdfCZ+fk7dE0su4XP0Reu39Kr4b9kWfD3uSi26VV+k1P1nUgHt7pV55PtJVzVBBfjm1vkQGK+1beC9qEq+5MWpcY5jCGXd+mQEh0/B3Q8u0OJm2e35El1yt8Suq0vU+PV39NXRE6HNfrffe8aC+8IPS6tyHhx3b4iWi1NyL9C5MHk7P8ZlsbsgmcrXYIyBTdiy6ZtYkqwkbqFlzzr8Pk+/LLhL0VO6eGfNreq8JJQvFSNzcAUwAT3uVjhy76kcgr3jS24L3JQLVjSJ+JgxVmsjMiYAHSTBOreOlHUFyos7/3Xv+QG6s5mjiV9eubJflD2951CfBGFt2Hez2xKccNf4HRpeeeKuxK/lQsQVwG8NnN/GZBdKYf2j/icRwEDnmqj6scnz88Chk+4m2OeSz9PIyjp1upX9Y8tZ2nP4OyqVShG7MFB3Sdp3sIMaD52R058J2+PuCb2DKSrslCPzxMWlwOqOxvmJFaCG6lSDQB+ayMZWmb7s6qc/HD5Js+s5Sv24Sa1D03L95Vcd+rW+Drb1UvM3He4wTNPpG/foz4d76PTFYRmLS1ZRa3yXBCAAg0hyyn3UD9v8ZslvS6K859ObWfpheV0+fvgDiV93XBXq0+dHzo/yB2o6fM69Mt2rrxz8HoBJYBv7tgLsPAohQPcNBpIE1sG9pb54nN/l8xsZ+vvZq/S3vmvU4Uo/WPlztLEdJCPnA8wrsvLubQ+Jt9sNYSvTJ0OwPLYCNBgdt0boRGWsf/LCGDW1XHCr7khwp/nJmw/o9NRDuevzza9Y2n3tsj6jZ3SBulPz1Dk8K0/Gq1I5/GeqzpE0tV+ZdvI0dYzMUperpJ1C9E6vvhQ6FpebIvzbIA4gfDqaBD85qb3/6KBr7uIy/6JATe4zmA88KXf3+uM9z78NyvYwvtiuMzXjMEddo/OSHBPApJwYGpX7Q/fYQmVsTuSsyz+2bBeL4kNj0IpSJOcWfAVXEeAzUJl9alsmcs4yhby80/tnfnIXnaI7td1l5tqKO+3PSPLNree8QbGMk5Ok3GevEOQgKz08Jbo8xp/Eo3PLlMu/p77ULRnP5HciMWJ8mAvKhACr8HnggLdlby+9ylPrpUlJvmvirhx4/N7e+/UJb1Dc5lUTAtyKtqemQ0Kl5Eduy0/lWvpMAI+dujwhhLzPBxWAvnGO6pgrY/oWsIpJBhZ6PmQKJdnbaXfg8Z7nHzVO3f4p/LUn5/ZynK1C9v9IUOb86xA/uex7h8blGt7h+sHed9tkZCasmK387hml5V8r/ujchgAFOtBDxafDz6xbBb7iDi09ltfclz2XJXn+nZ8/bPKF7ZjJd/tdo7OVxGepx12Pu67M0lb5PzLGSSkBTAqT1TEyTaVydZxxfXzTMIIcPATEActKkXV7nwnon1+llisz9FXPD8Gtza2eLUufH4aeAUzAMZecHmBWX84AR8ClqYWqEx5jYlskIw7eMwADxIkQ2WJJ7vnHxhZl5bnNn6xxvtA+IKBSAW774Hy8BeSAdBieWa4aR9/8tCThuEUsAeokouxhVfadu7dzBRxoH5Q/fy0+elKllwS+9HBy/Lnb7T54cJxj0QpIzd0LE/HFI/485R6HKgLYeT0HiRhXAtjV55/WClXveZ8NyvjPaGzLAeE4g98y/FvCpySH8MVURQAGiGX0OajH/vfqYNw+O589H9JVW8AHJEL7PhnaYb+WDPs+2efOXyXLma9BVAxKmoHy/28kVQNCtkC1QfQXGnUayOIJQZtacjteSwd9+WziZD4foR/fGRA1ChK2Mp9Tnxz79cqw75PV6tcrAwJ0dXdPcXsq4zapd8/5UEvPN15LpvH4ZNzW5HFcfha3Cgh0miTDvk/m84/9WjLsJ8lsX/8uqAvL7YakfZ2MCnFx7+7K5D5ifbJa+BwbBL/2+KkkVLZAbQJwcuz7ZdV+WQf1sO+ToR3242TVCGJSIqoOQQtmiRWRNXXAwBKrniz41UV9WN/V+rWBdtivFxqTISC6WknJa18ntzoYEMps6cXpoEz3LfqxQBur5+uHi6IXoSRowLWCRqiOXX2d2MrQj7XDsWoECxenpzHzuM3B5uStAB+wjOOgCSbpa3JahjjOexntcX9jPwlIvM4bEhDHoAKD+b2wwdSTSC1Ca8ESrYmrTyEgMsg/YVX+cUomNf9EpU+cwMK3ojYQ3/bBPkKDRpswRtO3bY3Xjqk/+c8YPgMy+QwxJIhKsvap7KFTbSdBE4vTt3JMWGOIg2/cJ/NBk+e8G7Zz29JQIQcVllxFpoZWFgcl1E4YlqDxFde2Adr5UVaPPM4fI5vdFvwPPDes6+bCrUIAAAAASUVORK5CYII=",
       "javaStatusTarget": "projectpermanence.serveminecraft.net",
       "javaSrvResolved": false,
@@ -12955,12 +12955,48 @@
             "playersOnline": 6,
             "playersMax": 40,
             "online": true
+          },
+          {
+            "createdAt": "2026-09-22T11:42:31.376Z",
+            "playersOnline": 3,
+            "playersMax": 40,
+            "online": true
+          },
+          {
+            "createdAt": "2026-09-22T11:42:31.376Z",
+            "playersOnline": 3,
+            "playersMax": 40,
+            "online": true
+          },
+          {
+            "createdAt": "2026-09-22T11:42:31.376Z",
+            "playersOnline": 3,
+            "playersMax": 40,
+            "online": true
+          },
+          {
+            "createdAt": "2026-09-22T11:42:31.376Z",
+            "playersOnline": 3,
+            "playersMax": 40,
+            "online": true
+          },
+          {
+            "createdAt": "2026-09-22T16:36:34.060Z",
+            "playersOnline": 6,
+            "playersMax": 40,
+            "online": true
+          },
+          {
+            "createdAt": "2026-09-22T19:54:49.517Z",
+            "playersOnline": 8,
+            "playersMax": 40,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-09-22T16:36:34.060Z",
-      "uptimeChecks": 2,
-      "uptimeSuccesses": 2,
+      "lastSuccessfulPingAt": "2026-09-22T19:54:49.517Z",
+      "uptimeChecks": 3,
+      "uptimeSuccesses": 3,
       "iconListingVoteQueue": [],
       "sponsoredUntil": ""
     }
