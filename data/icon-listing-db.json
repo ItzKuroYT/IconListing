@@ -13283,9 +13283,9 @@
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-09-23T21:33:45.830Z",
-      "updatedAt": "2026-09-23T21:41:32.983Z",
-      "lastPingAt": "2026-09-23T21:41:34.420Z",
-      "lastPingAttemptAt": "2026-09-23T21:41:34.420Z",
+      "updatedAt": "2026-09-23T21:42:20.459Z",
+      "lastPingAt": "2026-09-23T21:42:20.509Z",
+      "lastPingAttemptAt": "2026-09-23T21:42:20.509Z",
       "iconUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACH0lEQVR4Xu2QC27EMAhE9/7H6Ol6i1bQzYoM2DE25FN7pLcIawPDvF5f3z9T8/fzmpNdAJjMf2cFsAJ4V9nMxApgBfCusjmBVuF34aQHQDMreKRmR5AWgHFsDY/UrhHCAzCO8+CR2t0D7eUqm16Mg+RR+F7CK+XDA+3kKpseKofgewteKT+t0D6usvFSMI/vXrxSvlqgXVxl48EwjW8jeKX8HUF7uMrGA5jFA0bpkfJYg/ZwlU0rYBTNR9Ej5bUE7eAqmwZ4iWE2g16hZxPawVU2LRhGM+mR8mxB87nK5gAebpjMpFfoXUHzucrmAB5smMykV+hdQfO5yqbCZ7BhMpMR4Q07aD5X2VT4DDVMZjIivGEHzecqmwK7oYbJTEaFt6wARgPgoYbRDCKEt7gDsIRGs4gS3rQCGA2AhGajiRTeFBIACU1HES28KSwAEpofJUN4U2gAJDyilyzhTeEBkPAYL5nCm1IC2ISHHXGG8KbUADbhociZwptOCeBOwptcATw9BLxlBbAC6AjgqSHgDTtWAM4AiCcJvStWAB0BEE8QejZZAXQGQNxZ6LXISADEHYUeq4wGQNxJ6O2QiACIOwg9oT98Y6ICIK4UerF84TsTGQBxhdAD+pFVER3AxhnCnTWK/88KYCNDuKOF4nfZAWxECGd6KH5/VgASj/DbXoqzrgjgCqYNwNLuP/89gENWACuAd5XNTKgAZuQTwMT8Ao555eJUHVuUAAAAAElFTkSuQmCC",
       "javaStatusTarget": "powersmpgg.falix.gg",
       "javaSrvResolved": true,
@@ -13306,12 +13306,24 @@
             "playersOnline": 1,
             "playersMax": 25,
             "online": true
+          },
+          {
+            "createdAt": "2026-09-23T21:33:47.048Z",
+            "playersOnline": 1,
+            "playersMax": 25,
+            "online": true
+          },
+          {
+            "createdAt": "2026-09-23T21:42:20.509Z",
+            "playersOnline": 1,
+            "playersMax": 25,
+            "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-09-23T21:41:34.420Z",
-      "uptimeChecks": 2,
-      "uptimeSuccesses": 2,
+      "lastSuccessfulPingAt": "2026-09-23T21:42:20.509Z",
+      "uptimeChecks": 3,
+      "uptimeSuccesses": 3,
       "iconListingVoteQueue": [],
       "sponsoredUntil": ""
     }
