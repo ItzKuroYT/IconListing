@@ -709,6 +709,23 @@
       "termsAcceptedAt": "2026-09-20T17:26:50.304Z",
       "banned": false,
       "createdAt": "2026-09-20T17:26:50.304Z"
+    },
+    {
+      "id": "0b0a41fd-996f-4943-aba4-0da70c82a99e",
+      "username": "papaisupernoob",
+      "email": "papaisupernoob@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-09-23T21:27:11.082Z",
+      "termsAcceptedAt": "2026-09-23T21:27:11.082Z",
+      "googleLinkedAt": "2026-09-23T21:27:11.082Z",
+      "createdAt": "2026-09-23T21:27:11.082Z",
+      "banned": false,
+      "googleSub": "104636957578806788067",
+      "googleName": "papaisupernoob",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocI4CZJpMxr7g___CopdDmohtdMkWxL611WvLftBCMBvbp9mHg=s96-c",
+      "updatedAt": "2026-09-23T21:27:11.082Z"
     }
   ],
   "servers": [
