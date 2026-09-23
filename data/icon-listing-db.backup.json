@@ -13497,7 +13497,7 @@
       },
       {
         "date": "2026-09-23",
-        "count": 1
+        "count": 2
       }
     ],
     "siteVisitVisitorDays": {
@@ -13675,7 +13675,8 @@
         "42d09ca037bfcdc5"
       ],
       "2026-09-23": [
-        "42d09ca037bfcdc5"
+        "42d09ca037bfcdc5",
+        "eb467cf947a98b42"
       ]
     }
   },
