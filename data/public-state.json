@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-23T21:33:53.642Z",
+  "generatedAt": "2026-09-23T21:41:42.805Z",
   "campaigns": [],
   "servers": [
     {
@@ -1193,11 +1193,11 @@
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-09-23T21:33:45.830Z",
-      "updatedAt": "2026-09-23T21:33:45.830Z",
-      "lastPingAt": "2026-09-23T21:33:47.048Z",
-      "lastSuccessfulPingAt": "2026-09-23T21:33:47.048Z",
-      "uptimeChecks": 1,
-      "uptimeSuccesses": 1,
+      "updatedAt": "2026-09-23T21:41:32.983Z",
+      "lastPingAt": "2026-09-23T21:41:34.420Z",
+      "lastSuccessfulPingAt": "2026-09-23T21:41:34.420Z",
+      "uptimeChecks": 2,
+      "uptimeSuccesses": 2,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
