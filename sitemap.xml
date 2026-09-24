@@ -323,12 +323,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
-    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/Project-Permanence/</loc>
     <lastmod>2026-09-22T19:54:48.235Z</lastmod>
     <changefreq>daily</changefreq>
@@ -341,26 +335,26 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/PulsedMC-Hosting-FREE/</loc>
+    <lastmod>2026-08-02T21:43:26.761Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Mobcraft-SMP/</loc>
     <lastmod>2026-07-31T22:23:53.982Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Power-SMP/</loc>
-    <lastmod>2026-09-23T21:42:25.596Z</lastmod>
+    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
+    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/Calamity-SMP/</loc>
     <lastmod>2026-06-30T15:54:50.226Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/PulsedMC-Hosting-FREE/</loc>
-    <lastmod>2026-08-02T21:43:26.761Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -425,14 +419,20 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
-    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
+    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/Fallen-Realm/</loc>
     <lastmod>2026-09-17T01:49:06.908Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Power-SMP/</loc>
+    <lastmod>2026-09-24T00:12:05.441Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
