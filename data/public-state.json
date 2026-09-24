@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-23T22:47:25.149Z",
+  "generatedAt": "2026-09-24T00:12:14.242Z",
   "campaigns": [],
   "servers": [
     {
@@ -382,7 +382,7 @@
       "iconUrl": "",
       "rank": 7,
       "analytics": {
-        "viewsLast7": 1,
+        "viewsLast7": 0,
         "viewsLast30": 2,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
@@ -1219,63 +1219,6 @@
       "communityHighlighted": false
     },
     {
-      "id": "2781437d-4106-464c-b37e-c0ecf1359d9b",
-      "name": "Power SMP",
-      "javaHost": "powersmpgg.falix.gg",
-      "javaPort": 25565,
-      "javaSrvResolved": true,
-      "javaStatusTarget": "powersmpgg.falix.gg",
-      "crossPlay": true,
-      "bedrockHost": "powersmpgg.falix.gg",
-      "bedrockPort": 20095,
-      "websiteUrl": "",
-      "discordUrl": "https://discord.gg/D3MewsfJj",
-      "youtubeUrl": "",
-      "country": "Brazil",
-      "bannerUrl": "",
-      "description": "Power SMP\n\nwe have:\n/rtp\n/skin\n/home\n/spawn\n/shop\nand many more!\n\ngriefing ✔️\nXray ❌\nmacros ❌\nPvP ✔️\nHacks ❌\n\nWe are a brazilian server but anyone can join this server (even if you are a north-korean 😭)\nyou call DM me in dc to create you own team and configurate it (using vanilla minecraft /team)\nour server is 100% vanilla and with crossplay\n\nJoin now",
-      "tags": [
-        "Survival",
-        "Economy",
-        "SMP",
-        "Raiding",
-        "Vanilla",
-        "Bedrock",
-        "Cross-Play"
-      ],
-      "ownerName": "papaisupernoob",
-      "votes": 0,
-      "playersOnline": 1,
-      "playersMax": 25,
-      "version": "1.21",
-      "online": true,
-      "uptimePercent": 100,
-      "sponsored": false,
-      "createdAt": "2026-09-23T21:33:45.830Z",
-      "updatedAt": "2026-09-23T21:41:32.983Z",
-      "lastPingAt": "2026-09-23T22:09:36.550Z",
-      "lastSuccessfulPingAt": "2026-09-23T22:09:36.550Z",
-      "uptimeChecks": 4,
-      "uptimeSuccesses": 4,
-      "edition": "java",
-      "bedrockType": "server",
-      "realmCode": "",
-      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Power-SMP&kind=icon",
-      "rank": 23,
-      "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
-      },
-      "reviewStats": {
-        "average": 0,
-        "count": 0
-      },
-      "communityVotesThisWeek": 0,
-      "communityHighlighted": false
-    },
-    {
       "id": "eada511e-c7b9-43e8-8f1e-bcffcb21764d",
       "name": "Calamity SMP",
       "javaHost": "162.245.187.170",
@@ -1315,7 +1258,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 24,
+      "rank": 23,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 2,
@@ -1371,7 +1314,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 25,
+      "rank": 24,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1428,7 +1371,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
-      "rank": 26,
+      "rank": 25,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1479,7 +1422,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 27,
+      "rank": 26,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -1530,7 +1473,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 28,
+      "rank": 27,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1585,7 +1528,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 29,
+      "rank": 28,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1641,7 +1584,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 30,
+      "rank": 29,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1694,7 +1637,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=LimboMC&kind=icon",
-      "rank": 31,
+      "rank": 30,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1749,7 +1692,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 32,
+      "rank": 31,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1806,7 +1749,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Futurelands&kind=icon",
-      "rank": 33,
+      "rank": 32,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 2,
@@ -1861,7 +1804,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 34,
+      "rank": 33,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1914,7 +1857,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 35,
+      "rank": 34,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1967,6 +1910,63 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
+      "rank": 35,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
+      "id": "2781437d-4106-464c-b37e-c0ecf1359d9b",
+      "name": "Power SMP",
+      "javaHost": "powersmpgg.falix.gg",
+      "javaPort": 25565,
+      "javaSrvResolved": true,
+      "javaStatusTarget": "powersmpgg.falix.gg",
+      "crossPlay": true,
+      "bedrockHost": "powersmpgg.falix.gg",
+      "bedrockPort": 20095,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/D3MewsfJj",
+      "youtubeUrl": "",
+      "country": "Brazil",
+      "bannerUrl": "",
+      "description": "Power SMP\n\nwe have:\n/rtp\n/skin\n/home\n/spawn\n/shop\nand many more!\n\ngriefing ✔️\nXray ❌\nmacros ❌\nPvP ✔️\nHacks ❌\n\nWe are a brazilian server but anyone can join this server (even if you are a north-korean 😭)\nyou call DM me in dc to create you own team and configurate it (using vanilla minecraft /team)\nour server is 100% vanilla and with crossplay\n\nJoin now",
+      "tags": [
+        "Survival",
+        "Economy",
+        "SMP",
+        "Raiding",
+        "Vanilla",
+        "Bedrock",
+        "Cross-Play"
+      ],
+      "ownerName": "papaisupernoob",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "OFFLINE",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-09-23T21:33:45.830Z",
+      "updatedAt": "2026-09-24T00:12:05.441Z",
+      "lastPingAt": "2026-09-24T00:12:06.746Z",
+      "lastSuccessfulPingAt": "2026-09-24T00:12:06.746Z",
+      "uptimeChecks": 5,
+      "uptimeSuccesses": 5,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Power-SMP&kind=icon",
       "rank": 36,
       "analytics": {
         "viewsLast7": 0,
@@ -2519,9 +2519,9 @@
     }
   },
   "siteAnalytics": {
-    "uniqueVisitsLast7": 33,
+    "uniqueVisitsLast7": 28,
     "uniqueVisitsLast30": 135,
-    "websiteVisitsLast7": 33,
+    "websiteVisitsLast7": 28,
     "websiteVisitsLast30": 135
   }
 }
