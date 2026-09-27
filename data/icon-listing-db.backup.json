@@ -1884,18 +1884,11 @@
           {
             "date": "2026-09-07",
             "count": 1
-          },
-          {
-            "date": "2026-09-27",
-            "count": 1
           }
         ],
         "viewVisitorDays": {
           "2026-09-07": [
             "3ff7cbd03a1aa142"
-          ],
-          "2026-09-27": [
-            "d00c2312eef279ed"
           ]
         },
         "playerHistory": [
@@ -7981,11 +7974,18 @@
           {
             "date": "2026-09-11",
             "count": 1
+          },
+          {
+            "date": "2026-09-27",
+            "count": 1
           }
         ],
         "viewVisitorDays": {
           "2026-09-11": [
             "784cbf410e08bd79"
+          ],
+          "2026-09-27": [
+            "d00c2312eef279ed"
           ]
         },
         "playerHistory": [
