@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-29T04:34:37.335Z",
+  "generatedAt": "2026-09-29T06:45:51.690Z",
   "campaigns": [],
   "servers": [
     {
@@ -252,7 +252,7 @@
         "Cross-Play"
       ],
       "ownerName": "kadika333",
-      "votes": 6,
+      "votes": 7,
       "playersOnline": 0,
       "playersMax": 333,
       "version": "Velocity 1.7.2-26.2",
@@ -2126,7 +2126,7 @@
             "Cross-Play"
           ],
           "ownerName": "kadika333",
-          "votes": 6,
+          "votes": 7,
           "playersOnline": 0,
           "playersMax": 333,
           "version": "Velocity 1.7.2-26.2",
