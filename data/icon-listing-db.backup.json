@@ -2983,7 +2983,7 @@
       ],
       "ownerId": "86189895-8ed1-42db-a438-6e5c4d80cb20",
       "ownerName": "kadika333",
-      "votes": 6,
+      "votes": 7,
       "playersOnline": 0,
       "playersMax": 333,
       "version": "Velocity 1.7.2-26.2",
@@ -13913,6 +13913,12 @@
       "serverId": "5dfae4a0-1f21-4ec5-90e0-e98ca539cec5",
       "minecraftUsername": "MrFoxynator",
       "createdAt": "2026-09-20T17:44:15.652Z"
+    },
+    {
+      "id": "e73909d1-0119-4701-86bc-0c63953a0f99",
+      "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
+      "minecraftUsername": "o0Gregory0o",
+      "createdAt": "2026-09-29T06:45:40.248Z"
     }
   ],
   "reviews": [
@@ -13940,7 +13946,12 @@
       "createdAt": "2026-09-01T23:13:55.536Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
+      "visitor:c2a01104fba60642d3effd9ff44cc34423b69702765ddba0622a9f5bf4fffaea": "2026-09-29T06:45:40.249Z",
+      "name:o0gregory0o": "2026-09-29T06:45:40.249Z"
+    }
+  },
   "siteAnalytics": {
     "siteVisitDaily": [
       {
@@ -14057,7 +14068,7 @@
       },
       {
         "date": "2026-09-29",
-        "count": 2
+        "count": 1
       }
     ],
     "siteVisitVisitorDays": {
@@ -14274,8 +14285,7 @@
         "1c3877dcf1a31a59"
       ],
       "2026-09-29": [
-        "d33c7e07f94d0b8e",
-        "352831c13c087a0a"
+        "d33c7e07f94d0b8e"
       ]
     }
   },
