@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-30T10:03:51.201Z",
+  "generatedAt": "2026-09-30T10:07:31.121Z",
   "campaigns": [],
   "servers": [
     {
@@ -1980,6 +1980,60 @@
       },
       "communityVotesThisWeek": 0,
       "communityHighlighted": false
+    },
+    {
+      "id": "9e35fa27-6d51-4aee-80a5-805330443cfe",
+      "name": "Hagga smp",
+      "javaHost": "hagga.infinitynoob.lol",
+      "javaPort": 25565,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "hagga.infinitynoob.lol",
+      "crossPlay": true,
+      "bedrockHost": "hagga.infinitynoob.lol",
+      "bedrockPort": 19695,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/V9Cd5hpEuZ",
+      "youtubeUrl": "",
+      "country": "India",
+      "bannerUrl": "",
+      "description": "🟩 HAGGA SMP\n\nA survival server where every player has a story.\n\n⛏️ SURVIVE — Gather, explore & build\n💰 THRIVE — Trade, earn & grow your wealth\n⚔️ COMPETE — PvP, rivalries & battles\n🏰 CREATE — Build your kingdom from nothing\n🤝 CONNECT — Make friends, teams & alliances\n🌎 EXPLORE — Discover a world full of possibilities\n\nYou decide what HAGGA SMP becomes.\n\n👑 Build an empire.\n⚔️ Make your name known.\n🏹 Or simply survive with your friends.\n\n🚀 JOIN HAGGA SMP\n\nDiscord: https://discord.gg/V9Cd5hpEuZ\n\nHAGGA SMP — Where your story begins.",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP",
+        "Cross-Play"
+      ],
+      "ownerName": "MdAushaif",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 30,
+      "version": "Purpur 1.21.11",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-09-30T10:07:21.432Z",
+      "updatedAt": "2026-09-30T10:07:21.432Z",
+      "lastPingAt": "2026-09-30T10:07:22.549Z",
+      "lastSuccessfulPingAt": "2026-09-30T10:07:22.549Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Hagga-smp&kind=icon",
+      "rank": 37,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
     }
   ],
   "clients": [
@@ -2523,9 +2577,9 @@
     }
   },
   "siteAnalytics": {
-    "uniqueVisitsLast7": 25,
-    "uniqueVisitsLast30": 160,
-    "websiteVisitsLast7": 25,
-    "websiteVisitsLast30": 160
+    "uniqueVisitsLast7": 26,
+    "uniqueVisitsLast30": 161,
+    "websiteVisitsLast7": 26,
+    "websiteVisitsLast30": 161
   }
 }
