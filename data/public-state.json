@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-30T10:07:36.011Z",
+  "generatedAt": "2026-09-30T10:07:46.528Z",
   "campaigns": [],
   "servers": [
     {
@@ -1982,7 +1982,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "73dac9eb-0176-4dc6-8c01-f22089109f77",
+      "id": "afb489ea-8d50-4edf-9718-f8cf5bda6651",
       "name": "Hagga smp",
       "javaHost": "hagga.infinitynoob.lol",
       "javaPort": 25565,
@@ -2011,10 +2011,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-09-30T10:07:24.632Z",
-      "updatedAt": "2026-09-30T10:07:24.632Z",
-      "lastPingAt": "2026-09-30T10:07:24.702Z",
-      "lastSuccessfulPingAt": "2026-09-30T10:07:24.702Z",
+      "createdAt": "2026-09-30T10:07:26.092Z",
+      "updatedAt": "2026-09-30T10:07:26.092Z",
+      "lastPingAt": "2026-09-30T10:07:26.207Z",
+      "lastSuccessfulPingAt": "2026-09-30T10:07:26.207Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
