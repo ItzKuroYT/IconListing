@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-30T03:03:22.179Z",
+  "generatedAt": "2026-09-30T03:03:32.444Z",
   "campaigns": [],
   "servers": [
     {
@@ -1982,7 +1982,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "5e420992-1daa-4c03-a800-d5bd6c23ed2b",
+      "id": "080f696e-f78d-4ff4-8166-0acf8ca8376a",
       "name": "VantaSMP",
       "javaHost": "Vantasmp.world",
       "javaPort": 25565,
@@ -2014,10 +2014,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-09-30T03:03:14.603Z",
-      "updatedAt": "2026-09-30T03:03:14.603Z",
-      "lastPingAt": "2026-09-30T03:03:14.717Z",
-      "lastSuccessfulPingAt": "2026-09-30T03:03:14.717Z",
+      "createdAt": "2026-09-30T03:03:12.853Z",
+      "updatedAt": "2026-09-30T03:03:12.853Z",
+      "lastPingAt": "2026-09-30T03:03:12.983Z",
+      "lastSuccessfulPingAt": "2026-09-30T03:03:12.983Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
