@@ -96,6 +96,11 @@
     <priority>0.75</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/servers/skyblock/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/servers/anarchy/</loc>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
@@ -221,6 +226,12 @@
     <priority>0.75</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/IconGens/</loc>
+    <lastmod>2026-07-09T07:59:28.615Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/IconSMP/</loc>
     <lastmod>2026-09-03T01:25:43.246Z</lastmod>
     <changefreq>daily</changefreq>
@@ -251,26 +262,20 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/IconGens/</loc>
-    <lastmod>2026-07-09T07:59:28.615Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/Meems-smp/</loc>
     <lastmod>2026-07-30T22:52:01.841Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Timelords/</loc>
-    <lastmod>2026-07-08T02:51:29.618Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Kepler-Nations/</loc>
+    <lastmod>2026-08-01T17:25:28.427Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Kepler-Nations/</loc>
-    <lastmod>2026-08-01T17:25:28.427Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Timelords/</loc>
+    <lastmod>2026-07-08T02:51:29.618Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -329,24 +334,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Unirealm/</loc>
-    <lastmod>2026-07-16T08:31:34.016Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
-    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Mobcraft-SMP/</loc>
-    <lastmod>2026-07-31T22:23:53.982Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/Calamity-SMP/</loc>
     <lastmod>2026-06-30T15:54:50.226Z</lastmod>
     <changefreq>daily</changefreq>
@@ -361,6 +348,12 @@
   <url>
     <loc>https://minecraftlisting.org/server/CinderSMP/</loc>
     <lastmod>2026-07-15T19:12:21.727Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Unirealm/</loc>
+    <lastmod>2026-07-16T08:31:34.016Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -395,8 +388,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
+    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/GreenBeanSMP/</loc>
     <lastmod>2026-08-01T01:46:07.018Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Mobcraft-SMP/</loc>
+    <lastmod>2026-07-31T22:23:53.982Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -433,6 +438,12 @@
   <url>
     <loc>https://minecraftlisting.org/server/Power-SMP/</loc>
     <lastmod>2026-09-23T21:41:32.983Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/VantaSMP/</loc>
+    <lastmod>2026-09-30T03:02:59.856Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
