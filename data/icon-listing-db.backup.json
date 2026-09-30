@@ -13626,7 +13626,7 @@
       "sponsoredUntil": ""
     },
     {
-      "id": "4fdefa6f-9b8a-4be5-83e4-e2fa385afeb1",
+      "id": "080f696e-f78d-4ff4-8166-0acf8ca8376a",
       "name": "VantaSMP",
       "edition": "java",
       "javaHost": "Vantasmp.world",
@@ -13668,10 +13668,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-09-30T03:02:59.856Z",
-      "updatedAt": "2026-09-30T03:02:59.856Z",
-      "lastPingAt": "2026-09-30T03:03:00.778Z",
-      "lastPingAttemptAt": "2026-09-30T03:03:00.778Z",
+      "createdAt": "2026-09-30T03:03:12.853Z",
+      "updatedAt": "2026-09-30T03:03:12.853Z",
+      "lastPingAt": "2026-09-30T03:03:12.983Z",
+      "lastPingAttemptAt": "2026-09-30T03:03:12.983Z",
       "iconUrl": "data:image/png;base64,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",
       "javaStatusTarget": "Vantasmp.world",
       "javaSrvResolved": true,
@@ -13682,14 +13682,14 @@
         "viewVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-09-30T03:03:00.778Z",
+            "createdAt": "2026-09-30T03:03:12.983Z",
             "playersOnline": 0,
             "playersMax": 20,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-09-30T03:03:00.778Z",
+      "lastSuccessfulPingAt": "2026-09-30T03:03:12.983Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "iconListingVoteQueue": [],
