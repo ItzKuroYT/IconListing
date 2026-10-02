@@ -2287,17 +2287,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [
-          {
-            "date": "2026-09-02",
-            "count": 1
-          }
-        ],
-        "viewVisitorDays": {
-          "2026-09-02": [
-            "43ff4373d7c9140c"
-          ]
-        },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-09-20T22:01:54.126Z",
@@ -2645,18 +2636,11 @@
         "ipCopyVisitorDays": {},
         "viewDaily": [
           {
-            "date": "2026-09-02",
-            "count": 1
-          },
-          {
             "date": "2026-09-18",
             "count": 1
           }
         ],
         "viewVisitorDays": {
-          "2026-09-02": [
-            "264f4d845c73b684"
-          ],
           "2026-09-18": [
             "b92db56a2856b029"
           ]
@@ -3723,17 +3707,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [
-          {
-            "date": "2026-09-02",
-            "count": 1
-          }
-        ],
-        "viewVisitorDays": {
-          "2026-09-02": [
-            "e2cf854144e0229f"
-          ]
-        },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-09-20T19:59:06.650Z",
@@ -9037,17 +9012,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [
-          {
-            "date": "2026-09-02",
-            "count": 1
-          }
-        ],
-        "viewVisitorDays": {
-          "2026-09-02": [
-            "1c3877dcf1a31a59"
-          ]
-        },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-09-21T05:02:39.593Z",
@@ -9399,18 +9365,11 @@
         "ipCopyVisitorDays": {},
         "viewDaily": [
           {
-            "date": "2026-09-02",
-            "count": 1
-          },
-          {
             "date": "2026-09-07",
             "count": 1
           }
         ],
         "viewVisitorDays": {
-          "2026-09-02": [
-            "264f4d845c73b684"
-          ],
           "2026-09-07": [
             "ca40e6c3689f5146"
           ]
@@ -9766,18 +9725,11 @@
         "ipCopyVisitorDays": {},
         "viewDaily": [
           {
-            "date": "2026-09-02",
-            "count": 1
-          },
-          {
             "date": "2026-09-18",
             "count": 1
           }
         ],
         "viewVisitorDays": {
-          "2026-09-02": [
-            "96b40d7a4980c8f6"
-          ],
           "2026-09-18": [
             "1a7836a5c72a03e5"
           ]
@@ -11191,17 +11143,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [
-          {
-            "date": "2026-09-02",
-            "count": 1
-          }
-        ],
-        "viewVisitorDays": {
-          "2026-09-02": [
-            "43ff4373d7c9140c"
-          ]
-        },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-09-20T23:07:07.878Z",
@@ -14309,10 +14252,6 @@
   "siteAnalytics": {
     "siteVisitDaily": [
       {
-        "date": "2026-09-02",
-        "count": 16
-      },
-      {
         "date": "2026-09-03",
         "count": 10
       },
@@ -14427,27 +14366,13 @@
       {
         "date": "2026-10-01",
         "count": 2
+      },
+      {
+        "date": "2026-10-02",
+        "count": 1
       }
     ],
     "siteVisitVisitorDays": {
-      "2026-09-02": [
-        "75cedf1fa71dc3e8",
-        "43ff4373d7c9140c",
-        "e6d345f5e51bf45c",
-        "ad6538ae14845828",
-        "b922aaf21bfa10bf",
-        "96b40d7a4980c8f6",
-        "e3997115c86b65ba",
-        "3b120e8b271abdd5",
-        "a8c43f7ed82ea261",
-        "cfd32c055078ac50",
-        "264f4d845c73b684",
-        "1fe6aa251b440fd2",
-        "31e7f9aeec2d143a",
-        "75a0133c4cca2f42",
-        "edb0cb823ab5e542",
-        "b3582ee4e8da8234"
-      ],
       "2026-09-03": [
         "747f7657e2d609ca",
         "75cedf1fa71dc3e8",
@@ -14653,6 +14578,9 @@
       "2026-10-01": [
         "feb0d055c2a41c92",
         "6e631166b366a88c"
+      ],
+      "2026-10-02": [
+        "75544cad1646483b"
       ]
     }
   },
