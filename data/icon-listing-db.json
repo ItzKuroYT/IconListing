@@ -806,10 +806,6 @@
         "ipCopyVisitorDays": {},
         "viewDaily": [
           {
-            "date": "2026-09-03",
-            "count": 1
-          },
-          {
             "date": "2026-09-05",
             "count": 1
           },
@@ -823,9 +819,6 @@
           }
         ],
         "viewVisitorDays": {
-          "2026-09-03": [
-            "75cedf1fa71dc3e8"
-          ],
           "2026-09-05": [
             "e2cf854144e0229f"
           ],
@@ -14252,10 +14245,6 @@
   "siteAnalytics": {
     "siteVisitDaily": [
       {
-        "date": "2026-09-03",
-        "count": 10
-      },
-      {
         "date": "2026-09-04",
         "count": 3
       },
@@ -14370,21 +14359,13 @@
       {
         "date": "2026-10-02",
         "count": 3
+      },
+      {
+        "date": "2026-10-03",
+        "count": 1
       }
     ],
     "siteVisitVisitorDays": {
-      "2026-09-03": [
-        "747f7657e2d609ca",
-        "75cedf1fa71dc3e8",
-        "c603706aac6a012f",
-        "2dd9c726a2fd0627",
-        "4b74b4f86e3179af",
-        "1fe6aa251b440fd2",
-        "67cc25d9116b2cf8",
-        "74d641ba1f0d0bef",
-        "fefbf118c8bce09e",
-        "59da0fb89f6e0f20"
-      ],
       "2026-09-04": [
         "1c3877dcf1a31a59",
         "75cedf1fa71dc3e8",
@@ -14583,6 +14564,9 @@
         "2c6b678d92d10241",
         "7a722b7ac2d1c51f",
         "faac2210c2c07c1f"
+      ],
+      "2026-10-03": [
+        "75544cad1646483b"
       ]
     }
   },
