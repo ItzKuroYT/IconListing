@@ -13926,94 +13926,6 @@
       "uptimeSuccesses": 22,
       "iconListingVoteQueue": [],
       "sponsoredUntil": ""
-    },
-    {
-      "id": "fe31eb1d-d165-49af-a61f-06691572f678",
-      "name": "Dominion Towny SMP",
-      "edition": "java",
-      "javaHost": "www.dominiongaming.org",
-      "javaPort": 25558,
-      "crossPlay": true,
-      "bedrockType": "server",
-      "bedrockHost": "www.dominiongaming.org",
-      "bedrockPort": 25558,
-      "realmCode": "",
-      "votifierEnabled": false,
-      "votifierType": "auto",
-      "votifierHost": "",
-      "votifierPort": 8192,
-      "votifierToken": "",
-      "iconListingPluginEnabled": false,
-      "iconListingVoteKey": "ilv_4b5ff199b2b3900a342d7bd60315a01d3814",
-      "websiteUrl": "https://dominiongaming.net/",
-      "discordUrl": "https://discord.gg/FkMyaYfaS",
-      "youtubeUrl": "https://www.youtube.com/watch?v=7YFRSBACJsY",
-      "country": "United States",
-      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Dominion-Towny-SMP&kind=banner",
-      "description": "Dominion Towny SMP is a brand-new Minecraft 26.3 server that you can join using the vanilla Java or Bedrock client with no extra downloads needed. The server is built around Towny, where you can create towns, build a community, earn money through jobs, buy and sell items, and set up your own player shops.\n\nThere are plenty of features to keep things interesting, including custom mobs, auctions, EcoEnchants, holograms, and Discord integration. We also run EssentialsX, Multiverse, death chests, and several other quality-of-life features. Our own custom plugins add backpacks, boosted ore rates, bounty hunting, and the ability to capture friendly mobs.\n\nThe server is split between the main Towny world, where players build their towns and communities, and a separate resource world with boosted ore rates where you can gather the materials you need to grow and expand.",
-      "tags": [
-        "Survival",
-        "Economy",
-        "PvP",
-        "SMP",
-        "Towny",
-        "Cross-Play",
-        "New"
-      ],
-      "ownerId": "24fe1dfd-722d-4861-a764-85927f997850",
-      "ownerName": "BrandonDawson",
-      "moderationStatus": "published",
-      "votes": 0,
-      "playersOnline": 1,
-      "playersMax": 69,
-      "version": "Paper 26.3",
-      "online": true,
-      "uptimePercent": 66.66666666666666,
-      "sponsored": false,
-      "createdAt": "2026-10-04T06:35:50.920Z",
-      "updatedAt": "2026-10-04T07:03:30.697Z",
-      "lastPingAt": "2026-10-04T07:03:31.047Z",
-      "lastPingAttemptAt": "2026-10-04T07:03:31.047Z",
-      "javaStatusTarget": "www.dominiongaming.org:25558",
-      "javaSrvResolved": false,
-      "analytics": {
-        "ipCopyDaily": [],
-        "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
-        "playerHistory": [
-          {
-            "createdAt": "2026-10-04T06:35:52.341Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-04T06:52:07.906Z",
-            "playersOnline": 0,
-            "playersMax": 69,
-            "online": true
-          },
-          {
-            "createdAt": "2026-10-04T06:35:52.341Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-04T07:03:31.047Z",
-            "playersOnline": 1,
-            "playersMax": 69,
-            "online": true
-          }
-        ]
-      },
-      "uptimeChecks": 3,
-      "iconUrl": "",
-      "iconListingVoteQueue": [],
-      "sponsoredUntil": "",
-      "lastSuccessfulPingAt": "2026-10-04T07:03:31.047Z",
-      "uptimeSuccesses": 2
     }
   ],
   "clients": [
@@ -14744,7 +14656,8 @@
       "83b6d5fa-2cfb-4318-8517-fb09543ef3e0": "2026-06-28T05:48:47.738Z",
       "7bf4e7b7-a605-4897-87fb-1eb541315811": "2026-06-28T16:39:55.737Z",
       "48af8ec3-158a-4fca-9523-89eef6a617bd": "2026-07-01T01:51:51.328Z",
-      "d61794c2-b587-4fa6-ae50-8fcc206edb4f": "2026-07-16T01:57:32.326Z"
+      "d61794c2-b587-4fa6-ae50-8fcc206edb4f": "2026-07-16T01:57:32.326Z",
+      "fe31eb1d-d165-49af-a61f-06691572f678": "2026-10-04T07:04:06.790Z"
     },
     "clients": {},
     "hosts": {
