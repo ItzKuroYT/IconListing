@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-04T07:04:11.672Z",
+  "generatedAt": "2026-10-04T07:07:26.132Z",
   "campaigns": [],
   "servers": [
     {
@@ -1164,6 +1164,63 @@
       "communityHighlighted": false
     },
     {
+      "id": "25a2fe4a-5e70-4b54-8934-bd298c08b452",
+      "name": "Dominion Towny SMP",
+      "javaHost": "www.dominiongaming.org",
+      "javaPort": 25558,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "www.dominiongaming.org:25558",
+      "crossPlay": true,
+      "bedrockHost": "www.dominiongaming.org",
+      "bedrockPort": 25558,
+      "websiteUrl": "https://dominiongaming.net/",
+      "discordUrl": "https://discord.gg/FkMyaYfaS",
+      "youtubeUrl": "https://www.youtube.com/watch?v=7YFRSBACJsY",
+      "country": "United States",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Dominion-Towny-SMP&kind=banner",
+      "description": "Dominion Towny SMP is a brand-new Minecraft 26.3 server that you can join using the vanilla Java or Bedrock client with no extra downloads needed. The server is built around Towny, where you can create towns, build a community, earn money through jobs, buy and sell items, and set up your own player shops.\n\nThere are plenty of features to keep things interesting, including custom mobs, auctions, EcoEnchants, holograms, and Discord integration. We also run EssentialsX, Multiverse, death chests, and several other quality-of-life features. Our own custom plugins add backpacks, boosted ore rates, bounty hunting, and the ability to capture friendly mobs.\n\nThe server is split between the main Towny world, where players build their towns and communities, and a separate resource world with boosted ore rates where you can gather the materials you need to grow and expand.",
+      "tags": [
+        "Survival",
+        "Economy",
+        "PvP",
+        "SMP",
+        "Towny",
+        "Cross-Play",
+        "New"
+      ],
+      "ownerName": "BrandonDawson",
+      "votes": 0,
+      "playersOnline": 1,
+      "playersMax": 69,
+      "version": "Paper 26.3",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-10-04T07:07:18.794Z",
+      "updatedAt": "2026-10-04T07:07:18.794Z",
+      "lastPingAt": "2026-10-04T07:07:20.280Z",
+      "lastSuccessfulPingAt": "2026-10-04T07:07:20.280Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "",
+      "rank": 22,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
       "id": "eada511e-c7b9-43e8-8f1e-bcffcb21764d",
       "name": "Calamity SMP",
       "javaHost": "162.245.187.170",
@@ -1203,7 +1260,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 22,
+      "rank": 23,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1260,7 +1317,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PulsedMC-Hosting-FREE&kind=icon",
-      "rank": 23,
+      "rank": 24,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1316,7 +1373,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 24,
+      "rank": 25,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1373,7 +1430,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
-      "rank": 25,
+      "rank": 26,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1424,7 +1481,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 26,
+      "rank": 27,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1475,7 +1532,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 27,
+      "rank": 28,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1530,7 +1587,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 28,
+      "rank": 29,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1586,7 +1643,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 29,
+      "rank": 30,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1639,7 +1696,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=LimboMC&kind=icon",
-      "rank": 30,
+      "rank": 31,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1694,7 +1751,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 31,
+      "rank": 32,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1749,7 +1806,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 32,
+      "rank": 33,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1802,7 +1859,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 33,
+      "rank": 34,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1857,7 +1914,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=HARDCORE-3-lives&kind=icon",
-      "rank": 34,
+      "rank": 35,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1910,7 +1967,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 35,
+      "rank": 36,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1967,7 +2024,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Power-SMP&kind=icon",
-      "rank": 36,
+      "rank": 37,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2021,7 +2078,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Hagga-smp&kind=icon",
-      "rank": 37,
+      "rank": 38,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
