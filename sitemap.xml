@@ -281,6 +281,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Project-Permanence/</loc>
+    <lastmod>2026-09-25T18:18:45.934Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Pixelmonia/</loc>
     <lastmod>2026-06-24T19:52:18.582Z</lastmod>
     <changefreq>daily</changefreq>
@@ -323,8 +329,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Project-Permanence/</loc>
-    <lastmod>2026-09-25T18:18:45.934Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
+    <lastmod>2026-10-04T07:30:13.754Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/PulsedMC-Hosting-FREE/</loc>
+    <lastmod>2026-10-04T23:09:30.339Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -335,32 +347,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Futurelands/</loc>
-    <lastmod>2026-08-04T19:32:15.223Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
-    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
-    <lastmod>2026-10-04T07:30:13.754Z</lastmod>
+    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
+    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/Calamity-SMP/</loc>
     <lastmod>2026-06-30T15:54:50.226Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/PulsedMC-Hosting-FREE/</loc>
-    <lastmod>2026-08-02T21:43:26.761Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -407,8 +401,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
+    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/GreenBeanSMP/</loc>
     <lastmod>2026-08-01T01:46:07.018Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Futurelands/</loc>
+    <lastmod>2026-08-04T19:32:15.223Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -421,12 +427,6 @@
   <url>
     <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
     <lastmod>2026-08-31T22:13:24.965Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
-    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
