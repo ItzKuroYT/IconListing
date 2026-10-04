@@ -763,9 +763,9 @@
     },
     {
       "id": "24fe1dfd-722d-4861-a764-85927f997850",
-      "username": "LordDagon32",
+      "username": "BrandonDawson",
       "email": "tbrandon.dawson@gmail.com",
-      "passwordHash": "af7cd8da9de65ea394dfb5f8143754aa:3be7e88a17228529516c23347308783a38ad0fe320cf7df83da688073f4ae563",
+      "passwordHash": "",
       "emailOptIn": false,
       "emailVerified": true,
       "emailVerifiedAt": "2026-10-04T06:27:46.511Z",
@@ -13979,9 +13979,24 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-10-04",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-10-04": [
+            "0b102c39b987a267"
+          ]
+        },
         "playerHistory": [
+          {
+            "createdAt": "2026-10-04T07:07:20.280Z",
+            "playersOnline": 1,
+            "playersMax": 69,
+            "online": true
+          },
           {
             "createdAt": "2026-10-04T07:07:20.280Z",
             "playersOnline": 1,
