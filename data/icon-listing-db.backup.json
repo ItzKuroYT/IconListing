@@ -13933,10 +13933,10 @@
       "edition": "java",
       "javaHost": "www.dominiongaming.org",
       "javaPort": 25558,
-      "crossPlay": false,
+      "crossPlay": true,
       "bedrockType": "server",
       "bedrockHost": "www.dominiongaming.org",
-      "bedrockPort": 25565,
+      "bedrockPort": 25558,
       "realmCode": "",
       "votifierEnabled": false,
       "votifierType": "auto",
@@ -13964,32 +13964,23 @@
       "ownerName": "BrandonDawson",
       "moderationStatus": "published",
       "votes": 0,
-      "playersOnline": 0,
+      "playersOnline": 1,
       "playersMax": 69,
       "version": "Paper 26.3",
       "online": true,
-      "uptimePercent": 50,
+      "uptimePercent": 66.66666666666666,
       "sponsored": false,
       "createdAt": "2026-10-04T06:35:50.920Z",
-      "updatedAt": "2026-10-04T06:52:06.458Z",
-      "lastPingAt": "2026-10-04T06:52:07.906Z",
-      "lastPingAttemptAt": "2026-10-04T06:52:07.906Z",
+      "updatedAt": "2026-10-04T07:03:30.697Z",
+      "lastPingAt": "2026-10-04T07:03:31.047Z",
+      "lastPingAttemptAt": "2026-10-04T07:03:31.047Z",
       "javaStatusTarget": "www.dominiongaming.org:25558",
       "javaSrvResolved": false,
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [
-          {
-            "date": "2026-10-04",
-            "count": 1
-          }
-        ],
-        "viewVisitorDays": {
-          "2026-10-04": [
-            "0b102c39b987a267"
-          ]
-        },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-10-04T06:35:52.341Z",
@@ -14010,19 +14001,19 @@
             "online": false
           },
           {
-            "createdAt": "2026-10-04T06:52:07.906Z",
-            "playersOnline": 0,
+            "createdAt": "2026-10-04T07:03:31.047Z",
+            "playersOnline": 1,
             "playersMax": 69,
             "online": true
           }
         ]
       },
-      "uptimeChecks": 2,
+      "uptimeChecks": 3,
       "iconUrl": "",
       "iconListingVoteQueue": [],
       "sponsoredUntil": "",
-      "lastSuccessfulPingAt": "2026-10-04T06:52:07.906Z",
-      "uptimeSuccesses": 1
+      "lastSuccessfulPingAt": "2026-10-04T07:03:31.047Z",
+      "uptimeSuccesses": 2
     }
   ],
   "clients": [
