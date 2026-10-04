@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-04T06:52:13.657Z",
+  "generatedAt": "2026-10-04T06:53:24.375Z",
   "campaigns": [],
   "servers": [
     {
@@ -2022,63 +2022,6 @@
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Hagga-smp&kind=icon",
       "rank": 37,
-      "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 0,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
-      },
-      "reviewStats": {
-        "average": 0,
-        "count": 0
-      },
-      "communityVotesThisWeek": 0,
-      "communityHighlighted": false
-    },
-    {
-      "id": "fe31eb1d-d165-49af-a61f-06691572f678",
-      "name": "Dominion Towny SMP",
-      "javaHost": "www.dominiongaming.org",
-      "javaPort": 25558,
-      "javaSrvResolved": false,
-      "javaStatusTarget": "www.dominiongaming.org:25558",
-      "crossPlay": false,
-      "bedrockHost": "www.dominiongaming.org",
-      "bedrockPort": 25565,
-      "websiteUrl": "https://dominiongaming.net/",
-      "discordUrl": "https://discord.gg/FkMyaYfaS",
-      "youtubeUrl": "https://www.youtube.com/watch?v=7YFRSBACJsY",
-      "country": "United States",
-      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Dominion-Towny-SMP&kind=banner",
-      "description": "Dominion Towny SMP is a brand-new Minecraft 26.3 server that you can join using the vanilla Java or Bedrock client with no extra downloads needed. The server is built around Towny, where you can create towns, build a community, earn money through jobs, buy and sell items, and set up your own player shops.\n\nThere are plenty of features to keep things interesting, including custom mobs, auctions, EcoEnchants, holograms, and Discord integration. We also run EssentialsX, Multiverse, death chests, and several other quality-of-life features. Our own custom plugins add backpacks, boosted ore rates, bounty hunting, and the ability to capture friendly mobs.\n\nThe server is split between the main Towny world, where players build their towns and communities, and a separate resource world with boosted ore rates where you can gather the materials you need to grow and expand.",
-      "tags": [
-        "Survival",
-        "Economy",
-        "PvP",
-        "SMP",
-        "Towny",
-        "Cross-Play",
-        "New"
-      ],
-      "ownerName": "BrandonDawson",
-      "votes": 0,
-      "playersOnline": 0,
-      "playersMax": 69,
-      "version": "Paper 26.3",
-      "online": true,
-      "uptimePercent": 50,
-      "sponsored": false,
-      "createdAt": "2026-10-04T06:35:50.920Z",
-      "updatedAt": "2026-10-04T06:52:06.458Z",
-      "lastPingAt": "2026-10-04T06:52:07.906Z",
-      "lastSuccessfulPingAt": "2026-10-04T06:52:07.906Z",
-      "uptimeChecks": 2,
-      "uptimeSuccesses": 1,
-      "edition": "java",
-      "bedrockType": "server",
-      "realmCode": "",
-      "iconUrl": "",
-      "rank": 38,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
