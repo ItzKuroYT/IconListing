@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-04T23:03:19.405Z",
+  "generatedAt": "2026-10-04T23:09:39.537Z",
   "campaigns": [],
   "servers": [
     {
@@ -1082,14 +1082,14 @@
       "playersMax": 3000,
       "version": "Paper 1.21.11",
       "online": true,
-      "uptimePercent": 99.2094861660079,
+      "uptimePercent": 99.21104536489152,
       "sponsored": false,
       "createdAt": "2026-07-11T05:20:38.114Z",
-      "updatedAt": "2026-08-02T21:43:26.761Z",
-      "lastPingAt": "2026-10-04T23:03:03.520Z",
-      "lastSuccessfulPingAt": "2026-10-04T23:03:03.520Z",
-      "uptimeChecks": 506,
-      "uptimeSuccesses": 502,
+      "updatedAt": "2026-10-04T23:09:30.339Z",
+      "lastPingAt": "2026-10-04T23:09:30.981Z",
+      "lastSuccessfulPingAt": "2026-10-04T23:09:30.981Z",
+      "uptimeChecks": 507,
+      "uptimeSuccesses": 503,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -1106,7 +1106,9 @@
         "count": 0
       },
       "communityVotesThisWeek": 0,
-      "communityHighlighted": false
+      "communityHighlighted": false,
+      "directoryNotes": "",
+      "directoryReviewedAt": "2026-10-04T23:09:30.340Z"
     },
     {
       "id": "cb42efd4-fbfd-47da-abdb-b153b7f07f9c",
