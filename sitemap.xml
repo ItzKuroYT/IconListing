@@ -227,6 +227,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/IconGens/</loc>
+    <lastmod>2026-07-09T07:59:28.615Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/GTM-GTA-based-minecraft-server-for-Java/</loc>
     <lastmod>2026-06-24T14:32:13.157Z</lastmod>
     <changefreq>daily</changefreq>
@@ -247,12 +253,6 @@
   <url>
     <loc>https://minecraftlisting.org/server/Etherium-SMP/</loc>
     <lastmod>2026-08-16T05:20:49.059Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/IconGens/</loc>
-    <lastmod>2026-07-09T07:59:28.615Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -444,7 +444,7 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
-    <lastmod>2026-10-04T06:35:50.920Z</lastmod>
+    <lastmod>2026-10-04T06:41:36.835Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
