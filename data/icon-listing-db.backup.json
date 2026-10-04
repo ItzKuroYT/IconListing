@@ -776,7 +776,7 @@
       "googleSub": "101867738157207775986",
       "googleName": "Brandon Dawson",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocLvc2PZy4hN_5F8ij2tyzL-__KCW5Y0v0iF64Cu9ejVqnuzNT-i=s96-c",
-      "updatedAt": "2026-10-04T07:15:54.908Z"
+      "updatedAt": "2026-10-04T06:27:46.511Z"
     }
   ],
   "servers": [
@@ -13979,9 +13979,24 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-10-04",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-10-04": [
+            "0b102c39b987a267"
+          ]
+        },
         "playerHistory": [
+          {
+            "createdAt": "2026-10-04T07:07:20.280Z",
+            "playersOnline": 1,
+            "playersMax": 69,
+            "online": true
+          },
           {
             "createdAt": "2026-10-04T07:07:20.280Z",
             "playersOnline": 1,
