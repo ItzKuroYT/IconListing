@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-06T22:18:46.591Z",
+  "generatedAt": "2026-10-06T22:18:53.394Z",
   "campaigns": [],
   "servers": [
     {
@@ -2095,7 +2095,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "c767c9a1-3574-416e-8b9b-ef126110d40d",
+      "id": "7f84b3ac-a053-4130-beaa-4002b39cf786",
       "name": "Valoris",
       "javaHost": "valoris.minekeep.gg",
       "javaPort": 25565,
@@ -2127,10 +2127,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-10-06T22:18:38.296Z",
-      "updatedAt": "2026-10-06T22:18:38.296Z",
-      "lastPingAt": "2026-10-06T22:18:39.631Z",
-      "lastSuccessfulPingAt": "2026-10-06T22:18:39.631Z",
+      "createdAt": "2026-10-06T22:18:42.421Z",
+      "updatedAt": "2026-10-06T22:18:42.421Z",
+      "lastPingAt": "2026-10-06T22:18:42.447Z",
+      "lastSuccessfulPingAt": "2026-10-06T22:18:42.447Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
