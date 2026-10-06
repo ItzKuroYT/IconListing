@@ -14317,7 +14317,7 @@
       "sponsoredUntil": ""
     },
     {
-      "id": "c767c9a1-3574-416e-8b9b-ef126110d40d",
+      "id": "7f84b3ac-a053-4130-beaa-4002b39cf786",
       "name": "Valoris",
       "edition": "java",
       "javaHost": "valoris.minekeep.gg",
@@ -14359,10 +14359,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-10-06T22:18:38.296Z",
-      "updatedAt": "2026-10-06T22:18:38.296Z",
-      "lastPingAt": "2026-10-06T22:18:39.631Z",
-      "lastPingAttemptAt": "2026-10-06T22:18:39.631Z",
+      "createdAt": "2026-10-06T22:18:42.421Z",
+      "updatedAt": "2026-10-06T22:18:42.421Z",
+      "lastPingAt": "2026-10-06T22:18:42.447Z",
+      "lastPingAttemptAt": "2026-10-06T22:18:42.447Z",
       "iconUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADV0lEQVR4Xu2bvUorURSFoxJFERKwiGBj71/EmMpCEOID6COIIBYptdT4Q14gYJPORrCKL2EhVmKiaKGNgvjfREX3ZQsernuZmBnnbHNzz4KvWWfPOWcvJkxmkgmFQiH6Lfr7+6mvrw98ZcBQY3l5mZaWlsBXBgw1Dg8PqVQqga8MGCoMDg7ShwYGBmBcETBUWFlZMQFkMhkYVwQMFYrFogng6OgIxhUBwzrxeNw0/6GhoSGoUwIM66ytrcn+aXV1FeqUAMM6x8fHsn86OTmBOiXAsMrw8LDs3Yg/GrJeATCssr6+Lvs24o+GrFcADKscHBzIvo14TNYrAIZVzs/PZd9GPCbrFQDDKi4AF0CDBdDS0kIjIyM1c3l5Kfs24jFZXw1eW+7HB2B4IhKJyD7UxGvL/fgADE+4AFwALgC5LzXVRQCdnZ20t7dXM09PT7IPIx6T9dXgteV+fACGVRrue4BXXAAugAYLoLW1lWZnZ7+kq6sL6r0GwHPIeT/gtWW9D8DwRLXL4FdPer0GwHNUUl1cBl0ALgAXgNyXkQvABeACgHoXgAvABSDLjFwALoAGC2BxcRHqvQbAc1RS3QfA2tzcpI6ODlNfawBtbW2Uz+dlySf9EwGw9vf3qbe3972+lgB6enpod3dXDoPqIoCmpiZKp9NVn/ayrq6uaGJi4tsAxsbG6OLiQg590vPzMy0sLLyvLffjAzB8kUgk6PT0VO71k3jj1YLiMa6pJv4zFa8l1/8BYPgmGo3Szs6O3HNgKhQKQZ32fwPGj+DTkk/P19dXuX/fent7o2w2S83NzbBeAIARCNPT01Qul2UvnsVzTE1NwfwBAkZgjI+P0/39veypZj0+PlIqlYJ5AwaMQBkdHaWHhwfZ27fi4PhfIHI+C4AROJOTk/Ty8iJ7rCi+EvAxch5LgGGFmZkZ2WdFca083iJgWGN7e1v2Ctra2oLjLAOGNbq7u+nm5kb2bHR9fU2xWAyOswwYVpmbm5N9G/HvfbJeATCsEg6H6ezsTPb+fh8Q0I+dXgHDOnzzJDU/Pw91SoBhHX4+cHd3Z5q/vb2l9vZ2qFMCDBU2NjZMALlcDsYVAUOFZDJpAlD6xlcJMNTg12b59VnpKwOGGv/9y9P86vxvvz7/B6M0AuTJibelAAAAAElFTkSuQmCC",
       "javaStatusTarget": "valoris.minekeep.gg",
       "javaSrvResolved": false,
@@ -14373,14 +14373,14 @@
         "viewVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-10-06T22:18:39.631Z",
+            "createdAt": "2026-10-06T22:18:42.447Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-10-06T22:18:39.631Z",
+      "lastSuccessfulPingAt": "2026-10-06T22:18:42.447Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "iconListingVoteQueue": [],
