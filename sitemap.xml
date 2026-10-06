@@ -221,20 +221,26 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/IconSMP/</loc>
-    <lastmod>2026-09-03T01:25:43.246Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/IconGens/</loc>
     <lastmod>2026-07-09T07:59:28.615Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/IconSMP/</loc>
+    <lastmod>2026-09-03T01:25:43.246Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/GTM-GTA-based-minecraft-server-for-Java/</loc>
     <lastmod>2026-06-24T14:32:13.157Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/PulsedMC-Hosting-FREE/</loc>
+    <lastmod>2026-10-04T23:09:30.339Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -331,12 +337,6 @@
   <url>
     <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
     <lastmod>2026-10-04T07:30:13.754Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/PulsedMC-Hosting-FREE/</loc>
-    <lastmod>2026-10-04T23:09:30.339Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -445,6 +445,12 @@
   <url>
     <loc>https://minecraftlisting.org/server/Hagga-smp/</loc>
     <lastmod>2026-09-30T10:07:26.092Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Valoris/</loc>
+    <lastmod>2026-10-06T22:18:38.296Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
