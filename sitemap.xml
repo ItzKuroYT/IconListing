@@ -336,13 +336,7 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
-    <lastmod>2026-10-04T07:30:13.754Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Mobcraft-SMP/</loc>
-    <lastmod>2026-07-31T22:23:53.982Z</lastmod>
+    <lastmod>2026-10-06T23:43:07.418Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -413,6 +407,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Mobcraft-SMP/</loc>
+    <lastmod>2026-07-31T22:23:53.982Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Futurelands/</loc>
     <lastmod>2026-08-04T19:32:15.223Z</lastmod>
     <changefreq>daily</changefreq>
@@ -450,7 +450,7 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/Valoris/</loc>
-    <lastmod>2026-10-06T22:18:43.311Z</lastmod>
+    <lastmod>2026-10-06T22:18:38.296Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
