@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-07T21:51:11.256Z",
+  "generatedAt": "2026-10-07T21:53:09.458Z",
   "campaigns": [],
   "servers": [
     {
@@ -1084,14 +1084,14 @@
       "playersMax": 69,
       "version": "Paper 26.3",
       "online": true,
-      "uptimePercent": 90.9090909090909,
+      "uptimePercent": 91.30434782608695,
       "sponsored": false,
       "createdAt": "2026-10-04T07:30:13.754Z",
-      "updatedAt": "2026-10-06T23:43:07.418Z",
-      "lastPingAt": "2026-10-07T21:51:05.072Z",
-      "lastSuccessfulPingAt": "2026-10-07T21:51:05.072Z",
-      "uptimeChecks": 22,
-      "uptimeSuccesses": 20,
+      "updatedAt": "2026-10-07T21:53:00.852Z",
+      "lastPingAt": "2026-10-07T21:53:01.248Z",
+      "lastSuccessfulPingAt": "2026-10-07T21:53:01.248Z",
+      "uptimeChecks": 23,
+      "uptimeSuccesses": 21,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
