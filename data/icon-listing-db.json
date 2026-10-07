@@ -811,6 +811,23 @@
       "googleName": "Oblivion Network",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocIOVbEBQGIvjWOkI4qUO06VsUtZ0yV1YJ-A_76appsGLo7l6A=s96-c",
       "updatedAt": "2026-10-06T22:14:19.231Z"
+    },
+    {
+      "id": "03a0dc88-a9da-47cf-bdbe-39f7eb03fc4f",
+      "username": "PranavPeddapally",
+      "email": "pranavpeddapally@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-10-07T09:52:18.365Z",
+      "termsAcceptedAt": "2026-10-07T09:52:18.365Z",
+      "googleLinkedAt": "2026-10-07T09:52:18.365Z",
+      "createdAt": "2026-10-07T09:52:18.365Z",
+      "banned": false,
+      "googleSub": "110653030564193622698",
+      "googleName": "Pranav Peddapally",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocIHqUJMNz2n_uK1ChHldTSt9SlHzvSoNNzmw8jgkLlD7zOWLK6i=s96-c",
+      "updatedAt": "2026-10-07T09:52:18.365Z"
     }
   ],
   "servers": [
