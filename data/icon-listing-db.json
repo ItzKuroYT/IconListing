@@ -14676,6 +14676,72 @@
       "uptimeSuccesses": 15,
       "iconListingVoteQueue": [],
       "sponsoredUntil": ""
+    },
+    {
+      "id": "06edd38e-b065-40f2-bee9-d79a0ca35752",
+      "name": "Last Life Reborn",
+      "edition": "java",
+      "javaHost": "ComingSoon",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_50a3b4b819ec4de580b0480b8b6ffdf2ae83",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/JH9Fnc73Ea",
+      "youtubeUrl": "",
+      "country": "Australia",
+      "bannerUrl": "https://static.wikia.nocookie.net/3rd-life-tdirp/images/e/e6/Site-logo.png/revision/latest?cb=20250305030058",
+      "description": "❤️ Welcome To The Last Life (Reborn) SMP\n\nInspired By The Legend Himself GRIAN\n\nDont Know What Last Life Is?\n\nLast Life Reborn is a Minecraft SMP where:\n\n❤️ Everyone starts with a random number of lives.\n🟢 Green = 3+ lives\n🟡 Yellow = 2 lives\n🔴 Red = 1 life\n☠️ Lose your last life = you're out.\n🎭 A random player becomes the Boogeyman and must get a kill.\n🤝 Players can team up, betray each other, and fight.\n⏰ There are no sessions — players can play whenever they're online.\n\nApplications Open NOW\n\nHope To See You There For Season 1\n\nJoin The Discord To Make A Application!",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP",
+        "Whitelist",
+        "New"
+      ],
+      "ownerId": "74c19b82-4d30-443e-9d81-ac4da359e9d1",
+      "ownerName": "WhyJamies",
+      "moderationStatus": "published",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 0,
+      "sponsored": false,
+      "createdAt": "2026-10-09T01:23:22.590Z",
+      "updatedAt": "2026-10-09T01:23:22.590Z",
+      "lastPingAt": "2026-10-09T01:23:22.748Z",
+      "lastPingAttemptAt": "2026-10-09T01:23:22.748Z",
+      "javaStatusTarget": "ComingSoon",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-10-09T01:23:22.748Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          }
+        ]
+      },
+      "uptimeChecks": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": [],
+      "sponsoredUntil": ""
     }
   ],
   "clients": [
