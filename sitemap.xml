@@ -221,6 +221,12 @@
     <priority>0.75</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/IconGens/</loc>
+    <lastmod>2026-07-09T07:59:28.615Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/IconSMP/</loc>
     <lastmod>2026-09-03T01:25:43.246Z</lastmod>
     <changefreq>daily</changefreq>
@@ -253,12 +259,6 @@
   <url>
     <loc>https://minecraftlisting.org/server/Etherium-SMP/</loc>
     <lastmod>2026-08-16T05:20:49.059Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/IconGens/</loc>
-    <lastmod>2026-10-09T19:10:45.003Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -415,12 +415,6 @@
   <url>
     <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
     <lastmod>2026-08-31T22:13:24.965Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
-    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
