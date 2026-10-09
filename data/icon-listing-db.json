@@ -15394,12 +15394,7 @@
       "createdAt": "2026-10-04T23:36:39.646Z"
     }
   ],
-  "voteIps": {
-    "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
-      "visitor:3865311869e87626cecee583a92963f2ec3b0e88d86b2e5ac80e4170251a8a1d": "2026-10-08T18:47:41.239Z",
-      "name:kadika333": "2026-10-08T18:47:41.239Z"
-    }
-  },
+  "voteIps": {},
   "siteAnalytics": {
     "siteVisitDaily": [
       {
@@ -15520,7 +15515,7 @@
       },
       {
         "date": "2026-10-09",
-        "count": 6
+        "count": 7
       }
     ],
     "siteVisitVisitorDays": {
@@ -15721,7 +15716,8 @@
         "b0cb802a5726ab1d",
         "b1d3e22304ed4aa4",
         "1a13f4e9e0c89163",
-        "1a7836a5c72a03e5"
+        "1a7836a5c72a03e5",
+        "f40cf49ffd0d60cc"
       ]
     }
   },
