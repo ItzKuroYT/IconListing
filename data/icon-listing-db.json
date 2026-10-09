@@ -14678,7 +14678,7 @@
       "sponsoredUntil": ""
     },
     {
-      "id": "1e6aa875-b070-4905-af95-2158470ed52f",
+      "id": "50c7cff5-1866-486b-b88b-21d1394c6e63",
       "name": "Last Life Reborn",
       "edition": "java",
       "javaHost": "ComingSoon",
@@ -14718,10 +14718,10 @@
       "online": false,
       "uptimePercent": 0,
       "sponsored": false,
-      "createdAt": "2026-10-09T01:23:31.580Z",
-      "updatedAt": "2026-10-09T01:23:31.580Z",
-      "lastPingAt": "2026-10-09T01:23:32.131Z",
-      "lastPingAttemptAt": "2026-10-09T01:23:32.131Z",
+      "createdAt": "2026-10-09T01:23:31.501Z",
+      "updatedAt": "2026-10-09T01:23:31.501Z",
+      "lastPingAt": "2026-10-09T01:23:31.540Z",
+      "lastPingAttemptAt": "2026-10-09T01:23:31.540Z",
       "javaStatusTarget": "ComingSoon",
       "javaSrvResolved": false,
       "analytics": {
@@ -14731,7 +14731,7 @@
         "viewVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-10-09T01:23:32.131Z",
+            "createdAt": "2026-10-09T01:23:31.540Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
