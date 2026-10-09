@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-09T01:19:08.129Z",
+  "generatedAt": "2026-10-09T01:23:29.715Z",
   "campaigns": [],
   "servers": [
     {
@@ -2138,6 +2138,59 @@
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Valoris&kind=icon",
       "rank": 39,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
+      "id": "06edd38e-b065-40f2-bee9-d79a0ca35752",
+      "name": "Last Life Reborn",
+      "javaHost": "ComingSoon",
+      "javaPort": 25565,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "ComingSoon",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/JH9Fnc73Ea",
+      "youtubeUrl": "",
+      "country": "Australia",
+      "bannerUrl": "https://static.wikia.nocookie.net/3rd-life-tdirp/images/e/e6/Site-logo.png/revision/latest?cb=20250305030058",
+      "description": "❤️ Welcome To The Last Life (Reborn) SMP\n\nInspired By The Legend Himself GRIAN\n\nDont Know What Last Life Is?\n\nLast Life Reborn is a Minecraft SMP where:\n\n❤️ Everyone starts with a random number of lives.\n🟢 Green = 3+ lives\n🟡 Yellow = 2 lives\n🔴 Red = 1 life\n☠️ Lose your last life = you're out.\n🎭 A random player becomes the Boogeyman and must get a kill.\n🤝 Players can team up, betray each other, and fight.\n⏰ There are no sessions — players can play whenever they're online.\n\nApplications Open NOW\n\nHope To See You There For Season 1\n\nJoin The Discord To Make A Application!",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP",
+        "Whitelist",
+        "New"
+      ],
+      "ownerName": "WhyJamies",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 0,
+      "sponsored": false,
+      "createdAt": "2026-10-09T01:23:22.590Z",
+      "updatedAt": "2026-10-09T01:23:22.590Z",
+      "lastPingAt": "2026-10-09T01:23:22.748Z",
+      "uptimeChecks": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "",
+      "rank": 40,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
