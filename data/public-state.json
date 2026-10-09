@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-09T01:23:39.081Z",
+  "generatedAt": "2026-10-09T01:23:49.240Z",
   "campaigns": [],
   "servers": [
     {
@@ -2152,7 +2152,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "1e6aa875-b070-4905-af95-2158470ed52f",
+      "id": "50c7cff5-1866-486b-b88b-21d1394c6e63",
       "name": "Last Life Reborn",
       "javaHost": "ComingSoon",
       "javaPort": 25565,
@@ -2182,9 +2182,9 @@
       "online": false,
       "uptimePercent": 0,
       "sponsored": false,
-      "createdAt": "2026-10-09T01:23:31.580Z",
-      "updatedAt": "2026-10-09T01:23:31.580Z",
-      "lastPingAt": "2026-10-09T01:23:32.131Z",
+      "createdAt": "2026-10-09T01:23:31.501Z",
+      "updatedAt": "2026-10-09T01:23:31.501Z",
+      "lastPingAt": "2026-10-09T01:23:31.540Z",
       "uptimeChecks": 1,
       "edition": "java",
       "bedrockType": "server",
