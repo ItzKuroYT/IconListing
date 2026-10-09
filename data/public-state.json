@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-09T19:10:00.863Z",
+  "generatedAt": "2026-10-09T19:10:03.216Z",
   "campaigns": [],
   "servers": [
     {
@@ -1632,9 +1632,9 @@
       "uptimePercent": 99.48979591836735,
       "sponsored": false,
       "createdAt": "2026-07-31T00:17:47.994Z",
-      "updatedAt": "2026-10-09T19:09:52.304Z",
-      "lastPingAt": "2026-10-09T19:09:52.975Z",
-      "lastSuccessfulPingAt": "2026-10-09T19:09:52.975Z",
+      "updatedAt": "2026-10-09T19:09:57.119Z",
+      "lastPingAt": "2026-10-09T19:09:57.183Z",
+      "lastSuccessfulPingAt": "2026-10-09T19:09:57.183Z",
       "uptimeChecks": 392,
       "uptimeSuccesses": 390,
       "edition": "java",
