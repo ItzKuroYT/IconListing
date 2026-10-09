@@ -227,12 +227,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/IconSMP/</loc>
-    <lastmod>2026-09-03T01:25:43.246Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/GTM-GTA-based-minecraft-server-for-Java/</loc>
     <lastmod>2026-06-24T14:32:13.157Z</lastmod>
     <changefreq>daily</changefreq>
@@ -329,8 +323,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Mobcraft-SMP/</loc>
+    <lastmod>2026-07-31T22:23:53.982Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Project-Permanence/</loc>
     <lastmod>2026-09-25T18:18:45.934Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
+    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -389,20 +395,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
-    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
+    <loc>https://minecraftlisting.org/server/IconSMP/</loc>
+    <lastmod>2026-10-09T19:09:57.119Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/GreenBeanSMP/</loc>
     <lastmod>2026-08-01T01:46:07.018Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Mobcraft-SMP/</loc>
-    <lastmod>2026-07-31T22:23:53.982Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -456,7 +456,7 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/Last-Life-Reborn/</loc>
-    <lastmod>2026-10-09T01:23:31.501Z</lastmod>
+    <lastmod>2026-10-09T01:23:31.580Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
