@@ -281,6 +281,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Project-Permanence/</loc>
+    <lastmod>2026-09-25T18:18:45.934Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Pixelmonia/</loc>
     <lastmod>2026-06-24T19:52:18.582Z</lastmod>
     <changefreq>daily</changefreq>
@@ -329,20 +335,8 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Project-Permanence/</loc>
-    <lastmod>2026-09-25T18:18:45.934Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/Tancraft/</loc>
     <lastmod>2026-07-31T15:16:27.026Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
-    <lastmod>2026-10-07T21:53:00.852Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -396,7 +390,7 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/IconSMP/</loc>
-    <lastmod>2026-10-09T19:09:52.304Z</lastmod>
+    <lastmod>2026-10-09T19:09:54.544Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -445,6 +439,12 @@
   <url>
     <loc>https://minecraftlisting.org/server/Hagga-smp/</loc>
     <lastmod>2026-10-07T11:12:36.437Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
+    <lastmod>2026-10-07T21:53:00.852Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
