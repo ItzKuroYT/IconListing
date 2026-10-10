@@ -287,6 +287,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
+    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Pixelmonia/</loc>
     <lastmod>2026-06-24T19:52:18.582Z</lastmod>
     <changefreq>daily</changefreq>
@@ -307,12 +313,6 @@
   <url>
     <loc>https://minecraftlisting.org/server/Idacraftnet/</loc>
     <lastmod>2026-07-11T01:34:35.523Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Futurelands/</loc>
-    <lastmod>2026-08-04T19:32:15.223Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -347,14 +347,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
-    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
+    <lastmod>2026-10-07T21:53:00.852Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
-    <lastmod>2026-10-07T21:53:00.852Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
+    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -407,14 +407,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
-    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
+    <loc>https://minecraftlisting.org/server/GreenBeanSMP/</loc>
+    <lastmod>2026-08-01T01:46:07.018Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/GreenBeanSMP/</loc>
-    <lastmod>2026-08-01T01:46:07.018Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Futurelands/</loc>
+    <lastmod>2026-08-04T19:32:15.223Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -462,7 +462,13 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/AgarX-SMP-Season-2/</loc>
-    <lastmod>2026-10-10T07:32:59.460Z</lastmod>
+    <lastmod>2026-10-10T07:32:52.929Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Gremlins-SMP/</loc>
+    <lastmod>2026-10-10T20:57:40.131Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
