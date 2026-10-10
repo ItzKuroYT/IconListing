@@ -858,23 +858,6 @@
       "termsAcceptedAt": "2026-10-09T01:19:17.107Z",
       "createdAt": "2026-10-09T01:19:17.107Z",
       "banned": false
-    },
-    {
-      "id": "394d2964-3cb3-48a2-8f90-d65fa3f5adc7",
-      "username": "LucasPete",
-      "email": "dandonb3ans@gmail.com",
-      "passwordHash": "",
-      "emailOptIn": false,
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-10-10T14:13:20.066Z",
-      "termsAcceptedAt": "2026-10-10T14:13:20.066Z",
-      "googleLinkedAt": "2026-10-10T14:13:20.066Z",
-      "createdAt": "2026-10-10T14:13:20.066Z",
-      "banned": false,
-      "googleSub": "108427279967285877440",
-      "googleName": "Lucas Pete",
-      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJZYnsauK22UxueHdXsgF4BGuhQX4Y8rmTJsMcLS4Hq4Ze1eA=s96-c",
-      "updatedAt": "2026-10-10T14:13:20.066Z"
     }
   ],
   "servers": [
@@ -15638,7 +15621,7 @@
       },
       {
         "date": "2026-10-10",
-        "count": 2
+        "count": 3
       }
     ],
     "siteVisitVisitorDays": {
@@ -15839,7 +15822,8 @@
       ],
       "2026-10-10": [
         "c99c094c9a432fdf",
-        "0c0d71ab781e1338"
+        "0c0d71ab781e1338",
+        "0b102c39b987a267"
       ]
     }
   },
