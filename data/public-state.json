@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-10T07:33:01.766Z",
+  "generatedAt": "2026-10-10T07:33:11.118Z",
   "campaigns": [],
   "servers": [
     {
@@ -2205,7 +2205,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "358bed0e-ded4-448e-bd71-d06c119dc54a",
+      "id": "fefada8d-756d-413c-83c1-76003b1ee25b",
       "name": "AgarX SMP - Season 2",
       "javaHost": "mc.agarx.net",
       "javaPort": 25587,
@@ -2237,10 +2237,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-10-10T07:32:52.929Z",
-      "updatedAt": "2026-10-10T07:32:52.929Z",
-      "lastPingAt": "2026-10-10T07:32:54.396Z",
-      "lastSuccessfulPingAt": "2026-10-10T07:32:54.396Z",
+      "createdAt": "2026-10-10T07:32:59.460Z",
+      "updatedAt": "2026-10-10T07:32:59.460Z",
+      "lastPingAt": "2026-10-10T07:32:59.484Z",
+      "lastSuccessfulPingAt": "2026-10-10T07:32:59.484Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
