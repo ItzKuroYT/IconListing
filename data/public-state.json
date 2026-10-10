@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-10T07:26:38.318Z",
+  "generatedAt": "2026-10-10T07:33:01.766Z",
   "campaigns": [],
   "servers": [
     {
@@ -2194,6 +2194,63 @@
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
+      "id": "358bed0e-ded4-448e-bd71-d06c119dc54a",
+      "name": "AgarX SMP - Season 2",
+      "javaHost": "mc.agarx.net",
+      "javaPort": 25587,
+      "javaSrvResolved": true,
+      "javaStatusTarget": "mc.agarx.net:25587",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/agarx",
+      "youtubeUrl": "",
+      "country": "United States",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=AgarX-SMP-Season-2&kind=banner",
+      "description": "AgarX SMP Season 2 is a modded survival server on Minecraft 1.21.1 (NeoForge). Fresh world opens Saturday Oct 10 at 3 PM ET.\n\nWhat's in it:\n- 16 races with their own powers, plus skill trees\n- boss fights and huge dungeons with per-player loot\n- warships with cannons, planes and airships\n- new biomes, villages, animals and structures\n- horror mobs in the caves\n- 170+ quests with rewards\n- cooking, backpacks, furniture, fast travel, voice chat\n- floating castle spawn\n- new realms open during the season: Twilight Forest, Deeper and Darker, the Aether\n\nRules: PvP everywhere except spawn. Every block and chest is logged and griefing gets rolled back.\n\nHow to join:\n1. Join our Discord: discord.gg/agarx\n2. Type /whitelist <your name> in the Discord\n3. Install \"AgarX SMP\" with the CurseForge app (one click), then join mc.agarx.net\n\nJava only. Free to play, nothing for sale.",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP",
+        "RPG",
+        "Modded",
+        "Whitelist",
+        "New"
+      ],
+      "ownerName": "AgarXOfficial",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 20,
+      "version": "1.21.1",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-10-10T07:32:52.929Z",
+      "updatedAt": "2026-10-10T07:32:52.929Z",
+      "lastPingAt": "2026-10-10T07:32:54.396Z",
+      "lastSuccessfulPingAt": "2026-10-10T07:32:54.396Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=AgarX-SMP-Season-2&kind=icon",
+      "rank": 41,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       },
