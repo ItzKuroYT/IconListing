@@ -15156,6 +15156,72 @@
       "uptimeSuccesses": 2,
       "iconListingVoteQueue": [],
       "sponsoredUntil": ""
+    },
+    {
+      "id": "606b2960-5e3a-4bb2-ad0b-1d2c0cc4c747",
+      "name": "Gremlins SMP",
+      "edition": "java",
+      "javaHost": "noipyet",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_2efe041c8ae283eeb3c3db1c9f30304b260d",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/KN4C427Nn",
+      "youtubeUrl": "",
+      "country": "Netherlands",
+      "bannerUrl": "",
+      "description": "Looking for players for future 18+ java realm!\n\nI've been wanting to make a Minecraft world with a group of friends for a while, so I'm hoping to find some new people to play with and get to know before it starts and I invite my friends! I'm not trying to make some huge SMP, just a small chill group of people who enjoy playing Minecraft together, building stuff, messing around, hanging out in VC and having fun. I want it to be a world where we can all become friends and make memories together, rather than just a bunch of random people playing on the same server and barely interacting with each other.\n\nThe goal is to have a world that we can keep playing on for months or even years, so I'm looking for people who are willing to stick around and be active. We're mainly looking for people from Europe so we can have similar time zones and make it easier to play together! The realm will be 18+ and we'll be using keep inventory.\n\nIf you're interested, feel free to message me! I'd love to meet some new people and hopefully get a nice little group together before we start. Hopefully we can make a world that we'll still be playing on years from now :)",
+      "tags": [
+        "Survival",
+        "SMP",
+        "Vanilla",
+        "Whitelist",
+        "New"
+      ],
+      "ownerId": "07ad0bec-3e79-411f-87f7-185c5df18646",
+      "ownerName": "ElxseyX",
+      "moderationStatus": "published",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 0,
+      "version": "Unknown",
+      "online": false,
+      "uptimePercent": 0,
+      "sponsored": false,
+      "createdAt": "2026-10-10T20:57:40.131Z",
+      "updatedAt": "2026-10-10T20:57:40.131Z",
+      "lastPingAt": "2026-10-10T20:57:40.319Z",
+      "lastPingAttemptAt": "2026-10-10T20:57:40.319Z",
+      "javaStatusTarget": "noipyet",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-10-10T20:57:40.319Z",
+            "playersOnline": 0,
+            "playersMax": 0,
+            "online": false
+          }
+        ]
+      },
+      "uptimeChecks": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": [],
+      "sponsoredUntil": ""
     }
   ],
   "clients": [
