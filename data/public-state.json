@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-10T20:57:46.628Z",
+  "generatedAt": "2026-10-11T03:13:33.429Z",
   "campaigns": [],
   "servers": [
     {
@@ -106,7 +106,7 @@
       "rank": 2,
       "analytics": {
         "viewsLast7": 0,
-        "viewsLast30": 1,
+        "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       },
@@ -162,7 +162,7 @@
       "rank": 3,
       "analytics": {
         "viewsLast7": 0,
-        "viewsLast30": 2,
+        "viewsLast30": 1,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       },
@@ -218,7 +218,7 @@
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PulsedMC-Hosting-FREE&kind=icon",
       "rank": 4,
       "analytics": {
-        "viewsLast7": 1,
+        "viewsLast7": 0,
         "viewsLast30": 2,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
@@ -387,7 +387,7 @@
       "rank": 7,
       "analytics": {
         "viewsLast7": 0,
-        "viewsLast30": 2,
+        "viewsLast30": 1,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       },
@@ -442,7 +442,7 @@
       "rank": 8,
       "analytics": {
         "viewsLast7": 0,
-        "viewsLast30": 2,
+        "viewsLast30": 1,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       },
@@ -1107,6 +1107,63 @@
       "communityHighlighted": false
     },
     {
+      "id": "ea1937d3-e274-4521-812e-9b6110c7dbc5",
+      "name": "Dominion Towny SMP",
+      "javaHost": "www.dominiongaming.org",
+      "javaPort": 25558,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "www.dominiongaming.org:25558",
+      "crossPlay": true,
+      "bedrockHost": "www.dominiongaming.org",
+      "bedrockPort": 25558,
+      "websiteUrl": "https://dominiongaming.net/",
+      "discordUrl": "https://discord.gg/FkMyaYfaS",
+      "youtubeUrl": "https://www.youtube.com/watch?v=DVYehMZfGJg",
+      "country": "United States",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Dominion-Towny-SMP&kind=banner",
+      "description": "Dominion Towny SMP is a brand-new Minecraft 26.3 server that you can join using the vanilla Java or Bedrock client with no extra downloads needed. The server is built around Towny, where you can create towns, build a community, earn money through jobs, buy and sell items, and set up your own player shops.\n\nThere are plenty of features to keep things interesting, including custom mobs, auctions, EcoEnchants, holograms, and Discord integration. We also run EssentialsX, Multiverse, death chests, and several other quality-of-life features. Our own custom plugins add backpacks, boosted ore rates, bounty hunting, and the ability to capture friendly mobs.\n\nThe server is split between the main Towny world, where players build their towns and communities, and a separate resource world with boosted ore rates where you can gather the materials you need to grow and expand.",
+      "tags": [
+        "Survival",
+        "Economy",
+        "PvP",
+        "SMP",
+        "Towny",
+        "Cross-Play",
+        "New"
+      ],
+      "ownerName": "LordDagon32",
+      "votes": 0,
+      "playersOnline": 3,
+      "playersMax": 69,
+      "version": "Paper 26.3",
+      "online": true,
+      "uptimePercent": 95.23809523809523,
+      "sponsored": false,
+      "createdAt": "2026-10-04T07:30:13.754Z",
+      "updatedAt": "2026-10-11T03:13:25.131Z",
+      "lastPingAt": "2026-10-11T03:13:26.729Z",
+      "lastSuccessfulPingAt": "2026-10-11T03:13:26.729Z",
+      "uptimeChecks": 42,
+      "uptimeSuccesses": 40,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Dominion-Towny-SMP&kind=icon",
+      "rank": 21,
+      "analytics": {
+        "viewsLast7": 2,
+        "viewsLast30": 3,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
       "id": "cb42efd4-fbfd-47da-abdb-b153b7f07f9c",
       "name": "Mobcraft SMP",
       "javaHost": "survival.mobcraft.org",
@@ -1149,67 +1206,10 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Mobcraft-SMP&kind=icon",
-      "rank": 21,
+      "rank": 22,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
-      },
-      "reviewStats": {
-        "average": 0,
-        "count": 0
-      },
-      "communityVotesThisWeek": 0,
-      "communityHighlighted": false
-    },
-    {
-      "id": "ea1937d3-e274-4521-812e-9b6110c7dbc5",
-      "name": "Dominion Towny SMP",
-      "javaHost": "www.dominiongaming.org",
-      "javaPort": 25558,
-      "javaSrvResolved": false,
-      "javaStatusTarget": "www.dominiongaming.org:25558",
-      "crossPlay": true,
-      "bedrockHost": "www.dominiongaming.org",
-      "bedrockPort": 25558,
-      "websiteUrl": "https://dominiongaming.net/",
-      "discordUrl": "https://discord.gg/FkMyaYfaS",
-      "youtubeUrl": "https://www.youtube.com/watch?v=DVYehMZfGJg",
-      "country": "United States",
-      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Dominion-Towny-SMP&kind=banner",
-      "description": "Dominion Towny SMP is a brand-new Minecraft 26.3 server that you can join using the vanilla Java or Bedrock client with no extra downloads needed. The server is built around Towny, where you can create towns, build a community, earn money through jobs, buy and sell items, and set up your own player shops.\n\nThere are plenty of features to keep things interesting, including custom mobs, auctions, EcoEnchants, holograms, and Discord integration. We also run EssentialsX, Multiverse, death chests, and several other quality-of-life features. Our own custom plugins add backpacks, boosted ore rates, bounty hunting, and the ability to capture friendly mobs.\n\nThe server is split between the main Towny world, where players build their towns and communities, and a separate resource world with boosted ore rates where you can gather the materials you need to grow and expand.",
-      "tags": [
-        "Survival",
-        "Economy",
-        "PvP",
-        "SMP",
-        "Towny",
-        "Cross-Play",
-        "New"
-      ],
-      "ownerName": "LordDagon32",
-      "votes": 0,
-      "playersOnline": 2,
-      "playersMax": 69,
-      "version": "Paper 26.3",
-      "online": true,
-      "uptimePercent": 95.1219512195122,
-      "sponsored": false,
-      "createdAt": "2026-10-04T07:30:13.754Z",
-      "updatedAt": "2026-10-07T21:53:00.852Z",
-      "lastPingAt": "2026-10-10T14:10:41.657Z",
-      "lastSuccessfulPingAt": "2026-10-10T14:10:41.657Z",
-      "uptimeChecks": 41,
-      "uptimeSuccesses": 39,
-      "edition": "java",
-      "bedrockType": "server",
-      "realmCode": "",
-      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Dominion-Towny-SMP&kind=icon",
-      "rank": 22,
-      "analytics": {
-        "viewsLast7": 3,
-        "viewsLast30": 3,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       },
@@ -1588,7 +1588,7 @@
       "rank": 29,
       "analytics": {
         "viewsLast7": 0,
-        "viewsLast30": 1,
+        "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       },
@@ -1697,7 +1697,7 @@
       "rank": 31,
       "analytics": {
         "viewsLast7": 0,
-        "viewsLast30": 1,
+        "viewsLast30": 0,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       },
@@ -2535,7 +2535,7 @@
           "rank": 7,
           "analytics": {
             "viewsLast7": 0,
-            "viewsLast30": 2,
+            "viewsLast30": 1,
             "ipCopiesLast7": 0,
             "ipCopiesLast30": 0
           },
@@ -2651,7 +2651,7 @@
           "rank": 2,
           "analytics": {
             "viewsLast7": 0,
-            "viewsLast30": 1,
+            "viewsLast30": 0,
             "ipCopiesLast7": 0,
             "ipCopiesLast30": 0
           },
@@ -2707,7 +2707,7 @@
           "rank": 3,
           "analytics": {
             "viewsLast7": 0,
-            "viewsLast30": 2,
+            "viewsLast30": 1,
             "ipCopiesLast7": 0,
             "ipCopiesLast30": 0
           },
@@ -2765,7 +2765,7 @@
           "rank": 3,
           "analytics": {
             "viewsLast7": 0,
-            "viewsLast30": 2,
+            "viewsLast30": 1,
             "ipCopiesLast7": 0,
             "ipCopiesLast30": 0
           },
@@ -2821,7 +2821,7 @@
           "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PulsedMC-Hosting-FREE&kind=icon",
           "rank": 4,
           "analytics": {
-            "viewsLast7": 1,
+            "viewsLast7": 0,
             "viewsLast30": 2,
             "ipCopiesLast7": 0,
             "ipCopiesLast30": 0
@@ -2915,9 +2915,9 @@
     }
   },
   "siteAnalytics": {
-    "uniqueVisitsLast7": 35,
-    "uniqueVisitsLast30": 140,
-    "websiteVisitsLast7": 35,
-    "websiteVisitsLast30": 140
+    "uniqueVisitsLast7": 32,
+    "uniqueVisitsLast30": 128,
+    "websiteVisitsLast7": 32,
+    "websiteVisitsLast30": 128
   }
 }
