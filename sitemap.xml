@@ -166,11 +166,6 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/servers/gens/</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/servers/farming/</loc>
     <changefreq>daily</changefreq>
     <priority>0.75</priority>
@@ -221,8 +216,8 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/IconGens/</loc>
-    <lastmod>2026-07-09T07:59:28.615Z</lastmod>
+    <loc>https://minecraftlisting.org/server/IconSMP/</loc>
+    <lastmod>2026-09-03T01:25:43.246Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
