@@ -883,17 +883,11 @@
       "passwordHash": "8bbbfc7a53c20e7d0867f064542867ed:f2b7af71643d07bc2f7cc08e248702860bd849a832a170dbd6940a2104363be0",
       "emailOptIn": true,
       "emailOptInAt": "2026-10-13T09:45:50.300Z",
-      "emailVerified": false,
-      "emailVerifiedAt": "",
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-10-13T09:46:24.640Z",
       "termsAcceptedAt": "2026-10-13T09:45:50.300Z",
       "banned": false,
-      "createdAt": "2026-10-13T09:45:50.300Z",
-      "emailVerification": {
-        "codeHash": "6dbf11358451403bbeb50f604a9a508740e37b3e6d12e056b65cd098f2664a8b",
-        "createdAt": "2026-10-13T09:45:50.300Z",
-        "expiresAt": "2026-10-13T10:00:50.300Z",
-        "attempts": 0
-      }
+      "createdAt": "2026-10-13T09:45:50.300Z"
     }
   ],
   "servers": [
