@@ -875,6 +875,25 @@
       "googleName": "Elxsey X",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocLplSMcKmCGWfmaLWJBsehX6iDhEeNy8h5VvBXyHIBog5mk9Q=s96-c",
       "updatedAt": "2026-10-10T20:53:55.895Z"
+    },
+    {
+      "id": "94b00d17-d4e8-47cc-9c5e-3fdf2c9c2dd2",
+      "username": "FcSmp",
+      "email": "SkillBossNation@gmail.com",
+      "passwordHash": "8bbbfc7a53c20e7d0867f064542867ed:f2b7af71643d07bc2f7cc08e248702860bd849a832a170dbd6940a2104363be0",
+      "emailOptIn": true,
+      "emailOptInAt": "2026-10-13T09:45:50.300Z",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-10-13T09:45:50.300Z",
+      "banned": false,
+      "createdAt": "2026-10-13T09:45:50.300Z",
+      "emailVerification": {
+        "codeHash": "6dbf11358451403bbeb50f604a9a508740e37b3e6d12e056b65cd098f2664a8b",
+        "createdAt": "2026-10-13T09:45:50.300Z",
+        "expiresAt": "2026-10-13T10:00:50.300Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
