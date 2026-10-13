@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-13T09:48:30.066Z",
+  "generatedAt": "2026-10-13T09:48:42.783Z",
   "campaigns": [],
   "servers": [
     {
@@ -2315,7 +2315,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "f985c08e-7bfd-4e05-8c06-15da123cffc3",
+      "id": "eceff089-e737-4f9b-a950-c4afd54ab4c3",
       "name": "FCSMP",
       "javaHost": "Play.Fc-Smp.Online",
       "javaPort": 25571,
@@ -2346,10 +2346,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-10-13T09:48:19.537Z",
-      "updatedAt": "2026-10-13T09:48:19.537Z",
-      "lastPingAt": "2026-10-13T09:48:20.999Z",
-      "lastSuccessfulPingAt": "2026-10-13T09:48:20.999Z",
+      "createdAt": "2026-10-13T09:48:23.393Z",
+      "updatedAt": "2026-10-13T09:48:23.393Z",
+      "lastPingAt": "2026-10-13T09:48:23.418Z",
+      "lastSuccessfulPingAt": "2026-10-13T09:48:23.418Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
