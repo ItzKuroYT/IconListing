@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-16T17:59:08.541Z",
+  "generatedAt": "2026-10-16T17:59:11.020Z",
   "campaigns": [],
   "servers": [
     {
@@ -1334,7 +1334,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "591b1684-23b2-4c67-a641-f674c8cd3304",
+      "id": "be7566cc-7cdb-456c-ba26-359cdee86a5a",
       "name": "p0lar SMP",
       "javaHost": "p0lar-smp.play.hosting",
       "javaPort": 25565,
@@ -1365,10 +1365,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-10-16T17:58:51.828Z",
-      "updatedAt": "2026-10-16T17:58:51.828Z",
-      "lastPingAt": "2026-10-16T17:58:51.867Z",
-      "lastSuccessfulPingAt": "2026-10-16T17:58:51.867Z",
+      "createdAt": "2026-10-16T17:58:56.926Z",
+      "updatedAt": "2026-10-16T17:58:56.926Z",
+      "lastPingAt": "2026-10-16T17:58:57.056Z",
+      "lastSuccessfulPingAt": "2026-10-16T17:58:57.056Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
