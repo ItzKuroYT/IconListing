@@ -16413,7 +16413,7 @@
       "sponsoredUntil": ""
     },
     {
-      "id": "7ee662f0-797c-4519-bc7f-f72355089a3c",
+      "id": "a0ee716d-73c7-4bc9-96ae-0146a79b0781",
       "name": "Vorax SMP",
       "edition": "java",
       "javaHost": "the-vorax-smp.playwithbao.com",
@@ -16454,10 +16454,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-10-18T00:06:58.329Z",
-      "updatedAt": "2026-10-18T00:06:58.329Z",
-      "lastPingAt": "2026-10-18T00:07:00.137Z",
-      "lastPingAttemptAt": "2026-10-18T00:07:00.137Z",
+      "createdAt": "2026-10-18T00:07:06.509Z",
+      "updatedAt": "2026-10-18T00:07:06.509Z",
+      "lastPingAt": "2026-10-18T00:07:06.583Z",
+      "lastPingAttemptAt": "2026-10-18T00:07:06.583Z",
       "javaStatusTarget": "the-vorax-smp.playwithbao.com:33456",
       "javaSrvResolved": true,
       "analytics": {
@@ -16467,14 +16467,14 @@
         "viewVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-10-18T00:07:00.137Z",
+            "createdAt": "2026-10-18T00:07:06.583Z",
             "playersOnline": 0,
             "playersMax": 50,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-10-18T00:07:00.137Z",
+      "lastSuccessfulPingAt": "2026-10-18T00:07:06.583Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "iconUrl": "",
