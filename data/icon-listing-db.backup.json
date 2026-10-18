@@ -3093,7 +3093,7 @@
       ],
       "ownerId": "86189895-8ed1-42db-a438-6e5c4d80cb20",
       "ownerName": "kadika333",
-      "votes": 9,
+      "votes": 8,
       "playersOnline": 0,
       "playersMax": 333,
       "version": "Velocity 1.7.2-26.3",
@@ -16724,12 +16724,6 @@
       "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
       "minecraftUsername": "kadika333",
       "createdAt": "2026-10-08T18:47:41.239Z"
-    },
-    {
-      "id": "b946f1ea-bd99-430a-a236-82b7f723fd02",
-      "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
-      "minecraftUsername": "tebung",
-      "createdAt": "2026-10-18T09:02:40.260Z"
     }
   ],
   "reviews": [
@@ -16778,12 +16772,7 @@
       "createdAt": "2026-10-04T23:36:39.646Z"
     }
   ],
-  "voteIps": {
-    "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
-      "visitor:c1afea7846069817ab134a0c06cd321ee5fde697b429cca21ad9c8299d2aefc8": "2026-10-18T09:02:40.260Z",
-      "name:tebung": "2026-10-18T09:02:40.260Z"
-    }
-  },
+  "voteIps": {},
   "siteAnalytics": {
     "siteVisitDaily": [
       {
@@ -16904,7 +16893,7 @@
       },
       {
         "date": "2026-10-18",
-        "count": 3
+        "count": 4
       }
     ],
     "siteVisitVisitorDays": {
@@ -17105,7 +17094,8 @@
       "2026-10-18": [
         "f42d5130b9170f17",
         "747f7657e2d609ca",
-        "026671f2db9fa056"
+        "026671f2db9fa056",
+        "1b074e42fc103d1d"
       ]
     }
   },
