@@ -16411,75 +16411,6 @@
       "uptimeSuccesses": 6,
       "iconListingVoteQueue": [],
       "sponsoredUntil": ""
-    },
-    {
-      "id": "a0ee716d-73c7-4bc9-96ae-0146a79b0781",
-      "name": "Vorax SMP",
-      "edition": "java",
-      "javaHost": "the-vorax-smp.playwithbao.com",
-      "javaPort": 33456,
-      "crossPlay": true,
-      "bedrockType": "server",
-      "bedrockHost": "the-vorax-smp.playwithbao.com",
-      "bedrockPort": 33456,
-      "realmCode": "",
-      "votifierEnabled": false,
-      "votifierType": "auto",
-      "votifierHost": "",
-      "votifierPort": 8192,
-      "votifierToken": "",
-      "iconListingPluginEnabled": false,
-      "iconListingVoteKey": "ilv_1cf482b14606d52649f87f5572dc6d149198",
-      "websiteUrl": "",
-      "discordUrl": "https://discord.gg/A9GPvMkxbX",
-      "youtubeUrl": "",
-      "country": "Philippines",
-      "bannerUrl": "",
-      "description": "Welcome to Vorax SMP, a cross-platform Minecraft survival server where Java and Bedrock players can play together! Explore the world, build your base, fight other players, grind for valuable loot, and rise through the ranks. Enjoy features like RTP, player homes, TPA, an economy and shop system, auctions, kill milestones, and more. Whether you're here to dominate PvP, become rich, or build your own empire, there's a place for you in Vorax. Join our Discord to get started and become part of the community!",
-      "tags": [
-        "Factions",
-        "Anarchy",
-        "Economy",
-        "SMP",
-        "Cross-Play",
-        "New"
-      ],
-      "ownerId": "aac24d0a-8360-4e6b-9c7c-f7d83248aa20",
-      "ownerName": "ConradMurillo",
-      "moderationStatus": "published",
-      "votes": 0,
-      "playersOnline": 0,
-      "playersMax": 50,
-      "version": "Paper",
-      "online": true,
-      "uptimePercent": 100,
-      "sponsored": false,
-      "createdAt": "2026-10-18T00:07:06.509Z",
-      "updatedAt": "2026-10-18T00:07:06.509Z",
-      "lastPingAt": "2026-10-18T00:07:06.583Z",
-      "lastPingAttemptAt": "2026-10-18T00:07:06.583Z",
-      "javaStatusTarget": "the-vorax-smp.playwithbao.com:33456",
-      "javaSrvResolved": true,
-      "analytics": {
-        "ipCopyDaily": [],
-        "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
-        "playerHistory": [
-          {
-            "createdAt": "2026-10-18T00:07:06.583Z",
-            "playersOnline": 0,
-            "playersMax": 50,
-            "online": true
-          }
-        ]
-      },
-      "lastSuccessfulPingAt": "2026-10-18T00:07:06.583Z",
-      "uptimeChecks": 1,
-      "uptimeSuccesses": 1,
-      "iconUrl": "",
-      "iconListingVoteQueue": [],
-      "sponsoredUntil": ""
     }
   ],
   "clients": [
@@ -16959,6 +16890,10 @@
       {
         "date": "2026-10-17",
         "count": 9
+      },
+      {
+        "date": "2026-10-18",
+        "count": 1
       }
     ],
     "siteVisitVisitorDays": {
@@ -17155,6 +17090,9 @@
         "09c8a911cc712c9a",
         "5d42c3301effbc33",
         "cbb0083eca541b3a"
+      ],
+      "2026-10-18": [
+        "f42d5130b9170f17"
       ]
     }
   },
