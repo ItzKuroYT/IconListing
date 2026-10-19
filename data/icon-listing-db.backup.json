@@ -16424,6 +16424,73 @@
       "uptimeSuccesses": 12,
       "iconListingVoteQueue": [],
       "sponsoredUntil": ""
+    },
+    {
+      "id": "8cca1863-2f1a-445f-9b04-7e9075530aa2",
+      "name": "New Nations SMP | Bending Survival | Java 1.21.1 |",
+      "edition": "java",
+      "javaHost": "51.83.237.29:25565",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": false,
+      "votifierType": "auto",
+      "votifierHost": "",
+      "votifierPort": 8192,
+      "votifierToken": "",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_2c373a5123857e7901057a3b73dc0b8f9a4b",
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/W85RVZQs5u",
+      "youtubeUrl": "",
+      "country": "United Kingdom",
+      "bannerUrl": "",
+      "description": "New Nations SMP | Bending Survival | Java 1.21.1 | Build the Four Nations From Scratch\n\n> **Master the elements and help build the four nations from the ground up, block by block.**\n>\n> 🌊🪨🔥🌪️ **Welcome to New Nations SMP!**\n>\n> New Nations is a survival server powered by **ProjectKorra**, where players bend water, earth, fire and air in a fresh world with no pre-built cities. The goal is simple: **build the nations together.** The Air Temples, Ba Sing Se, the Fire Nation capital, the Water Tribes, all created by the community.\n>\n> **What we offer:**\n> 🔹 **Full bending** with ProjectKorra abilities, combos and sub-elements like Plantbending\n> 🔹 **Element quests:** progress through quest paths to unlock new abilities and grow as a bender\n> 🔹 **A brand-new world** with dramatic custom terrain: towering mountains, deep oceans and wild biomes perfect for temples, cities and hidden villages\n> 🔹 **A huge, pre-generated map** for smooth, lag-free exploring\n> 🔹 **Creativity first:** builders, roleplayers, explorers, PvPers and lore nerds are all welcome\n>\n> **Why join?**\n> Most bending servers hand you a finished world. Here, the nations don't exist yet. *You* shape them. Found a city, design a temple, train with other benders and leave your mark on a world that grows with its players.\n>\n> 🖥️ **IP:** [51.83.237.29:25565]\n> 🎮 **Version:** Java 1.21.1\n> 💬 **Discord:** [https://discord.gg/6hQKNY4jtP]\n>\n> *The nations are waiting to be built. Pick your element.*",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP",
+        "Modded"
+      ],
+      "ownerId": "4a9fbe5c-4e29-4da5-b5bb-6b69c4853074",
+      "ownerName": "shorryuken",
+      "moderationStatus": "published",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 67,
+      "version": "fabric arclight/FeudalKings 1.21.1",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-10-19T13:19:48.434Z",
+      "updatedAt": "2026-10-19T13:19:48.434Z",
+      "lastPingAt": "2026-10-19T13:19:49.434Z",
+      "lastPingAttemptAt": "2026-10-19T13:19:49.434Z",
+      "javaStatusTarget": "51.83.237.29",
+      "javaSrvResolved": false,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-10-19T13:19:49.434Z",
+            "playersOnline": 0,
+            "playersMax": 67,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-10-19T13:19:49.434Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": [],
+      "sponsoredUntil": ""
     }
   ],
   "clients": [
