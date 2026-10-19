@@ -924,6 +924,25 @@
         "expiresAt": "2026-10-16T17:43:24.025Z",
         "attempts": 0
       }
+    },
+    {
+      "id": "4a9fbe5c-4e29-4da5-b5bb-6b69c4853074",
+      "username": "shorryuken",
+      "email": "malcolm_omoyola@yahoo.com",
+      "passwordHash": "371c10bf3cc6c999d57aa724feaafb9f:9da543d015dc55fd07d31c273d9387e8cd7f2cb61601ede7fa6b1cc6d21f1735",
+      "emailOptIn": false,
+      "emailOptInAt": "",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-10-19T13:13:26.348Z",
+      "banned": false,
+      "createdAt": "2026-10-19T13:13:26.348Z",
+      "emailVerification": {
+        "codeHash": "f4576305361f8624f2eff1cbec8b087cc3e6e5e324aa51788884c130b208fc6d",
+        "createdAt": "2026-10-19T13:13:26.348Z",
+        "expiresAt": "2026-10-19T13:28:26.348Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
