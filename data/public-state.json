@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-19T13:11:10.759Z",
+  "generatedAt": "2026-10-19T13:19:57.620Z",
   "campaigns": [],
   "servers": [
     {
@@ -2414,6 +2414,60 @@
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=p0lar-SMP&kind=icon",
       "rank": 44,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
+      "id": "8cca1863-2f1a-445f-9b04-7e9075530aa2",
+      "name": "New Nations SMP | Bending Survival | Java 1.21.1 |",
+      "javaHost": "51.83.237.29:25565",
+      "javaPort": 25565,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "51.83.237.29",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/W85RVZQs5u",
+      "youtubeUrl": "",
+      "country": "United Kingdom",
+      "bannerUrl": "",
+      "description": "New Nations SMP | Bending Survival | Java 1.21.1 | Build the Four Nations From Scratch\n\n> **Master the elements and help build the four nations from the ground up, block by block.**\n>\n> 🌊🪨🔥🌪️ **Welcome to New Nations SMP!**\n>\n> New Nations is a survival server powered by **ProjectKorra**, where players bend water, earth, fire and air in a fresh world with no pre-built cities. The goal is simple: **build the nations together.** The Air Temples, Ba Sing Se, the Fire Nation capital, the Water Tribes, all created by the community.\n>\n> **What we offer:**\n> 🔹 **Full bending** with ProjectKorra abilities, combos and sub-elements like Plantbending\n> 🔹 **Element quests:** progress through quest paths to unlock new abilities and grow as a bender\n> 🔹 **A brand-new world** with dramatic custom terrain: towering mountains, deep oceans and wild biomes perfect for temples, cities and hidden villages\n> 🔹 **A huge, pre-generated map** for smooth, lag-free exploring\n> 🔹 **Creativity first:** builders, roleplayers, explorers, PvPers and lore nerds are all welcome\n>\n> **Why join?**\n> Most bending servers hand you a finished world. Here, the nations don't exist yet. *You* shape them. Found a city, design a temple, train with other benders and leave your mark on a world that grows with its players.\n>\n> 🖥️ **IP:** [51.83.237.29:25565]\n> 🎮 **Version:** Java 1.21.1\n> 💬 **Discord:** [https://discord.gg/6hQKNY4jtP]\n>\n> *The nations are waiting to be built. Pick your element.*",
+      "tags": [
+        "Survival",
+        "PvP",
+        "SMP",
+        "Modded"
+      ],
+      "ownerName": "shorryuken",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 67,
+      "version": "fabric arclight/FeudalKings 1.21.1",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-10-19T13:19:48.434Z",
+      "updatedAt": "2026-10-19T13:19:48.434Z",
+      "lastPingAt": "2026-10-19T13:19:49.434Z",
+      "lastSuccessfulPingAt": "2026-10-19T13:19:49.434Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "",
+      "rank": 45,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
