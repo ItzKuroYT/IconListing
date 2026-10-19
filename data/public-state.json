@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-19T13:20:00.700Z",
+  "generatedAt": "2026-10-19T13:20:14.803Z",
   "campaigns": [],
   "servers": [
     {
@@ -2428,7 +2428,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "13ab7b26-0aff-4a4a-9748-d97cb321c29e",
+      "id": "4fa4d8f1-949d-47d5-8831-83e5adb048ca",
       "name": "New Nations SMP | Bending Survival | Java 1.21.1 |",
       "javaHost": "51.83.237.29:25565",
       "javaPort": 25565,
@@ -2457,10 +2457,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-10-19T13:19:50.844Z",
-      "updatedAt": "2026-10-19T13:19:50.844Z",
-      "lastPingAt": "2026-10-19T13:19:50.881Z",
-      "lastSuccessfulPingAt": "2026-10-19T13:19:50.881Z",
+      "createdAt": "2026-10-19T13:20:01.011Z",
+      "updatedAt": "2026-10-19T13:20:01.011Z",
+      "lastPingAt": "2026-10-19T13:20:01.061Z",
+      "lastSuccessfulPingAt": "2026-10-19T13:20:01.061Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
