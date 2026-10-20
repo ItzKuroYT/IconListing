@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-20T02:59:31.043Z",
+  "generatedAt": "2026-10-20T02:59:40.509Z",
   "campaigns": [],
   "servers": [
     {
@@ -1109,7 +1109,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "6a5e8002-47fc-40a0-8dba-40674e92fc8c",
+      "id": "1ea356f7-bd44-4a9d-85f6-0cf5a97620b5",
       "name": "WoutWoot",
       "javaHost": "woutwoot.com",
       "javaPort": 25565,
@@ -1141,10 +1141,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-10-20T02:59:21.227Z",
-      "updatedAt": "2026-10-20T02:59:21.227Z",
-      "lastPingAt": "2026-10-20T02:59:23.030Z",
-      "lastSuccessfulPingAt": "2026-10-20T02:59:23.030Z",
+      "createdAt": "2026-10-20T02:59:29.135Z",
+      "updatedAt": "2026-10-20T02:59:29.135Z",
+      "lastPingAt": "2026-10-20T02:59:29.207Z",
+      "lastSuccessfulPingAt": "2026-10-20T02:59:29.207Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
@@ -3085,9 +3085,9 @@
     }
   },
   "siteAnalytics": {
-    "uniqueVisitsLast7": 38,
-    "uniqueVisitsLast30": 144,
-    "websiteVisitsLast7": 38,
-    "websiteVisitsLast30": 144
+    "uniqueVisitsLast7": 37,
+    "uniqueVisitsLast30": 143,
+    "websiteVisitsLast7": 37,
+    "websiteVisitsLast30": 143
   }
 }
