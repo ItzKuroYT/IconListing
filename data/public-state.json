@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-20T02:59:40.509Z",
+  "generatedAt": "2026-10-20T02:59:43.745Z",
   "campaigns": [],
   "servers": [
     {
@@ -1109,7 +1109,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "1ea356f7-bd44-4a9d-85f6-0cf5a97620b5",
+      "id": "53b9e6a5-178a-46b5-b33b-9c5a85607a0b",
       "name": "WoutWoot",
       "javaHost": "woutwoot.com",
       "javaPort": 25565,
@@ -1141,10 +1141,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-10-20T02:59:29.135Z",
-      "updatedAt": "2026-10-20T02:59:29.135Z",
-      "lastPingAt": "2026-10-20T02:59:29.207Z",
-      "lastSuccessfulPingAt": "2026-10-20T02:59:29.207Z",
+      "createdAt": "2026-10-20T02:59:30.149Z",
+      "updatedAt": "2026-10-20T02:59:30.149Z",
+      "lastPingAt": "2026-10-20T02:59:31.134Z",
+      "lastSuccessfulPingAt": "2026-10-20T02:59:31.134Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
