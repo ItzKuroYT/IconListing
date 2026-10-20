@@ -16411,6 +16411,76 @@
       "uptimeSuccesses": 14,
       "iconListingVoteQueue": [],
       "sponsoredUntil": ""
+    },
+    {
+      "id": "b11924e6-1575-4590-bb41-f0e43b0b6b6f",
+      "name": "Herb Crew",
+      "edition": "java",
+      "javaHost": "herbcrew.net",
+      "javaPort": 25565,
+      "crossPlay": false,
+      "bedrockType": "server",
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "realmCode": "",
+      "votifierEnabled": true,
+      "votifierType": "auto",
+      "votifierHost": "51.161.212.242",
+      "votifierPort": 8192,
+      "votifierToken": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA31jpXdZvFHnxg/64JCO551rNeSdZ/EjOq6xASHMKHJuEgehE5c934CFbVp/9Qp5w2sBhBslwdtudBsgFmO1Eo0Mh7kfas5rWOT9qL7Lnq3tMYvvSTXitnYHGeFwctFdpTQrQqj2a9icgh/aLXN124MfumC7Xa/06b5fTqtdC9ZoX+9udejNO/o03HBjRgW3Ef/Ewo6ay7Tgp0v0Yj9JjCUV++VZYOXvm4L1mMhjd5EXKzS17ZkFzqovgIoOfKYAXZjj4DF8sYK5/KIF76fh/AMJ3Fjy7Q0hReHSY0QzvpnWInEz/jXVYrRVm9MbH4J+YT6OGquGHyL/rRp51xkIN+wIDAQAB",
+      "iconListingPluginEnabled": false,
+      "iconListingVoteKey": "ilv_74eeedc030618f29ec86f6cedc0258347c8f",
+      "websiteUrl": "https://linktr.ee/herbcrew",
+      "discordUrl": "https://discord.gg/2DpXwA63BH",
+      "youtubeUrl": "",
+      "country": "Australia",
+      "bannerUrl": "",
+      "description": "Herb Crew is a new factions server with a player-driven economy, custom darkzone & dungeon, bosses, and a store that doesn't sell anything affecting gameplay.\n\nYou claim land, build cannons, raid other factions, farm bosses in the darkzone and dungeon, and fight over KoTH and outposts. There's a custom auction house, shop, upgradable tools and printer mode. On top of that we have numerous pvp options: duels, hunger games, bounties and coinflips.",
+      "tags": [
+        "Factions",
+        "Anarchy",
+        "PvP",
+        "KitPvP",
+        "Minigames",
+        "Parkour",
+        "New"
+      ],
+      "ownerId": "a40e9fc0-7f33-4381-9758-26da061f8383",
+      "ownerName": "wizdimizm",
+      "moderationStatus": "published",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 420,
+      "version": "WineSpigot 1.8.8",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-10-20T01:59:06.680Z",
+      "updatedAt": "2026-10-20T01:59:06.680Z",
+      "lastPingAt": "2026-10-20T01:59:07.863Z",
+      "lastPingAttemptAt": "2026-10-20T01:59:07.863Z",
+      "javaStatusTarget": "herbcrew.net",
+      "javaSrvResolved": true,
+      "analytics": {
+        "ipCopyDaily": [],
+        "ipCopyVisitorDays": {},
+        "viewDaily": [],
+        "viewVisitorDays": {},
+        "playerHistory": [
+          {
+            "createdAt": "2026-10-20T01:59:07.863Z",
+            "playersOnline": 0,
+            "playersMax": 420,
+            "online": true
+          }
+        ]
+      },
+      "lastSuccessfulPingAt": "2026-10-20T01:59:07.863Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "iconUrl": "",
+      "iconListingVoteQueue": [],
+      "sponsoredUntil": ""
     }
   ],
   "clients": [
@@ -16893,7 +16963,7 @@
       },
       {
         "date": "2026-10-20",
-        "count": 3
+        "count": 2
       }
     ],
     "siteVisitVisitorDays": {
@@ -17098,8 +17168,7 @@
       ],
       "2026-10-20": [
         "74d641ba1f0d0bef",
-        "38398a03df16f452",
-        "6b2c4dcbbb57c7da"
+        "38398a03df16f452"
       ]
     }
   },
