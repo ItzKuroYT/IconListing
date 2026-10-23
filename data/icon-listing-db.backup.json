@@ -16717,10 +16717,10 @@
       "createdAt": "2026-10-08T18:47:41.239Z"
     },
     {
-      "id": "72138544-c6fb-4194-ac51-6fa060b2ee61",
+      "id": "372e24c3-e815-4afb-b937-ada92596a430",
       "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
       "minecraftUsername": "tebung",
-      "createdAt": "2026-10-23T18:18:04.457Z"
+      "createdAt": "2026-10-23T18:17:59.508Z"
     }
   ],
   "reviews": [
@@ -16771,8 +16771,8 @@
   ],
   "voteIps": {
     "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
-      "visitor:c1afea7846069817ab134a0c06cd321ee5fde697b429cca21ad9c8299d2aefc8": "2026-10-23T18:18:04.457Z",
-      "name:tebung": "2026-10-23T18:18:04.457Z"
+      "visitor:c1afea7846069817ab134a0c06cd321ee5fde697b429cca21ad9c8299d2aefc8": "2026-10-23T18:17:59.508Z",
+      "name:tebung": "2026-10-23T18:17:59.508Z"
     }
   },
   "siteAnalytics": {
