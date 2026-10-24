@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-24T01:18:33.987Z",
+  "generatedAt": "2026-10-24T01:18:44.428Z",
   "campaigns": [],
   "servers": [
     {
@@ -1387,7 +1387,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "44ccab6d-9e28-41a5-858d-a6f9b1395115",
+      "id": "e5585e77-d438-4e73-bf4b-748284fab102",
       "name": "YieldMC",
       "javaHost": "play.yieldmc.net",
       "javaPort": 25565,
@@ -1418,10 +1418,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-10-24T01:18:24.125Z",
-      "updatedAt": "2026-10-24T01:18:24.125Z",
-      "lastPingAt": "2026-10-24T01:18:25.931Z",
-      "lastSuccessfulPingAt": "2026-10-24T01:18:25.931Z",
+      "createdAt": "2026-10-24T01:18:27.862Z",
+      "updatedAt": "2026-10-24T01:18:27.862Z",
+      "lastPingAt": "2026-10-24T01:18:27.900Z",
+      "lastSuccessfulPingAt": "2026-10-24T01:18:27.900Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
