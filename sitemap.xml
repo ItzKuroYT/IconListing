@@ -231,14 +231,14 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/IconSMP/</loc>
-    <lastmod>2026-09-03T01:25:43.246Z</lastmod>
+    <loc>https://minecraftlisting.org/server/IconGens/</loc>
+    <lastmod>2026-07-09T07:59:28.615Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/IconGens/</loc>
-    <lastmod>2026-07-09T07:59:28.615Z</lastmod>
+    <loc>https://minecraftlisting.org/server/IconSMP/</loc>
+    <lastmod>2026-09-03T01:25:43.246Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -291,20 +291,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
-    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/GroundZero/</loc>
     <lastmod>2026-07-11T16:55:27.628Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Iron-to-Empire/</loc>
-    <lastmod>2026-08-04T21:24:59.018Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
+    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -333,8 +327,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Iron-to-Empire/</loc>
+    <lastmod>2026-08-04T21:24:59.018Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/TopHatSMP/</loc>
     <lastmod>2026-09-05T01:54:11.862Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
+    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -357,32 +363,8 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
-    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
-    <lastmod>2026-10-11T03:13:25.131Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Mobcraft-SMP/</loc>
-    <lastmod>2026-07-31T22:23:53.982Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/FCSMP/</loc>
-    <lastmod>2026-10-13T09:48:23.393Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/YieldMC/</loc>
-    <lastmod>2026-10-24T01:18:27.862Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Universal-Gaming-Network/</loc>
+    <lastmod>2026-10-29T20:37:31.250Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -441,6 +423,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Mobcraft-SMP/</loc>
+    <lastmod>2026-07-31T22:23:53.982Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Futurelands/</loc>
     <lastmod>2026-08-04T19:32:15.223Z</lastmod>
     <changefreq>daily</changefreq>
@@ -471,6 +459,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
+    <lastmod>2026-10-11T03:13:25.131Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Valoris/</loc>
     <lastmod>2026-10-06T22:18:38.296Z</lastmod>
     <changefreq>daily</changefreq>
@@ -491,6 +485,12 @@
   <url>
     <loc>https://minecraftlisting.org/server/Gremlins-SMP/</loc>
     <lastmod>2026-10-10T20:57:40.131Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/FCSMP/</loc>
+    <lastmod>2026-10-13T09:48:23.393Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
