@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-29T20:27:11.855Z",
+  "generatedAt": "2026-10-29T20:37:41.073Z",
   "campaigns": [],
   "servers": [
     {
@@ -1217,6 +1217,63 @@
       "communityHighlighted": false
     },
     {
+      "id": "379738ce-c7dd-454d-8d2c-17a66a1f325b",
+      "name": "Universal Gaming Network",
+      "javaHost": "play.universalgaming.us",
+      "javaPort": 25565,
+      "javaSrvResolved": true,
+      "javaStatusTarget": "play.universalgaming.us",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "https://universalgaming.us",
+      "discordUrl": "https://discord.gg/jHuD7mmP85",
+      "youtubeUrl": "https://www.youtube.com/@_UniversalGaming",
+      "country": "United States",
+      "bannerUrl": "",
+      "description": "🎮 Console & Bedrock Connection\n1️⃣ Open Minecraft Bedrock Edition\n\n2️⃣ Go to the Friends tab\n\n3️⃣ Select Add Friend\n\n4️⃣ Add our official UGN connection account:\n\nUGNconnect\n\n5️⃣ Give it a few seconds to process your connection.\n\n6️⃣ Return to the Friends tab.\n\n7️⃣ Under Joinable Friends, you should see the Universal Gaming Network / Universal SMP session.\n\n8️⃣ Click the session to connect.\n\n🚀 You'll be transferred directly into the UGN network!",
+      "tags": [
+        "Survival",
+        "Factions",
+        "Anarchy",
+        "Economy",
+        "SMP",
+        "Bedrock",
+        "Cross-Play"
+      ],
+      "ownerName": "Brentschiltz",
+      "votes": 0,
+      "playersOnline": 1,
+      "playersMax": 420,
+      "version": "Velocity 1.7.2-26.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-10-29T20:37:31.250Z",
+      "updatedAt": "2026-10-29T20:37:31.250Z",
+      "lastPingAt": "2026-10-29T20:37:31.775Z",
+      "lastSuccessfulPingAt": "2026-10-29T20:37:31.775Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Universal-Gaming-Network&kind=icon",
+      "rank": 23,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
       "id": "eada511e-c7b9-43e8-8f1e-bcffcb21764d",
       "name": "Calamity SMP",
       "javaHost": "162.245.187.170",
@@ -1256,7 +1313,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 23,
+      "rank": 24,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1312,7 +1369,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 24,
+      "rank": 25,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1369,7 +1426,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
-      "rank": 25,
+      "rank": 26,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1420,7 +1477,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 26,
+      "rank": 27,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1471,7 +1528,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 27,
+      "rank": 28,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1526,7 +1583,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 28,
+      "rank": 29,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1582,7 +1639,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 29,
+      "rank": 30,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1635,7 +1692,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=LimboMC&kind=icon",
-      "rank": 30,
+      "rank": 31,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1690,7 +1747,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 31,
+      "rank": 32,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1747,7 +1804,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Mobcraft-SMP&kind=icon",
-      "rank": 32,
+      "rank": 33,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1804,7 +1861,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Futurelands&kind=icon",
-      "rank": 33,
+      "rank": 34,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1859,7 +1916,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 34,
+      "rank": 35,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1912,7 +1969,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 35,
+      "rank": 36,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1969,7 +2026,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Power-SMP&kind=icon",
-      "rank": 36,
+      "rank": 37,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2023,7 +2080,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Hagga-smp&kind=icon",
-      "rank": 37,
+      "rank": 38,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2080,7 +2137,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Dominion-Towny-SMP&kind=icon",
-      "rank": 38,
+      "rank": 39,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 3,
@@ -2137,7 +2194,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Valoris&kind=icon",
-      "rank": 39,
+      "rank": 40,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2190,7 +2247,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 40,
+      "rank": 41,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -2247,7 +2304,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=AgarX-SMP-Season-2&kind=icon",
-      "rank": 41,
+      "rank": 42,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2300,7 +2357,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 42,
+      "rank": 43,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
@@ -2356,7 +2413,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=FCSMP&kind=icon",
-      "rank": 43,
+      "rank": 44,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2413,7 +2470,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=p0lar-SMP&kind=icon",
-      "rank": 44,
+      "rank": 45,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
