@@ -941,6 +941,23 @@
       "googleName": "Brent schiltz",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJtG7VfOBNM4LbuYxKvIdL-sW91sBc3mtuVLGhhrhaCB_2oF4w=s96-c",
       "updatedAt": "2026-10-29T01:55:04.592Z"
+    },
+    {
+      "id": "cfa9feec-a82e-4c47-b903-a3e18d9e79b1",
+      "username": "JoeXeoano",
+      "email": "xeoanojoex@gmail.com",
+      "passwordHash": "",
+      "emailOptIn": false,
+      "emailVerified": true,
+      "emailVerifiedAt": "2026-11-03T00:14:11.385Z",
+      "termsAcceptedAt": "2026-11-03T00:14:11.385Z",
+      "googleLinkedAt": "2026-11-03T00:14:11.385Z",
+      "createdAt": "2026-11-03T00:14:11.385Z",
+      "banned": false,
+      "googleSub": "114721449683253883685",
+      "googleName": "Joe Xeoano",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKkSfxjT8AqUeTcoIBvRGR2PcCkLz8uHfhnDOgY3vBxVkcwCQ=s96-c",
+      "updatedAt": "2026-11-03T00:14:11.385Z"
     }
   ],
   "servers": [
