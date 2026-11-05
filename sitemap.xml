@@ -297,8 +297,8 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
-    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Universal-Gaming-Network/</loc>
+    <lastmod>2026-10-29T20:37:31.250Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -339,12 +339,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
-    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/WanderLand/</loc>
     <lastmod>2026-09-20T17:32:38.060Z</lastmod>
     <changefreq>daily</changefreq>
@@ -352,19 +346,19 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/Project-Permanence/</loc>
-    <lastmod>2026-09-25T18:18:45.934Z</lastmod>
+    <lastmod>2026-11-03T00:15:11.707Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
-    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
+    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Universal-Gaming-Network/</loc>
-    <lastmod>2026-10-29T20:37:31.250Z</lastmod>
+    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
+    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -413,6 +407,12 @@
   <url>
     <loc>https://minecraftlisting.org/server/LimboMC/</loc>
     <lastmod>2026-07-30T00:42:38.461Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/Tancraft/</loc>
+    <lastmod>2026-07-31T15:16:27.026Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -497,6 +497,12 @@
   <url>
     <loc>https://minecraftlisting.org/server/p0lar-SMP/</loc>
     <lastmod>2026-10-16T18:02:09.078Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/PixelSMP/</loc>
+    <lastmod>2026-11-05T11:47:58.095Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
