@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-05T11:48:33.615Z",
+  "generatedAt": "2026-11-05T11:48:35.953Z",
   "campaigns": [],
   "servers": [
     {
@@ -2485,7 +2485,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "aedb50eb-4ea7-413a-8a23-de7b9681becd",
+      "id": "e5ed899e-3510-4375-9ce3-09ee307c4d40",
       "name": "PixelSMP",
       "javaHost": "pixelsmp.swiftservers.org",
       "javaPort": 25565,
@@ -2517,10 +2517,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-11-05T11:48:15.049Z",
-      "updatedAt": "2026-11-05T11:48:15.049Z",
-      "lastPingAt": "2026-11-05T11:48:16.172Z",
-      "lastSuccessfulPingAt": "2026-11-05T11:48:16.172Z",
+      "createdAt": "2026-11-05T11:48:14.851Z",
+      "updatedAt": "2026-11-05T11:48:14.851Z",
+      "lastPingAt": "2026-11-05T11:48:16.162Z",
+      "lastSuccessfulPingAt": "2026-11-05T11:48:16.162Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
