@@ -16829,7 +16829,7 @@
       "sponsoredUntil": ""
     },
     {
-      "id": "de7ca27d-4cce-4547-be20-a84ec16ceef1",
+      "id": "7d99ffe9-1f4f-498b-a295-cb1e1fdd87a2",
       "name": "PixelSMP",
       "edition": "java",
       "javaHost": "pixelsmp.swiftservers.org",
@@ -16871,10 +16871,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-11-05T11:47:58.095Z",
-      "updatedAt": "2026-11-05T11:47:58.095Z",
-      "lastPingAt": "2026-11-05T11:47:58.565Z",
-      "lastPingAttemptAt": "2026-11-05T11:47:58.565Z",
+      "createdAt": "2026-11-05T11:48:11.490Z",
+      "updatedAt": "2026-11-05T11:48:11.490Z",
+      "lastPingAt": "2026-11-05T11:48:11.773Z",
+      "lastPingAttemptAt": "2026-11-05T11:48:11.773Z",
       "iconUrl": "data:image/png;base64,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",
       "javaStatusTarget": "pixelsmp.swiftservers.org",
       "javaSrvResolved": false,
@@ -16885,14 +16885,14 @@
         "viewVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-11-05T11:47:58.565Z",
+            "createdAt": "2026-11-05T11:48:11.773Z",
             "playersOnline": 0,
             "playersMax": 20,
             "online": true
           }
         ]
       },
-      "lastSuccessfulPingAt": "2026-11-05T11:47:58.565Z",
+      "lastSuccessfulPingAt": "2026-11-05T11:48:11.773Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "iconListingVoteQueue": [],
