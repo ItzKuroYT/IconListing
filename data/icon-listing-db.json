@@ -14037,17 +14037,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [
-          {
-            "date": "2026-10-07",
-            "count": 1
-          }
-        ],
-        "viewVisitorDays": {
-          "2026-10-07": [
-            "0b102c39b987a267"
-          ]
-        },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-10-21T12:49:27.526Z",
@@ -17204,10 +17195,6 @@
   "siteAnalytics": {
     "siteVisitDaily": [
       {
-        "date": "2026-10-07",
-        "count": 6
-      },
-      {
         "date": "2026-10-08",
         "count": 3
       },
@@ -17318,17 +17305,13 @@
       {
         "date": "2026-11-05",
         "count": 4
+      },
+      {
+        "date": "2026-11-06",
+        "count": 1
       }
     ],
     "siteVisitVisitorDays": {
-      "2026-10-07": [
-        "0b102c39b987a267",
-        "f40cf49ffd0d60cc",
-        "22384b9865f94c93",
-        "726f08763326e817",
-        "6bdb3f9235612542",
-        "b0cb802a5726ab1d"
-      ],
       "2026-10-08": [
         "e9fa2da1259f4ab6",
         "2da9732edc3cf91f",
@@ -17527,6 +17510,9 @@
         "fdb5fb3c5be315f1",
         "4d4329c61f47b885",
         "c9a31555dce12418"
+      ],
+      "2026-11-06": [
+        "af03d86056ba7e73"
       ]
     }
   },
