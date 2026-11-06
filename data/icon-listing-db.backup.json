@@ -3179,8 +3179,17 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [],
-        "viewVisitorDays": {},
+        "viewDaily": [
+          {
+            "date": "2026-11-06",
+            "count": 1
+          }
+        ],
+        "viewVisitorDays": {
+          "2026-11-06": [
+            "3ff7cbd03a1aa142"
+          ]
+        },
         "playerHistory": [
           {
             "createdAt": "2026-10-21T16:17:34.789Z",
