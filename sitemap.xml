@@ -256,7 +256,7 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/Unbent-Flames/</loc>
-    <lastmod>2026-09-07T20:46:08.423Z</lastmod>
+    <lastmod>2026-11-06T05:08:20.393Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -345,14 +345,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Project-Permanence/</loc>
-    <lastmod>2026-11-03T00:15:11.707Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
+    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
-    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Project-Permanence/</loc>
+    <lastmod>2026-11-03T00:15:11.707Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -497,12 +497,6 @@
   <url>
     <loc>https://minecraftlisting.org/server/p0lar-SMP/</loc>
     <lastmod>2026-10-16T18:02:09.078Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/PixelSMP/</loc>
-    <lastmod>2026-11-05T11:48:14.851Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
