@@ -9496,11 +9496,18 @@
           {
             "date": "2026-10-29",
             "count": 1
+          },
+          {
+            "date": "2026-11-08",
+            "count": 1
           }
         ],
         "viewVisitorDays": {
           "2026-10-29": [
             "1f0f302c40f804c9"
+          ],
+          "2026-11-08": [
+            "0231adc19aa845f0"
           ]
         },
         "playerHistory": [
@@ -14750,17 +14757,8 @@
       "analytics": {
         "ipCopyDaily": [],
         "ipCopyVisitorDays": {},
-        "viewDaily": [
-          {
-            "date": "2026-10-09",
-            "count": 1
-          }
-        ],
-        "viewVisitorDays": {
-          "2026-10-09": [
-            "f40cf49ffd0d60cc"
-          ]
-        },
+        "viewDaily": [],
+        "viewVisitorDays": {},
         "playerHistory": [
           {
             "createdAt": "2026-10-22T03:27:46.217Z",
@@ -17206,10 +17204,6 @@
   "siteAnalytics": {
     "siteVisitDaily": [
       {
-        "date": "2026-10-09",
-        "count": 8
-      },
-      {
         "date": "2026-10-10",
         "count": 3
       },
@@ -17323,16 +17317,6 @@
       }
     ],
     "siteVisitVisitorDays": {
-      "2026-10-09": [
-        "6038477d13aa9d3d",
-        "db23d393c93ddbe3",
-        "b0cb802a5726ab1d",
-        "b1d3e22304ed4aa4",
-        "1a13f4e9e0c89163",
-        "1a7836a5c72a03e5",
-        "f40cf49ffd0d60cc",
-        "d7a802a8387ca093"
-      ],
       "2026-10-10": [
         "c99c094c9a432fdf",
         "0c0d71ab781e1338",
