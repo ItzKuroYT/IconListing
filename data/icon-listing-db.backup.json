@@ -988,19 +988,6 @@
       "termsAcceptedAt": "2026-11-08T18:40:52.129Z",
       "createdAt": "2026-11-08T18:40:52.129Z",
       "banned": false
-    },
-    {
-      "id": "97f7ab6c-fcf2-4645-aefb-446c116db67d",
-      "username": "at0_m1c",
-      "email": "color.crusher75001@gmail.com",
-      "passwordHash": "8df06de31a04f93b2a28b27d29d1c78c:b1ae065aadf4e9fd3641e28f7e0cdeaaaf426ada1c0ba491d32f2133c7c657be",
-      "emailOptIn": false,
-      "emailOptInAt": "",
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-11-08T23:58:26.118Z",
-      "termsAcceptedAt": "2026-11-08T23:57:59.397Z",
-      "banned": false,
-      "createdAt": "2026-11-08T23:57:59.397Z"
     }
   ],
   "servers": [
@@ -17603,7 +17590,8 @@
   },
   "deleted": {
     "users": {
-      "e7f69622-09e1-4b86-af3c-b90fff23b3ca": "2026-06-29T22:53:42.842Z"
+      "e7f69622-09e1-4b86-af3c-b90fff23b3ca": "2026-06-29T22:53:42.842Z",
+      "97f7ab6c-fcf2-4645-aefb-446c116db67d": "2026-11-08T23:59:52.546Z"
     },
     "servers": {
       "83b6d5fa-2cfb-4318-8517-fb09543ef3e0": "2026-06-28T05:48:47.738Z",
