@@ -988,6 +988,25 @@
       "termsAcceptedAt": "2026-11-08T18:40:52.129Z",
       "createdAt": "2026-11-08T18:40:52.129Z",
       "banned": false
+    },
+    {
+      "id": "97f7ab6c-fcf2-4645-aefb-446c116db67d",
+      "username": "at0_m1c",
+      "email": "color.crusher75001@gmail.com",
+      "passwordHash": "8df06de31a04f93b2a28b27d29d1c78c:b1ae065aadf4e9fd3641e28f7e0cdeaaaf426ada1c0ba491d32f2133c7c657be",
+      "emailOptIn": false,
+      "emailOptInAt": "",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-11-08T23:57:59.397Z",
+      "banned": false,
+      "createdAt": "2026-11-08T23:57:59.397Z",
+      "emailVerification": {
+        "codeHash": "2fd933e8812f547b77668cebe09d45112aff5e535f3b8fa54b8278d8b955367e",
+        "createdAt": "2026-11-08T23:57:59.397Z",
+        "expiresAt": "2026-11-09T00:12:59.397Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
