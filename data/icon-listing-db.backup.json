@@ -975,25 +975,6 @@
       "googleName": "Threshold",
       "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocKZi4rSGCA4CxZ84xoPWs-H05AHb33iib9x1ECUsdhUEVokWLw=s96-c",
       "updatedAt": "2026-11-05T11:41:59.651Z"
-    },
-    {
-      "id": "50e1046b-4f7e-4035-b36d-fab467f1b326",
-      "username": "peacecore01",
-      "email": "andrei.pasare14@gmail.com",
-      "passwordHash": "b5635e2a4c0f001d344b0787206ccc80:39eff2d86dfb7358b90059a0f4e4207f2fb434ba6d7e44424d1ddc0e4ed16109",
-      "emailOptIn": false,
-      "emailOptInAt": "",
-      "emailVerified": false,
-      "emailVerifiedAt": "",
-      "termsAcceptedAt": "2026-11-08T18:40:52.129Z",
-      "banned": false,
-      "createdAt": "2026-11-08T18:40:52.129Z",
-      "emailVerification": {
-        "codeHash": "4387174933ccdadf1d6e447724bd28d9727ccab534f046d1c6de333fd3bfeb7f",
-        "createdAt": "2026-11-08T18:40:52.129Z",
-        "expiresAt": "2026-11-08T18:55:52.129Z",
-        "attempts": 0
-      }
     }
   ],
   "servers": [
@@ -17329,7 +17310,7 @@
       },
       {
         "date": "2026-11-08",
-        "count": 2
+        "count": 3
       }
     ],
     "siteVisitVisitorDays": {
@@ -17527,7 +17508,8 @@
       ],
       "2026-11-08": [
         "330919c763afeaf7",
-        "e4c25abc74c7ade5"
+        "e4c25abc74c7ade5",
+        "bb7aac73fdc6d44e"
       ]
     }
   },
