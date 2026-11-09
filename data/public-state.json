@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-09T20:50:19.279Z",
+  "generatedAt": "2026-11-09T20:57:13.706Z",
   "campaigns": [],
   "servers": [
     {
@@ -2472,6 +2472,63 @@
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=p0lar-SMP&kind=icon",
       "rank": 45,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
+      "id": "ed762dba-7c7c-4007-8590-0b388151242d",
+      "name": "imperial SMP",
+      "javaHost": "imperialsmp.my.pebble.host",
+      "javaPort": 25565,
+      "javaSrvResolved": true,
+      "javaStatusTarget": "imperialsmp.my.pebble.host",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/b5aATHsZCG",
+      "youtubeUrl": "",
+      "country": "Serbia",
+      "bannerUrl": "",
+      "description": "⚔👑𝓲𝓶𝓹𝓮𝓻𝓲𝓪𝓵𝓲𝓼𝓶.𝓶𝔂.𝓹𝓮𝓫𝓫𝓵𝓮.𝓱𝓸𝓼𝓽 👑⚔️\nor just 𝓘𝓶𝓹𝓮𝓻𝓲𝓪𝓵 𝓢𝓜𝓟\nIs a semi anarchy SMP server which allows griefing, raiding and peaceful modes such as building and peaceful civilization! \nthe disallowed features (for atleast NOW..) are such as: hacking, exploiting or abusing OP status!!",
+      "tags": [
+        "Survival",
+        "Factions",
+        "Anarchy",
+        "PvP",
+        "SMP",
+        "Roleplay",
+        "Vanilla"
+      ],
+      "ownerName": "crims0nq",
+      "votes": 0,
+      "playersOnline": 0,
+      "playersMax": 20,
+      "version": "26.3",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-11-09T20:57:03.537Z",
+      "updatedAt": "2026-11-09T20:57:03.537Z",
+      "lastPingAt": "2026-11-09T20:57:04.598Z",
+      "lastSuccessfulPingAt": "2026-11-09T20:57:04.598Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=imperial-SMP&kind=icon",
+      "rank": 46,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
