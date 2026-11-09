@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-09T20:57:13.706Z",
+  "generatedAt": "2026-11-09T20:57:25.528Z",
   "campaigns": [],
   "servers": [
     {
@@ -2486,7 +2486,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "ed762dba-7c7c-4007-8590-0b388151242d",
+      "id": "43bb7887-d2e5-41d3-806b-509d5d7757cd",
       "name": "imperial SMP",
       "javaHost": "imperialsmp.my.pebble.host",
       "javaPort": 25565,
@@ -2518,10 +2518,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-11-09T20:57:03.537Z",
-      "updatedAt": "2026-11-09T20:57:03.537Z",
-      "lastPingAt": "2026-11-09T20:57:04.598Z",
-      "lastSuccessfulPingAt": "2026-11-09T20:57:04.598Z",
+      "createdAt": "2026-11-09T20:57:10.488Z",
+      "updatedAt": "2026-11-09T20:57:10.488Z",
+      "lastPingAt": "2026-11-09T20:57:10.673Z",
+      "lastSuccessfulPingAt": "2026-11-09T20:57:10.673Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
