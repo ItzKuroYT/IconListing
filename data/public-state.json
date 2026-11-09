@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-09T21:20:12.685Z",
+  "generatedAt": "2026-11-09T21:22:20.364Z",
   "campaigns": [],
   "servers": [
     {
@@ -2500,7 +2500,7 @@
       "youtubeUrl": "",
       "country": "Serbia",
       "bannerUrl": "",
-      "description": "⚔👑𝓲𝓶𝓹𝓮𝓻𝓲𝓪𝓵𝓲𝓼𝓶.𝓶𝔂.𝓹𝓮𝓫𝓫𝓵𝓮.𝓱𝓸𝓼𝓽 👑⚔️\nor just 𝓘𝓶𝓹𝓮𝓻𝓲𝓪𝓵 𝓢𝓜𝓟\nIs a semi anarchy SMP server which allows griefing, raiding and peaceful modes such as building and peaceful civilization! \nthe disallowed features (for atleast NOW..) are such as: hacking, exploiting or abusing OP status!!",
+      "description": "⚔👑𝓲𝓶𝓹𝓮𝓻𝓲𝓪𝓵𝓼𝓶𝓹.𝓶𝔂.𝓹𝓮𝓫𝓫𝓵𝓮.𝓱𝓸𝓼𝓽 👑⚔️\nor just 𝓘𝓶𝓹𝓮𝓻𝓲𝓪𝓵 𝓢𝓜𝓟\nIs a semi anarchy SMP server which allows griefing, raiding and peaceful modes such as building and peaceful civilization! \nthe disallowed features (for atleast NOW..) are such as: hacking, exploiting or abusing OP status!!",
       "tags": [
         "Survival",
         "Factions",
@@ -2519,11 +2519,11 @@
       "uptimePercent": 100,
       "sponsored": false,
       "createdAt": "2026-11-09T20:57:03.537Z",
-      "updatedAt": "2026-11-09T20:57:03.537Z",
-      "lastPingAt": "2026-11-09T21:19:59.908Z",
-      "lastSuccessfulPingAt": "2026-11-09T21:19:59.908Z",
-      "uptimeChecks": 3,
-      "uptimeSuccesses": 3,
+      "updatedAt": "2026-11-09T21:22:11.328Z",
+      "lastPingAt": "2026-11-09T21:22:12.230Z",
+      "lastSuccessfulPingAt": "2026-11-09T21:22:12.230Z",
+      "uptimeChecks": 4,
+      "uptimeSuccesses": 4,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
@@ -3145,9 +3145,9 @@
     }
   },
   "siteAnalytics": {
-    "uniqueVisitsLast7": 23,
-    "uniqueVisitsLast30": 145,
-    "websiteVisitsLast7": 23,
-    "websiteVisitsLast30": 145
+    "uniqueVisitsLast7": 24,
+    "uniqueVisitsLast30": 146,
+    "websiteVisitsLast7": 24,
+    "websiteVisitsLast30": 146
   }
 }
