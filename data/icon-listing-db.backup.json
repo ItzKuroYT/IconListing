@@ -1000,7 +1000,12 @@
       "emailVerifiedAt": "2026-11-09T20:49:21.270Z",
       "termsAcceptedAt": "2026-11-09T20:44:22.477Z",
       "banned": false,
-      "createdAt": "2026-11-09T20:44:22.477Z"
+      "createdAt": "2026-11-09T20:44:22.477Z",
+      "googleSub": "111275448133217603699",
+      "googleName": "Jwexq",
+      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJ-Oe3DoM6sDUixC7TvGWJIINYY7RjsGCgexNULoIJKhFOES9E=s96-c",
+      "googleLinkedAt": "2026-11-09T21:21:31.973Z",
+      "updatedAt": "2026-11-09T21:21:31.973Z"
     }
   ],
   "servers": [
