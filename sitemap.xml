@@ -369,12 +369,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
-    <lastmod>2026-10-11T03:13:25.131Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/Calamity-SMP/</loc>
     <lastmod>2026-06-30T15:54:50.226Z</lastmod>
     <changefreq>daily</changefreq>
@@ -465,6 +459,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Dominion-Towny-SMP/</loc>
+    <lastmod>2026-10-11T03:13:25.131Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Valoris/</loc>
     <lastmod>2026-10-06T22:18:38.296Z</lastmod>
     <changefreq>daily</changefreq>
@@ -502,7 +502,7 @@
   </url>
   <url>
     <loc>https://minecraftlisting.org/server/imperial-SMP/</loc>
-    <lastmod>2026-11-09T20:57:10.659Z</lastmod>
+    <lastmod>2026-11-09T21:22:11.328Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
