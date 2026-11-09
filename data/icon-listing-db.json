@@ -1000,12 +1000,7 @@
       "emailVerifiedAt": "2026-11-09T20:49:21.270Z",
       "termsAcceptedAt": "2026-11-09T20:44:22.477Z",
       "banned": false,
-      "createdAt": "2026-11-09T20:44:22.477Z",
-      "googleSub": "111275448133217603699",
-      "googleName": "Jwexq",
-      "googlePicture": "https://lh3.googleusercontent.com/a/ACg8ocJ-Oe3DoM6sDUixC7TvGWJIINYY7RjsGCgexNULoIJKhFOES9E=s96-c",
-      "googleLinkedAt": "2026-11-09T21:21:31.973Z",
-      "updatedAt": "2026-11-09T21:21:31.973Z"
+      "createdAt": "2026-11-09T20:44:22.477Z"
     }
   ],
   "servers": [
@@ -17486,7 +17481,7 @@
       },
       {
         "date": "2026-11-09",
-        "count": 8
+        "count": 9
       }
     ],
     "siteVisitVisitorDays": {
@@ -17691,7 +17686,8 @@
         "e4c25abc74c7ade5",
         "81c1a8b5df26bca5",
         "7b8f94720ad43c21",
-        "002337ac7a61289c"
+        "002337ac7a61289c",
+        "d314dd755c4e8f7e"
       ]
     }
   },
