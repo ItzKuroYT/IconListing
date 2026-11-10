@@ -17231,7 +17231,7 @@
       "ownerId": "50e1046b-4f7e-4035-b36d-fab467f1b326",
       "ownerName": "peacecore01",
       "moderationStatus": "published",
-      "votes": 1,
+      "votes": 0,
       "playersOnline": 2,
       "playersMax": 50,
       "version": "Paper 26.2",
@@ -17251,42 +17251,6 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
-          {
-            "createdAt": "2026-11-10T17:21:04.497Z",
-            "playersOnline": 2,
-            "playersMax": 50,
-            "online": true
-          },
-          {
-            "createdAt": "2026-11-10T17:21:04.497Z",
-            "playersOnline": 2,
-            "playersMax": 50,
-            "online": true
-          },
-          {
-            "createdAt": "2026-11-10T17:21:04.497Z",
-            "playersOnline": 2,
-            "playersMax": 50,
-            "online": true
-          },
-          {
-            "createdAt": "2026-11-10T17:21:04.497Z",
-            "playersOnline": 2,
-            "playersMax": 50,
-            "online": true
-          },
-          {
-            "createdAt": "2026-11-10T17:21:04.497Z",
-            "playersOnline": 2,
-            "playersMax": 50,
-            "online": true
-          },
-          {
-            "createdAt": "2026-11-10T17:21:04.497Z",
-            "playersOnline": 2,
-            "playersMax": 50,
-            "online": true
-          },
           {
             "createdAt": "2026-11-10T17:21:04.497Z",
             "playersOnline": 2,
@@ -17801,7 +17765,7 @@
       },
       {
         "date": "2026-11-10",
-        "count": 5
+        "count": 6
       }
     ],
     "siteVisitVisitorDays": {
@@ -18001,7 +17965,8 @@
         "0b102c39b987a267",
         "2942f0823412298c",
         "1f996a94d0b12516",
-        "e4c25abc74c7ade5"
+        "e4c25abc74c7ade5",
+        "cec5ac0a2e133bf4"
       ]
     }
   },
