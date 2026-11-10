@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-10T17:21:00.914Z",
+  "generatedAt": "2026-11-10T17:21:03.105Z",
   "campaigns": [],
   "servers": [
     {
@@ -1220,7 +1220,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "f8b340d7-bdd8-4f36-b028-fbb13ec1fd92",
+      "id": "d77444e9-2353-4ae3-bb4a-d198cce79c80",
       "name": "PuffSMP",
       "javaHost": "ddp-engineering.go.ro:30814",
       "javaPort": 25565,
@@ -1236,6 +1236,8 @@
       "bannerUrl": "",
       "description": "🌎 PuffSMP \nLooking for a new Minecraft community to join from the very beginning?\n\n🏠 Build your own base\n💰 Create your own fortune\n⚔️ Take part in events\n🤝 Meet new players\n🌍 Explore a huge survival world\n🎉 Become part of the community\n\n🚨 THE MINECRAFT SERVER IS CURRENTLY IN DEVELOPMENT! 🚨\n\nJoin our Discord to get:\n\n📢 Server announcements\n🛠️ Development updates\n🎉 Community events\n💬 Chat with other players\n🚀 Launch news & information\n\n⚠️ IMPORTANT: The Minecraft server will be available ONLY for Minecraft Java Edition.\n\n🔥 JOIN NOW AND BE HERE FROM DAY ONE!\n\n🔗 JOIN THE COMMUNITY. BUILD YOUR WORLD. MAKE YOUR MARK.",
       "tags": [
+        "Survival",
+        "PvP",
         "New"
       ],
       "ownerName": "peacecore01",
@@ -1246,10 +1248,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-11-10T17:20:49.933Z",
-      "updatedAt": "2026-11-10T17:20:49.933Z",
-      "lastPingAt": "2026-11-10T17:20:51.741Z",
-      "lastSuccessfulPingAt": "2026-11-10T17:20:51.741Z",
+      "createdAt": "2026-11-10T17:20:54.561Z",
+      "updatedAt": "2026-11-10T17:20:54.561Z",
+      "lastPingAt": "2026-11-10T17:20:54.598Z",
+      "lastSuccessfulPingAt": "2026-11-10T17:20:54.598Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
