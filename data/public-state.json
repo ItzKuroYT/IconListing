@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-10T17:39:53.653Z",
+  "generatedAt": "2026-11-10T17:40:00.913Z",
   "campaigns": [],
   "servers": [
     {
@@ -618,6 +618,59 @@
       "communityHighlighted": false
     },
     {
+      "id": "5b439e3b-7c1c-495b-a493-25068ca7bcd0",
+      "name": "PuffSMP",
+      "javaHost": "ddp-engineering.go.ro:30814",
+      "javaPort": 25565,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "ddp-engineering.go.ro:30814",
+      "crossPlay": false,
+      "bedrockHost": "",
+      "bedrockPort": 19132,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/tVxVbQAnf3",
+      "youtubeUrl": "",
+      "country": "Romania",
+      "bannerUrl": "",
+      "description": "🌎 PuffSMP \nLooking for a new Minecraft community to join from the very beginning?\n\n🏠 Build your own base\n💰 Create your own fortune\n⚔️ Take part in events\n🤝 Meet new players\n🌍 Explore a huge survival world\n🎉 Become part of the community\n\n🚨 THE MINECRAFT SERVER IS CURRENTLY IN DEVELOPMENT! 🚨\n\nJoin our Discord to get:\n\n📢 Server announcements\n🛠️ Development updates\n🎉 Community events\n💬 Chat with other players\n🚀 Launch news & information\n\n⚠️ IMPORTANT: The Minecraft server will be available ONLY for Minecraft Java Edition.\n\n🔥 JOIN NOW AND BE HERE FROM DAY ONE!\n\n🔗 JOIN THE COMMUNITY. BUILD YOUR WORLD. MAKE YOUR MARK.",
+      "tags": [
+        "Survival",
+        "PvP",
+        "New"
+      ],
+      "ownerName": "peacecore01",
+      "votes": 2,
+      "playersOnline": 2,
+      "playersMax": 50,
+      "version": "Paper 26.2",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-11-10T17:21:04.374Z",
+      "updatedAt": "2026-11-10T17:21:04.374Z",
+      "lastPingAt": "2026-11-10T17:21:04.497Z",
+      "lastSuccessfulPingAt": "2026-11-10T17:21:04.497Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PuffSMP&kind=icon",
+      "rank": 12,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
       "id": "f08ab5db-3b64-4766-bdf1-f1948c85be3b",
       "name": "GroundZero",
       "javaHost": "54.36.164.58",
@@ -659,7 +712,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=GroundZero&kind=icon",
-      "rank": 12,
+      "rank": 13,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -716,63 +769,10 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Universal-Gaming-Network&kind=icon",
-      "rank": 13,
-      "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 1,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
-      },
-      "reviewStats": {
-        "average": 0,
-        "count": 0
-      },
-      "communityVotesThisWeek": 0,
-      "communityHighlighted": false
-    },
-    {
-      "id": "5b439e3b-7c1c-495b-a493-25068ca7bcd0",
-      "name": "PuffSMP",
-      "javaHost": "ddp-engineering.go.ro:30814",
-      "javaPort": 25565,
-      "javaSrvResolved": false,
-      "javaStatusTarget": "ddp-engineering.go.ro:30814",
-      "crossPlay": false,
-      "bedrockHost": "",
-      "bedrockPort": 19132,
-      "websiteUrl": "",
-      "discordUrl": "https://discord.gg/tVxVbQAnf3",
-      "youtubeUrl": "",
-      "country": "Romania",
-      "bannerUrl": "",
-      "description": "🌎 PuffSMP \nLooking for a new Minecraft community to join from the very beginning?\n\n🏠 Build your own base\n💰 Create your own fortune\n⚔️ Take part in events\n🤝 Meet new players\n🌍 Explore a huge survival world\n🎉 Become part of the community\n\n🚨 THE MINECRAFT SERVER IS CURRENTLY IN DEVELOPMENT! 🚨\n\nJoin our Discord to get:\n\n📢 Server announcements\n🛠️ Development updates\n🎉 Community events\n💬 Chat with other players\n🚀 Launch news & information\n\n⚠️ IMPORTANT: The Minecraft server will be available ONLY for Minecraft Java Edition.\n\n🔥 JOIN NOW AND BE HERE FROM DAY ONE!\n\n🔗 JOIN THE COMMUNITY. BUILD YOUR WORLD. MAKE YOUR MARK.",
-      "tags": [
-        "Survival",
-        "PvP",
-        "New"
-      ],
-      "ownerName": "peacecore01",
-      "votes": 1,
-      "playersOnline": 2,
-      "playersMax": 50,
-      "version": "Paper 26.2",
-      "online": true,
-      "uptimePercent": 100,
-      "sponsored": false,
-      "createdAt": "2026-11-10T17:21:04.374Z",
-      "updatedAt": "2026-11-10T17:21:04.374Z",
-      "lastPingAt": "2026-11-10T17:21:04.497Z",
-      "lastSuccessfulPingAt": "2026-11-10T17:21:04.497Z",
-      "uptimeChecks": 1,
-      "uptimeSuccesses": 1,
-      "edition": "java",
-      "bedrockType": "server",
-      "realmCode": "",
-      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PuffSMP&kind=icon",
       "rank": 14,
       "analytics": {
         "viewsLast7": 0,
-        "viewsLast30": 0,
+        "viewsLast30": 1,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       },
