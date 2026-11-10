@@ -285,6 +285,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
+    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Timelords/</loc>
     <lastmod>2026-07-08T02:51:29.618Z</lastmod>
     <changefreq>daily</changefreq>
@@ -293,12 +299,6 @@
   <url>
     <loc>https://minecraftlisting.org/server/GroundZero/</loc>
     <lastmod>2026-07-11T16:55:27.628Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/Rage-SMP/</loc>
-    <lastmod>2026-08-31T22:13:24.965Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -345,6 +345,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
+    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/WanderLand/</loc>
     <lastmod>2026-09-20T17:32:38.060Z</lastmod>
     <changefreq>daily</changefreq>
@@ -357,8 +363,8 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
-    <lastmod>2026-09-06T03:10:55.230Z</lastmod>
+    <loc>https://minecraftlisting.org/server/PuffSMP/</loc>
+    <lastmod>2026-11-10T17:20:49.933Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
