@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-10T17:21:09.493Z",
+  "generatedAt": "2026-11-10T17:21:24.391Z",
   "campaigns": [],
   "servers": [
     {
@@ -1220,7 +1220,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "52236cf2-7e04-4b24-8acf-8f8c3cee87f8",
+      "id": "27413050-e306-4561-a30f-09c33a3f6da8",
       "name": "PuffSMP",
       "javaHost": "ddp-engineering.go.ro:30814",
       "javaPort": 25565,
@@ -1248,10 +1248,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-11-10T17:20:52.425Z",
-      "updatedAt": "2026-11-10T17:20:52.425Z",
-      "lastPingAt": "2026-11-10T17:20:52.849Z",
-      "lastSuccessfulPingAt": "2026-11-10T17:20:52.849Z",
+      "createdAt": "2026-11-10T17:21:06.468Z",
+      "updatedAt": "2026-11-10T17:21:06.468Z",
+      "lastPingAt": "2026-11-10T17:21:06.560Z",
+      "lastSuccessfulPingAt": "2026-11-10T17:21:06.560Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
