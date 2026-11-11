@@ -1001,6 +1001,25 @@
       "termsAcceptedAt": "2026-11-09T20:44:22.477Z",
       "banned": false,
       "createdAt": "2026-11-09T20:44:22.477Z"
+    },
+    {
+      "id": "2ceca51b-689b-4507-97d4-dc3f9fa01ecc",
+      "username": "real_lava",
+      "email": "lava421@gmail.com",
+      "passwordHash": "aa995dc6dba8654a5989b714b0006498:09a6f709d40682b6765b6070c9f2af30d1f3b7bf4388fc1d249c041c848f2871",
+      "emailOptIn": false,
+      "emailOptInAt": "",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-11-11T18:32:22.449Z",
+      "banned": false,
+      "createdAt": "2026-11-11T18:32:22.449Z",
+      "emailVerification": {
+        "codeHash": "f3a1dcdc2d52de5f26ef5e698775e86b6f1a2efd24ba7cb0dfcedd0a331d5833",
+        "createdAt": "2026-11-11T18:32:22.449Z",
+        "expiresAt": "2026-11-11T18:47:22.449Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
