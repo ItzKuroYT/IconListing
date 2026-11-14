@@ -5336,12 +5336,6 @@
         "viewVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-10-14T23:59:10.083Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
             "createdAt": "2026-10-15T03:51:59.576Z",
             "playersOnline": 0,
             "playersMax": 0,
@@ -5687,12 +5681,6 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
-          {
-            "createdAt": "2026-10-14T22:16:27.679Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
           {
             "createdAt": "2026-10-15T03:51:56.803Z",
             "playersOnline": 0,
@@ -12329,24 +12317,6 @@
         "viewVisitorDays": {},
         "playerHistory": [
           {
-            "createdAt": "2026-10-14T02:49:54.766Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-14T19:17:21.163Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-14T23:59:11.586Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
             "createdAt": "2026-10-15T03:52:46.451Z",
             "playersOnline": 0,
             "playersMax": 0,
@@ -17959,10 +17929,6 @@
   "siteAnalytics": {
     "siteVisitDaily": [
       {
-        "date": "2026-10-15",
-        "count": 6
-      },
-      {
         "date": "2026-10-16",
         "count": 8
       },
@@ -18073,17 +18039,13 @@
       {
         "date": "2026-11-13",
         "count": 2
+      },
+      {
+        "date": "2026-11-14",
+        "count": 1
       }
     ],
     "siteVisitVisitorDays": {
-      "2026-10-15": [
-        "08ec3ee15ee2d2bd",
-        "332829af077095ec",
-        "74d641ba1f0d0bef",
-        "747f7657e2d609ca",
-        "0756303c5250338d",
-        "4b74b4f86e3179af"
-      ],
       "2026-10-16": [
         "08ac0d69cc246624",
         "747f7657e2d609ca",
@@ -18281,6 +18243,9 @@
       "2026-11-13": [
         "eaace374fdf5ec25",
         "e4c25abc74c7ade5"
+      ],
+      "2026-11-14": [
+        "9a236bb61d94017b"
       ]
     }
   },
