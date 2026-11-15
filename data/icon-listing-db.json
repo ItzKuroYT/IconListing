@@ -17616,7 +17616,7 @@
       "ownerId": "eb205c98-0bb5-48dd-9396-8a051c958a9c",
       "ownerName": "cliveoverflow",
       "moderationStatus": "published",
-      "votes": 2,
+      "votes": 3,
       "playersOnline": 4,
       "playersMax": 50,
       "version": "My custom version name!",
@@ -17636,6 +17636,102 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:46:39.185Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
           {
             "createdAt": "2026-11-15T03:39:06.436Z",
             "playersOnline": 4,
@@ -18180,10 +18276,16 @@
       "createdAt": "2026-11-15T03:43:58.076Z"
     },
     {
-      "id": "91a4bd8e-77ef-49e5-a0b6-aecfae726cec",
+      "id": "2e886648-0fdd-4edb-8ab6-5458a814328d",
       "serverId": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
       "minecraftUsername": "13124124alt",
-      "createdAt": "2026-11-15T03:48:03.819Z"
+      "createdAt": "2026-11-15T03:48:07.270Z"
+    },
+    {
+      "id": "cfd45ef8-b062-4bfa-8f0b-174c6727197b",
+      "serverId": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
+      "minecraftUsername": "Alexander11",
+      "createdAt": "2026-11-15T03:48:41.414Z"
     }
   ],
   "reviews": [
@@ -18236,8 +18338,10 @@
     "cd1e059e-c22f-49b6-bb9b-9d39308db577": {
       "visitor:84c9abc7a49a500036fe81463fb533740c0042c950d59af423838fc9a7ffbdcf": "2026-11-15T03:43:58.076Z",
       "name:eagler_67_1": "2026-11-15T03:43:58.076Z",
-      "visitor:2e2fa7ad4e021abfe4d20e3b06b4551a28550721bf485ca7c40b3dbe0854a9fb": "2026-11-15T03:48:03.819Z",
-      "name:13124124alt": "2026-11-15T03:48:03.819Z"
+      "visitor:2e2fa7ad4e021abfe4d20e3b06b4551a28550721bf485ca7c40b3dbe0854a9fb": "2026-11-15T03:48:07.270Z",
+      "name:13124124alt": "2026-11-15T03:48:07.270Z",
+      "visitor:7899d3277c597d892bccc4c898184ae0c3031dbb0658bb1d8c72487823110c72": "2026-11-15T03:48:41.414Z",
+      "name:alexander11": "2026-11-15T03:48:41.414Z"
     }
   },
   "siteAnalytics": {
@@ -18356,7 +18460,7 @@
       },
       {
         "date": "2026-11-15",
-        "count": 3
+        "count": 2
       }
     ],
     "siteVisitVisitorDays": {
@@ -18555,8 +18659,7 @@
       ],
       "2026-11-15": [
         "2f9d050e85396ef9",
-        "3028b0ef245dfad5",
-        "fc1a1c4bb17b6ef3"
+        "3028b0ef245dfad5"
       ]
     }
   },
