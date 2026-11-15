@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-15T03:39:14.323Z",
+  "generatedAt": "2026-11-15T03:39:26.373Z",
   "campaigns": [],
   "servers": [
     {
@@ -1218,7 +1218,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
+      "id": "e0a55c4d-d9cc-4994-871a-4c7c54f64261",
       "name": "Cliveoverflow",
       "javaHost": "cliveoverflow.com",
       "javaPort": 25565,
@@ -1250,10 +1250,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-11-15T03:39:04.631Z",
-      "updatedAt": "2026-11-15T03:39:04.631Z",
-      "lastPingAt": "2026-11-15T03:39:06.436Z",
-      "lastSuccessfulPingAt": "2026-11-15T03:39:06.436Z",
+      "createdAt": "2026-11-15T03:39:08.023Z",
+      "updatedAt": "2026-11-15T03:39:08.023Z",
+      "lastPingAt": "2026-11-15T03:39:08.059Z",
+      "lastSuccessfulPingAt": "2026-11-15T03:39:08.059Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
