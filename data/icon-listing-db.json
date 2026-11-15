@@ -17616,7 +17616,7 @@
       "ownerId": "eb205c98-0bb5-48dd-9396-8a051c958a9c",
       "ownerName": "cliveoverflow",
       "moderationStatus": "published",
-      "votes": 3,
+      "votes": 2,
       "playersOnline": 4,
       "playersMax": 50,
       "version": "My custom version name!",
@@ -18276,16 +18276,10 @@
       "createdAt": "2026-11-15T03:43:58.076Z"
     },
     {
-      "id": "2e886648-0fdd-4edb-8ab6-5458a814328d",
+      "id": "8cc51eb8-7c9b-4a16-ba06-b94f6216899e",
       "serverId": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
       "minecraftUsername": "13124124alt",
-      "createdAt": "2026-11-15T03:48:07.270Z"
-    },
-    {
-      "id": "43afe1b0-5dbd-4833-bfba-7b660fc7fc03",
-      "serverId": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
-      "minecraftUsername": "Alexander11",
-      "createdAt": "2026-11-15T03:48:42.148Z"
+      "createdAt": "2026-11-15T03:48:17.934Z"
     }
   ],
   "reviews": [
@@ -18338,10 +18332,8 @@
     "cd1e059e-c22f-49b6-bb9b-9d39308db577": {
       "visitor:84c9abc7a49a500036fe81463fb533740c0042c950d59af423838fc9a7ffbdcf": "2026-11-15T03:43:58.076Z",
       "name:eagler_67_1": "2026-11-15T03:43:58.076Z",
-      "visitor:2e2fa7ad4e021abfe4d20e3b06b4551a28550721bf485ca7c40b3dbe0854a9fb": "2026-11-15T03:48:07.270Z",
-      "name:13124124alt": "2026-11-15T03:48:07.270Z",
-      "visitor:7899d3277c597d892bccc4c898184ae0c3031dbb0658bb1d8c72487823110c72": "2026-11-15T03:48:42.148Z",
-      "name:alexander11": "2026-11-15T03:48:42.148Z"
+      "visitor:2e2fa7ad4e021abfe4d20e3b06b4551a28550721bf485ca7c40b3dbe0854a9fb": "2026-11-15T03:48:17.934Z",
+      "name:13124124alt": "2026-11-15T03:48:17.934Z"
     }
   },
   "siteAnalytics": {
@@ -18460,7 +18452,7 @@
       },
       {
         "date": "2026-11-15",
-        "count": 2
+        "count": 3
       }
     ],
     "siteVisitVisitorDays": {
@@ -18659,7 +18651,8 @@
       ],
       "2026-11-15": [
         "2f9d050e85396ef9",
-        "3028b0ef245dfad5"
+        "3028b0ef245dfad5",
+        "49c012fde15e14c6"
       ]
     }
   },
