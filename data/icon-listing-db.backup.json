@@ -1020,6 +1020,25 @@
         "expiresAt": "2026-11-11T18:47:22.449Z",
         "attempts": 1
       }
+    },
+    {
+      "id": "eb205c98-0bb5-48dd-9396-8a051c958a9c",
+      "username": "cliveoverflow",
+      "email": "cliveoverflow@gmail.com",
+      "passwordHash": "ed3e0fdf74a935f1882673d0b4e84176:f8e119da428d1b8f52263beed1cb073f569a7105b8e7819f53698b2c29cbeedb",
+      "emailOptIn": false,
+      "emailOptInAt": "",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-11-15T03:23:48.501Z",
+      "banned": false,
+      "createdAt": "2026-11-15T03:23:48.501Z",
+      "emailVerification": {
+        "codeHash": "54818b56f786439ac2f5e71bac3a671b051759a1d6ad2de71ef0a66a771ab3c1",
+        "createdAt": "2026-11-15T03:23:48.501Z",
+        "expiresAt": "2026-11-15T03:38:48.501Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
