@@ -1028,11 +1028,17 @@
       "passwordHash": "ed3e0fdf74a935f1882673d0b4e84176:f8e119da428d1b8f52263beed1cb073f569a7105b8e7819f53698b2c29cbeedb",
       "emailOptIn": false,
       "emailOptInAt": "",
-      "emailVerified": true,
-      "emailVerifiedAt": "2026-11-15T03:24:19.193Z",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
       "termsAcceptedAt": "2026-11-15T03:23:48.501Z",
       "banned": false,
-      "createdAt": "2026-11-15T03:23:48.501Z"
+      "createdAt": "2026-11-15T03:23:48.501Z",
+      "emailVerification": {
+        "codeHash": "54818b56f786439ac2f5e71bac3a671b051759a1d6ad2de71ef0a66a771ab3c1",
+        "createdAt": "2026-11-15T03:23:48.501Z",
+        "expiresAt": "2026-11-15T03:38:48.501Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
@@ -18080,7 +18086,7 @@
       },
       {
         "date": "2026-11-15",
-        "count": 1
+        "count": 2
       }
     ],
     "siteVisitVisitorDays": {
@@ -18278,7 +18284,8 @@
         "002337ac7a61289c"
       ],
       "2026-11-15": [
-        "2f9d050e85396ef9"
+        "2f9d050e85396ef9",
+        "3028b0ef245dfad5"
       ]
     }
   },
