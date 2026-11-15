@@ -17616,7 +17616,7 @@
       "ownerId": "eb205c98-0bb5-48dd-9396-8a051c958a9c",
       "ownerName": "cliveoverflow",
       "moderationStatus": "published",
-      "votes": 1,
+      "votes": 2,
       "playersOnline": 4,
       "playersMax": 50,
       "version": "My custom version name!",
@@ -17636,6 +17636,102 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:39:06.436Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
+          {
+            "createdAt": "2026-11-15T03:46:39.185Z",
+            "playersOnline": 4,
+            "playersMax": 50,
+            "online": true
+          },
           {
             "createdAt": "2026-11-15T03:39:06.436Z",
             "playersOnline": 4,
@@ -18082,6 +18178,12 @@
       "serverId": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
       "minecraftUsername": "Eagler_67_1",
       "createdAt": "2026-11-15T03:43:58.076Z"
+    },
+    {
+      "id": "7f40699e-ee7e-4c6c-affa-1dfef54ce737",
+      "serverId": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
+      "minecraftUsername": "13124124alt",
+      "createdAt": "2026-11-15T03:47:59.965Z"
     }
   ],
   "reviews": [
@@ -18133,7 +18235,9 @@
   "voteIps": {
     "cd1e059e-c22f-49b6-bb9b-9d39308db577": {
       "visitor:84c9abc7a49a500036fe81463fb533740c0042c950d59af423838fc9a7ffbdcf": "2026-11-15T03:43:58.076Z",
-      "name:eagler_67_1": "2026-11-15T03:43:58.076Z"
+      "name:eagler_67_1": "2026-11-15T03:43:58.076Z",
+      "visitor:2e2fa7ad4e021abfe4d20e3b06b4551a28550721bf485ca7c40b3dbe0854a9fb": "2026-11-15T03:47:59.965Z",
+      "name:13124124alt": "2026-11-15T03:47:59.965Z"
     }
   },
   "siteAnalytics": {
