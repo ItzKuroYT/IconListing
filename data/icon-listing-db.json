@@ -18307,12 +18307,6 @@
       "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
       "minecraftUsername": "NorthImperial",
       "createdAt": "2026-11-16T20:37:59.207Z"
-    },
-    {
-      "id": "791d9cbb-ab4c-4231-9dfc-91269e6a5a50",
-      "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
-      "minecraftUsername": "kadika333",
-      "createdAt": "2026-11-16T20:39:59.578Z"
     }
   ],
   "reviews": [
@@ -18368,9 +18362,7 @@
     },
     "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
       "visitor:418af3a3e9ca8248c1d67fa51f6a91486fc2cb8391a256ebb8624fe506d2985a": "2026-11-16T20:37:59.207Z",
-      "name:northimperial": "2026-11-16T20:37:59.207Z",
-      "visitor:145abbec398fe7c33bdbd9829cb7d65548d7cd65281eea430e710bdf1132cab2": "2026-11-16T20:39:59.578Z",
-      "name:kadika333": "2026-11-16T20:39:59.578Z"
+      "name:northimperial": "2026-11-16T20:37:59.207Z"
     }
   },
   "siteAnalytics": {
@@ -18690,7 +18682,7 @@
         "7b8f94720ad43c21",
         "ac363a9fd1d20eae",
         "e4c25abc74c7ade5",
-        "4fd58f59c7c07b81"
+        "d314dd755c4e8f7e"
       ]
     }
   },
