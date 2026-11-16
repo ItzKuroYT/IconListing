@@ -17273,7 +17273,7 @@
       "ownerId": "50e1046b-4f7e-4035-b36d-fab467f1b326",
       "ownerName": "peacecore01",
       "moderationStatus": "published",
-      "votes": 3,
+      "votes": 4,
       "playersOnline": 0,
       "playersMax": 50,
       "version": "Paper 26.2",
@@ -18295,6 +18295,12 @@
       "serverId": "5b439e3b-7c1c-495b-a493-25068ca7bcd0",
       "minecraftUsername": "peacecore01",
       "createdAt": "2026-11-15T12:57:58.407Z"
+    },
+    {
+      "id": "5b6014e8-1a2e-4bbb-92b3-a606ca9a8759",
+      "serverId": "5b439e3b-7c1c-495b-a493-25068ca7bcd0",
+      "minecraftUsername": "peacecore01",
+      "createdAt": "2026-11-16T18:05:56.112Z"
     }
   ],
   "reviews": [
@@ -18343,7 +18349,12 @@
       "createdAt": "2026-10-04T23:36:39.646Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "5b439e3b-7c1c-495b-a493-25068ca7bcd0": {
+      "visitor:c904cafbf5c0f378db3760375687c68e3786ffdc0f7ad61e082fda5a9325f0d2": "2026-11-16T18:05:56.112Z",
+      "name:peacecore01": "2026-11-16T18:05:56.112Z"
+    }
+  },
   "siteAnalytics": {
     "siteVisitDaily": [
       {
