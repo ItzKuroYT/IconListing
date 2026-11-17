@@ -18374,10 +18374,6 @@
     }
   ],
   "voteIps": {
-    "5b439e3b-7c1c-495b-a493-25068ca7bcd0": {
-      "visitor:c904cafbf5c0f378db3760375687c68e3786ffdc0f7ad61e082fda5a9325f0d2": "2026-11-16T18:05:56.112Z",
-      "name:peacecore01": "2026-11-16T18:05:56.112Z"
-    },
     "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
       "visitor:418af3a3e9ca8248c1d67fa51f6a91486fc2cb8391a256ebb8624fe506d2985a": "2026-11-16T20:37:59.207Z",
       "name:northimperial": "2026-11-16T20:37:59.207Z"
@@ -18499,7 +18495,7 @@
       },
       {
         "date": "2026-11-17",
-        "count": 5
+        "count": 6
       }
     ],
     "siteVisitVisitorDays": {
@@ -18702,7 +18698,8 @@
         "f84776e5418579fb",
         "7b8f94720ad43c21",
         "1b2fe37de285ccd4",
-        "92179ab80e3eb957"
+        "92179ab80e3eb957",
+        "e4c25abc74c7ade5"
       ]
     }
   },
