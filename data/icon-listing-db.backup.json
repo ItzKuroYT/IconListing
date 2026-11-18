@@ -17282,7 +17282,7 @@
       "ownerId": "50e1046b-4f7e-4035-b36d-fab467f1b326",
       "ownerName": "peacecore01",
       "moderationStatus": "published",
-      "votes": 4,
+      "votes": 5,
       "playersOnline": 0,
       "playersMax": 50,
       "version": "Paper 26.2",
@@ -17595,7 +17595,17 @@
       "lastSuccessfulPingAt": "2026-11-18T13:30:17.498Z",
       "uptimeChecks": 34,
       "uptimeSuccesses": 34,
-      "iconListingVoteQueue": [],
+      "iconListingVoteQueue": [
+        {
+          "id": "a24794e8-71f2-4c1a-9228-55981014a0aa",
+          "voteId": "183163c9-c69a-4ece-a6f7-9512960bec87",
+          "serverId": "5b439e3b-7c1c-495b-a493-25068ca7bcd0",
+          "serverName": "PuffSMP",
+          "minecraftUsername": "peacecore01",
+          "createdAt": "2026-11-18T13:48:51.682Z",
+          "deliveredAt": ""
+        }
+      ],
       "sponsoredUntil": ""
     },
     {
@@ -18325,6 +18335,12 @@
       "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
       "minecraftUsername": "NorthImperial",
       "createdAt": "2026-11-16T20:37:59.207Z"
+    },
+    {
+      "id": "183163c9-c69a-4ece-a6f7-9512960bec87",
+      "serverId": "5b439e3b-7c1c-495b-a493-25068ca7bcd0",
+      "minecraftUsername": "peacecore01",
+      "createdAt": "2026-11-18T13:48:51.682Z"
     }
   ],
   "reviews": [
@@ -18373,7 +18389,12 @@
       "createdAt": "2026-10-04T23:36:39.646Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "5b439e3b-7c1c-495b-a493-25068ca7bcd0": {
+      "visitor:c904cafbf5c0f378db3760375687c68e3786ffdc0f7ad61e082fda5a9325f0d2": "2026-11-18T13:48:51.682Z",
+      "name:peacecore01": "2026-11-18T13:48:51.682Z"
+    }
+  },
   "siteAnalytics": {
     "siteVisitDaily": [
       {
