@@ -18492,12 +18492,7 @@
       "createdAt": "2026-10-04T23:36:39.646Z"
     }
   ],
-  "voteIps": {
-    "5b439e3b-7c1c-495b-a493-25068ca7bcd0": {
-      "visitor:c904cafbf5c0f378db3760375687c68e3786ffdc0f7ad61e082fda5a9325f0d2": "2026-11-18T13:48:51.682Z",
-      "name:peacecore01": "2026-11-18T13:48:51.682Z"
-    }
-  },
+  "voteIps": {},
   "siteAnalytics": {
     "siteVisitDaily": [
       {
@@ -18614,7 +18609,7 @@
       },
       {
         "date": "2026-11-19",
-        "count": 1
+        "count": 2
       }
     ],
     "siteVisitVisitorDays": {
@@ -18812,7 +18807,8 @@
         "0ecec4583e508f09"
       ],
       "2026-11-19": [
-        "c1eec1994b731390"
+        "c1eec1994b731390",
+        "e4c25abc74c7ade5"
       ]
     }
   },
