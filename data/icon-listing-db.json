@@ -5428,24 +5428,6 @@
             "online": false
           },
           {
-            "createdAt": "2026-10-20T02:11:24.507Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T13:34:10.727Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T21:57:18.305Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
             "createdAt": "2026-10-21T15:11:52.680Z",
             "playersOnline": 0,
             "playersMax": 0,
@@ -5763,24 +5745,6 @@
           },
           {
             "createdAt": "2026-11-14T13:29:59.825Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T02:11:24.512Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T13:34:10.794Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T21:57:18.314Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -7454,24 +7418,6 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
-          {
-            "createdAt": "2026-10-20T13:34:11.339Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T15:09:59.208Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T21:57:18.818Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
           {
             "createdAt": "2026-10-21T03:51:42.335Z",
             "playersOnline": 0,
@@ -12421,24 +12367,6 @@
             "online": false
           },
           {
-            "createdAt": "2026-10-20T02:11:24.510Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T13:34:10.947Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T21:57:18.322Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
             "createdAt": "2026-10-21T15:11:52.691Z",
             "playersOnline": 0,
             "playersMax": 0,
@@ -12761,24 +12689,6 @@
           },
           {
             "createdAt": "2026-11-15T04:02:44.922Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T02:57:02.816Z",
-            "playersOnline": 0,
-            "playersMax": 25,
-            "online": true
-          },
-          {
-            "createdAt": "2026-10-20T13:34:11.545Z",
-            "playersOnline": 0,
-            "playersMax": 0,
-            "online": false
-          },
-          {
-            "createdAt": "2026-10-20T21:57:18.448Z",
             "playersOnline": 0,
             "playersMax": 0,
             "online": false
@@ -13768,36 +13678,6 @@
         "viewDaily": [],
         "viewVisitorDays": {},
         "playerHistory": [
-          {
-            "createdAt": "2026-10-20T01:53:26.603Z",
-            "playersOnline": 0,
-            "playersMax": 30,
-            "online": true
-          },
-          {
-            "createdAt": "2026-10-20T02:56:58.516Z",
-            "playersOnline": 0,
-            "playersMax": 30,
-            "online": true
-          },
-          {
-            "createdAt": "2026-10-20T13:34:11.224Z",
-            "playersOnline": 2,
-            "playersMax": 30,
-            "online": true
-          },
-          {
-            "createdAt": "2026-10-20T15:09:58.038Z",
-            "playersOnline": 0,
-            "playersMax": 30,
-            "online": true
-          },
-          {
-            "createdAt": "2026-10-20T21:57:18.464Z",
-            "playersOnline": 0,
-            "playersMax": 30,
-            "online": true
-          },
           {
             "createdAt": "2026-10-21T03:51:43.004Z",
             "playersOnline": 0,
@@ -18516,10 +18396,6 @@
   "siteAnalytics": {
     "siteVisitDaily": [
       {
-        "date": "2026-10-21",
-        "count": 4
-      },
-      {
         "date": "2026-10-22",
         "count": 8
       },
@@ -18630,15 +18506,13 @@
       {
         "date": "2026-11-19",
         "count": 1
+      },
+      {
+        "date": "2026-11-20",
+        "count": 1
       }
     ],
     "siteVisitVisitorDays": {
-      "2026-10-21": [
-        "747f7657e2d609ca",
-        "74d641ba1f0d0bef",
-        "cc7865826ceda152",
-        "8ee415c7ade7edc7"
-      ],
       "2026-10-22": [
         "31237845ff738a33",
         "74d641ba1f0d0bef",
@@ -18828,6 +18702,9 @@
       ],
       "2026-11-19": [
         "c1eec1994b731390"
+      ],
+      "2026-11-20": [
+        "0c714e789dc512f6"
       ]
     }
   },
