@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-21T17:31:10.809Z",
+  "generatedAt": "2026-11-21T17:33:48.511Z",
   "campaigns": [],
   "servers": [
     {
@@ -1909,14 +1909,14 @@
       "playersMax": 20,
       "version": "Purpur 1.21.1",
       "online": true,
-      "uptimePercent": 99.2818671454219,
+      "uptimePercent": 99.2831541218638,
       "sponsored": false,
       "createdAt": "2026-07-28T01:53:56.492Z",
       "updatedAt": "2026-07-28T01:53:56.492Z",
-      "lastPingAt": "2026-11-21T17:22:37.876Z",
-      "lastSuccessfulPingAt": "2026-11-21T17:22:37.876Z",
-      "uptimeChecks": 557,
-      "uptimeSuccesses": 553,
+      "lastPingAt": "2026-11-21T17:33:34.402Z",
+      "lastSuccessfulPingAt": "2026-11-21T17:33:34.402Z",
+      "uptimeChecks": 558,
+      "uptimeSuccesses": 554,
       "edition": "java",
       "bedrockType": "server",
       "realmCode": "",
