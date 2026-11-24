@@ -249,6 +249,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/GTM-GTA-based-minecraft-server-for-Java/</loc>
+    <lastmod>2026-06-24T14:32:13.157Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Unbent-Flames/</loc>
     <lastmod>2026-11-06T05:08:20.393Z</lastmod>
     <changefreq>daily</changefreq>
@@ -257,12 +263,6 @@
   <url>
     <loc>https://minecraftlisting.org/server/PulsedMC-Hosting-FREE/</loc>
     <lastmod>2026-10-04T23:09:30.339Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/GTM-GTA-based-minecraft-server-for-Java/</loc>
-    <lastmod>2026-06-24T14:32:13.157Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -297,26 +297,20 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Timelords/</loc>
-    <lastmod>2026-07-08T02:51:29.618Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://minecraftlisting.org/server/Cliveoverflow/</loc>
     <lastmod>2026-11-15T03:39:04.631Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/GroundZero/</loc>
-    <lastmod>2026-07-11T16:55:27.628Z</lastmod>
+    <loc>https://minecraftlisting.org/server/Timelords/</loc>
+    <lastmod>2026-07-08T02:51:29.618Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://minecraftlisting.org/server/Universal-Gaming-Network/</loc>
-    <lastmod>2026-10-29T20:37:31.250Z</lastmod>
+    <loc>https://minecraftlisting.org/server/GroundZero/</loc>
+    <lastmod>2026-07-11T16:55:27.628Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -363,6 +357,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://minecraftlisting.org/server/Universal-Gaming-Network/</loc>
+    <lastmod>2026-10-29T20:37:31.250Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://minecraftlisting.org/server/Project-Permanence/</loc>
     <lastmod>2026-11-03T00:15:11.707Z</lastmod>
     <changefreq>daily</changefreq>
@@ -371,6 +371,12 @@
   <url>
     <loc>https://minecraftlisting.org/server/HARDCORE-3-lives/</loc>
     <lastmod>2026-09-06T03:10:55.230Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://minecraftlisting.org/server/PixelSMP/</loc>
+    <lastmod>2026-11-24T12:59:28.320Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -515,12 +521,6 @@
   <url>
     <loc>https://minecraftlisting.org/server/imperial-SMP/</loc>
     <lastmod>2026-11-09T21:22:12.887Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://minecraftlisting.org/server/PixelSMP/</loc>
-    <lastmod>2026-11-19T12:28:37.655Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
