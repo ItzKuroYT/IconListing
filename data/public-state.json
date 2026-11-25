@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-25T01:30:06.496Z",
+  "generatedAt": "2026-11-25T01:48:17.783Z",
   "campaigns": [],
   "servers": [
     {
@@ -175,6 +175,62 @@
       "communityHighlighted": false
     },
     {
+      "id": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
+      "name": "Unbent Flames",
+      "javaHost": "unbent.xyz",
+      "javaPort": 25565,
+      "javaSrvResolved": true,
+      "javaStatusTarget": "unbent.xyz",
+      "crossPlay": true,
+      "bedrockHost": "bed.unbent.xyz",
+      "bedrockPort": 25597,
+      "websiteUrl": "https://unbent.buycraft.net",
+      "discordUrl": "https://discord.gg/EVfNrqp2JE",
+      "youtubeUrl": "https://youtu.be/WMOfc1_1PXc",
+      "country": "United States",
+      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unbent-Flames&kind=banner",
+      "description": "🔥 UNBENT FLAMES 🔥 An Avatar-style world, solo or with friends\n\nJava: unbent.xyz | Bedrock: bed.unbent.xyz port 25597 | No mods needed, 1.20 and up\n\nEver wanted to actually bend lava instead of carrying it in a bucket? Unbent Flames is an Avatar-inspired survival server with a full bending system: fire, water, earth, air, light and dark spirit, plus chi-blocking, each with its own abilities you unlock through scrolls.\n\nYour first ten minutes: pick an element, walk down the path from spawn, and test it against the Sparring Master - a training bender who switches elements mid-fight and can't kill you. Beat him for your first mystery scroll, then step through the portal to Shellhaven, a village built on the shell of the lion turtle that carried benders to this world. Its elder has work for you, and the corruption creeping through the island is where the story starts.\n\nWhat's in it:\n- Story questline, dailies and bounties, with EliteMobs bosses and dungeons across 13+ worlds\n- Movecraft airships: buy one ready-made, or rent a shipyard and build your own\n- Towny towns and nations - join an open town or found your own\n- Jobs, Slimefun tech and ItemsAdder, with about 1,500 custom items\n- Brewing, a live map, and Java + Bedrock crossplay\n\nBuilt PvE-first: everything works solo, so you don't need a crowd online to get something out of a session. PvP is there in the wilderness if you want it. We're small, which means your suggestions reach the people who build the server.\n\nDiscord: discord.gg/EVfNrqp2JE · Live map: http://map.unbent.xyz:25614",
+      "tags": [
+        "Survival",
+        "SMP",
+        "RPG",
+        "Towny",
+        "Cross-Play",
+        "Vote Rewards"
+      ],
+      "ownerName": "kadika333",
+      "votes": 10,
+      "playersOnline": 1,
+      "playersMax": 333,
+      "version": "Velocity 1.7.2-26.3",
+      "online": true,
+      "uptimePercent": 98.88268156424581,
+      "sponsored": false,
+      "createdAt": "2026-07-01T05:09:11.571Z",
+      "updatedAt": "2026-11-06T05:08:20.393Z",
+      "lastPingAt": "2026-11-25T01:29:55.755Z",
+      "lastSuccessfulPingAt": "2026-11-25T01:29:55.755Z",
+      "uptimeChecks": 895,
+      "uptimeSuccesses": 885,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unbent-Flames&kind=icon",
+      "rank": 4,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 1,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
       "id": "c030be5b-3b23-4383-8e0a-bb0b520d71e4",
       "name": "GTM - GTA-based minecraft server for Java",
       "javaHost": "maxfullcalypse.gtm.network",
@@ -216,7 +272,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=GTM-GTA-based-minecraft-server-for-Java&kind=icon",
-      "rank": 4,
+      "rank": 5,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -226,62 +282,6 @@
       "reviewStats": {
         "average": 5,
         "count": 1
-      },
-      "communityVotesThisWeek": 0,
-      "communityHighlighted": false
-    },
-    {
-      "id": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
-      "name": "Unbent Flames",
-      "javaHost": "unbent.xyz",
-      "javaPort": 25565,
-      "javaSrvResolved": true,
-      "javaStatusTarget": "unbent.xyz",
-      "crossPlay": true,
-      "bedrockHost": "bed.unbent.xyz",
-      "bedrockPort": 25597,
-      "websiteUrl": "https://unbent.buycraft.net",
-      "discordUrl": "https://discord.gg/EVfNrqp2JE",
-      "youtubeUrl": "https://youtu.be/WMOfc1_1PXc",
-      "country": "United States",
-      "bannerUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unbent-Flames&kind=banner",
-      "description": "🔥 UNBENT FLAMES 🔥 An Avatar-style world, solo or with friends\n\nJava: unbent.xyz | Bedrock: bed.unbent.xyz port 25597 | No mods needed, 1.20 and up\n\nEver wanted to actually bend lava instead of carrying it in a bucket? Unbent Flames is an Avatar-inspired survival server with a full bending system: fire, water, earth, air, light and dark spirit, plus chi-blocking, each with its own abilities you unlock through scrolls.\n\nYour first ten minutes: pick an element, walk down the path from spawn, and test it against the Sparring Master - a training bender who switches elements mid-fight and can't kill you. Beat him for your first mystery scroll, then step through the portal to Shellhaven, a village built on the shell of the lion turtle that carried benders to this world. Its elder has work for you, and the corruption creeping through the island is where the story starts.\n\nWhat's in it:\n- Story questline, dailies and bounties, with EliteMobs bosses and dungeons across 13+ worlds\n- Movecraft airships: buy one ready-made, or rent a shipyard and build your own\n- Towny towns and nations - join an open town or found your own\n- Jobs, Slimefun tech and ItemsAdder, with about 1,500 custom items\n- Brewing, a live map, and Java + Bedrock crossplay\n\nBuilt PvE-first: everything works solo, so you don't need a crowd online to get something out of a session. PvP is there in the wilderness if you want it. We're small, which means your suggestions reach the people who build the server.\n\nDiscord: discord.gg/EVfNrqp2JE · Live map: http://map.unbent.xyz:25614",
-      "tags": [
-        "Survival",
-        "SMP",
-        "RPG",
-        "Towny",
-        "Cross-Play",
-        "Vote Rewards"
-      ],
-      "ownerName": "kadika333",
-      "votes": 9,
-      "playersOnline": 1,
-      "playersMax": 333,
-      "version": "Velocity 1.7.2-26.3",
-      "online": true,
-      "uptimePercent": 98.88268156424581,
-      "sponsored": false,
-      "createdAt": "2026-07-01T05:09:11.571Z",
-      "updatedAt": "2026-11-06T05:08:20.393Z",
-      "lastPingAt": "2026-11-25T01:29:55.755Z",
-      "lastSuccessfulPingAt": "2026-11-25T01:29:55.755Z",
-      "uptimeChecks": 895,
-      "uptimeSuccesses": 885,
-      "edition": "java",
-      "bedrockType": "server",
-      "realmCode": "",
-      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unbent-Flames&kind=icon",
-      "rank": 5,
-      "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 1,
-        "ipCopiesLast7": 0,
-        "ipCopiesLast30": 0
-      },
-      "reviewStats": {
-        "average": 0,
-        "count": 0
       },
       "communityVotesThisWeek": 0,
       "communityHighlighted": false
@@ -2800,7 +2800,7 @@
             "Vote Rewards"
           ],
           "ownerName": "kadika333",
-          "votes": 9,
+          "votes": 10,
           "playersOnline": 1,
           "playersMax": 333,
           "version": "Velocity 1.7.2-26.3",
@@ -2817,7 +2817,7 @@
           "bedrockType": "server",
           "realmCode": "",
           "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unbent-Flames&kind=icon",
-          "rank": 5,
+          "rank": 4,
           "analytics": {
             "viewsLast7": 0,
             "viewsLast30": 1,
@@ -3160,7 +3160,7 @@
           "bedrockType": "server",
           "realmCode": "",
           "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=GTM-GTA-based-minecraft-server-for-Java&kind=icon",
-          "rank": 4,
+          "rank": 5,
           "analytics": {
             "viewsLast7": 0,
             "viewsLast30": 0,
