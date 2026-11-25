@@ -3231,7 +3231,7 @@
       ],
       "ownerId": "86189895-8ed1-42db-a438-6e5c4d80cb20",
       "ownerName": "kadika333",
-      "votes": 9,
+      "votes": 10,
       "playersOnline": 1,
       "playersMax": 333,
       "version": "Velocity 1.7.2-26.3",
@@ -18714,6 +18714,12 @@
       "serverId": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
       "minecraftUsername": "13124124alt",
       "createdAt": "2026-11-21T15:45:05.411Z"
+    },
+    {
+      "id": "5758268f-f282-4533-8627-f96c597c69e2",
+      "serverId": "9d2c63fe-dffe-446c-ac82-9be394e273e2",
+      "minecraftUsername": "kadika333",
+      "createdAt": "2026-11-25T01:48:08.834Z"
     }
   ],
   "reviews": [
@@ -18762,7 +18768,12 @@
       "createdAt": "2026-10-04T23:36:39.646Z"
     }
   ],
-  "voteIps": {},
+  "voteIps": {
+    "9d2c63fe-dffe-446c-ac82-9be394e273e2": {
+      "visitor:fbb37f639082ed537a320626e2433c50391c34d6e7849d2d25f19c8a1b064ef3": "2026-11-25T01:48:08.834Z",
+      "name:kadika333": "2026-11-25T01:48:08.834Z"
+    }
+  },
   "siteAnalytics": {
     "siteVisitDaily": [
       {
