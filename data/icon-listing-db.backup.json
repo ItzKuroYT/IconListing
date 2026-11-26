@@ -17663,7 +17663,7 @@
       "ownerId": "eb205c98-0bb5-48dd-9396-8a051c958a9c",
       "ownerName": "cliveoverflow",
       "moderationStatus": "published",
-      "votes": 4,
+      "votes": 5,
       "playersOnline": 5,
       "playersMax": 50,
       "version": "My custom version name!",
@@ -18745,6 +18745,12 @@
       "serverId": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
       "minecraftUsername": "yeet116",
       "createdAt": "2026-11-26T21:35:11.619Z"
+    },
+    {
+      "id": "a47b10ad-1144-445c-845c-b84fbf600f1c",
+      "serverId": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
+      "minecraftUsername": "gz_",
+      "createdAt": "2026-11-26T21:40:10.591Z"
     }
   ],
   "reviews": [
@@ -18796,7 +18802,9 @@
   "voteIps": {
     "cd1e059e-c22f-49b6-bb9b-9d39308db577": {
       "visitor:07ecb92d42d850a99beb3a0e376fc2aabca250a7a1f463ac762b801f2d7ade9b": "2026-11-26T21:35:11.619Z",
-      "name:yeet116": "2026-11-26T21:35:11.619Z"
+      "name:yeet116": "2026-11-26T21:35:11.619Z",
+      "visitor:e36e2656453f86791fe30c11086addef2a78c1bb7122f33666a856f7ed7ebd3a": "2026-11-26T21:40:10.591Z",
+      "name:gz_": "2026-11-26T21:40:10.591Z"
     }
   },
   "siteAnalytics": {
