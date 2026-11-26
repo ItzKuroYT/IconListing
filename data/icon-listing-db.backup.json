@@ -17684,11 +17684,18 @@
           {
             "date": "2026-11-17",
             "count": 1
+          },
+          {
+            "date": "2026-11-26",
+            "count": 1
           }
         ],
         "viewVisitorDays": {
           "2026-11-17": [
             "0ecec4583e508f09"
+          ],
+          "2026-11-26": [
+            "95042b76c430e283"
           ]
         },
         "playerHistory": [
@@ -18741,10 +18748,10 @@
       "createdAt": "2026-11-25T01:48:08.834Z"
     },
     {
-      "id": "7d27ef02-0b6b-4373-b097-54c25c92532d",
+      "id": "56be587d-9bc6-4c87-912c-8a8516f2ae43",
       "serverId": "cd1e059e-c22f-49b6-bb9b-9d39308db577",
       "minecraftUsername": "yeet116",
-      "createdAt": "2026-11-26T21:35:11.619Z"
+      "createdAt": "2026-11-26T21:35:26.510Z"
     }
   ],
   "reviews": [
@@ -18795,8 +18802,8 @@
   ],
   "voteIps": {
     "cd1e059e-c22f-49b6-bb9b-9d39308db577": {
-      "visitor:07ecb92d42d850a99beb3a0e376fc2aabca250a7a1f463ac762b801f2d7ade9b": "2026-11-26T21:35:11.619Z",
-      "name:yeet116": "2026-11-26T21:35:11.619Z"
+      "visitor:07ecb92d42d850a99beb3a0e376fc2aabca250a7a1f463ac762b801f2d7ade9b": "2026-11-26T21:35:26.510Z",
+      "name:yeet116": "2026-11-26T21:35:26.510Z"
     }
   },
   "siteAnalytics": {
@@ -18911,7 +18918,7 @@
       },
       {
         "date": "2026-11-26",
-        "count": 2
+        "count": 1
       }
     ],
     "siteVisitVisitorDays": {
@@ -19085,8 +19092,7 @@
         "3ff7cbd03a1aa142"
       ],
       "2026-11-26": [
-        "cd77780bd1b8a5b0",
-        "95042b76c430e283"
+        "cd77780bd1b8a5b0"
       ]
     }
   },
