@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-26T21:41:36.178Z",
+  "generatedAt": "2026-11-26T21:41:47.075Z",
   "campaigns": [],
   "servers": [
     {
@@ -1497,7 +1497,7 @@
       "communityHighlighted": false
     },
     {
-      "id": "3ca8ab27-b13b-48db-8476-f1f955624ac6",
+      "id": "ce6f3907-6ed6-4fda-a892-4f9b373c9549",
       "name": "MineCountry",
       "javaHost": "minecountry.feathermc.gg",
       "javaPort": 25565,
@@ -1529,10 +1529,10 @@
       "online": true,
       "uptimePercent": 100,
       "sponsored": false,
-      "createdAt": "2026-11-26T21:41:26.692Z",
-      "updatedAt": "2026-11-26T21:41:26.692Z",
-      "lastPingAt": "2026-11-26T21:41:26.710Z",
-      "lastSuccessfulPingAt": "2026-11-26T21:41:26.710Z",
+      "createdAt": "2026-11-26T21:41:27.612Z",
+      "updatedAt": "2026-11-26T21:41:27.612Z",
+      "lastPingAt": "2026-11-26T21:41:27.668Z",
+      "lastSuccessfulPingAt": "2026-11-26T21:41:27.668Z",
       "uptimeChecks": 1,
       "uptimeSuccesses": 1,
       "edition": "java",
