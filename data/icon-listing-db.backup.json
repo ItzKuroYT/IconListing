@@ -1034,6 +1034,25 @@
       "banned": false,
       "createdAt": "2026-11-15T03:23:48.501Z",
       "fromVerifiedSession": true
+    },
+    {
+      "id": "e67c1dc7-8cfa-43f8-b39e-5cafc913a1eb",
+      "username": "OspreyOutreach",
+      "email": "ai.osprey@proton.me",
+      "passwordHash": "27798a5caa00a52d4efe6e76e74fc28e:4c7642702145fc027c680bf7f67a60f97fe252d1ff98f6eb9eaa8df55f7a5151",
+      "emailOptIn": false,
+      "emailOptInAt": "",
+      "emailVerified": false,
+      "emailVerifiedAt": "",
+      "termsAcceptedAt": "2026-11-26T05:07:36.432Z",
+      "banned": false,
+      "createdAt": "2026-11-26T05:07:36.432Z",
+      "emailVerification": {
+        "codeHash": "a1a69c6bd351cc4f90a4a26198db2d820fb8ca9a3854c0b8cf4e67b84b3610a7",
+        "createdAt": "2026-11-26T05:07:36.432Z",
+        "expiresAt": "2026-11-26T05:22:36.432Z",
+        "attempts": 0
+      }
     }
   ],
   "servers": [
