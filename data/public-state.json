@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-26T21:40:29.639Z",
+  "generatedAt": "2026-11-26T21:41:25.513Z",
   "campaigns": [],
   "servers": [
     {
@@ -1497,6 +1497,63 @@
       "communityHighlighted": false
     },
     {
+      "id": "81830ec8-ee71-43e4-92f2-06c5fd1fc4e9",
+      "name": "MineCountry",
+      "javaHost": "minecountry.feathermc.gg",
+      "javaPort": 25565,
+      "javaSrvResolved": false,
+      "javaStatusTarget": "minecountry.feathermc.gg",
+      "crossPlay": true,
+      "bedrockHost": "adequately-lasts.tun.ply.gg",
+      "bedrockPort": 42299,
+      "websiteUrl": "",
+      "discordUrl": "https://discord.gg/GcdVKUrN3A",
+      "youtubeUrl": "https://youtu.be/HXcreY1jExI?si=mF4eZ9_i030G39t2",
+      "country": "United States",
+      "bannerUrl": "https://media.discordapp.net/attachments/1553568860555190272/1568793897151234228/rn_image_picker_lib_temp_eaeb0cb1-298f-488f-a24a-77bccdd91362.gif?ex=6b09806b&is=6b082eeb&hm=8b480d84b2766f4444f590159d5ef45dc59fd6983123cc4945312e48d3c33f5e",
+      "description": "🌍 MineCountry: A Minecraft World of Wonders\n\n🏙️ Welcome to MineCountry\nMineCountry is a sprawling Minecraft world where creativity, culture, and community meet. With dozens of uniquely crafted cities, it offers adventures for builders, roleplayers, and explorers.\n\nClimb icy peaks in Nordica, explore ancient ruins in Solaris, or admire Empirepolis's skyline.\n\n🗺️ Geography & Layout\nFrom snowy mountains and tropical coasts to forests and volcanic wastelands, MineCountry features:\n\n• Vast interconnected cities\n• Extensive highways, railways, and rivers\n• Diverse biomes for roleplay, exploration, and survival\n• Countless builds, hidden places, and scenic routes\n\n🌆 Notable Cities\nGreenfield – A hyper-realistic metropolis by THEJESTR, with bustling districts and urban detail.\n\nMattupolis – A Scandinavian-inspired smart city by mattuFIN, blending design and function.\n\nMine York City – A vibrant urban sprawl by JohnC234, rich in culture and city life.\n\nBroville – A lore-rich world of secrets by Oldshoes, mixing medieval and modern styles.\n\nNew Blockston – A blend of history and innovation by the New Blockston Building Team.\n\nAmberlight City – A modernist city by NoodleCoffee, known for its waterfronts.\n\nEmpirepolis – A futuristic megacity by rodgermourtagh2, with impressive skyline and transit.\n\n🏰 Landmarks & Attractions\n🏛️ Iconic Builds: Visit the Temple of Notch, Clubhouse, Technoblade's House, Zeon Pyramid, JESTR's Gas, and more.\n\n🎭 Culture: Explore museums, theaters, galleries, and community spaces.\n\n💰 Economy: Trade rare items and custom crafts for MSD in Broville and Mine York City.\n\n🧗 Adventure: Find dungeons, ruins, parkour challenges, and surprises across the map.\n\nJoin MineCountry and explore a world shaped by creativity, history, and community. Build your legacy, meet players, and discover what lies beyond the next road!",
+      "tags": [
+        "Survival",
+        "Creative",
+        "Economy",
+        "PvP",
+        "SMP",
+        "Parkour",
+        "Cross-Play"
+      ],
+      "ownerName": "AngelaSamlidisDisa",
+      "votes": 0,
+      "playersOnline": 1,
+      "playersMax": 100,
+      "version": "Purpur 1.21.11",
+      "online": true,
+      "uptimePercent": 100,
+      "sponsored": false,
+      "createdAt": "2026-11-26T21:41:16.390Z",
+      "updatedAt": "2026-11-26T21:41:16.390Z",
+      "lastPingAt": "2026-11-26T21:41:17.903Z",
+      "lastSuccessfulPingAt": "2026-11-26T21:41:17.903Z",
+      "uptimeChecks": 1,
+      "uptimeSuccesses": 1,
+      "edition": "java",
+      "bedrockType": "server",
+      "realmCode": "",
+      "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=MineCountry&kind=icon",
+      "rank": 28,
+      "analytics": {
+        "viewsLast7": 0,
+        "viewsLast30": 0,
+        "ipCopiesLast7": 0,
+        "ipCopiesLast30": 0
+      },
+      "reviewStats": {
+        "average": 0,
+        "count": 0
+      },
+      "communityVotesThisWeek": 0,
+      "communityHighlighted": false
+    },
+    {
       "id": "eada511e-c7b9-43e8-8f1e-bcffcb21764d",
       "name": "Calamity SMP",
       "javaHost": "162.245.187.170",
@@ -1536,7 +1593,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 28,
+      "rank": 29,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1592,7 +1649,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=CinderSMP&kind=icon",
-      "rank": 29,
+      "rank": 30,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -1649,7 +1706,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Unirealm&kind=icon",
-      "rank": 30,
+      "rank": 31,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1700,7 +1757,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 31,
+      "rank": 32,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1751,7 +1808,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 32,
+      "rank": 33,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1806,7 +1863,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=TOMODACHI-SMP&kind=icon",
-      "rank": 33,
+      "rank": 34,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1862,7 +1919,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Ember-SMP&kind=icon",
-      "rank": 34,
+      "rank": 35,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1915,7 +1972,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=LimboMC&kind=icon",
-      "rank": 35,
+      "rank": 36,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -1970,7 +2027,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 36,
+      "rank": 37,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2027,7 +2084,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Mobcraft-SMP&kind=icon",
-      "rank": 37,
+      "rank": 38,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2084,7 +2141,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Futurelands&kind=icon",
-      "rank": 38,
+      "rank": 39,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2137,7 +2194,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 39,
+      "rank": 40,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2194,7 +2251,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Power-SMP&kind=icon",
-      "rank": 40,
+      "rank": 41,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2248,7 +2305,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Hagga-smp&kind=icon",
-      "rank": 41,
+      "rank": 42,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2305,7 +2362,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Dominion-Towny-SMP&kind=icon",
-      "rank": 42,
+      "rank": 43,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2362,7 +2419,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Valoris&kind=icon",
-      "rank": 43,
+      "rank": 44,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2415,7 +2472,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 44,
+      "rank": 45,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2468,7 +2525,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "",
-      "rank": 45,
+      "rank": 46,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2524,7 +2581,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=FCSMP&kind=icon",
-      "rank": 46,
+      "rank": 47,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2581,7 +2638,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=p0lar-SMP&kind=icon",
-      "rank": 47,
+      "rank": 48,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 0,
@@ -2638,7 +2695,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=imperial-SMP&kind=icon",
-      "rank": 48,
+      "rank": 49,
       "analytics": {
         "viewsLast7": 0,
         "viewsLast30": 1,
@@ -2695,7 +2752,7 @@
       "bedrockType": "server",
       "realmCode": "",
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=PixelSMP&kind=icon",
-      "rank": 49,
+      "rank": 50,
       "analytics": {
         "viewsLast7": 1,
         "viewsLast30": 1,
