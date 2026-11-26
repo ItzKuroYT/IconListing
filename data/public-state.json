@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-26T21:35:24.495Z",
+  "generatedAt": "2026-11-26T21:35:33.816Z",
   "campaigns": [],
   "servers": [
     {
@@ -554,8 +554,8 @@
       "iconUrl": "https://icon-listing.vercel.app/api?action=serverImage&slug=Cliveoverflow&kind=icon",
       "rank": 10,
       "analytics": {
-        "viewsLast7": 0,
-        "viewsLast30": 1,
+        "viewsLast7": 1,
+        "viewsLast30": 2,
         "ipCopiesLast7": 0,
         "ipCopiesLast30": 0
       },
@@ -3313,9 +3313,9 @@
     }
   },
   "siteAnalytics": {
-    "uniqueVisitsLast7": 23,
-    "uniqueVisitsLast30": 117,
-    "websiteVisitsLast7": 23,
-    "websiteVisitsLast30": 117
+    "uniqueVisitsLast7": 22,
+    "uniqueVisitsLast30": 116,
+    "websiteVisitsLast7": 22,
+    "websiteVisitsLast30": 116
   }
 }
